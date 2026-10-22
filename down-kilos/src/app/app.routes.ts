@@ -19,6 +19,12 @@ export const routes: Routes = [
     title: 'Down Kilos – Profil erstellen',
   },
   {
+    path: 'calculator',
+    loadComponent: () =>
+      import('./features/calculator/calculator.component').then((m) => m.CalculatorComponent),
+    title: 'Down Kilos – Mein Kalorienbedarf',
+  },
+  {
     path: '**',
     redirectTo: '',
   },

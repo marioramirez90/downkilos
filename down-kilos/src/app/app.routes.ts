@@ -25,6 +25,12 @@ export const routes: Routes = [
     title: 'Down Kilos – Mein Kalorienbedarf',
   },
   {
+    path: 'retailers',
+    loadComponent: () =>
+      import('./features/retailers/retailers.component').then((m) => m.RetailersComponent),
+    title: 'Down Kilos – Dein Markt',
+  },
+  {
     path: '**',
     redirectTo: '',
   },

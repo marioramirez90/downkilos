@@ -37,6 +37,30 @@ export const routes: Routes = [
     title: 'Down Kilos – Dashboard',
   },
   {
+    path: 'meal-planner',
+    loadComponent: () =>
+      import('./features/meal-planner/meal-planner.component').then((m) => m.MealPlannerComponent),
+    title: 'Down Kilos – Mahlzeitenplan',
+  },
+  {
+    path: 'shopping-list',
+    loadComponent: () =>
+      import('./features/shopping-list/shopping-list.component').then((m) => m.ShoppingListComponent),
+    title: 'Down Kilos – Einkaufsliste',
+  },
+  {
+    path: 'recipes',
+    loadComponent: () =>
+      import('./features/recipes/recipes.component').then((m) => m.RecipesComponent),
+    title: 'Down Kilos – Rezepte',
+  },
+  {
+    path: 'progress',
+    loadComponent: () =>
+      import('./features/progress/progress.component').then((m) => m.ProgressComponent),
+    title: 'Down Kilos – Fortschritt',
+  },
+  {
     path: '**',
     redirectTo: '',
   },

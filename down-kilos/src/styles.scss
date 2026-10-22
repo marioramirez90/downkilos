@@ -1,1 +1,44 @@
-/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand-primary: #278F39;
+  --brand-dark: #103A2A;
+  --brand-light: #E5F5E8;
+  --brand-bg: #FFFFFF;
+  --brand-bg-secondary: #F6F8F6;
+  --brand-text: #17241D;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Mobile-first wrapper styling */
+.mobile-device-frame {
+  width: 100%;
+  max-width: 440px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  background-color: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 0 40px rgba(16, 58, 42, 0.08);
+}
+
+@media (min-width: 640px) {
+  .mobile-device-frame {
+    min-height: calc(100dvh - 2rem);
+    margin: 1rem auto;
+    border-radius: 2.25rem;
+    overflow: hidden;
+    border: 8px solid #103A2A;
+    box-shadow: 0 25px 50px -12px rgba(16, 58, 42, 0.25);
+  }
+}

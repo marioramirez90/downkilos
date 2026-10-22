@@ -31,6 +31,12 @@ export const routes: Routes = [
     title: 'Down Kilos – Dein Markt',
   },
   {
+    path: 'dashboard',
+    loadComponent: () =>
+      import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent),
+    title: 'Down Kilos – Dashboard',
+  },
+  {
     path: '**',
     redirectTo: '',
   },

@@ -1,18 +1,23 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { Retailer, RetailerPreference, StoreBranch } from '../../core/models/retailer.model';
+import { RetailerService } from '../../core/services/retailer.service';
 
 @Component({
   selector: 'app-retailers',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="flex flex-col min-h-full px-5 pt-4 pb-6 bg-[#FFFFFF]">
-      <div class="flex items-center gap-3 pb-3">
+      <!-- Header -->
+      <div class="flex items-center gap-3 pb-2">
         <button
           type="button"
           (click)="goBack()"
           class="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-[#103A2A] hover:bg-[#F1F5F2] active:scale-95 transition-transform"
+          aria-label="Zurück"
         >
           <svg class="w-6 h-6 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -23,32 +28,264 @@ import { Router } from '@angular/router';
         </h1>
       </div>
 
-      <div class="flex-1 flex flex-col justify-center items-center text-center space-y-4 py-8">
-        <div class="w-16 h-16 rounded-full bg-[#E5F5E8] flex items-center justify-center text-[#278F39] text-2xl font-bold">
-          🛒
+      <!-- Subtitle -->
+      <p class="text-xs sm:text-[13px] text-[#55695C] leading-relaxed mb-4">
+        Wähle deinen bevorzugten Markt, damit wir dir passende Produkte und Preise anzeigen können.
+      </p>
+
+      <!-- Active Netto Card (Matching Screen 4) -->
+      <div class="space-y-3">
+        <div
+          class="p-4 rounded-2xl border-2 border-[#278F39] bg-[#FFFFFF] shadow-soft-sm flex items-center justify-between cursor-pointer select-none"
+        >
+          <!-- Netto Brand Visual Card -->
+          <div class="flex items-center gap-3.5">
+            <div class="w-24 h-12 rounded-xl bg-[#FFF200] flex flex-col items-center justify-center px-2 py-1 shadow-sm border border-[#E6DB00]">
+              <span class="text-[#ED1C24] font-black text-xl italic tracking-tighter leading-none">
+                Netto
+              </span>
+              <span class="text-[#ED1C24] font-bold text-[8px] uppercase tracking-tight -mt-0.5">
+                Marken-Discount
+              </span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xs font-bold text-[#103A2A]">
+                Netto Marken-Discount
+              </span>
+              <span class="text-[11px] text-[#278F39] font-semibold flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#278F39]"></span>
+                Aktiv ausgewählt
+              </span>
+            </div>
+          </div>
+
+          <!-- Green Checkmark Circle -->
+          <div class="w-6 h-6 rounded-full bg-[#278F39] text-white flex items-center justify-center shadow-sm">
+            <svg class="w-4 h-4 stroke-[3]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
+          </div>
         </div>
-        <h2 class="text-xl font-bold text-[#103A2A]">Marktauswahl (Phase 4)</h2>
-        <p class="text-xs text-[#55695C] max-w-xs">
-          Wähle deinen bevorzugten Markt, damit wir dir passende Produkte und Preise anzeigen können.
-        </p>
-        <div class="p-3 bg-[#F6F8F6] rounded-xl border border-[#E3EBE4] text-xs text-[#627264] max-w-xs">
-          Vorbereitete Route für Phase 4: Netto Marken-Discount, Coming-Soon-Händler & Wochenbudget.
+
+        <!-- Location row with inline search -->
+        <div class="p-3.5 rounded-2xl bg-[#F6F8F6] border border-[#E3EBE4] space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-base text-[#278F39]">📍</span>
+              <div class="flex flex-col">
+                <span class="text-[10px] uppercase font-bold text-[#627264] tracking-wider">
+                  Dein Standort
+                </span>
+                <span class="text-xs font-bold text-[#103A2A]">
+                  {{ currentBranch().postalCode }} {{ currentBranch().city }}
+                </span>
+              </div>
+            </div>
+            <button
+              type="button"
+              (click)="isEditingLocation.set(!isEditingLocation())"
+              class="text-xs font-bold text-[#278F39] hover:underline cursor-pointer"
+            >
+              {{ isEditingLocation() ? 'Schließen' : 'Ändern' }}
+            </button>
+          </div>
+
+          <!-- Inline Location Search Form -->
+          @if (isEditingLocation()) {
+            <div class="pt-2 border-t border-[#E3EBE4] flex gap-2 animate-fade-in">
+              <input
+                type="text"
+                [(ngModel)]="searchLocationQuery"
+                placeholder="PLZ oder Ort (z.B. 10115 oder Berlin)"
+                class="flex-1 px-3 py-2 text-xs rounded-xl bg-white border border-[#DCE4DE] text-[#17241D] focus:outline-none focus:border-[#278F39]"
+                (keyup.enter)="applyLocationSearch()"
+              />
+              <button
+                type="button"
+                (click)="applyLocationSearch()"
+                class="px-3 py-2 text-xs font-bold rounded-xl bg-[#278F39] text-white hover:bg-[#217A30] cursor-pointer"
+              >
+                Suchen
+              </button>
+            </div>
+          }
         </div>
       </div>
 
-      <button
-        (click)="goBack()"
-        class="w-full py-3.5 px-6 rounded-2xl bg-[#EDF5EF] text-[#103A2A] font-semibold text-sm hover:bg-[#E2EDE5] transition-colors"
-      >
-        ← Zurück zur Kalorienübersicht
-      </button>
+      <!-- Coming Soon Notification Banner -->
+      @if (comingSoonNotice()) {
+        <div class="my-3 p-3 rounded-2xl bg-[#FEF9C3] border border-[#FDE047] text-xs font-semibold text-[#854D0E] animate-fade-in flex items-center justify-between">
+          <span>{{ comingSoonNotice() }}</span>
+          <button
+            type="button"
+            (click)="comingSoonNotice.set(null)"
+            class="text-sm font-bold text-[#854D0E] ml-2"
+          >
+            ✕
+          </button>
+        </div>
+      }
+
+      <!-- Section: Weitere Märkte (Disabled with Coming Soon) -->
+      <div class="space-y-2 pt-3">
+        <h3 class="text-xs font-bold text-[#103A2A] tracking-tight">
+          Weitere Märkte
+        </h3>
+
+        <div class="space-y-2">
+          @for (retailer of otherRetailers; track retailer.id) {
+            <div
+              (click)="onSelectOtherRetailer(retailer)"
+              class="flex items-center justify-between p-3 rounded-2xl border border-[#E3EBE4] bg-[#FFFFFF] hover:bg-[#F9FAF9] cursor-pointer transition-all select-none opacity-85 hover:opacity-100"
+            >
+              <!-- Retailer badge & name -->
+              <div class="flex items-center gap-3">
+                <span
+                  class="w-16 h-8 rounded-lg flex items-center justify-center font-extrabold text-[11px] shadow-2xs"
+                  [style.backgroundColor]="retailer.badgeBg"
+                  [style.color]="retailer.badgeColor"
+                >
+                  {{ retailer.shortName }}
+                </span>
+                <span class="text-xs font-semibold text-[#17241D]">
+                  {{ retailer.name }}
+                </span>
+              </div>
+
+              <!-- Empty radio circle -->
+              <div class="w-5 h-5 rounded-full border-2 border-[#CBD5E1] bg-white flex items-center justify-center"></div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Section: Dein Wochenbudget (Matching Screen 4) -->
+      <div class="space-y-3 pt-5">
+        <div class="flex items-center justify-between">
+          <label for="budgetSlider" class="text-xs font-bold text-[#103A2A]">
+            Dein Wochenbudget
+          </label>
+          <div class="flex items-center gap-1 bg-[#F6F8F6] border border-[#E3EBE4] px-3 py-1 rounded-xl">
+            <input
+              type="number"
+              min="20"
+              max="150"
+              step="5"
+              [(ngModel)]="weeklyBudget"
+              class="w-10 text-right bg-transparent text-xs font-bold text-[#103A2A] focus:outline-none"
+            />
+            <span class="text-xs font-bold text-[#103A2A]">€</span>
+          </div>
+        </div>
+
+        <!-- Slider -->
+        <div class="space-y-1">
+          <input
+            id="budgetSlider"
+            type="range"
+            min="20"
+            max="100"
+            step="5"
+            [(ngModel)]="weeklyBudget"
+            class="w-full accent-[#278F39] cursor-pointer h-2 bg-[#E3EBE4] rounded-lg"
+          />
+          <div class="flex justify-between text-[11px] font-semibold text-[#7A8E80]">
+            <span>20 €</span>
+            <span>100 €</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Confirm CTA Button -->
+      <div class="pt-6 mt-auto">
+        <button
+          type="submit"
+          (click)="confirmSelection()"
+          class="w-full py-4 px-6 rounded-2xl bg-[#278F39] hover:bg-[#217A30] active:scale-[0.98] text-white font-bold text-base shadow-button flex items-center justify-center gap-2 transition-all cursor-pointer"
+        >
+          <span>Auswahl bestätigen</span>
+          <span class="text-lg">→</span>
+        </button>
+      </div>
     </div>
-  `
+  `,
+  styles: [`
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.2s ease-out forwards;
+    }
+  `]
 })
-export class RetailersComponent {
+export class RetailersComponent implements OnInit {
   private router = inject(Router);
+  private retailerService = inject(RetailerService);
+
+  readonly allRetailers = this.retailerService.getRetailers();
+  readonly otherRetailers = this.allRetailers.filter(r => !r.isAvailable);
+
+  currentBranch = signal<StoreBranch>({
+    id: 'netto-10115',
+    name: 'Netto Marken-Discount',
+    street: 'Invalidenstraße 158',
+    postalCode: '10115',
+    city: 'Berlin – Mitte'
+  });
+
+  isEditingLocation = signal<boolean>(false);
+  searchLocationQuery = '';
+  weeklyBudget = 40;
+  comingSoonNotice = signal<string | null>(null);
+
+  async ngOnInit() {
+    const saved = await this.retailerService.loadPreference();
+    if (saved) {
+      this.weeklyBudget = saved.weeklyBudget || 40;
+      if (saved.postalCode && saved.city) {
+        this.currentBranch.set({
+          id: 'saved-branch',
+          name: 'Netto Marken-Discount',
+          street: saved.branch?.street || 'Filiale im Einzugsgebiet',
+          postalCode: saved.postalCode,
+          city: saved.city
+        });
+      }
+    }
+  }
+
+  applyLocationSearch() {
+    if (!this.searchLocationQuery.trim()) return;
+    const branch = this.retailerService.findNettoBranch(this.searchLocationQuery);
+    this.currentBranch.set(branch);
+    this.isEditingLocation.set(false);
+    this.searchLocationQuery = '';
+  }
+
+  onSelectOtherRetailer(retailer: Retailer) {
+    this.comingSoonNotice.set(`Coming soon – ${retailer.name} wird bald unterstützt.`);
+    setTimeout(() => {
+      this.comingSoonNotice.set(null);
+    }, 4000);
+  }
 
   goBack() {
     this.router.navigate(['/calculator']);
+  }
+
+  async confirmSelection() {
+    const branch = this.currentBranch();
+    const pref: RetailerPreference = {
+      retailerId: 'netto',
+      retailerName: 'Netto Marken-Discount',
+      branch,
+      postalCode: branch.postalCode,
+      city: branch.city,
+      weeklyBudget: Number(this.weeklyBudget)
+    };
+
+    await this.retailerService.savePreference(pref);
+    this.router.navigate(['/dashboard']);
   }
 }

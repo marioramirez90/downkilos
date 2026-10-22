@@ -1,11 +1,15 @@
 import { Injectable, signal } from '@angular/core';
 import { UserProfile } from '../models/user-profile.model';
+import { RetailerPreference } from '../models/retailer.model';
 
 const DB_NAME = 'down_kilos_db';
 const DB_VERSION = 1;
 const STORE_PROFILE = 'user_profile';
+const STORE_PREF = 'preferences';
 const PROFILE_KEY = 'guest_profile';
+const RETAILER_KEY = 'guest_retailer';
 const LOCAL_FALLBACK_KEY = 'down_kilos_guest_profile';
+const LOCAL_RETAILER_KEY = 'down_kilos_guest_retailer';
 
 @Injectable({
   providedIn: 'root'
@@ -13,10 +17,12 @@ const LOCAL_FALLBACK_KEY = 'down_kilos_guest_profile';
 export class StorageService {
   private dbPromise: Promise<IDBDatabase | null> | null = null;
   readonly profile = signal<UserProfile | null>(null);
+  readonly retailerPref = signal<RetailerPreference | null>(null);
 
   constructor() {
     this.initDatabase();
     this.loadProfile();
+    this.loadRetailerPreference();
   }
 
   private initDatabase(): Promise<IDBDatabase | null> {
@@ -162,5 +168,33 @@ export class StorageService {
     if (current) return true;
     const loaded = await this.loadProfile();
     return !!loaded;
+  }
+
+  async loadRetailerPreference(): Promise<RetailerPreference | null> {
+    const fallback = localStorage.getItem(LOCAL_RETAILER_KEY);
+    if (fallback) {
+      try {
+        const parsed: RetailerPreference = JSON.parse(fallback);
+        this.retailerPref.set(parsed);
+        return parsed;
+      } catch {
+        // ignore
+      }
+    }
+
+    const defaultPref: RetailerPreference = {
+      retailerId: 'netto',
+      retailerName: 'Netto Marken-Discount',
+      postalCode: '10115',
+      city: 'Berlin – Mitte',
+      weeklyBudget: 40
+    };
+    this.retailerPref.set(defaultPref);
+    return defaultPref;
+  }
+
+  async saveRetailerPreference(pref: RetailerPreference): Promise<void> {
+    localStorage.setItem(LOCAL_RETAILER_KEY, JSON.stringify(pref));
+    this.retailerPref.set(pref);
   }
 }

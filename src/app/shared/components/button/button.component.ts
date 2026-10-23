@@ -5,19 +5,8 @@ import { CommonModule } from '@angular/common';
   selector: 'app-button',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <button
-      [type]="type()"
-      [disabled]="disabled()"
-      (click)="clicked.emit($event)"
-      [class]="buttonClasses()"
-    >
-      <ng-content></ng-content>
-      @if (iconRight()) {
-        <span class="inline-block transition-transform duration-200 group-hover:translate-x-1">→</span>
-      }
-    </button>
-  `
+  templateUrl: './button.component.html',
+  styleUrl: './button.component.scss'
 })
 export class ButtonComponent {
   variant = input<'primary' | 'secondary' | 'outline' | 'ghost'>('primary');

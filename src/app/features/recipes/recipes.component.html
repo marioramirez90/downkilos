@@ -1,0 +1,87 @@
+<div class="flex flex-col h-full bg-[#FFFFFF] overflow-hidden">
+  <!-- Fixed Header -->
+  <header class="flex-shrink-0 px-5 pt-4 pb-2 border-b border-[#F0F4F1] bg-white z-10">
+    <div class="flex items-center justify-between pb-2">
+      <h1 class="text-xl sm:text-2xl font-extrabold text-[#103A2A] tracking-tight">
+        Rezepte & Produkte
+      </h1>
+      <div class="flex items-center gap-2">
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FFF200] text-[#ED1C24] border border-[#E6DB00]">
+          Netto
+        </span>
+        <app-hamburger-button></app-hamburger-button>
+      </div>
+    </div>
+
+    <!-- Segmented Tab: Rezepte vs Netto-Sortiment -->
+    <div class="flex p-1 bg-[#F1F5F2] rounded-2xl select-none">
+      <button
+        type="button"
+        (click)="activeTab.set('recipes')"
+        class="flex-1 py-1.5 px-3 text-xs font-bold rounded-xl transition-all cursor-pointer text-center"
+        [ngClass]="activeTab() === 'recipes'
+          ? 'bg-[#278F39] text-white shadow-soft-sm'
+          : 'text-[#627264] hover:text-[#103A2A]'"
+      >
+        Rezept-Ideen ({{ allRecipes.length }})
+      </button>
+      <button
+        type="button"
+        (click)="activeTab.set('catalog')"
+        class="flex-1 py-1.5 px-3 text-xs font-bold rounded-xl transition-all cursor-pointer text-center"
+        [ngClass]="activeTab() === 'catalog'
+          ? 'bg-[#278F39] text-white shadow-soft-sm'
+          : 'text-[#627264] hover:text-[#103A2A]'"
+      >
+        Netto-Produkte
+      </button>
+    </div>
+  </header>
+
+  <!-- Scrollable Content Area -->
+  <div class="flex-1 min-h-0 overflow-y-auto px-5 py-4 space-y-3">
+    @if (activeTab() === 'catalog') {
+      <!-- Product Catalog Component -->
+      <div class="animate-fade-in">
+        <app-product-catalog></app-product-catalog>
+      </div>
+    } @else {
+      <!-- Recipe List -->
+      <div class="space-y-3 animate-fade-in">
+        @for (recipe of allRecipes; track recipe.id) {
+          <div class="p-3 bg-white rounded-2xl border border-[#E3EBE4] hover:border-[#278F39] shadow-soft-sm flex gap-3 transition-all">
+            <img
+              [src]="recipe.imageUrl"
+              [alt]="recipe.title"
+              class="w-20 h-20 rounded-xl object-cover flex-shrink-0"
+            />
+            <div class="flex-1 min-w-0 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between gap-1">
+                  <span class="text-[9px] font-bold uppercase tracking-wider text-[#278F39] bg-[#E5F5E8] px-2 py-0.5 rounded-full">
+                    {{ getMealTypeLabel(recipe.mealType) }}
+                  </span>
+                  <span class="text-xs font-bold text-[#103A2A]">
+                    {{ recipe.pricePerPortion.toFixed(2).replace('.', ',') }} €
+                  </span>
+                </div>
+                <h3 class="text-xs sm:text-sm font-bold text-[#103A2A] mt-1 line-clamp-1">
+                  {{ recipe.title }}
+                </h3>
+              </div>
+
+              <div class="flex items-center gap-3 text-[11px] text-[#627264]">
+                <span>🔥 {{ recipe.calories }} kcal</span>
+                <span>⏱️ {{ recipe.prepTimeMinutes }} Min.</span>
+                <span>🥩 {{ recipe.protein }}g Eiweiß</span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Static Bottom Navigation -->
+  <app-bottom-nav></app-bottom-nav>
+</div>

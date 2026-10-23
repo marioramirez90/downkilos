@@ -1,0 +1,11 @@
+<button
+  [type]="type()"
+  [disabled]="disabled()"
+  (click)="clicked.emit($event)"
+  [class]="buttonClasses()"
+>
+  <ng-content></ng-content>
+  @if (iconRight()) {
+    <span class="inline-block transition-transform duration-200 group-hover:translate-x-1">→</span>
+  }
+</button>

@@ -1,10 +1,12 @@
-<nav class="bottom-navigation">
+<nav class="bottom-navigation" id="bottom-navigation-bar" role="navigation" aria-label="Hauptnavigation">
   <!-- 1. Home -->
   <a
+    id="nav-tab-home"
     routerLink="/dashboard"
     routerLinkActive="active"
     [routerLinkActiveOptions]="{ exact: true }"
     class="nav-tab"
+    aria-label="Home Dashboard"
   >
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
       <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -15,9 +17,11 @@
 
   <!-- 2. Produkte -->
   <a
+    id="nav-tab-products"
     routerLink="/discover"
     routerLinkActive="active"
     class="nav-tab"
+    aria-label="Produkte entdecken"
   >
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
@@ -29,9 +33,11 @@
 
   <!-- 3. Einkaufsliste -->
   <a
+    id="nav-tab-shopping-list"
     routerLink="/shopping-list"
     routerLinkActive="active"
     class="nav-tab"
+    aria-label="Einkaufsliste"
   >
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="9" cy="21" r="1" />
@@ -43,9 +49,11 @@
 
   <!-- 4. Rezepte -->
   <a
+    id="nav-tab-recipes"
     routerLink="/recipes"
     routerLinkActive="active"
     class="nav-tab"
+    aria-label="Rezepte"
   >
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
       <path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z" />
@@ -56,9 +64,11 @@
 
   <!-- 5. Mehr / Fortschritt -->
   <a
+    id="nav-tab-progress"
     routerLink="/progress"
     routerLinkActive="active"
     class="nav-tab"
+    aria-label="Mehr und Fortschritt"
   >
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="1" />

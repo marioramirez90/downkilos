@@ -85,8 +85,15 @@ export class HowItWorksComponent {
     this.finishIntro();
   }
 
-  finishIntro(): void {
-    this.storageService.setOnboardingCompleted(true);
-    this.router.navigate(['/dashboard']);
+  async finishIntro(): Promise<void> {
+    try {
+      this.storageService.setOnboardingCompleted(true);
+    } catch (e) {
+      console.warn('Storage set error:', e);
+    }
+    const success = await this.router.navigate(['/dashboard']);
+    if (!success && typeof window !== 'undefined') {
+      window.location.href = '/dashboard';
+    }
   }
 }

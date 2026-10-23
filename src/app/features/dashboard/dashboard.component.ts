@@ -49,35 +49,39 @@ export class DashboardComponent implements OnInit {
   readonly toastMessage = signal<string | null>(null);
 
   async ngOnInit(): Promise<void> {
-    let p = await this.storageService.loadProfile();
-    if (!p) {
-      p = {
-        id: 'guest_profile',
-        name: 'Lisa',
-        birthDate: '1992-06-15',
-        gender: 'female',
-        currentWeight: 75,
-        height: 168,
-        targetWeight: 65,
-        activityLevel: 'moderate',
-        goal: 'lose_weight',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-    }
-    this.profile.set(p);
-
-    const calc = this.calorieService.calculate(p);
-    this.calculation.set(calc);
-
-    // Laden der Supermarkt-Präferenz
-    const pref = await this.retailerService.loadPreference();
-    if (pref) {
-      if (pref.branch?.street) {
-        this.marketLocation.set(`${pref.branch.postalCode} ${pref.branch.city}`);
-      } else if (pref.postalCode && pref.city) {
-        this.marketLocation.set(`${pref.postalCode} ${pref.city}`);
+    try {
+      let p = await this.storageService.loadProfile();
+      if (!p) {
+        p = {
+          id: 'guest_profile',
+          name: 'Lisa',
+          birthDate: '1992-06-15',
+          gender: 'female',
+          currentWeight: 75,
+          height: 168,
+          targetWeight: 65,
+          activityLevel: 'moderate',
+          goal: 'lose_weight',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
       }
+      this.profile.set(p);
+
+      const calc = this.calorieService.calculate(p);
+      this.calculation.set(calc);
+
+      // Laden der Supermarkt-Präferenz
+      const pref = await this.retailerService.loadPreference();
+      if (pref) {
+        const pc = pref.branch?.postalCode || pref.postalCode || '';
+        const city = pref.branch?.city || pref.city || '';
+        if (pc || city) {
+          this.marketLocation.set(`${pc} ${city}`.trim());
+        }
+      }
+    } catch (err) {
+      console.warn('Dashboard init non-fatal error:', err);
     }
   }
 

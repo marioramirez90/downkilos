@@ -63,6 +63,12 @@
         </div>
       </div>
 
+      <!-- KLARE TRENNUNG: Gesamtkalorien des Einkaufs vs. tägliches Kalorienkonto -->
+      <div class="separation-notice-pill">
+        <span>ℹ️</span>
+        <p>{{ 'SHOPPING_LIST.BUDGET_SEPARATION_TEXT' | translate }}</p>
+      </div>
+
       <!-- Hinweise bei unvollständigen Daten -->
       @if (shoppingService.summary().estimateNotice; as priceNotice) {
         <div class="notice-pill">

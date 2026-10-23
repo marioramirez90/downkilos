@@ -1,3 +1,313 @@
+@use '../../../styles/abstracts/variables' as vars;
+@use '../../../styles/abstracts/mixins' as mixins;
+
+:host {
+  display: block;
+  height: 100%;
+}
+
+.recipes-container {
+  height: 100%;
+  background-color: vars.$bg-white;
+  overflow: hidden;
+  @include mixins.flexbox(column, flex-start, stretch);
+}
+
+.recipes-header {
+  flex-shrink: 0;
+  padding: 16px 20px 8px;
+  background-color: vars.$bg-white;
+  border-bottom: 1px solid vars.$border-color-light;
+  z-index: 10;
+  @include mixins.flexbox(column, flex-start, stretch, 10px);
+
+  .header-main-row {
+    @include mixins.flexbox(row, space-between, center);
+
+    .header-title-box {
+      h1 {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: vars.$secondary-color;
+        margin: 0;
+        letter-spacing: -0.02em;
+      }
+
+      span {
+        display: block;
+        font-size: 0.72rem;
+        color: vars.$text-muted;
+        margin-top: 2px;
+      }
+    }
+
+    .header-action-pills {
+      @include mixins.flexbox(row, flex-end, center, 8px);
+
+      .netto-badge {
+        font-size: 0.65rem;
+        font-weight: 800;
+        padding: 3px 8px;
+        border-radius: vars.$radius-full;
+        background-color: vars.$netto-yellow;
+        color: vars.$netto-red;
+        border: 1px solid #E6DB00;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+    }
+  }
+
+  .segment-tab-bar {
+    padding: 4px;
+    background-color: #F1F5F2;
+    border-radius: vars.$radius-lg;
+    @include mixins.flexbox(row, space-between, center, 4px);
+
+    .tab-btn {
+      flex: 1;
+      padding: 7px 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: none;
+      border-radius: vars.$radius-md;
+      background: transparent;
+      color: vars.$text-muted;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+
+      &.active {
+        background-color: vars.$primary-color;
+        color: vars.$bg-white;
+        box-shadow: vars.$shadow-sm;
+      }
+
+      &:hover:not(.active) {
+        color: vars.$secondary-color;
+      }
+    }
+  }
+
+  .filter-pills-bar {
+    @include mixins.flexbox(row, flex-start, center, 6px);
+    overflow-x: auto;
+    padding-bottom: 4px;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter-pill {
+      flex-shrink: 0;
+      padding: 5px 12px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      border-radius: vars.$radius-full;
+      border: 1px solid vars.$border-color;
+      background-color: vars.$bg-light;
+      color: vars.$text-muted;
+      cursor: pointer;
+      transition: all 0.15s ease;
+
+      &.active {
+        background-color: vars.$secondary-color;
+        color: vars.$bg-white;
+        border-color: vars.$secondary-color;
+      }
+
+      &:hover:not(.active) {
+        border-color: vars.$primary-color;
+        color: vars.$secondary-color;
+      }
+    }
+  }
+}
+
+.recipes-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px 20px;
+
+  .catalog-wrapper {
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  .recipes-grid {
+    @include mixins.flexbox(column, flex-start, stretch, 12px);
+    animation: fadeIn 0.2s ease-out;
+
+    .recipe-card {
+      display: block;
+      padding: 14px;
+      background-color: vars.$bg-white;
+      border-radius: vars.$radius-lg;
+      border: 1px solid vars.$border-color;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+
+      &:hover {
+        border-color: vars.$primary-color;
+        box-shadow: vars.$shadow-md;
+        transform: translateY(-1px);
+
+        .card-hero-row .card-thumb-box img {
+          transform: scale(1.03);
+        }
+
+        .card-cta-row span {
+          transform: translateX(2px);
+        }
+      }
+
+      .card-hero-row {
+        @include mixins.flexbox(row, flex-start, stretch, 12px);
+
+        .card-thumb-box {
+          position: relative;
+          width: 84px;
+          height: 84px;
+          flex-shrink: 0;
+          border-radius: vars.$radius-md;
+          overflow: hidden;
+          background-color: vars.$bg-light;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.2s ease;
+          }
+
+          .thumb-badge {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            font-size: 0.58rem;
+            font-weight: 800;
+            padding: 2px 5px;
+            border-radius: 4px;
+            background-color: vars.$netto-yellow;
+            color: vars.$netto-red;
+            letter-spacing: 0.04em;
+          }
+        }
+
+        .card-info-col {
+          flex: 1;
+          min-width: 0;
+          @include mixins.flexbox(column, space-between, stretch);
+
+          .card-tag-row {
+            @include mixins.flexbox(row, space-between, center, 6px);
+
+            .meal-tag {
+              font-size: 0.62rem;
+              font-weight: 800;
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+              color: vars.$primary-color;
+              background-color: vars.$primary-light;
+              padding: 2px 7px;
+              border-radius: vars.$radius-full;
+            }
+
+            .portion-price {
+              font-size: 0.78rem;
+              font-weight: 800;
+              color: vars.$primary-color;
+
+              small {
+                font-size: 0.65rem;
+                font-weight: 500;
+                color: vars.$text-muted;
+              }
+            }
+          }
+
+          h3 {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: vars.$secondary-color;
+            margin: 4px 0 2px;
+            line-height: 1.25;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+          }
+
+          .package-cost-badge {
+            margin-top: 3px;
+
+            span {
+              display: inline-block;
+              font-size: 0.68rem;
+              font-weight: 600;
+              color: #B45309;
+              background-color: #FFF9E6;
+              padding: 2px 6px;
+              border-radius: 4px;
+              border: 1px solid #FFE082;
+            }
+          }
+
+          .card-cta-row {
+            margin-top: 4px;
+            text-align: right;
+
+            span {
+              display: inline-block;
+              font-size: 0.7rem;
+              font-weight: 700;
+              color: vars.$primary-color;
+              transition: transform 0.15s ease;
+            }
+          }
+        }
+      }
+
+      .card-stats-row {
+        margin-top: 10px;
+        padding-top: 8px;
+        border-top: 1px solid vars.$border-color-light;
+        @include mixins.flexbox(row, space-between, center);
+        font-size: 0.7rem;
+        color: vars.$text-muted;
+        font-weight: 500;
+
+        @include mixins.respond-to(390px) {
+          flex-wrap: wrap;
+          gap: 6px;
+        }
+      }
+    }
+
+    .empty-state-box {
+      text-align: center;
+      padding: 40px 20px;
+      color: vars.$text-muted;
+
+      span {
+        font-size: 2rem;
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      p {
+        font-size: 0.85rem;
+        margin: 0;
+      }
+    }
+  }
+}
+
+.recipes-footer {
+  flex-shrink: 0;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -7,8 +317,4 @@
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.2s ease-out forwards;
 }

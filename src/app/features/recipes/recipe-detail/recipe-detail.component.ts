@@ -10,11 +10,20 @@ import { FoodLogService } from '../../../core/services/food-log.service';
 import { PantryService } from '../../../core/services/pantry.service';
 import { BottomNavComponent } from '../../../shared/components/bottom-nav/bottom-nav.component';
 import { HamburgerButtonComponent } from '../../../shared/components/hamburger-button/hamburger-button.component';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
+import { PriceService } from '../../../core/services/price.service';
 
 @Component({
   selector: 'app-recipe-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, BottomNavComponent, HamburgerButtonComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    BottomNavComponent,
+    HamburgerButtonComponent,
+    TranslatePipe
+  ],
   templateUrl: './recipe-detail.component.html',
   styleUrl: './recipe-detail.component.scss'
 })
@@ -25,6 +34,7 @@ export class RecipeDetailComponent implements OnInit {
   private shoppingListService = inject(ShoppingListService);
   private foodLogService = inject(FoodLogService);
   private pantryService = inject(PantryService);
+  priceService = inject(PriceService);
 
   @Input() recipeId?: string;
 

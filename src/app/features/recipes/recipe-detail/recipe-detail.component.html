@@ -1,150 +1,127 @@
-<div class="flex flex-col h-full bg-[#FFFFFF] overflow-hidden">
+<div class="recipe-detail-container">
   @if (recipe(); as currentRecipe) {
     <!-- Bereich A: Fester Header -->
-    <header class="flex-shrink-0 px-5 pt-4 pb-2 border-b border-[#F0F4F1] bg-white z-10 space-y-2">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
+    <header class="detail-header">
+      <div class="header-main-row">
+        <div class="header-back-title">
           <button
             type="button"
             (click)="goBack()"
-            class="w-8 h-8 rounded-full bg-[#F6F8F6] border border-[#E3EBE4] flex items-center justify-center text-[#103A2A] hover:bg-[#E5F5E8] cursor-pointer"
-            title="Zurück"
+            class="back-btn"
+            title="{{ 'COMMON.BACK' | translate }}"
           >
             ←
           </button>
-          <div>
-            <h1 class="text-base sm:text-lg font-extrabold text-[#103A2A] tracking-tight line-clamp-1">
-              {{ currentRecipe.title }}
-            </h1>
-            <span class="text-[10px] text-[#627264] block">
-              Zutaten von Netto Marken-Discount & Kochanleitung
-            </span>
+          <div class="header-titles">
+            <h1>{{ currentRecipe.title }}</h1>
+            <span>{{ 'RECIPES.HEADER_SUBTITLE' | translate }}</span>
           </div>
         </div>
 
-        <div class="flex items-center gap-2">
-          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FFF200] text-[#ED1C24] border border-[#E6DB00]">
-            Netto
-          </span>
+        <div class="header-actions">
+          <span class="netto-badge">Netto</span>
           <app-hamburger-button></app-hamburger-button>
         </div>
       </div>
     </header>
 
     <!-- Bereich B: Scrollbarer Inhalt -->
-    <div class="flex-1 min-h-0 overflow-y-auto px-5 py-4 space-y-5 pb-28">
+    <main class="detail-content">
       <!-- 1. Hero Bild & Meta-Infos -->
-      <div class="relative rounded-2xl overflow-hidden border border-[#E3EBE4] shadow-soft-sm bg-[#F6F8F6]">
-        <img
-          [src]="currentRecipe.imageUrl"
-          [alt]="currentRecipe.title"
-          class="w-full h-48 sm:h-56 object-cover"
-        />
-        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-
-        <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white">
-          <span class="text-[10px] font-bold uppercase tracking-wider bg-[#278F39] px-2.5 py-1 rounded-full shadow-sm">
-            {{ currentRecipe.difficulty }} • {{ currentRecipe.prepTimeMinutes + currentRecipe.cookTimeMinutes }} Min.
+      <div class="hero-image-card">
+        <img [src]="currentRecipe.imageUrl" [alt]="currentRecipe.title" />
+        <div class="hero-overlay-bar">
+          <span class="difficulty-pill">{{ currentRecipe.difficulty }}</span>
+          <span class="time-pill">
+            ⏱️ {{ currentRecipe.prepTimeMinutes + currentRecipe.cookTimeMinutes }} Min.
           </span>
-          <div class="text-[11px] font-medium bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-full">
-            ⏱️ Vorbereitung: {{ currentRecipe.prepTimeMinutes }}m | Kochen: {{ currentRecipe.cookTimeMinutes }}m
-          </div>
         </div>
       </div>
 
-      <!-- 2. WICHTIGSTE FUNKTION: Zwei getrennte Kostenberechnungen (Portionspreis vs. Vollständiger Einkauf) -->
+      <!-- 2. Duale Kostenberechnung (Portionspreis vs. Vollständiger Einkauf) -->
       @if (scaledData(); as scaled) {
-        <div class="p-3.5 rounded-2xl bg-[#F6F8F6] border-2 border-[#278F39]/20 space-y-2.5 shadow-soft-sm">
-          <div class="flex items-center justify-between">
-            <span class="text-[11px] font-extrabold uppercase tracking-wider text-[#278F39]">
-              Transparente Netto-Kostenberechnung
-            </span>
-            <span class="text-[10px] text-[#627264]">
-              Für {{ servings() }} {{ servings() === 1 ? 'Portion' : 'Portionen' }}
+        <div class="cost-comparison-card">
+          <div class="card-headline-row">
+            <h4>{{ 'RECIPES.COST_TITLE' | translate }}</h4>
+            <span class="servings-badge">
+              {{ servings() }} {{ (servings() === 1 ? 'RECIPES.PORTION_LABEL' : 'RECIPES.PORTIONS_LABEL') | translate }}
             </span>
           </div>
 
-          <div class="grid grid-cols-2 gap-2.5">
+          <div class="dual-cost-grid">
             <!-- Box A: Rechnerischer Portionspreis -->
-            <div class="p-2.5 rounded-xl bg-white border border-[#CDE9D2] flex flex-col justify-between">
-              <div>
-                <span class="text-[10px] font-bold text-[#627264] block">A. Rechnerischer Portionspreis</span>
-                <span class="text-[9px] text-[#627264] block leading-tight">Anteilig verbrauchte Zutaten</span>
+            <div class="portion-cost-box">
+              <span class="box-title">{{ 'RECIPES.PORTION_COST_TITLE' | translate }}</span>
+              <span class="box-subtitle">{{ 'RECIPES.PORTION_COST_SUB' | translate }}</span>
+              <div class="price-value-row">
+                <span class="price-num">{{ priceService.formatPrice(scaled.costBreakdown.portionCost) }}</span>
+                <small>{{ 'COMMON.TOTAL' | translate }}</small>
               </div>
-              <div class="mt-2 flex items-baseline gap-1">
-                <span class="text-xl font-extrabold text-[#278F39]">
-                  {{ scaled.costBreakdown.portionCost.toFixed(2).replace('.', ',') }} €
-                </span>
-                <span class="text-[10px] text-[#627264]">gesamt</span>
-              </div>
-              <span class="text-[9px] text-[#278F39] font-medium mt-0.5 block">
-                ({{ (scaled.costBreakdown.portionCost / servings()).toFixed(2).replace('.', ',') }} € je Portion)
+              <span class="portion-detail">
+                ({{ priceService.formatPrice(scaled.costBreakdown.portionCost / servings()) }} {{ 'RECIPES.PER_PORTION_SHORT' | translate }})
               </span>
             </div>
 
             <!-- Box B: Tatsächlicher Einkaufspreis -->
-            <div class="p-2.5 rounded-xl bg-[#FFF9E6] border border-[#FFE082] flex flex-col justify-between">
-              <div>
-                <span class="text-[10px] font-bold text-[#B45309] block">B. Tatsächlicher Einkaufspreis</span>
-                <span class="text-[9px] text-[#B45309]/80 block leading-tight">Falls alle Packungen neu gekauft werden</span>
+            <div class="full-package-cost-box">
+              <span class="box-title">{{ 'RECIPES.FULL_COST_TITLE' | translate }}</span>
+              <span class="box-subtitle">{{ 'RECIPES.FULL_COST_SUB' | translate }}</span>
+              <div class="price-value-row">
+                <span class="price-num">{{ priceService.formatPrice(scaled.costBreakdown.fullPackageCost) }}</span>
+                <small>({{ scaled.costBreakdown.packagesCount }} {{ 'RECIPES.PACKAGES' | translate }})</small>
               </div>
-              <div class="mt-2 flex items-baseline gap-1">
-                <span class="text-xl font-extrabold text-[#B45309]">
-                  {{ scaled.costBreakdown.fullPackageCost.toFixed(2).replace('.', ',') }} €
-                </span>
-                <span class="text-[10px] text-[#B45309]/80">({{ scaled.costBreakdown.packagesCount }} Pack.)</span>
-              </div>
-              <span class="text-[9px] text-[#B45309] font-medium mt-0.5 block">
-                Überschuss wandert in Vorrat
+              <span class="package-detail">
+                {{ 'RECIPES.LEFTOVER_NOTICE_TEXT' | translate }}
               </span>
             </div>
           </div>
 
-          <!-- Hinweis zur Resteverwertung -->
-          <div class="text-[10px] text-[#627264] bg-white p-2 rounded-xl border border-[#E3EBE4] flex items-center gap-1.5">
-            <span>💡</span>
-            <span>
-              <strong>Kein Cent verloren:</strong> Angebrochene Packungen werden im digitalen Vorrat gespeichert und für Folgegerichte empfohlen!
-            </span>
+          <!-- Resteverwertung Hinweis -->
+          <div class="leftover-info-banner">
+            <span class="info-icon">💡</span>
+            <p>
+              <strong>{{ 'RECIPES.LEFTOVER_NOTICE_TITLE' | translate }}</strong>
+              {{ 'RECIPES.LEFTOVER_NOTICE_TEXT' | translate }}
+            </p>
           </div>
         </div>
 
-        <!-- 3. Portionsauswahl (1, 2, 3, 4, Custom) -->
-        <div class="p-3 rounded-2xl bg-white border border-[#E3EBE4] space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-[#103A2A]">Portionen anpassen</span>
-            <span class="text-xs font-extrabold text-[#278F39]">{{ servings() }} {{ servings() === 1 ? 'Portion' : 'Portionen' }}</span>
+        <!-- 3. Portionsauswahl -->
+        <div class="servings-selector-card">
+          <div class="selector-headline-row">
+            <h4>{{ 'RECIPES.SERVINGS_TITLE' | translate }}</h4>
+            <span class="current-servings">
+              {{ servings() }} {{ (servings() === 1 ? 'RECIPES.PORTION_LABEL' : 'RECIPES.PORTIONS_LABEL') | translate }}
+            </span>
           </div>
 
-          <div class="flex items-center gap-2">
-            <button
-              *ngFor="let s of [1, 2, 3, 4]"
-              type="button"
-              (click)="setServings(s)"
-              class="flex-1 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer text-center"
-              [ngClass]="servings() === s
-                ? 'bg-[#278F39] text-white shadow-soft-sm'
-                : 'bg-[#F6F8F6] text-[#627264] border border-[#E3EBE4] hover:bg-[#E5F5E8]'"
-            >
-              {{ s }}x
-            </button>
+          <div class="servings-buttons-row">
+            @for (s of [1, 2, 3, 4]; track s) {
+              <button
+                type="button"
+                (click)="setServings(s)"
+                class="quick-serving-btn"
+                [class.active]="servings() === s"
+              >
+                {{ s }}x
+              </button>
+            }
 
-            <!-- Custom +/- -->
-            <div class="flex items-center border border-[#E3EBE4] rounded-xl overflow-hidden bg-[#F6F8F6]">
+            <div class="stepper-box">
               <button
                 type="button"
                 (click)="addServings(-1)"
                 [disabled]="servings() <= 1"
-                class="px-2.5 py-1.5 text-xs font-bold text-[#103A2A] hover:bg-[#E5F5E8] disabled:opacity-30 cursor-pointer"
+                class="stepper-action-btn"
               >
-                -
+                −
               </button>
-              <span class="px-2 text-xs font-bold text-[#103A2A]">{{ servings() }}</span>
+              <span class="stepper-val">{{ servings() }}</span>
               <button
                 type="button"
                 (click)="addServings(1)"
                 [disabled]="servings() >= 12"
-                class="px-2.5 py-1.5 text-xs font-bold text-[#103A2A] hover:bg-[#E5F5E8] disabled:opacity-30 cursor-pointer"
+                class="stepper-action-btn"
               >
                 +
               </button>
@@ -153,104 +130,94 @@
         </div>
 
         <!-- 4. Nährwerte & Makros (skaliert) -->
-        <div class="p-3.5 rounded-2xl bg-white border border-[#E3EBE4] space-y-2.5">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-[#103A2A]">Nährwerte</span>
-            <span class="text-[10px] text-[#627264]">Für {{ servings() }} {{ servings() === 1 ? 'Portion' : 'Portionen' }}</span>
+        <div class="nutrition-card">
+          <div class="nutrition-header-row">
+            <h4>{{ 'RECIPES.NUTRITION_TITLE' | translate }}</h4>
+            <span class="servings-note">
+              {{ servings() }} {{ (servings() === 1 ? 'RECIPES.PORTION_LABEL' : 'RECIPES.PORTIONS_LABEL') | translate }}
+            </span>
           </div>
 
-          <div class="grid grid-cols-4 gap-2 text-center">
-            <div class="p-2 rounded-xl bg-[#E5F5E8] border border-[#CDE9D2]">
-              <span class="text-base font-extrabold text-[#278F39] block">{{ scaled.calories }}</span>
-              <span class="text-[9px] font-bold text-[#627264] uppercase">kcal</span>
+          <div class="macro-stats-grid">
+            <div class="macro-cell calories-cell">
+              <strong>{{ scaled.calories }}</strong>
+              <small>{{ 'COMMON.CALORIES' | translate }}</small>
             </div>
-            <div class="p-2 rounded-xl bg-[#F6F8F6] border border-[#E3EBE4]">
-              <span class="text-base font-extrabold text-[#103A2A] block">{{ scaled.protein }}g</span>
-              <span class="text-[9px] font-bold text-[#627264] uppercase">Eiweiß</span>
+            <div class="macro-cell">
+              <strong>{{ scaled.protein }}g</strong>
+              <small>{{ 'COMMON.PROTEIN' | translate }}</small>
             </div>
-            <div class="p-2 rounded-xl bg-[#F6F8F6] border border-[#E3EBE4]">
-              <span class="text-base font-extrabold text-[#103A2A] block">{{ scaled.carbs }}g</span>
-              <span class="text-[9px] font-bold text-[#627264] uppercase">Kohlenh.</span>
+            <div class="macro-cell">
+              <strong>{{ scaled.carbs }}g</strong>
+              <small>{{ 'COMMON.CARBS' | translate }}</small>
             </div>
-            <div class="p-2 rounded-xl bg-[#F6F8F6] border border-[#E3EBE4]">
-              <span class="text-base font-extrabold text-[#103A2A] block">{{ scaled.fat }}g</span>
-              <span class="text-[9px] font-bold text-[#627264] uppercase">Fett</span>
+            <div class="macro-cell">
+              <strong>{{ scaled.fat }}g</strong>
+              <small>{{ 'COMMON.FAT' | translate }}</small>
             </div>
           </div>
         </div>
 
-        <!-- 5. Zutatenliste mit Netto-Packungszuordnung -->
-        <div class="p-3.5 rounded-2xl bg-white border border-[#E3EBE4] space-y-3">
-          <div class="flex items-center justify-between">
+        <!-- 5. Zutatenliste mit Netto-Packungen und Restmengen -->
+        <div class="ingredients-card">
+          <div class="ingredients-header-row">
             <div>
-              <h3 class="text-xs sm:text-sm font-bold text-[#103A2A]">Zutaten & Netto-Packungen</h3>
-              <span class="text-[10px] text-[#627264]">Inkl. Öle, Gewürze und vollständiger Packungsgrößen</span>
+              <h4>{{ 'RECIPES.INGREDIENTS_TITLE' | translate }}</h4>
+              <p>{{ 'RECIPES.INGREDIENTS_SUB' | translate }}</p>
             </div>
-            <span class="text-[10px] font-bold text-[#278F39] bg-[#E5F5E8] px-2 py-0.5 rounded-full">
-              {{ scaled.scaledIngredients.length }} Zutaten
-            </span>
+            <span class="count-badge">{{ scaled.scaledIngredients.length }}</span>
           </div>
 
-          <div class="divide-y divide-[#F0F4F1]">
+          <div class="ingredients-list">
             @for (ing of scaled.scaledIngredients; track ing.name) {
-              <div class="py-2.5 flex items-start justify-between gap-3 text-xs">
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-baseline gap-1.5">
-                    <span class="font-extrabold text-[#103A2A]">{{ ing.scaledAmount }} {{ ing.unit }}</span>
-                    <span class="font-semibold text-[#17241D]">{{ ing.name }}</span>
+              <div class="ingredient-row">
+                <div class="ing-meta-col">
+                  <div class="ing-title-row">
+                    <span class="ing-amount">{{ ing.scaledAmount }} {{ ing.unit }}</span>
+                    <span class="ing-name">{{ ing.name }}</span>
                   </div>
 
-                  <!-- Netto Produkt-Infos & Packungsdetails -->
-                  <div class="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] text-[#627264]">
+                  <div class="ing-package-info">
                     @if (ing.packageSize) {
-                      <span class="bg-[#F6F8F6] px-1.5 py-0.5 rounded border border-[#E3EBE4]">
-                        Packung: {{ ing.packageSize }}
-                      </span>
+                      <span class="pack-size-pill">Packung: {{ ing.packageSize }}</span>
                     }
                     @if (ing.packagePrice !== null && ing.packagePrice !== undefined) {
-                      <span class="font-bold text-[#103A2A]">
-                        Packungspreis: {{ ing.packagePrice.toFixed(2).replace('.', ',') }} €
+                      <span class="pack-price-pill">
+                        {{ priceService.formatPrice(ing.packagePrice) }}
                       </span>
                     }
                     @if (ing.surplusGrams > 0) {
-                      <span class="text-[#278F39] font-medium">
+                      <span class="pack-surplus-pill">
                         (Rest: ~{{ ing.surplusGrams }}g für Vorrat)
                       </span>
                     }
                   </div>
                 </div>
 
-                <!-- Anteiliger Portionspreis für diese Zutat -->
-                <div class="text-right flex-shrink-0">
-                  <span class="font-bold text-[#278F39] block text-xs">
-                    {{ ing.portionCost.toFixed(2).replace('.', ',') }} €
-                  </span>
-                  <span class="text-[9px] text-[#627264]">anteilig</span>
+                <div class="ing-cost-col">
+                  <span class="cost-val">{{ priceService.formatPrice(ing.portionCost) }}</span>
+                  <small>{{ 'RECIPES.PORTION_COST_SUB' | translate }}</small>
                 </div>
               </div>
             }
           </div>
         </div>
 
-        <!-- 6. Schritt-für-Schritt Kochanleitung -->
-        <div class="p-3.5 rounded-2xl bg-white border border-[#E3EBE4] space-y-3">
-          <div class="flex items-center justify-between">
+        <!-- 6. Schritt-für-Schritt Zubereitung -->
+        <div class="instructions-card">
+          <div class="instructions-header-row">
             <div>
-              <h3 class="text-xs sm:text-sm font-bold text-[#103A2A]">Schritt-für-Schritt Zubereitung</h3>
-              <span class="text-[10px] text-[#627264]">Einfach, nachvollziehbar und anfängerfreundlich</span>
+              <h4>{{ 'RECIPES.STEPS_TITLE' | translate }}</h4>
+              <p>{{ 'RECIPES.STEPS_SUB' | translate }}</p>
             </div>
-            <span class="text-xs">👨‍🍳</span>
+            <span class="chef-icon">👨‍🍳</span>
           </div>
 
-          <div class="space-y-3">
+          <div class="steps-list">
             @for (step of currentRecipe.stepInstructions; track $index) {
-              <div class="flex items-start gap-3 p-2.5 rounded-xl bg-[#F6F8F6] border border-[#E3EBE4]">
-                <div class="w-6 h-6 rounded-full bg-[#278F39] text-white font-extrabold text-xs flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
-                  {{ $index + 1 }}
-                </div>
-                <div class="flex-1 text-xs text-[#17241D] leading-relaxed">
-                  {{ step }}
-                </div>
+              <div class="step-card">
+                <div class="step-num">{{ $index + 1 }}</div>
+                <p>{{ step }}</p>
               </div>
             }
           </div>
@@ -258,71 +225,67 @@
 
         <!-- 7. Meal Prep & Lagerungshinweise -->
         @if (currentRecipe.mealPrepTips || currentRecipe.storageTips) {
-          <div class="p-3.5 rounded-2xl bg-[#E5F5E8]/60 border border-[#CDE9D2] space-y-2 text-xs">
-            <div class="flex items-center gap-1.5 font-bold text-[#103A2A]">
+          <div class="tips-card">
+            <div class="tips-header">
               <span>❄️</span>
-              <span>Meal Prep & Haltbarkeit</span>
+              <h4>{{ 'RECIPES.MEAL_PREP_TITLE' | translate }}</h4>
             </div>
             @if (currentRecipe.mealPrepTips) {
-              <p class="text-[11px] text-[#17241D] leading-relaxed">
-                <strong>Meal Prep:</strong> {{ currentRecipe.mealPrepTips }}
-              </p>
+              <p><strong>Meal Prep:</strong> {{ currentRecipe.mealPrepTips }}</p>
             }
             @if (currentRecipe.storageTips) {
-              <p class="text-[11px] text-[#627264] leading-relaxed">
-                <strong>Lagerung:</strong> {{ currentRecipe.storageTips }}
-              </p>
+              <p><strong>Lagerung:</strong> {{ currentRecipe.storageTips }}</p>
             }
           </div>
         }
       }
-    </div>
+    </main>
 
-    <!-- Bereich C: Fester unterer Aktionsbereich (über der festen BottomNav) -->
-    <div class="flex-shrink-0 bg-white/95 backdrop-blur-md border-t border-[#E3EBE4] px-5 py-2.5 space-y-2 z-20">
-      <!-- Feedback Messages -->
+    <!-- Bereich C: Fester Aktionsbereich -->
+    <div class="detail-actions-panel">
+      <!-- Toast-Meldungen -->
       @if (addedToShoppingList()) {
-        <div class="py-1 px-3 bg-[#E5F5E8] border border-[#278F39] text-[#278F39] text-[11px] font-bold rounded-xl text-center animate-fade-in">
-          ✓ Zutaten wurden automatisch zur Einkaufsliste hinzugefügt!
+        <div class="action-toast">
+          {{ 'RECIPES.TOAST_CART_ADDED' | translate }}
         </div>
       }
       @if (addedToFoodLog()) {
-        <div class="py-1 px-3 bg-[#E5F5E8] border border-[#278F39] text-[#278F39] text-[11px] font-bold rounded-xl text-center animate-fade-in">
-          ✓ Mahlzeit wurde in deinen Tagesplan eingetragen!
+        <div class="action-toast">
+          {{ 'RECIPES.TOAST_LOG_ADDED' | translate }}
         </div>
       }
 
-      <div class="flex gap-2">
+      <div class="action-buttons-row">
+        <!-- Button 1: Als gegessen eintragen -->
         <button
           type="button"
-          (click)="addToDailyPlan('planned')"
-          class="flex-1 py-2.5 px-3 rounded-2xl bg-[#F6F8F6] border border-[#E3EBE4] text-[#103A2A] font-bold text-xs hover:bg-[#E5F5E8] transition-all cursor-pointer text-center"
+          (click)="addToDailyPlan('eaten')"
+          class="log-eaten-btn"
         >
-          📅 Zum Tagesplan
+          {{ 'RECIPES.LOG_AS_EATEN' | translate }}
         </button>
 
+        <!-- Button 2: Zutaten auf Einkaufsliste -->
         <button
           type="button"
           (click)="addIngredientsToShoppingList()"
-          class="flex-1 py-2.5 px-3 rounded-2xl bg-[#278F39] hover:bg-[#1E722D] text-white font-extrabold text-xs shadow-soft transition-all cursor-pointer text-center flex items-center justify-center gap-1.5"
+          class="add-cart-btn"
         >
-          🛒 Auf Einkaufsliste
+          {{ 'RECIPES.ADD_TO_CART' | translate }}
         </button>
       </div>
     </div>
   } @else {
-    <div class="flex-1 flex flex-col items-center justify-center p-6 text-center">
-      <p class="text-sm text-[#627264] font-medium">Rezept konnte nicht gefunden werden.</p>
-      <button
-        type="button"
-        (click)="goBack()"
-        class="mt-4 px-4 py-2 bg-[#278F39] text-white font-bold text-xs rounded-xl cursor-pointer"
-      >
-        Zurück zur Rezeptübersicht
+    <div class="not-found-card">
+      <p>{{ 'RECIPES.NOT_FOUND' | translate }}</p>
+      <button type="button" (click)="goBack()" class="back-link-btn">
+        {{ 'RECIPES.BACK_TO_LIST' | translate }}
       </button>
     </div>
   }
 
   <!-- Feste Bottom Navigation -->
-  <app-bottom-nav></app-bottom-nav>
+  <footer class="detail-footer">
+    <app-bottom-nav></app-bottom-nav>
+  </footer>
 </div>

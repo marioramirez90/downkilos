@@ -2,15 +2,10 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { TranslatePipe } from '../../core/i18n/translate.pipe';
 import { ShoppingListService } from '../../core/services/shopping-list.service';
 import { PriceService } from '../../core/services/price.service';
-import { PackageCalorieCalculatorService, CartDurationPlan } from '../../core/services/package-calorie-calculator.service';
-import { CalorieCalculatorService } from '../../core/services/calorie-calculator.service';
-import { StorageService } from '../../core/services/storage.service';
 import { ProductCategory } from '../../core/models/product.model';
 import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-nav.component';
-import { HamburgerButtonComponent } from '../../shared/components/hamburger-button/hamburger-button.component';
 
 @Component({
   selector: 'app-shopping-list',
@@ -18,56 +13,27 @@ import { HamburgerButtonComponent } from '../../shared/components/hamburger-butt
   imports: [
     CommonModule,
     FormsModule,
-    BottomNavComponent,
-    HamburgerButtonComponent,
-    TranslatePipe
+    BottomNavComponent
   ],
   templateUrl: './shopping-list.component.html',
   styleUrl: './shopping-list.component.scss'
 })
 export class ShoppingListComponent {
   private router = inject(Router);
-  shoppingService = inject(ShoppingListService);
-  priceService = inject(PriceService);
-  private packageCalorieCalc = inject(PackageCalorieCalculatorService);
-  private calorieService = inject(CalorieCalculatorService);
-  private storageService = inject(StorageService);
+  readonly shoppingService = inject(ShoppingListService);
+  readonly priceService = inject(PriceService);
 
-  showInfo = signal<boolean>(false);
-  showAddModal = signal<boolean>(false);
-  showDurationModal = signal<boolean>(false);
-  plannedDays = signal<number>(3);
+  readonly showAddModal = signal<boolean>(false);
   newItemName = '';
-  newItemPrice: number | null = 1.49;
+  newItemPrice: number | null = null;
+  newItemSize = '1 Packung';
 
-  durationPlan = computed<CartDurationPlan>(() => {
-    const totalCals = this.shoppingService.summary().totalCalories || 0;
-    const profile = this.storageService.profile();
-    const target = profile ? this.calorieService.calculate(profile).dailyTargetKcal : 2000;
-    return this.packageCalorieCalc.calculateCartDuration(totalCals, target, this.plannedDays());
+  readonly displayedItems = computed(() => {
+    return this.shoppingService.filteredItems();
   });
 
-  openDurationModal() {
-    this.showDurationModal.set(true);
-  }
-
-  closeDurationModal() {
-    this.showDurationModal.set(false);
-  }
-
-  setDays(days: number) {
-    this.plannedDays.set(days);
-  }
-
-  setCategory(cat: ProductCategory) {
-    this.shoppingService.selectedCategory.set(cat);
-  }
-
-  addCustomItem() {
-    if (!this.newItemName.trim()) return;
-    this.shoppingService.addCustomItem(this.newItemName, this.newItemPrice);
-    this.newItemName = '';
-    this.showAddModal.set(false);
+  toggleChecked(id: string): void {
+    this.shoppingService.toggleItemChecked(id);
   }
 
   updateCount(id: string, delta: number): void {
@@ -78,12 +44,36 @@ export class ShoppingListComponent {
     this.shoppingService.removeItem(id);
   }
 
-  openListInStore() {
-    // Mode for shopping directly at Netto
-    alert('Einkaufsmodus aktiviert! Hake deine Artikel beim Einkauf im Netto-Markt einfach ab.');
+  openAddModal(): void {
+    this.newItemName = '';
+    this.newItemPrice = null;
+    this.newItemSize = '1 Packung';
+    this.showAddModal.set(true);
   }
 
-  goBack() {
+  closeAddModal(): void {
+    this.showAddModal.set(false);
+  }
+
+  addCustomItem(): void {
+    const name = this.newItemName.trim();
+    if (!name) return;
+    this.shoppingService.addCustomItem(name, this.newItemPrice, 'pantry', this.newItemSize);
+    this.newItemName = '';
+    this.newItemPrice = null;
+    this.showAddModal.set(false);
+  }
+
+  setCategory(cat: ProductCategory): void {
+    this.shoppingService.selectedCategory.set(cat);
+  }
+
+  goBack(): void {
+    this.router.navigate(['/dashboard']);
+  }
+
+  goToDiscover(): void {
     this.router.navigate(['/discover']);
   }
 }
+

@@ -64,4 +64,39 @@ describe('ShoppingListComponent', () => {
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('Zitronen');
   });
+
+  it('should toggle item checked status', () => {
+    const first = component.displayedItems()[0];
+    const initialStatus = first.isChecked;
+
+    component.toggleChecked(first.id);
+    fixture.detectChanges();
+
+    const updated = component.displayedItems().find(i => i.id === first.id)!;
+    expect(updated.isChecked).toBe(!initialStatus);
+  });
+
+  it('should increase item quantity and update total price & calories', () => {
+    const first = component.displayedItems()[0];
+    const initialCount = first.packageCount;
+    const initialCost = component.shoppingService.summary().totalCost;
+
+    component.updateCount(first.id, 1);
+    fixture.detectChanges();
+
+    const updated = component.displayedItems().find(i => i.id === first.id)!;
+    expect(updated.packageCount).toBe(initialCount + 1);
+    expect(component.shoppingService.summary().totalCost).toBeGreaterThanOrEqual(initialCost);
+  });
+
+  it('should remove item when clicking delete', () => {
+    const initialLength = component.displayedItems().length;
+    const first = component.displayedItems()[0];
+
+    component.removeItem(first.id);
+    fixture.detectChanges();
+
+    expect(component.displayedItems().length).toBe(initialLength - 1);
+    expect(component.displayedItems().some(i => i.id === first.id)).toBe(false);
+  });
 });

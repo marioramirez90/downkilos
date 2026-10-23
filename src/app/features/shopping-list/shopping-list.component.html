@@ -1,96 +1,77 @@
-<div class="flex flex-col h-full bg-[#FFFFFF] overflow-hidden">
+<div class="shopping-container">
   <!-- Bereich A: Fester Header mit Kategoriefilter -->
-  <header class="flex-shrink-0 px-5 pt-4 pb-2 bg-white border-b border-[#F0F4F1] z-10 space-y-2.5">
-    <div class="flex items-center justify-between pb-1">
-      <div class="flex items-center gap-3">
+  <header class="shopping-header">
+    <div class="header-top-row">
+      <div class="header-title-box">
         <button
           type="button"
           (click)="goBack()"
-          class="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-[#103A2A] hover:bg-[#F1F5F2] active:scale-95 transition-transform cursor-pointer"
+          class="back-btn"
           aria-label="Zurück"
         >
-          <svg class="w-6 h-6 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
           </svg>
         </button>
         <div>
-          <h1 class="text-xl sm:text-2xl font-extrabold text-[#103A2A] tracking-tight">
-            Meine Einkaufsliste
-          </h1>
-          <span class="text-[10px] text-[#627264] block">
-            Echte Netto-Packungen, Gesamtkosten & Packungskalorien
-          </span>
+          <h1>{{ 'SHOPPING_LIST.HEADER_TITLE' | translate }}</h1>
+          <span>{{ 'SHOPPING_LIST.HEADER_SUBTITLE' | translate }}</span>
         </div>
       </div>
 
-      <!-- Info & Add Action -->
-      <div class="flex items-center gap-1.5">
-        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FFF200] text-[#ED1C24] border border-[#E6DB00]">
-          Netto
-        </span>
+      <div class="header-actions-box">
+        <span class="netto-badge">Netto</span>
         <button
           type="button"
           (click)="showAddModal.set(true)"
-          class="px-2.5 py-1 text-xs font-bold rounded-full bg-[#E5F5E8] text-[#278F39] hover:bg-[#D4EED8] transition-colors cursor-pointer"
+          class="add-item-btn"
         >
-          + Artikel
+          {{ 'SHOPPING_LIST.ADD_ITEM' | translate }}
         </button>
         <app-hamburger-button></app-hamburger-button>
       </div>
     </div>
 
     <!-- ZENTRALE KENNZAHLEN DER EINKAUFSLISTE (Kosten & Kalorien) -->
-    <div class="p-3.5 rounded-3xl bg-gradient-to-br from-[#EBF3EC] to-[#DEECE0] border border-[#CDE9D2] shadow-soft-sm space-y-2">
-      <div class="flex items-center justify-between">
-        <span class="text-[11px] font-extrabold text-[#103A2A] uppercase tracking-wider flex items-center gap-1.5">
-          <span>🛒</span>
-          <span>Netto Einkaufskosten & Gesamtsumme</span>
-        </span>
-        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white text-[#278F39] border border-[#CDE9D2]">
-          {{ shoppingService.summary().checkedItems }} von {{ shoppingService.summary().totalItems }} gekauft
+    <div class="summary-banner">
+      <div class="summary-headline">
+        <span>🛒 {{ 'SHOPPING_LIST.SUMMARY_TITLE' | translate }}</span>
+        <span class="status-pill">
+          {{ shoppingService.summary().checkedItems }} von {{ shoppingService.summary().totalItems }} {{ 'SHOPPING_LIST.CHECKED_STATUS' | translate }}
         </span>
       </div>
 
-      <div class="grid grid-cols-2 gap-2">
-        <!-- Karte 1: Gesamtkosten in Euro -->
-        <div class="p-2.5 rounded-2xl bg-white border border-[#CDE9D2] shadow-2xs">
-          <span class="text-[9px] font-bold text-[#627264] uppercase block">Gesamtkosten</span>
-          <span class="text-lg font-black text-[#103A2A] block mt-0.5">
-            {{ priceService.formatPrice(shoppingService.summary().totalCost) }}
-          </span>
-          <span class="text-[9px] text-[#278F39] font-medium block">
-            exakt in Cent berechnet
-          </span>
+      <div class="summary-cards-grid">
+        <!-- Karte 1: Gesamtkosten -->
+        <div class="cost-card">
+          <span>{{ 'SHOPPING_LIST.TOTAL_COST' | translate }}</span>
+          <strong>{{ priceService.formatPrice(shoppingService.summary().totalCost) }}</strong>
+          <small>{{ 'SHOPPING_LIST.EXACT_CENTS' | translate }}</small>
         </div>
 
-        <!-- Karte 2: Gesamtkalorien aller gekauften Lebensmittelpackungen -->
-        <div class="p-2.5 rounded-2xl bg-[#103A2A] text-white shadow-2xs">
-          <span class="text-[9px] font-bold text-[#A3E5B1] uppercase block flex items-center gap-1">
-            <span>🔥</span>
-            <span>Gesamtkalorien</span>
-          </span>
-          <span class="text-lg font-black text-white block mt-0.5">
+        <!-- Karte 2: Gesamtkalorien -->
+        <div class="calories-card">
+          <span>🔥 {{ 'SHOPPING_LIST.TOTAL_CALS_LABEL' | translate }}</span>
+          <strong>
             @if (shoppingService.summary().totalCalories !== null) {
               {{ shoppingService.summary().totalCalories | number:'1.0-0' }} kcal
             } @else {
-              <span class="text-xs font-semibold text-[#FED7AA]">Teilsumme</span>
+              <small>Teilsumme</small>
             }
-          </span>
-          <span class="text-[9px] text-[#A3E5B1]/80 block">
-            aller essbaren Packungen
-          </span>
+          </strong>
+          <small>{{ 'SHOPPING_LIST.ALL_EDIBLE_PACKS' | translate }}</small>
         </div>
       </div>
 
-      <!-- Hinweis bei unvollständigen Daten (niemals erfundene Zahlen!) -->
+      <!-- Hinweise bei unvollständigen Daten -->
       @if (shoppingService.summary().estimateNotice; as priceNotice) {
-        <div class="p-1.5 rounded-xl bg-white/70 text-[10px] text-[#D97706] font-semibold flex items-center gap-1.5">
+        <div class="notice-pill">
           <span>⚠️</span>
           <span>{{ priceNotice }}</span>
         </div>
       }
       @if (shoppingService.summary().caloriesNotice; as calNotice) {
-        <div class="p-1.5 rounded-xl bg-white/70 text-[10px] text-[#B45309] font-semibold flex items-center gap-1.5">
+        <div class="notice-pill">
           <span>ℹ️</span>
           <span>{{ calNotice }}</span>
         </div>
@@ -98,54 +79,44 @@
     </div>
 
     <!-- Category Filter Pills -->
-    <div class="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar select-none text-xs">
+    <div class="category-bar">
       <button
         type="button"
         (click)="setCategory('all')"
-        class="py-1 px-3 rounded-full font-bold transition-all whitespace-nowrap cursor-pointer text-[11px]"
-        [ngClass]="shoppingService.selectedCategory() === 'all'
-          ? 'bg-[#278F39] text-white shadow-soft-sm'
-          : 'bg-[#F1F5F2] text-[#627264] hover:bg-[#E2EDE5]'"
+        class="category-pill"
+        [class.active]="shoppingService.selectedCategory() === 'all'"
       >
         Alle ({{ shoppingService.items().length }})
       </button>
       <button
         type="button"
         (click)="setCategory('grains')"
-        class="py-1 px-3 rounded-full font-bold transition-all whitespace-nowrap cursor-pointer text-[11px]"
-        [ngClass]="shoppingService.selectedCategory() === 'grains'
-          ? 'bg-[#278F39] text-white shadow-soft-sm'
-          : 'bg-[#F1F5F2] text-[#627264] hover:bg-[#E2EDE5]'"
+        class="category-pill"
+        [class.active]="shoppingService.selectedCategory() === 'grains'"
       >
         Brot & Getreide
       </button>
       <button
         type="button"
         (click)="setCategory('dairy')"
-        class="py-1 px-3 rounded-full font-bold transition-all whitespace-nowrap cursor-pointer text-[11px]"
-        [ngClass]="shoppingService.selectedCategory() === 'dairy'
-          ? 'bg-[#278F39] text-white shadow-soft-sm'
-          : 'bg-[#F1F5F2] text-[#627264] hover:bg-[#E2EDE5]'"
+        class="category-pill"
+        [class.active]="shoppingService.selectedCategory() === 'dairy'"
       >
         Eier & Milch
       </button>
       <button
         type="button"
         (click)="setCategory('pantry')"
-        class="py-1 px-3 rounded-full font-bold transition-all whitespace-nowrap cursor-pointer text-[11px]"
-        [ngClass]="shoppingService.selectedCategory() === 'pantry'
-          ? 'bg-[#278F39] text-white shadow-soft-sm'
-          : 'bg-[#F1F5F2] text-[#627264] hover:bg-[#E2EDE5]'"
+        class="category-pill"
+        [class.active]="shoppingService.selectedCategory() === 'pantry'"
       >
         Vorrat & Dosen
       </button>
       <button
         type="button"
         (click)="setCategory('fruits_veg')"
-        class="py-1 px-3 rounded-full font-bold transition-all whitespace-nowrap cursor-pointer text-[11px]"
-        [ngClass]="shoppingService.selectedCategory() === 'fruits_veg'
-          ? 'bg-[#278F39] text-white shadow-soft-sm'
-          : 'bg-[#F1F5F2] text-[#627264] hover:bg-[#E2EDE5]'"
+        class="category-pill"
+        [class.active]="shoppingService.selectedCategory() === 'fruits_veg'"
       >
         Obst & Gemüse
       </button>
@@ -153,64 +124,52 @@
   </header>
 
   <!-- Bereich B: Scrollbarer Inhalt der Einkaufsliste -->
-  <main class="flex-1 px-5 py-4 space-y-3 min-h-0 overflow-y-auto">
-    <div class="space-y-3">
+  <main class="shopping-content">
+    <div class="items-list">
       @for (item of shoppingService.filteredItems(); track item.id) {
         <div
-          class="p-3.5 rounded-3xl border transition-all flex flex-col gap-2.5 select-none"
-          [ngClass]="item.isChecked || item.inPantry
-            ? 'bg-[#F8FAF9] border-[#E3EBE4] opacity-80'
-            : 'bg-white border-[#E3EBE4] shadow-soft-sm hover:border-[#278F39]'"
+          class="shopping-item-card"
+          [class.checked]="item.isChecked"
+          [class.in-pantry]="item.inPantry"
         >
           <!-- Top Row: Checkbox, Bild, Name, Marke, Entfernen -->
-          <div class="flex items-start gap-3 min-w-0">
-            <!-- Checkbox "Gekauft" -->
+          <div class="item-top-row">
             <button
               type="button"
               (click)="shoppingService.toggleItemChecked(item.id)"
-              class="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 transition-all cursor-pointer mt-0.5"
-              [ngClass]="item.isChecked
-                ? 'bg-[#278F39] text-white shadow-2xs'
-                : 'border-2 border-[#CBD5E1] bg-white hover:border-[#278F39]'"
+              class="item-check-btn"
+              [class.checked]="item.isChecked"
               [attr.aria-label]="item.name + ' als gekauft markieren'"
             >
               @if (item.isChecked) {
-                <svg class="w-4 h-4 stroke-[3]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                 </svg>
               }
             </button>
 
             <!-- Thumbnail -->
-            <div class="w-14 h-14 rounded-2xl overflow-hidden bg-[#F6F8F6] border border-[#E3EBE4] flex-shrink-0">
-              <img [src]="item.imageUrl" [alt]="item.name" class="w-full h-full object-cover" loading="lazy" />
+            <div class="item-thumb">
+              <img [src]="item.imageUrl" [alt]="item.name" loading="lazy" />
             </div>
 
             <!-- Produkt-Titel & Packungsgröße -->
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-1.5 flex-wrap">
-                <span class="text-[9px] font-bold text-[#627264] uppercase tracking-wider">
-                  {{ item.brand || 'Netto' }}
-                </span>
+            <div class="item-info-col">
+              <div class="brand-row">
+                <span>{{ item.brand || 'Netto' }}</span>
                 @if (item.inPantry) {
-                  <span class="text-[9px] font-bold text-[#278F39] bg-[#E5F5E8] px-1.5 py-0.2 rounded">
-                    Im Vorrat (kostet 0 €)
-                  </span>
+                  <span class="pantry-pill">{{ 'SHOPPING_LIST.IN_PANTRY_LABEL' | translate }}</span>
                 }
               </div>
 
-              <h4
-                class="text-xs sm:text-sm font-extrabold text-[#103A2A] leading-snug line-clamp-2 mt-0.5"
-                [class.line-through]="item.isChecked"
-                [class.text-[#627264]]="item.isChecked"
-              >
+              <h4 [class.strike]="item.isChecked">
                 {{ item.name }}
               </h4>
 
-              <div class="flex items-center gap-2 mt-0.5 text-[11px] text-[#627264] flex-wrap">
-                <span class="font-bold text-[#103A2A]">{{ item.packageSize }}</span>
+              <div class="meta-row">
+                <span class="pack-size">{{ item.packageSize }}</span>
                 @if (item.packageCalories !== null && item.packageCalories !== undefined) {
-                  <span class="text-[10px] text-[#278F39] font-bold">
+                  <span class="pack-cals">
                     {{ item.packageCalories }} kcal / Pck.
                   </span>
                 }
@@ -221,7 +180,7 @@
             <button
               type="button"
               (click)="removeItem(item.id)"
-              class="w-7 h-7 rounded-full bg-[#F6F8F6] hover:bg-[#FEE2E2] text-[#94A3B8] hover:text-[#EF4444] flex items-center justify-center transition-colors cursor-pointer text-xs flex-shrink-0"
+              class="delete-item-btn"
               title="Artikel entfernen"
             >
               🗑️
@@ -229,130 +188,120 @@
           </div>
 
           <!-- Bottom Row: Stepper für Packungsanzahl & Zeilen-Gesamtsummen -->
-          <div class="pt-2 border-t border-[#F0F4F1] flex items-center justify-between gap-2 flex-wrap">
+          <div class="item-bottom-row">
             <!-- Stepper für Packungen mit Plus & Minus -->
-            <div class="flex items-center gap-1 bg-[#F6F8F6] p-1 rounded-xl border border-[#E3EBE4]">
+            <div class="package-stepper">
               <button
                 type="button"
                 (click)="updateCount(item.id, -1)"
                 [disabled]="item.packageCount <= 1"
-                class="w-7 h-7 rounded-lg bg-white border border-[#DCE4DE] hover:bg-[#E5F5E8] active:scale-95 text-[#103A2A] font-extrabold text-sm flex items-center justify-center cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                class="stepper-btn"
                 title="1 Packung weniger"
               >
                 −
               </button>
 
-              <span class="px-2 text-xs font-black text-[#103A2A] min-w-[3.5rem] text-center">
+              <span class="stepper-count">
                 {{ item.packageCount }} {{ item.packageCount === 1 ? 'Packung' : 'Packungen' }}
               </span>
 
               <button
                 type="button"
                 (click)="updateCount(item.id, 1)"
-                class="w-7 h-7 rounded-lg bg-white border border-[#DCE4DE] hover:bg-[#E5F5E8] active:scale-95 text-[#103A2A] font-extrabold text-sm flex items-center justify-center cursor-pointer"
+                class="stepper-btn"
                 title="1 Packung mehr"
               >
                 +
               </button>
             </div>
 
-            <!-- Zeilensumme für diese Position (Preis & Kalorien) -->
-            <div class="flex items-center gap-3 text-right">
-              <!-- Kalorien dieser Position -->
-              <div>
-                <span class="text-[9px] text-[#627264] block font-semibold">Position Kalorien</span>
-                <span class="text-xs font-black text-[#278F39]">
+            <!-- Zeilensumme für diese Position -->
+            <div class="position-totals">
+              <div class="pos-col">
+                <small>{{ 'SHOPPING_LIST.LINE_CALORIES' | translate }}</small>
+                <strong>
                   @if (item.totalCalories !== null && item.totalCalories !== undefined) {
                     {{ item.totalCalories | number:'1.0-0' }} kcal
                   } @else {
-                    <span class="text-[10px] text-[#D97706]">unbekannt</span>
+                    <small>unbekannt</small>
                   }
-                </span>
+                </strong>
               </div>
 
-              <!-- Preis dieser Position -->
-              <div>
-                <span class="text-[9px] text-[#627264] block font-semibold">Position Preis</span>
-                <span
-                  class="text-xs sm:text-sm font-black"
-                  [ngClass]="item.inPantry ? 'text-[#94A3B8] line-through' : (item.totalCost !== null ? 'text-[#103A2A]' : 'text-[#D97706] text-xs font-semibold')"
-                >
+              <div class="pos-col">
+                <small>{{ 'SHOPPING_LIST.LINE_PRICE' | translate }}</small>
+                <strong [class.strike]="item.inPantry">
                   {{ item.inPantry ? '0,00 €' : priceService.formatPrice(item.totalCost) }}
-                </span>
+                </strong>
               </div>
             </div>
           </div>
         </div>
       } @empty {
-        <div class="text-center py-12 bg-[#F6F8F6] rounded-3xl border border-[#E3EBE4] space-y-2">
-          <span class="text-3xl">🛒</span>
-          <p class="text-xs font-bold text-[#103A2A]">Deine Einkaufsliste ist leer.</p>
-          <p class="text-[11px] text-[#627264]">Entdecke Netto-Lebensmittel und füge sie mit einem Klick hinzu!</p>
+        <div class="empty-list-box">
+          <span>🛒</span>
+          <p>{{ 'SHOPPING_LIST.EMPTY_TITLE' | translate }}</p>
+          <small>{{ 'SHOPPING_LIST.EMPTY_SUBTITLE' | translate }}</small>
         </div>
       }
     </div>
   </main>
 
   <!-- Bereich C: Fester Footer mit Hauptbutton und Navigationsleiste -->
-  <footer class="flex-shrink-0 bg-white border-t border-[#E3EBE4] z-20">
-    <!-- Hauptbutton "Liste im Markt öffnen" -->
-    <div class="px-5 py-2.5 bg-white border-b border-[#F0F4F1] flex gap-2">
+  <footer class="shopping-footer">
+    <div class="footer-btn-row">
       <button
         type="button"
         (click)="openListInStore()"
-        class="w-full py-3.5 px-6 rounded-2xl bg-[#278F39] hover:bg-[#217A30] active:scale-[0.98] text-white font-bold text-sm sm:text-base shadow-button flex items-center justify-center gap-2 transition-all cursor-pointer"
+        class="market-mode-btn"
       >
-        <span>Liste im Markt öffnen</span>
-        <span class="text-lg">→</span>
+        <span>{{ 'SHOPPING_LIST.MARKET_MODE' | translate }}</span>
+        <span>→</span>
       </button>
     </div>
-
-    <!-- Untere Navigationsleiste -->
     <app-bottom-nav></app-bottom-nav>
   </footer>
 
   <!-- Add Custom Item Modal -->
   @if (showAddModal()) {
-    <div class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fade-in">
-      <div class="bg-white rounded-3xl p-5 w-full max-w-sm space-y-4 shadow-xl border border-[#E3EBE4]">
-        <div class="flex justify-between items-center">
-          <h3 class="text-sm font-extrabold text-[#103A2A]">Eigenen Artikel hinzufügen</h3>
-          <button (click)="showAddModal.set(false)" class="text-[#627264] hover:text-[#103A2A] font-bold cursor-pointer">✕</button>
+    <div class="modal-backdrop">
+      <div class="modal-dialog">
+        <div class="dialog-header">
+          <h3>{{ 'SHOPPING_LIST.ADD_MODAL_TITLE' | translate }}</h3>
+          <button (click)="showAddModal.set(false)">✕</button>
         </div>
 
-        <div class="space-y-2">
-          <label class="block text-xs font-semibold text-[#17241D]">Produktname</label>
+        <div class="dialog-form">
+          <label>Produktname</label>
           <input
             type="text"
             [(ngModel)]="newItemName"
             placeholder="z.B. Mineralwasser"
-            class="w-full px-3.5 py-2.5 rounded-xl border border-[#DCE4DE] text-xs focus:outline-none focus:border-[#278F39]"
           />
 
-          <label class="block text-xs font-semibold text-[#17241D] pt-1">Geschätzter Preis in €</label>
+          <label>Geschätzter Preis in €</label>
           <input
             type="number"
             step="0.05"
             [(ngModel)]="newItemPrice"
             placeholder="0.79"
-            class="w-full px-3.5 py-2.5 rounded-xl border border-[#DCE4DE] text-xs focus:outline-none focus:border-[#278F39]"
           />
         </div>
 
-        <div class="flex gap-2 pt-2">
+        <div class="dialog-actions">
           <button
             type="button"
             (click)="showAddModal.set(false)"
-            class="flex-1 py-2.5 rounded-xl bg-[#F1F5F2] text-xs font-semibold text-[#627264] cursor-pointer"
+            class="cancel-btn"
           >
-            Abbrechen
+            {{ 'COMMON.CANCEL' | translate }}
           </button>
           <button
             type="button"
             (click)="addCustomItem()"
-            class="flex-1 py-2.5 rounded-xl bg-[#278F39] text-white text-xs font-bold hover:bg-[#217A30] cursor-pointer"
+            class="confirm-btn"
           >
-            Hinzufügen
+            {{ 'COMMON.ADD' | translate }}
           </button>
         </div>
       </div>

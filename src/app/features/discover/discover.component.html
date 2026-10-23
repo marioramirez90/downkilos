@@ -1,27 +1,21 @@
-<div class="flex flex-col h-full bg-[#FFFFFF] overflow-hidden">
+<div class="discover-container">
   <!-- Bereich A: Fester Header -->
-  <header class="flex-shrink-0 px-5 pt-4 pb-2 border-b border-[#F0F4F1] bg-white z-10 space-y-2.5">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-2">
+  <header class="discover-header">
+    <div class="header-main-row">
+      <div class="header-title-box">
         <app-logo size="sm"></app-logo>
         <div>
-          <h1 class="text-xl sm:text-2xl font-extrabold text-[#103A2A] tracking-tight">
-            Lebensmittel entdecken
-          </h1>
-          <span class="text-[10px] text-[#627264] block">
-            Echte Netto-Produkte, Kalorien pro Packung & Stück
-          </span>
+          <h1>{{ 'DISCOVER.HEADER_TITLE' | translate }}</h1>
+          <span>{{ 'DISCOVER.HEADER_SUBTITLE' | translate }}</span>
         </div>
       </div>
 
-      <div class="flex items-center gap-2">
-        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FFF200] text-[#ED1C24] border border-[#E6DB00]">
-          Netto
-        </span>
+      <div class="header-action-pills">
+        <span class="netto-badge">Netto</span>
         <button
           type="button"
           (click)="showBarcodeScanner.set(true)"
-          class="p-2 rounded-full bg-[#F1F5F2] hover:bg-[#E5F5E8] text-xs font-bold text-[#103A2A] cursor-pointer"
+          class="barcode-btn"
           title="Barcode scannen"
         >
           📷
@@ -31,14 +25,14 @@
     </div>
 
     <!-- Quick Actions Banner: Kalorienbudget -->
-    <div class="p-2.5 rounded-2xl bg-[#E5F5E8] border border-[#CDE9D2] flex items-center justify-between text-xs">
-      <div class="flex items-center gap-2">
-        <span class="text-base">🎯</span>
+    <div class="budget-banner">
+      <div class="budget-info">
+        <span class="budget-icon">🎯</span>
         <div>
-          <span class="font-bold text-[#103A2A] block">
+          <span class="budget-text">
             Noch {{ remainingCalories() }} kcal für heute frei
           </span>
-          <span class="text-[10px] text-[#278F39]">
+          <span class="budget-sub">
             Tagesziel: {{ foodLogService.targetCalories() }} kcal
           </span>
         </div>
@@ -47,52 +41,45 @@
       <button
         type="button"
         (click)="filterByRemainingKcal.set(!filterByRemainingKcal())"
-        class="py-1 px-2.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer"
-        [ngClass]="filterByRemainingKcal()
-          ? 'bg-[#278F39] text-white shadow-soft-sm'
-          : 'bg-white text-[#278F39] border border-[#278F39]/40 hover:bg-[#D4EED8]'"
+        class="budget-toggle-btn"
+        [class.active]="filterByRemainingKcal()"
       >
-        {{ filterByRemainingKcal() ? '✓ Budget-Filter aktiv' : 'Passt ins Budget?' }}
+        {{ filterByRemainingKcal() ? ('DISCOVER.BUDGET_ACTIVE' | translate) : ('DISCOVER.BUDGET_FIT' | translate) }}
       </button>
     </div>
 
     <!-- Suchleiste & Sortierung -->
-    <div class="flex gap-2">
-      <div class="relative flex-1">
+    <div class="search-sort-row">
+      <div class="search-input-wrapper">
         <input
           type="text"
           [(ngModel)]="searchQuery"
-          placeholder="Lebensmittel suchen (z.B. Toast, Eier, Bohnen, Bananen, Skyr)..."
-          class="w-full pl-9 pr-3 py-2 rounded-2xl bg-[#F6F8F6] border border-[#E3EBE4] text-xs text-[#17241D] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#278F39]"
+          [placeholder]="'DISCOVER.SEARCH_PLACEHOLDER' | translate"
         />
-        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[#627264] text-xs">
-          🔍
-        </span>
+        <span class="search-icon">🔍</span>
       </div>
 
       <!-- Sortierung Dropdown -->
       <select
         [ngModel]="activeSortBy()"
         (ngModelChange)="activeSortBy.set($event)"
-        class="px-2.5 py-2 rounded-2xl bg-[#F6F8F6] border border-[#E3EBE4] text-xs font-semibold text-[#103A2A] focus:outline-none focus:border-[#278F39]"
+        class="sort-dropdown"
       >
-        <option value="relevance">Sortieren</option>
-        <option value="price_asc">Günstigste zuerst</option>
-        <option value="calories_asc">Wenigste Kalorien</option>
-        <option value="protein_desc">Meistes Eiweiß</option>
+        <option value="relevance">{{ 'DISCOVER.SORT_RELEVANCE' | translate }}</option>
+        <option value="price_asc">{{ 'DISCOVER.SORT_PRICE_ASC' | translate }}</option>
+        <option value="calories_asc">{{ 'DISCOVER.SORT_CALORIES_ASC' | translate }}</option>
+        <option value="protein_desc">{{ 'DISCOVER.SORT_PROTEIN_DESC' | translate }}</option>
       </select>
     </div>
 
     <!-- Filter Pills -->
-    <div class="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar select-none text-[11px]">
+    <div class="category-pills-bar">
       @for (pill of categoryPills; track pill.id) {
         <button
           type="button"
           (click)="activeCategoryFilter.set(pill.id)"
-          class="py-1 px-3 rounded-full font-semibold transition-all whitespace-nowrap cursor-pointer"
-          [ngClass]="activeCategoryFilter() === pill.id
-            ? 'bg-[#278F39] text-white shadow-soft-sm'
-            : 'bg-[#F1F5F2] text-[#627264] hover:bg-[#E2EDE5]'"
+          class="category-pill"
+          [class.active]="activeCategoryFilter() === pill.id"
         >
           {{ pill.label }}
         </button>
@@ -102,236 +89,208 @@
 
   <!-- Toast Notification -->
   @if (toastMessage(); as msg) {
-    <div class="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-[#103A2A] text-white px-4 py-2.5 rounded-2xl shadow-xl text-xs font-bold animate-bounce flex items-center gap-2">
+    <div class="toast-popup">
       <span>✓</span>
       <span>{{ msg }}</span>
     </div>
   }
 
   <!-- Bereich B: Scrollbare Produktkarten -->
-  <main class="flex-1 min-h-0 overflow-y-auto px-5 py-4 space-y-3.5">
-    <div class="flex items-center justify-between text-xs text-[#627264]">
-      <span class="font-bold">{{ filteredProducts().length }} Netto-Produkte verifiziert</span>
-      <button (click)="goToShoppingList()" class="text-[#278F39] hover:underline font-semibold cursor-pointer">
-        Zur Einkaufsliste →
+  <main class="discover-content">
+    <div class="products-count-header">
+      <span>{{ filteredProducts().length }} {{ 'DISCOVER.VERIFIED_COUNT' | translate }}</span>
+      <button (click)="goToShoppingList()">
+        {{ 'DISCOVER.GO_TO_CART' | translate }}
       </button>
     </div>
 
-    <div class="space-y-3.5">
+    <div class="products-grid">
       @for (prod of filteredProducts(); track prod.id) {
-        <div class="p-4 rounded-3xl bg-white border border-[#E3EBE4] hover:border-[#278F39] shadow-soft-sm transition-all flex flex-col gap-3 group">
-          
+        <div class="product-card">
           <!-- Top Row: Bild, Name, Marke, Preis -->
-          <div class="flex items-start gap-3.5 cursor-pointer" (click)="openProductDetail(prod)">
-            <!-- Produktbild -->
-            <div class="w-20 h-20 rounded-2xl overflow-hidden bg-[#F6F8F6] border border-[#E3EBE4] flex-shrink-0 relative">
-              <img [src]="prod.imageUrl" [alt]="prod.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
-              <span class="absolute top-1 left-1 text-[8px] font-bold px-1.5 py-0.2 rounded bg-[#FFF200] text-[#ED1C24] shadow-xs">
-                Netto
-              </span>
+          <div class="card-header-row" (click)="openProductDetail(prod)">
+            <div class="product-thumb">
+              <img [src]="prod.imageUrl" [alt]="prod.name" loading="lazy" />
+              <span class="thumb-badge">Netto</span>
             </div>
 
-            <!-- Details -->
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-1.5 flex-wrap">
-                <span class="text-[10px] font-bold text-[#627264] uppercase tracking-wider">{{ prod.brand }}</span>
+            <div class="product-info-col">
+              <div class="brand-row">
+                <span>{{ prod.brand }}</span>
                 @if (prod.isHighProtein) {
-                  <span class="text-[9px] font-semibold text-[#2563EB] bg-[#EFF6FF] px-1.5 py-0.2 rounded-md">Protein</span>
+                  <span class="protein-tag">Protein</span>
                 }
               </div>
 
-              <h3 class="text-sm font-extrabold text-[#103A2A] leading-snug line-clamp-2 mt-0.5">
-                {{ prod.name }}
-              </h3>
+              <h3>{{ prod.name }}</h3>
 
-              <div class="flex items-center gap-2 mt-1 text-[11px] text-[#627264] flex-wrap">
-                <span class="font-bold text-[#103A2A]">{{ prod.packageSize }}</span>
+              <div class="package-meta">
+                <span>{{ prod.packageSize }}</span>
                 @if (prod.drainedWeightGrams) {
-                  <span class="text-[10px] text-[#278F39] font-bold bg-[#E5F5E8] px-1.5 py-0.2 rounded">
-                    {{ prod.drainedWeightGrams }} g Abtropfgewicht
+                  <span class="drained-badge">
+                    {{ prod.drainedWeightGrams }} g {{ 'DISCOVER.DRAINED_WEIGHT' | translate }}
                   </span>
                 }
                 @if (prod.edibleYieldPercent && prod.edibleYieldPercent < 1.0 && !prod.drainedWeightGrams) {
-                  <span class="text-[10px] text-[#D97706] font-semibold">
+                  <span class="yield-badge">
                     ({{ Math.round(prod.edibleYieldPercent * 100) }}% essbar)
                   </span>
                 }
               </div>
 
-              <!-- Verkaufspreis -->
-              <div class="flex items-baseline gap-1.5 mt-1">
-                <span class="text-base font-black text-[#103A2A]">
-                  {{ priceService.formatPrice(prod.price) }}
-                </span>
+              <div class="price-row">
+                <span class="main-price">{{ priceService.formatPrice(prod.price) }}</span>
                 @if (prod.priceUnit && prod.price !== null) {
-                  <span class="text-[10px] text-[#94A3B8]">({{ prod.priceUnit }})</span>
+                  <span class="price-unit">({{ prod.priceUnit }})</span>
                 }
               </div>
             </div>
           </div>
 
           <!-- PROMINENTE KALORIEN-KARTE (Ganze Packung, 100g, Stück) -->
-          <div class="p-3 rounded-2xl bg-gradient-to-r from-[#EBF3EC] to-[#DEECE0] border border-[#CDE9D2] grid grid-cols-3 gap-2 text-center text-xs">
-            <!-- 1. Ganze Packung (Besonders deutlich hervorgehoben!) -->
-            <div class="bg-white/80 backdrop-blur-xs p-1.5 rounded-xl border border-[#CDE9D2] shadow-2xs">
-              <span class="text-[9px] text-[#103A2A] block font-extrabold uppercase">Ganze Packung</span>
-              <span class="text-sm font-black text-[#278F39] block">
+          <div class="calories-banner-grid">
+            <!-- 1. Ganze Packung -->
+            <div class="package-cals-card">
+              <span>{{ 'DISCOVER.PER_PACKAGE' | translate }}</span>
+              <span class="cals-val">
                 @if (getPackageCalories(prod); as pCal) {
                   {{ pCal }} kcal
                 } @else {
-                  <span class="text-[10px] text-[#D97706]">k.A.</span>
+                  <span class="unknown-val">k.A.</span>
                 }
               </span>
-              <span class="text-[8px] text-[#627264]">essbare Menge</span>
+              <small>{{ 'DISCOVER.EDIBLE_AMOUNT' | translate }}</small>
             </div>
 
             <!-- 2. Je 100g -->
-            <div class="p-1.5 flex flex-col justify-center">
-              <span class="text-[9px] text-[#627264] block font-semibold">Je 100 g</span>
-              <span class="font-extrabold text-[#103A2A] block">{{ prod.nutrition.caloriesPer100g }} kcal</span>
-              <span class="text-[8px] text-[#278F39]">{{ prod.nutrition.proteinPer100g }}g Eiweiß</span>
+            <div class="per-100g-box">
+              <span>{{ 'DISCOVER.PER_100G' | translate }}</span>
+              <span class="cals-val">{{ prod.nutrition.caloriesPer100g }} kcal</span>
+              <small>{{ prod.nutrition.proteinPer100g }}g Eiweiß</small>
             </div>
 
-            <!-- 3. Je Stück / Portion (sofern ermittelbar) -->
-            <div class="p-1.5 flex flex-col justify-center">
+            <!-- 3. Je Stück / Portion -->
+            <div class="per-piece-box">
               @if (getPieceInfo(prod); as piece) {
-                <span class="text-[9px] text-[#627264] block font-semibold truncate" [title]="'1 ' + piece.unitName">
-                  1 {{ piece.unitName }}
-                </span>
-                <span class="font-extrabold text-[#103A2A] block">{{ piece.calories }} kcal</span>
-                <span class="text-[8px] text-[#94A3B8]">ca. {{ piece.pieceWeightGrams }}g</span>
+                <span>1 {{ piece.unitName }}</span>
+                <span class="cals-val">{{ piece.calories }} kcal</span>
+                <small>ca. {{ piece.pieceWeightGrams }}g</small>
               } @else if (prod.servingSizeGrams) {
-                <span class="text-[9px] text-[#627264] block font-semibold truncate">
-                  Portion
-                </span>
-                <span class="font-extrabold text-[#103A2A] block">
+                <span>Portion</span>
+                <span class="cals-val">
                   {{ Math.round((prod.servingSizeGrams * (prod.edibleYieldPercent || 1) * prod.nutrition.caloriesPer100g) / 100) }} kcal
                 </span>
-                <span class="text-[8px] text-[#94A3B8]">{{ prod.servingSizeGrams }}g</span>
+                <small>{{ prod.servingSizeGrams }}g</small>
               } @else {
-                <span class="text-[9px] text-[#94A3B8] block">Stückwert</span>
-                <span class="text-[10px] text-[#94A3B8] block italic">variabel</span>
+                <span>Stückwert</span>
+                <span class="cals-val-italic">variabel</span>
               }
             </div>
           </div>
 
           <!-- Aktionsbuttons: "Produkt ansehen" und "Zur Einkaufsliste" -->
-          <div class="flex gap-2 pt-0.5">
+          <div class="card-buttons-row">
             <button
               type="button"
               (click)="openProductDetail(prod)"
-              class="flex-1 py-2.5 px-3 rounded-2xl bg-[#F1F5F2] hover:bg-[#E5F5E8] active:scale-95 text-[#103A2A] font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              class="view-detail-btn"
             >
               <span>🔍</span>
-              <span>Produkt ansehen</span>
+              <span>{{ 'DISCOVER.VIEW_PRODUCT' | translate }}</span>
             </button>
 
             <button
               type="button"
               (click)="addToShoppingList(prod)"
-              class="flex-1 py-2.5 px-3 rounded-2xl bg-[#278F39] hover:bg-[#217A30] active:scale-95 text-white font-bold text-xs shadow-soft-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              class="add-cart-btn"
             >
               <span>🛒</span>
-              <span>Zur Einkaufsliste</span>
+              <span>{{ 'DISCOVER.ADD_TO_CART' | translate }}</span>
             </button>
           </div>
         </div>
       } @empty {
-        <div class="text-center py-12 bg-[#F6F8F6] rounded-3xl border border-[#E3EBE4] space-y-2">
-          <span class="text-2xl">🔍</span>
-          <p class="text-xs font-bold text-[#103A2A]">Keine passenden Netto-Produkte gefunden.</p>
-          <p class="text-[11px] text-[#627264]">Überprüfe deinen Suchbegriff oder deine Filter.</p>
+        <div class="empty-results-card">
+          <span>🔍</span>
+          <p>{{ 'DISCOVER.EMPTY_NOTICE' | translate }}</p>
         </div>
       }
     </div>
   </main>
 
   <!-- Bereich C: Fester Footer mit Hauptnavigation -->
-  <footer class="flex-shrink-0 bg-white border-t border-[#E3EBE4] z-20">
-    <div class="px-5 py-2.5 bg-white border-b border-[#F0F4F1] flex gap-2">
+  <footer class="discover-footer">
+    <div class="footer-action-row">
       <button
         type="button"
         (click)="goToRecipes()"
-        class="flex-1 py-3 px-4 rounded-2xl bg-[#F1F5F2] hover:bg-[#E2EDE5] text-[#103A2A] font-bold text-xs transition-all cursor-pointer text-center"
+        class="recipe-link-btn"
       >
-        🍲 Rezepte ansehen
+        {{ 'DISCOVER.VIEW_RECIPES' | translate }}
       </button>
       <button
         type="button"
         (click)="goToShoppingList()"
-        class="flex-1 py-3 px-4 rounded-2xl bg-[#278F39] hover:bg-[#217A30] text-white font-bold text-xs shadow-button transition-all cursor-pointer text-center flex items-center justify-center gap-1.5"
+        class="cart-link-btn"
       >
-        <span>Einkaufsliste</span>
+        <span>{{ 'NAV.SHOPPING_LIST' | translate }}</span>
         <span>→</span>
       </button>
     </div>
     <app-bottom-nav></app-bottom-nav>
   </footer>
 
-  <!-- PRODUKTDETAIL-MODAL (Interaktive Mengenauswahl & Nährwerte) -->
+  <!-- PRODUKTDETAIL-MODAL -->
   @if (selectedProductDetail(); as p) {
-    <div class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fade-in"
-         (click)="closeProductDetail()">
-      <div class="bg-white rounded-3xl p-5 w-full max-w-md max-h-[90vh] overflow-y-auto space-y-4 shadow-2xl border border-[#E3EBE4]"
-           (click)="$event.stopPropagation()">
-        
-        <!-- Header: Bild, Titel, Marke, Schließen -->
-        <div class="flex justify-between items-start gap-3">
-          <div class="flex items-center gap-3">
-            <div class="w-16 h-16 rounded-2xl overflow-hidden bg-[#F6F8F6] border border-[#E3EBE4] flex-shrink-0">
-              <img [src]="p.imageUrl" [alt]="p.name" class="w-full h-full object-cover" />
+    <div class="modal-backdrop" (click)="closeProductDetail()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="modal-header-row">
+          <div class="modal-title-box">
+            <div class="modal-thumb">
+              <img [src]="p.imageUrl" [alt]="p.name" />
             </div>
-            <div>
-              <span class="text-[10px] font-bold text-[#627264] uppercase">{{ p.brand }}</span>
-              <h3 class="text-base font-extrabold text-[#103A2A] leading-snug">{{ p.name }}</h3>
-              <div class="text-xs text-[#278F39] font-bold mt-0.5">
-                {{ p.packageSize }} • {{ priceService.formatPrice(p.price) }}
-              </div>
+            <div class="modal-title-text">
+              <span>{{ p.brand }}</span>
+              <h3>{{ p.name }}</h3>
+              <p>{{ p.packageSize }} • {{ priceService.formatPrice(p.price) }}</p>
             </div>
           </div>
-          <button (click)="closeProductDetail()" class="w-8 h-8 rounded-full bg-[#F1F5F2] text-xs font-bold text-[#103A2A] cursor-pointer flex items-center justify-center">✕</button>
+          <button (click)="closeProductDetail()" class="modal-close-btn">✕</button>
         </div>
 
-        <!-- GROSSE INFO-KARTE: KALORIEN DER GESAMTEN PACKUNG -->
-        <div class="p-4 rounded-2xl bg-gradient-to-br from-[#103A2A] to-[#18533C] text-white shadow-soft-sm space-y-1 text-center">
-          <span class="text-[10px] font-extrabold text-[#A3E5B1] uppercase tracking-wider block">
-            Kalorien der gesamten Packung
-          </span>
-          <span class="text-2xl sm:text-3xl font-black block">
+        <!-- KALORIEN DER GESAMTEN PACKUNG -->
+        <div class="modal-hero-cals-card">
+          <span>{{ 'DISCOVER.MODAL_PACKAGE_CALS' | translate }}</span>
+          <span class="hero-cals-num">
             @if (getPackageCalories(p); as packCals) {
               {{ packCals }} kcal
             } @else {
-              <span class="text-sm font-semibold text-[#FED7AA]">Nährwerte nicht verfügbar</span>
+              <small>Nährwerte nicht verfügbar</small>
             }
           </span>
-          <span class="text-[10px] text-[#A3E5B1]/80 block">
+          <small>
             bezogen auf die vollständige essbare Menge ({{ calorieCalc.calculatePackageEdibleGrams(p) }} g)
-          </span>
+          </small>
         </div>
 
         <!-- INTERAKTIVE MENGENAUSWAHL -->
-        <div class="p-3.5 rounded-2xl bg-[#F8FAF9] border border-[#E3EBE4] space-y-2.5">
-          <label class="block text-xs font-extrabold text-[#103A2A]">
-            Interaktive Mengenauswahl:
-          </label>
+        <div class="modal-amount-selector-box">
+          <label>{{ 'DISCOVER.INTERACTIVE_AMOUNT' | translate }}</label>
 
-          <!-- Schnellauswahl Buttons -->
-          <div class="grid grid-cols-3 gap-1.5 text-center text-xs">
-            <!-- Option 1: 1 Stück / Scheibe / Ei (wenn verfügbar) -->
+          <div class="quick-amounts-grid">
             @if (getPieceInfo(p); as piece) {
               <button
                 type="button"
                 (click)="setDetailSelection(1, 'pieces')"
-                class="py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer"
-                [ngClass]="detailMode() === 'pieces' && detailAmount() === 1 ? 'bg-[#278F39] text-white border-[#278F39]' : 'bg-white text-[#103A2A] border-[#E3EBE4]'"
+                [class.selected]="detailMode() === 'pieces' && detailAmount() === 1"
               >
                 1 {{ piece.unitName }}
               </button>
               <button
                 type="button"
                 (click)="setDetailSelection(2, 'pieces')"
-                class="py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer"
-                [ngClass]="detailMode() === 'pieces' && detailAmount() === 2 ? 'bg-[#278F39] text-white border-[#278F39]' : 'bg-white text-[#103A2A] border-[#E3EBE4]'"
+                [class.selected]="detailMode() === 'pieces' && detailAmount() === 2"
               >
                 2 {{ piece.unitName }}er
               </button>
@@ -339,47 +298,40 @@
               <button
                 type="button"
                 (click)="setDetailSelection(100, 'grams')"
-                class="py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer"
-                [ngClass]="detailMode() === 'grams' && detailAmount() === 100 ? 'bg-[#278F39] text-white border-[#278F39]' : 'bg-white text-[#103A2A] border-[#E3EBE4]'"
+                [class.selected]="detailMode() === 'grams' && detailAmount() === 100"
               >
                 100 g
               </button>
               <button
                 type="button"
                 (click)="setDetailSelection(200, 'grams')"
-                class="py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer"
-                [ngClass]="detailMode() === 'grams' && detailAmount() === 200 ? 'bg-[#278F39] text-white border-[#278F39]' : 'bg-white text-[#103A2A] border-[#E3EBE4]'"
+                [class.selected]="detailMode() === 'grams' && detailAmount() === 200"
               >
                 200 g
               </button>
             }
 
-            <!-- Option: Ganze Packung -->
             <button
               type="button"
               (click)="setDetailSelection(1, 'packages')"
-              class="py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer"
-              [ngClass]="detailMode() === 'packages' && detailAmount() === 1 ? 'bg-[#278F39] text-white border-[#278F39]' : 'bg-white text-[#103A2A] border-[#E3EBE4]'"
+              [class.selected]="detailMode() === 'packages' && detailAmount() === 1"
             >
-              Ganze Packung
+              {{ 'DISCOVER.PER_PACKAGE' | translate }}
             </button>
           </div>
 
-          <!-- Eigene Mengeneingabe -->
-          <div class="flex items-center gap-2 pt-1 text-xs">
-            <span class="text-[#627264] font-semibold">Eigene Menge:</span>
+          <div class="custom-amount-row">
+            <span>{{ 'DISCOVER.CUSTOM_AMOUNT' | translate }}</span>
             <input
               type="number"
               min="1"
               max="5000"
               [ngModel]="detailAmount()"
               (ngModelChange)="detailAmount.set($event)"
-              class="w-20 px-2.5 py-1.5 bg-white rounded-xl border border-[#DCE4DE] text-center font-bold text-[#103A2A] focus:outline-none focus:border-[#278F39]"
             />
             <select
               [ngModel]="detailMode()"
               (ngModelChange)="detailMode.set($event)"
-              class="px-2 py-1.5 bg-white rounded-xl border border-[#DCE4DE] text-xs font-semibold text-[#103A2A] focus:outline-none focus:border-[#278F39]"
             >
               @if (getPieceInfo(p); as piece) {
                 <option value="pieces">{{ piece.unitName }}</option>
@@ -389,12 +341,9 @@
             </select>
           </div>
 
-          <!-- Live berechnete Kalorien für die ausgewählte Menge -->
-          <div class="p-2.5 rounded-xl bg-[#E5F5E8] border border-[#CDE9D2] flex items-center justify-between">
-            <span class="text-xs font-bold text-[#103A2A]">
-              Ausgewählte Menge:
-            </span>
-            <span class="text-sm font-black text-[#278F39]">
+          <div class="live-calculated-cals-row">
+            <span>{{ 'DISCOVER.SELECTED_AMOUNT' | translate }}</span>
+            <span class="result-cals">
               @if (calculatedDetailCalories(); as cals) {
                 {{ cals }} kcal
               } @else {
@@ -405,46 +354,41 @@
         </div>
 
         <!-- Nährwerte Übersicht (100g) -->
-        <div class="space-y-1.5 text-xs">
-          <span class="font-extrabold text-[#103A2A] block">Nährwerte je 100 g:</span>
-          <div class="grid grid-cols-4 gap-2 text-center text-xs">
-            <div class="p-2 rounded-xl bg-[#F6F8F6] border border-[#E3EBE4]">
-              <span class="text-[9px] text-[#627264] block">Kalorien</span>
-              <span class="font-bold text-[#103A2A]">{{ p.nutrition.caloriesPer100g }} kcal</span>
+        <div class="modal-nutrition-grid-box">
+          <span>{{ 'DISCOVER.NUTRITION_100G' | translate }}</span>
+          <div class="nutrition-cards-row">
+            <div class="nutri-stat-card">
+              <small>Kalorien</small>
+              <strong>{{ p.nutrition.caloriesPer100g }} kcal</strong>
             </div>
-            <div class="p-2 rounded-xl bg-[#F6F8F6] border border-[#E3EBE4]">
-              <span class="text-[9px] text-[#627264] block">Eiweiß</span>
-              <span class="font-bold text-[#2563EB]">{{ p.nutrition.proteinPer100g }} g</span>
+            <div class="nutri-stat-card">
+              <small>Eiweiß</small>
+              <strong class="protein-text">{{ p.nutrition.proteinPer100g }} g</strong>
             </div>
-            <div class="p-2 rounded-xl bg-[#F6F8F6] border border-[#E3EBE4]">
-              <span class="text-[9px] text-[#627264] block">Kohlenhydrate</span>
-              <span class="font-bold text-[#D97706]">{{ p.nutrition.carbsPer100g }} g</span>
+            <div class="nutri-stat-card">
+              <small>Kohlenhydrate</small>
+              <strong class="carbs-text">{{ p.nutrition.carbsPer100g }} g</strong>
             </div>
-            <div class="p-2 rounded-xl bg-[#F6F8F6] border border-[#E3EBE4]">
-              <span class="text-[9px] text-[#627264] block">Fett</span>
-              <span class="font-bold text-[#DC2626]">{{ p.nutrition.fatPer100g }} g</span>
+            <div class="nutri-stat-card">
+              <small>Fett</small>
+              <strong class="fat-text">{{ p.nutrition.fatPer100g }} g</strong>
             </div>
           </div>
         </div>
 
-        <!-- Feste Buttons am Modal-Ende: Einkaufen vs Essen -->
-        <div class="space-y-2 pt-2 border-t border-[#F0F4F1]">
-          <!-- Button 1: Zur Einkaufsliste hinzufügen -->
+        <!-- Modal Actions -->
+        <div class="modal-actions-box">
           <button
             type="button"
             (click)="addToShoppingList(p); closeProductDetail()"
-            class="w-full py-3.5 px-4 rounded-2xl bg-[#278F39] hover:bg-[#217A30] active:scale-[0.98] text-white font-bold text-xs sm:text-sm shadow-button transition-all cursor-pointer flex items-center justify-center gap-2"
+            class="modal-add-cart-btn"
           >
             <span>🛒</span>
-            <span>Zur Einkaufsliste hinzufügen</span>
+            <span>{{ 'DISCOVER.ADD_TO_CART' | translate }}</span>
           </button>
 
-          <!-- Button 2: Als gegessen eintragen -->
-          <div class="flex items-center gap-2">
-            <select
-              [(ngModel)]="selectedMealType"
-              class="px-2.5 py-3 rounded-2xl bg-[#F1F5F2] border border-[#E3EBE4] text-xs font-semibold text-[#103A2A] focus:outline-none"
-            >
+          <div class="modal-eat-row">
+            <select [(ngModel)]="selectedMealType">
               <option value="breakfast">Frühstück</option>
               <option value="lunch">Mittagessen</option>
               <option value="dinner">Abendessen</option>
@@ -453,10 +397,10 @@
             <button
               type="button"
               (click)="logAsEatenFromDetail()"
-              class="flex-1 py-3 px-4 rounded-2xl bg-[#E5F5E8] hover:bg-[#D4EED8] active:scale-[0.98] text-[#278F39] font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
+              class="modal-eat-btn"
             >
               <span>🍽️</span>
-              <span>Als gegessen eintragen</span>
+              <span>{{ 'DISCOVER.LOG_AS_EATEN' | translate }}</span>
             </button>
           </div>
         </div>
@@ -466,43 +410,40 @@
 
   <!-- BARCODE-SCANNER MODAL -->
   @if (showBarcodeScanner()) {
-    <div class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fade-in">
-      <div class="bg-white rounded-3xl p-5 w-full max-w-sm space-y-4 shadow-xl border border-[#E3EBE4]">
-        <div class="flex justify-between items-center">
-          <h3 class="text-sm font-extrabold text-[#103A2A]">Barcode / EAN suchen</h3>
-          <button (click)="showBarcodeScanner.set(false)" class="text-[#627264] hover:text-[#103A2A] font-bold cursor-pointer">✕</button>
+    <div class="modal-backdrop">
+      <div class="modal-card barcode-dialog">
+        <div class="dialog-header">
+          <h3>{{ 'DISCOVER.BARCODE_TITLE' | translate }}</h3>
+          <button (click)="showBarcodeScanner.set(false)">✕</button>
         </div>
 
-        <p class="text-xs text-[#627264] leading-relaxed">
-          Scanne den EAN-Barcode eines Netto-Produkts mit der Kamera oder gib die Ziffern direkt ein:
-        </p>
+        <p>Scanne den EAN-Barcode eines Netto-Produkts oder gib die Ziffern ein:</p>
 
-        <div class="space-y-2">
+        <div class="dialog-input-row">
           <input
             type="text"
             [(ngModel)]="barcodeInput"
             placeholder="z.B. 4311501789012 (Toastbrot)"
-            class="w-full px-3.5 py-2.5 rounded-xl border border-[#DCE4DE] text-xs font-mono focus:outline-none focus:border-[#278F39]"
           />
           @if (barcodeScanError(); as err) {
-            <p class="text-[11px] text-[#DC2626] font-semibold">{{ err }}</p>
+            <span class="error-msg">{{ err }}</span>
           }
         </div>
 
-        <div class="flex gap-2 pt-1">
+        <div class="dialog-actions-row">
           <button
             type="button"
             (click)="showBarcodeScanner.set(false)"
-            class="flex-1 py-2.5 rounded-xl bg-[#F1F5F2] text-xs font-semibold text-[#627264] cursor-pointer"
+            class="cancel-btn"
           >
-            Abbrechen
+            {{ 'COMMON.CANCEL' | translate }}
           </button>
           <button
             type="button"
             (click)="searchByBarcode()"
-            class="flex-1 py-2.5 rounded-xl bg-[#278F39] text-white text-xs font-bold hover:bg-[#217A30] cursor-pointer"
+            class="search-btn"
           >
-            Suchen
+            {{ 'COMMON.SEARCH' | translate }}
           </button>
         </div>
       </div>

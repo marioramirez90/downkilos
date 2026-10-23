@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '../../core/i18n/translate.pipe';
 import { ShoppingListService } from '../../core/services/shopping-list.service';
 import { PriceService } from '../../core/services/price.service';
 import { ProductCategory } from '../../core/models/product.model';
@@ -11,7 +12,13 @@ import { HamburgerButtonComponent } from '../../shared/components/hamburger-butt
 @Component({
   selector: 'app-shopping-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, BottomNavComponent, HamburgerButtonComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    BottomNavComponent,
+    HamburgerButtonComponent,
+    TranslatePipe
+  ],
   templateUrl: './shopping-list.component.html',
   styleUrl: './shopping-list.component.scss'
 })

@@ -2,6 +2,7 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslatePipe } from '../../core/i18n/translate.pipe';
 import { ProductService } from '../../core/services/product.service';
 import { PriceService } from '../../core/services/price.service';
 import { FoodLogService } from '../../core/services/food-log.service';
@@ -16,7 +17,14 @@ import { LogoComponent } from '../../shared/components/logo/logo.component';
 @Component({
   selector: 'app-discover',
   standalone: true,
-  imports: [CommonModule, FormsModule, BottomNavComponent, HamburgerButtonComponent, LogoComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    BottomNavComponent,
+    HamburgerButtonComponent,
+    LogoComponent,
+    TranslatePipe
+  ],
   templateUrl: './discover.component.html',
   styleUrl: './discover.component.scss'
 })

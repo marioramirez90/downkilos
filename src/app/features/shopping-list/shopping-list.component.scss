@@ -1,3 +1,8 @@
+@use 'sass:color';
+@use '../../../styles/abstracts/variables' as *;
+@use '../../../styles/abstracts/mixins' as *;
+@use '../../../styles/components/buttons' as *;
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -9,6 +14,645 @@
   }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.2s ease-out forwards;
+:host {
+  display: block;
+  height: 100%;
+}
+
+.shopping-container {
+  @include flexbox(column, space-between, stretch);
+  height: 100%;
+  background-color: $bg-white;
+  overflow: hidden;
+
+  .shopping-header {
+    flex-shrink: 0;
+    padding: 16px 20px 8px;
+    background-color: $bg-white;
+    border-bottom: 1px solid $border-color-light;
+    z-index: 10;
+    @include flexbox(column, flex-start, stretch, 10px);
+
+    .header-top-row {
+      @include flexbox(row, space-between, center);
+
+      .header-title-box {
+        @include flexbox(row, flex-start, center, 12px);
+
+        .back-btn {
+          @include inline-flexbox(row, center, center);
+          width: 36px;
+          height: 36px;
+          border-radius: $radius-full;
+          border: none;
+          background: transparent;
+          color: $secondary-color;
+          cursor: pointer;
+          transition: background-color 0.2s ease, transform 0.1s ease;
+
+          &:hover {
+            background-color: $bg-light;
+          }
+
+          &:active {
+            transform: scale(0.95);
+          }
+
+          svg {
+            width: 22px;
+            height: 22px;
+            stroke-width: 2.5;
+          }
+        }
+
+        h1 {
+          margin: 0;
+          font-size: 22px;
+          font-weight: 800;
+          color: $secondary-color;
+          letter-spacing: -0.02em;
+
+          @media screen and (max-width: 390px) {
+            font-size: 19px;
+          }
+        }
+
+        span {
+          font-size: 10px;
+          color: $text-muted;
+          display: block;
+        }
+      }
+
+      .header-actions-box {
+        @include flexbox(row, flex-end, center, 6px);
+
+        .netto-badge {
+          font-size: 10px;
+          font-weight: 700;
+          padding: 2px 8px;
+          border-radius: $radius-full;
+          background-color: $netto-yellow;
+          color: $netto-red;
+          border: 1px solid color.adjust($netto-yellow, $lightness: -8%);
+        }
+
+        .add-item-btn {
+          padding: 5px 10px;
+          font-size: 11px;
+          font-weight: 700;
+          border-radius: $radius-full;
+          background-color: $primary-light;
+          color: $primary-color;
+          border: none;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+
+          &:hover {
+            background-color: color.adjust($primary-light, $lightness: -4%);
+          }
+        }
+      }
+    }
+
+    .summary-banner {
+      padding: 14px;
+      border-radius: $radius-xl;
+      background: linear-gradient(135deg, $secondary-light, #DEECE0);
+      border: 1px solid $border-color-green;
+      box-shadow: $shadow-sm;
+      @include flexbox(column, flex-start, stretch, 8px);
+
+      .summary-headline {
+        @include flexbox(row, space-between, center);
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: $secondary-color;
+
+        .status-pill {
+          font-size: 10px;
+          font-weight: 700;
+          padding: 2px 8px;
+          border-radius: $radius-full;
+          background-color: $bg-white;
+          color: $primary-color;
+          border: 1px solid $border-color-green;
+        }
+      }
+
+      .summary-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+
+        .cost-card {
+          padding: 10px 12px;
+          border-radius: $radius-lg;
+          background-color: $bg-white;
+          border: 1px solid $border-color-green;
+          box-shadow: $shadow-sm;
+          @include flexbox(column, flex-start, flex-start, 2px);
+
+          span {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: $text-muted;
+          }
+
+          strong {
+            font-size: 18px;
+            font-weight: 900;
+            color: $secondary-color;
+          }
+
+          small {
+            font-size: 9px;
+            font-weight: 500;
+            color: $primary-color;
+          }
+        }
+
+        .calories-card {
+          padding: 10px 12px;
+          border-radius: $radius-lg;
+          background-color: $secondary-color;
+          color: $bg-white;
+          box-shadow: $shadow-sm;
+          @include flexbox(column, flex-start, flex-start, 2px);
+
+          span {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #A3E5B1;
+          }
+
+          strong {
+            font-size: 18px;
+            font-weight: 900;
+            color: $bg-white;
+
+            small {
+              font-size: 12px;
+              color: #FED7AA;
+            }
+          }
+
+          small {
+            font-size: 9px;
+            color: rgba(163, 229, 177, 0.85);
+          }
+        }
+      }
+
+      .notice-pill {
+        padding: 6px 10px;
+        border-radius: $radius-md;
+        background-color: rgba(255, 255, 255, 0.7);
+        font-size: 10px;
+        font-weight: 600;
+        color: $warning-color;
+        @include flexbox(row, flex-start, center, 6px);
+      }
+    }
+
+    .category-bar {
+      @include flexbox(row, flex-start, center, 6px);
+      overflow-x: auto;
+      padding-bottom: 4px;
+      user-select: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      .category-pill {
+        padding: 4px 12px;
+        border-radius: $radius-full;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+        border: none;
+        background-color: $bg-light;
+        color: $text-muted;
+        cursor: pointer;
+        transition: all 0.15s ease;
+
+        &:hover {
+          background-color: $secondary-light;
+        }
+
+        &.active {
+          background-color: $primary-color;
+          color: $bg-white;
+          box-shadow: $shadow-sm;
+        }
+      }
+    }
+  }
+
+  .shopping-content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 16px 20px;
+
+    .items-list {
+      @include flexbox(column, flex-start, stretch, 12px);
+
+      .shopping-item-card {
+        padding: 14px;
+        border-radius: $radius-xl;
+        border: 1px solid $border-color;
+        background-color: $bg-white;
+        box-shadow: $shadow-sm;
+        @include flexbox(column, flex-start, stretch, 10px);
+        user-select: none;
+        transition: all 0.2s ease;
+
+        &:hover {
+          border-color: $primary-color;
+        }
+
+        &.checked {
+          background-color: #F8FAF9;
+          opacity: 0.75;
+        }
+
+        &.in-pantry {
+          background-color: #F8FAF9;
+        }
+
+        .item-top-row {
+          @include flexbox(row, flex-start, flex-start, 12px);
+
+          .item-check-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: $radius-sm;
+            border: 2px solid #CBD5E1;
+            background-color: $bg-white;
+            cursor: pointer;
+            margin-top: 2px;
+            flex-shrink: 0;
+            @include inline-flexbox(row, center, center);
+            transition: all 0.15s ease;
+
+            &:hover {
+              border-color: $primary-color;
+            }
+
+            &.checked {
+              background-color: $primary-color;
+              border-color: $primary-color;
+              color: $bg-white;
+
+              svg {
+                width: 16px;
+                height: 16px;
+                stroke-width: 3;
+              }
+            }
+          }
+
+          .item-thumb {
+            width: 56px;
+            height: 56px;
+            border-radius: $radius-lg;
+            overflow: hidden;
+            background-color: $bg-light;
+            border: 1px solid $border-color;
+            flex-shrink: 0;
+
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            }
+          }
+
+          .item-info-col {
+            flex: 1;
+            min-width: 0;
+
+            .brand-row {
+              @include flexbox(row, flex-start, center, 6px);
+
+              span:first-child {
+                font-size: 9px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: $text-muted;
+              }
+
+              .pantry-pill {
+                font-size: 9px;
+                font-weight: 700;
+                color: $primary-color;
+                background-color: $primary-light;
+                padding: 1px 6px;
+                border-radius: $radius-sm;
+              }
+            }
+
+            h4 {
+              margin: 2px 0 0;
+              font-size: 13px;
+              font-weight: 800;
+              color: $secondary-color;
+              line-height: 1.3;
+
+              &.strike {
+                text-decoration: line-through;
+                color: $text-muted;
+              }
+            }
+
+            .meta-row {
+              @include flexbox(row, flex-start, center, 8px);
+              margin-top: 2px;
+              font-size: 11px;
+              color: $text-muted;
+
+              .pack-size {
+                font-weight: 700;
+                color: $secondary-color;
+              }
+
+              .pack-cals {
+                font-size: 10px;
+                font-weight: 700;
+                color: $primary-color;
+              }
+            }
+          }
+
+          .delete-item-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: $radius-full;
+            background-color: $bg-light;
+            border: none;
+            color: $text-light;
+            font-size: 12px;
+            cursor: pointer;
+            flex-shrink: 0;
+            @include inline-flexbox(row, center, center);
+            transition: all 0.2s ease;
+
+            &:hover {
+              background-color: #FEE2E2;
+              color: $danger-color;
+            }
+          }
+        }
+
+        .item-bottom-row {
+          @include flexbox(row, space-between, center);
+          padding-top: 8px;
+          border-top: 1px solid $border-color-light;
+
+          .package-stepper {
+            @include inline-flexbox(row, flex-start, center, 4px);
+            background-color: $bg-light;
+            padding: 4px;
+            border-radius: $radius-md;
+            border: 1px solid $border-color;
+
+            .stepper-btn {
+              width: 28px;
+              height: 28px;
+              border-radius: $radius-sm;
+              border: 1px solid #DCE4DE;
+              background-color: $bg-white;
+              color: $secondary-color;
+              font-weight: 800;
+              font-size: 14px;
+              cursor: pointer;
+              @include inline-flexbox(row, center, center);
+              transition: all 0.15s ease;
+
+              &:hover {
+                background-color: $primary-light;
+              }
+
+              &:disabled {
+                opacity: 0.4;
+                cursor: not-allowed;
+              }
+            }
+
+            .stepper-count {
+              padding: 0 8px;
+              font-size: 12px;
+              font-weight: 800;
+              color: $secondary-color;
+              min-width: 4rem;
+              text-align: center;
+            }
+          }
+
+          .position-totals {
+            @include flexbox(row, flex-end, center, 14px);
+            text-align: right;
+
+            .pos-col {
+              @include flexbox(column, flex-start, flex-end);
+
+              small {
+                font-size: 9px;
+                font-weight: 600;
+                color: $text-muted;
+              }
+
+              strong {
+                font-size: 13px;
+                font-weight: 900;
+                color: $primary-color;
+
+                &.strike {
+                  text-decoration: line-through;
+                  color: $text-light;
+                }
+              }
+
+              &:last-child strong {
+                color: $secondary-color;
+              }
+            }
+          }
+        }
+      }
+
+      .empty-list-box {
+        text-align: center;
+        padding: 48px 20px;
+        background-color: $bg-light;
+        border-radius: $radius-xl;
+        border: 1px solid $border-color;
+        @include flexbox(column, center, center, 8px);
+
+        span {
+          font-size: 32px;
+        }
+
+        p {
+          margin: 0;
+          font-size: 13px;
+          font-weight: 800;
+          color: $secondary-color;
+        }
+
+        small {
+          font-size: 11px;
+          color: $text-muted;
+        }
+      }
+    }
+  }
+
+  .shopping-footer {
+    flex-shrink: 0;
+    background-color: $bg-white;
+    border-top: 1px solid $border-color;
+    z-index: 20;
+
+    .footer-btn-row {
+      padding: 10px 20px;
+      border-bottom: 1px solid $border-color-light;
+
+      .market-mode-btn {
+        width: 100%;
+        padding: 14px 24px;
+        border-radius: $radius-lg;
+        background-color: $primary-color;
+        color: $bg-white;
+        font-weight: 700;
+        font-size: 15px;
+        border: none;
+        box-shadow: $shadow-button;
+        cursor: pointer;
+        @include inline-flexbox(row, center, center, 8px);
+        transition: all 0.2s ease;
+
+        &:hover {
+          background-color: $primary-dark;
+        }
+
+        &:active {
+          transform: scale(0.98);
+        }
+
+        span:last-child {
+          font-size: 18px;
+          transition: transform 0.2s ease;
+        }
+
+        &:hover span:last-child {
+          transform: translateX(4px);
+        }
+      }
+    }
+  }
+
+  // ADD MODAL
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 50;
+    @include flexbox(row, center, center);
+    padding: 16px;
+    animation: fadeIn 0.2s ease-out forwards;
+
+    .modal-dialog {
+      background-color: $bg-white;
+      border-radius: $radius-xl;
+      padding: 20px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: $shadow-md;
+      border: 1px solid $border-color;
+      @include flexbox(column, flex-start, stretch, 16px);
+
+      .dialog-header {
+        @include flexbox(row, space-between, center);
+
+        h3 {
+          margin: 0;
+          font-size: 14px;
+          font-weight: 800;
+          color: $secondary-color;
+        }
+
+        button {
+          background: transparent;
+          border: none;
+          color: $text-muted;
+          font-weight: 700;
+          cursor: pointer;
+        }
+      }
+
+      .dialog-form {
+        @include flexbox(column, flex-start, stretch, 8px);
+
+        label {
+          font-size: 12px;
+          font-weight: 600;
+          color: $text-color;
+        }
+
+        input {
+          padding: 10px 14px;
+          border-radius: $radius-md;
+          border: 1px solid $border-color;
+          font-size: 12px;
+
+          &:focus {
+            outline: none;
+            border-color: $primary-color;
+          }
+        }
+      }
+
+      .dialog-actions {
+        @include flexbox(row, flex-start, center, 8px);
+        padding-top: 8px;
+
+        .cancel-btn {
+          flex: 1;
+          padding: 10px;
+          border-radius: $radius-md;
+          background-color: $bg-light;
+          color: $text-muted;
+          font-size: 12px;
+          font-weight: 600;
+          border: none;
+          cursor: pointer;
+        }
+
+        .confirm-btn {
+          flex: 1;
+          padding: 10px;
+          border-radius: $radius-md;
+          background-color: $primary-color;
+          color: $bg-white;
+          font-size: 12px;
+          font-weight: 700;
+          border: none;
+          cursor: pointer;
+
+          &:hover {
+            background-color: $primary-dark;
+          }
+        }
+      }
+    }
+  }
 }

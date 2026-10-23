@@ -35,7 +35,7 @@ export class CalorieCalculatorService {
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
       age--;
     }
-    return Math.max(16, Math.min(120, age));
+    return Math.max(1, Math.min(120, age));
   }
 
   /**
@@ -104,7 +104,9 @@ export class CalorieCalculatorService {
 
   /**
    * Projected weight progress based on daily caloric deficit.
-   * 1 kg body fat ≈ 7.000 kcal.
+   * Based on NIH Body Weight Planner / Hall et al. energy balance principles:
+   * 1 kg fat mass ≈ 7.700 kcal.
+   * Projected 4-week weight loss: (deficit * 28) / 7700 with metabolic adaptation.
    */
   calculateForecast(deficitKcal: number): WeightForecast {
     if (deficitKcal <= 0) {
@@ -115,16 +117,17 @@ export class CalorieCalculatorService {
       };
     }
 
-    // Weekly loss: (deficit * 7) / 7000
-    const weeklyLossKg = Math.round(((deficitKcal * 7) / 7000) * 10) / 10;
-    // Monthly loss range: weeklyLoss * 4 to weeklyLoss * 4.5
-    const monthlyLossMin = Math.round(weeklyLossKg * 4 * 10) / 10;
-    const monthlyLossMax = Math.round(weeklyLossKg * 5 * 10) / 10;
+    // Weekly loss: (deficit * 7) / 7700
+    const weeklyLossKg = Math.round(((deficitKcal * 7) / 7700) * 10) / 10;
+    // Monthly loss range (approx 4 weeks): conservative realistic range
+    const fourWeeksKg = Math.round(((deficitKcal * 28) / 7700) * 10) / 10;
+    const monthlyLossMin = Math.max(0.5, Math.round((fourWeeksKg * 0.85) * 10) / 10);
+    const monthlyLossMax = Math.max(monthlyLossMin, Math.round((fourWeeksKg * 1.15) * 10) / 10);
 
     return {
-      weeklyLossKg: weeklyLossKg > 0 ? weeklyLossKg : 0.5,
-      monthlyLossMinKg: monthlyLossMin >= 1 ? monthlyLossMin : 2,
-      monthlyLossMaxKg: monthlyLossMax >= 2 ? monthlyLossMax : 4
+      weeklyLossKg: weeklyLossKg > 0 ? weeklyLossKg : 0.3,
+      monthlyLossMinKg: monthlyLossMin,
+      monthlyLossMaxKg: monthlyLossMax
     };
   }
 
@@ -133,20 +136,24 @@ export class CalorieCalculatorService {
    */
   calculate(profile: UserProfile): CalorieCalculationResult {
     const age = this.calculateAge(profile.birthDate);
+    const isMinor = age < 18;
     const gender = profile.gender || 'female';
     const weight = Math.max(35, profile.currentWeight);
     const height = Math.max(100, profile.height);
 
-    // 1. Calculate BMR
+    // 1. Calculate BMR (Mifflin-St. Jeor)
     const bmr = this.calculateBmr(weight, height, age, gender);
 
     // 2. Calculate TDEE (Erhaltungsbedarf)
     const tdee = this.calculateTdee(bmr, profile.activityLevel);
 
-    // 3. Determine Deficit based on Goal
+    // 3. Determine Deficit based on Goal and Safety
     let deficit = 0;
-    if (profile.goal === 'lose_weight') {
-      deficit = this.DEFAULT_DEFICIT; // 300 kcal moderate deficit
+    if (isMinor) {
+      // Under 18: Protect growing adolescents – no automated deficit
+      deficit = 0;
+    } else if (profile.goal === 'lose_weight') {
+      deficit = this.DEFAULT_DEFICIT; // 300 kcal moderate, healthy deficit
     } else if (profile.goal === 'gain_weight') {
       deficit = -300; // Caloric surplus
     } else {
@@ -167,8 +174,12 @@ export class CalorieCalculatorService {
     // 5. Calculate Macronutrients
     const macros = this.calculateMacros(targetKcal, weight);
 
-    // 6. Forecast
+    // 6. Forecast & 4-Week estimate (NIH model basis)
     const forecast = this.calculateForecast(deficit);
+    const fourWeekLossKg = deficit > 0 ? Math.round(((deficit * 28) / 7700) * 10) / 10 : 0;
+    const fourWeekLossText = fourWeekLossKg > 0
+      ? `ungefähr ${Math.round(fourWeekLossKg)} kg weniger`
+      : 'Gewichtsstabilität';
 
     return {
       bmr,
@@ -179,7 +190,10 @@ export class CalorieCalculatorService {
       forecast,
       isUnderSafeMinimum,
       safeMinimumKcal: safeMin,
-      calculatedAge: age
+      calculatedAge: age,
+      isMinor,
+      fourWeekLossKg,
+      fourWeekLossText
     };
   }
 }

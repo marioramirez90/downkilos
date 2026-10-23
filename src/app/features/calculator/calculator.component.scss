@@ -1,492 +1,512 @@
-@use 'sass:color';
-@use '../../../styles/abstracts/variables' as *;
-@use '../../../styles/abstracts/mixins' as *;
-@use '../../../styles/components/buttons' as *;
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+@use '../../../styles/abstracts/variables' as vars;
+@use '../../../styles/abstracts/mixins' as mixins;
 
 :host {
   display: block;
   height: 100%;
 }
 
-.calculator-container {
-  @include flexbox(column, space-between, stretch);
-  height: 100%;
-  background-color: $bg-white;
+// 1. Mobile Screen Container (100dvh, App-Shell)
+.calculator-screen {
+  height: 100dvh;
+  background-color: vars.$bg-white;
   overflow: hidden;
+  @include mixins.flexbox(column, flex-start, stretch);
+  position: relative;
+  max-width: 480px;
+  margin: 0 auto;
 }
 
-// ----------------------------------------------------
-// Header & Navigation Tabs
-// ----------------------------------------------------
+// 2. Header
 .calculator-header {
-  @include flexbox(column, flex-start, stretch);
+  @include mixins.flexbox(column, flex-start, stretch);
   flex-shrink: 0;
-  padding: 16px 20px 8px;
-  background-color: $bg-white;
-  border-bottom: 1px solid $border-color-light;
+  padding: 12px 16px 8px;
+  background-color: vars.$bg-white;
+  border-bottom: 1px solid vars.$border-color;
   z-index: 10;
 
   .header-top-row {
-    @include flexbox(row, space-between, center);
-    padding-bottom: 4px;
+    @include mixins.flexbox(row, space-between, center);
 
-    .header-title-group {
-      @include flexbox(row, flex-start, center, 12px);
+    .back-nav-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: vars.$radius-full;
+      background: transparent;
+      border: 1px solid vars.$border-color;
+      color: vars.$secondary-color;
+      cursor: pointer;
+      @include mixins.flexbox(row, center, center);
+      transition: all 0.15s ease;
 
-      button {
-        @include inline-flexbox(row, center, center);
-        width: 40px;
-        height: 40px;
-        margin-left: -4px;
-        background: transparent;
-        border: none;
-        border-radius: $radius-full;
-        color: $secondary-color;
-        cursor: pointer;
-        transition: background-color 0.2s ease, transform 0.1s ease;
-
-        svg {
-          width: 24px;
-          height: 24px;
-          stroke-width: 2.5;
-        }
-
-        &:hover {
-          background-color: $secondary-light;
-        }
-
-        &:active {
-          transform: scale(0.95);
-        }
+      svg {
+        width: 18px;
+        height: 18px;
       }
 
-      h1 {
-        margin: 0;
-        font-size: 20px;
-        font-weight: 800;
-        color: $secondary-color;
-        letter-spacing: -0.02em;
+      &:hover {
+        background-color: vars.$bg-light;
+      }
+    }
 
-        @include respond-to('mobile') {
-          font-size: 18px;
-        }
+    .logo-group {
+      @include mixins.flexbox(row, center, center, 8px);
+
+      .leaf-logo-icon {
+        width: 26px;
+        height: 26px;
+        object-fit: contain;
+      }
+
+      .app-brand-name {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: vars.$secondary-color;
+        letter-spacing: -0.02em;
       }
     }
   }
 
   .calculator-tabs-bar {
-    @include flexbox(row, flex-start, center, 4px);
-    background-color: $secondary-light;
-    padding: 4px;
-    border-radius: $radius-lg;
-    margin: 8px 0 4px;
-    max-width: 280px;
-    user-select: none;
+    @include mixins.flexbox(row, center, center, 4px);
+    background-color: vars.$bg-light;
+    padding: 3px;
+    border-radius: vars.$radius-full;
+    margin: 8px auto 0;
+    width: 220px;
+    border: 1px solid vars.$border-color;
 
     button {
       flex: 1;
       padding: 6px 12px;
-      font-size: 12px;
-      font-weight: 700;
-      border: none;
-      border-radius: $radius-md;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: vars.$text-muted;
       background: transparent;
-      color: $text-muted;
+      border: none;
+      border-radius: vars.$radius-full;
       cursor: pointer;
-      text-align: center;
       transition: all 0.2s ease;
 
-      &:hover {
-        color: $secondary-color;
-      }
-
       &.active {
-        background-color: $primary-color;
-        color: $bg-white;
-        box-shadow: $shadow-sm;
+        background-color: vars.$primary-color;
+        color: vars.$bg-white;
+        box-shadow: 0 1px 4px rgba(39, 143, 57, 0.2);
       }
     }
   }
 }
 
-// ----------------------------------------------------
-// Scrollable Content Area
-// ----------------------------------------------------
-.calculator-body {
+// 3. Scrollable Body
+.calculator-scrollable-content {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 16px 20px;
+  padding: 12px 16px 20px;
+  @include mixins.flexbox(column, flex-start, stretch, 10px);
   -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
-.calculator-overview-tab {
-  @include flexbox(column, flex-start, stretch, 16px);
-  animation: fadeIn 0.2s ease-out forwards;
+// 4. Persönliche Begrüßung
+.personal-greeting-section {
+  @include mixins.flexbox(column, flex-start, stretch);
+
+  .user-greeting-title {
+    margin: 2px 0 2px;
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: vars.$secondary-color;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+  }
+
+  .greeting-subtitle {
+    margin: 0;
+    font-size: 0.85rem;
+    color: vars.$text-muted;
+    font-weight: 500;
+  }
 }
 
-.calculator-details-tab {
-  @include flexbox(column, flex-start, stretch, 16px);
-  animation: fadeIn 0.2s ease-out forwards;
-}
+// 5. Großer Kalorienring
+.gauge-ring-card {
+  @include mixins.flexbox(column, center, center);
+  padding: 2px 0;
 
-// ----------------------------------------------------
-// Calorie Gauge (Circular Progress Ring)
-// ----------------------------------------------------
-.gauge-card {
-  @include flexbox(column, center, center);
-  padding: 8px 0;
-
-  .gauge-wrapper {
+  .ring-svg-container {
     position: relative;
-    width: 200px;
-    height: 200px;
-    @include inline-flexbox(row, center, center);
+    width: 176px;
+    height: 176px;
+    max-width: 100%;
+    @include mixins.flexbox(row, center, center);
 
-    svg {
+    .ring-svg {
       width: 100%;
       height: 100%;
       transform: rotate(-90deg);
 
-      .gauge-circle-track {
-        // Light green background track matching the mockup
-        stroke: $border-color-green;
-        stroke-width: 12px;
-        fill: transparent;
+      .ring-bg-track {
+        fill: none;
+        stroke: vars.$primary-light;
+        stroke-width: 13;
       }
 
-      .gauge-circle-progress {
-        // Dark green active progress
-        stroke: $primary-color;
-        stroke-width: 12px;
+      .ring-active-track {
+        fill: none;
+        stroke-width: 13;
         stroke-linecap: round;
-        fill: transparent;
-        transition: stroke-dashoffset 1s ease-out;
+        transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
       }
     }
 
-    .gauge-center-content {
+    .ring-center-text {
       position: absolute;
       inset: 0;
-      @include flexbox(column, center, center);
+      @include mixins.flexbox(column, center, center);
       text-align: center;
-      user-select: none;
+      pointer-events: none;
+      padding: 0 15px;
+      transform: translateY(-10px);
 
-      strong {
-        font-size: 36px;
-        font-weight: 800;
-        color: $secondary-color;
+      .ring-number {
+        font-size: 2.15rem;
+        font-weight: 900;
+        color: vars.$text-color;
         line-height: 1;
         letter-spacing: -0.02em;
       }
 
-      span {
-        font-size: 13px;
-        font-weight: 600;
-        color: $text-muted;
+      .ring-unit {
+        font-size: 0.92rem;
+        font-weight: 700;
+        color: vars.$text-color;
         margin-top: 2px;
       }
 
-      small {
-        font-size: 11px;
-        font-weight: 500;
-        color: $text-light;
-        margin-top: 6px;
+      .ring-sub {
+        display: block;
+        width: 95px;
+        font-size: 0.62rem;
+        font-weight: 600;
+        color: vars.$text-muted;
+        margin-top: 3px;
+        line-height: 1.15;
+        text-align: center;
       }
     }
   }
 }
 
-// ----------------------------------------------------
-// Two Side-by-Side Metric Cards
-// ----------------------------------------------------
-.calculator-metrics-row {
+// 6. Zwei Spalten: Erhaltungsbedarf & Defizit
+.metrics-cards-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 
-  .calculator-metric-card {
-    @include flexbox(column, space-between, stretch);
-    padding: 14px;
-    background-color: $bg-card;
-    border: 1px solid $border-color;
-    border-radius: $radius-lg;
-    box-shadow: $shadow-sm;
+  .metric-card {
+    background-color: vars.$bg-light;
+    border: 1px solid vars.$border-color;
+    border-radius: 16px;
+    padding: 10px 12px;
+    @include mixins.flexbox(column, space-between, flex-start);
 
-    strong {
-      display: block;
-      font-size: 17px;
-      font-weight: 800;
-      color: $secondary-color;
-      line-height: 1.2;
+    .metric-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: vars.$text-muted;
     }
+
+    .metric-value {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: vars.$text-color;
+      letter-spacing: -0.02em;
+      margin: 4px 0 2px;
+    }
+
+    .metric-desc {
+      margin: 0;
+      font-size: 0.65rem;
+      color: vars.$text-muted;
+      line-height: 1.25;
+    }
+
+    .metric-header-row {
+      @include mixins.flexbox(row, space-between, center);
+      width: 100%;
+
+      .flame-icon-svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+}
+
+// 7. Deine mögliche Entwicklung (NIH Modell)
+.outlook-forecast-card {
+  background-color: vars.$bg-light;
+  border: 1px solid vars.$border-color;
+  border-radius: 16px;
+  padding: 12px 14px;
+  @include mixins.flexbox(column, flex-start, stretch, 6px);
+
+  .outlook-header {
+    @include mixins.flexbox(row, flex-start, center, 8px);
+
+    .outlook-icon-circle {
+      width: 26px;
+      height: 26px;
+      border-radius: vars.$radius-full;
+      background-color: vars.$primary-light;
+      @include mixins.flexbox(row, center, center);
+
+      svg {
+        width: 14px;
+        height: 14px;
+      }
+    }
+
+    .outlook-title {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: vars.$secondary-color;
+      letter-spacing: -0.01em;
+    }
+  }
+
+  .outlook-text {
+    margin: 0;
+    font-size: 0.74rem;
+    color: vars.$text-color;
+    line-height: 1.35;
+  }
+
+  .outlook-estimate-badge {
+    @include mixins.flexbox(row, flex-start, center, 6px);
+    background-color: vars.$primary-light;
+    border: 1px solid vars.$border-color-green;
+    border-radius: 10px;
+    padding: 7px 10px;
+
+    .estimate-bullet {
+      font-size: 13px;
+    }
+
+    .estimate-text {
+      font-size: 0.76rem;
+      font-weight: 800;
+      color: vars.$secondary-color;
+    }
+  }
+
+  .outlook-disclaimer {
+    margin: 0;
+    font-size: 0.65rem;
+    color: vars.$text-muted;
+    line-height: 1.25;
+  }
+
+  .youth-safety-box {
+    background-color: #FEF3C7;
+    border: 1px solid #FCD34D;
+    border-radius: 10px;
+    padding: 8px 10px;
+
+    p {
+      margin: 0;
+      font-size: 0.72rem;
+      color: #92400E;
+      line-height: 1.35;
+    }
+  }
+}
+
+// 8. Motivierende Erklärung
+.daily-life-motivation-card {
+  background-color: vars.$primary-light;
+  border: 1px solid vars.$border-color-green;
+  border-radius: 16px;
+  padding: 12px 14px;
+  @include mixins.flexbox(column, flex-start, stretch, 6px);
+
+  .motivation-title {
+    margin: 0;
+    font-size: 0.84rem;
+    font-weight: 800;
+    color: vars.$secondary-color;
+  }
+
+  .motivation-body {
+    margin: 0;
+    font-size: 0.73rem;
+    color: vars.$text-color;
+    line-height: 1.35;
+  }
+
+  .motivation-punchline {
+    @include mixins.flexbox(row, flex-start, center, 6px);
+    margin-top: 2px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: vars.$secondary-color;
 
     span {
-      display: block;
-      font-size: 12px;
-      font-weight: 600;
-      color: $text-color;
-      margin-top: 4px;
-    }
-
-    small {
-      display: block;
-      font-size: 10px;
-      color: $text-muted;
-      margin-top: 4px;
-    }
-
-    .deficit-header {
-      @include flexbox(row, flex-start, center, 4px);
-
-      .flame-emoji {
-        font-size: 14px;
-      }
+      font-size: 13px;
     }
   }
 }
 
-// ----------------------------------------------------
-// Green Info Callout Box
-// ----------------------------------------------------
-.calculator-info-box {
-  @include flexbox(row, flex-start, flex-start, 10px);
-  padding: 14px;
-  background-color: $primary-light;
-  border: 1px solid $border-color-green;
-  border-radius: $radius-lg;
+// 9. Details Tab Content
+.details-tab-content {
+  @include mixins.flexbox(column, flex-start, stretch, 12px);
 
-  .info-icon {
-    font-size: 16px;
-    color: $primary-color;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
+  .macros-breakdown-card,
+  .metabolism-analysis-card {
+    background-color: vars.$bg-light;
+    border: 1px solid vars.$border-color;
+    border-radius: 16px;
+    padding: 12px 14px;
 
-  p {
-    margin: 0;
-    font-size: 12px;
-    font-weight: 500;
-    color: $secondary-color;
-    line-height: 1.45;
-  }
-}
+    .details-section-title {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: vars.$secondary-color;
+    }
 
-// ----------------------------------------------------
-// Forecast Section
-// ----------------------------------------------------
-.calculator-forecast-section {
-  @include flexbox(column, flex-start, stretch, 8px);
-  padding-top: 4px;
-
-  h3 {
-    margin: 0;
-    font-size: 12px;
-    font-weight: 700;
-    color: $secondary-color;
-    letter-spacing: -0.01em;
-  }
-
-  .forecast-cards-row {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-
-    .forecast-card {
-      @include flexbox(column, center, center);
-      padding: 12px;
-      background-color: $bg-light;
-      border: 1px solid $border-color;
-      border-radius: $radius-lg;
-      text-align: center;
-
-      strong {
-        display: block;
-        font-size: 15px;
-        font-weight: 800;
-        color: $secondary-color;
-      }
-
-      span {
-        display: block;
-        font-size: 11px;
-        color: $text-muted;
-        margin-top: 2px;
-      }
+    .details-section-subtitle {
+      margin: 2px 0 10px;
+      font-size: 0.7rem;
+      color: vars.$text-muted;
     }
   }
-}
 
-// ----------------------------------------------------
-// Details Tab: Macros Breakdown
-// ----------------------------------------------------
-.macros-breakdown-card {
-  @include flexbox(column, flex-start, stretch, 12px);
-  padding: 16px;
-  background-color: $bg-card;
-  border: 1px solid $border-color;
-  border-radius: $radius-lg;
-  box-shadow: $shadow-sm;
+  .macro-item {
+    margin-bottom: 10px;
 
-  h3 {
-    margin: 0;
-    font-size: 11px;
-    font-weight: 700;
-    color: $secondary-color;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
+    &:last-child {
+      margin-bottom: 0;
+    }
 
-  .macro-bar-item {
-    @include flexbox(column, flex-start, stretch, 4px);
+    .macro-text-row {
+      @include mixins.flexbox(row, space-between, center);
+      font-size: 0.72rem;
+      margin-bottom: 4px;
 
-    .macro-label-row {
-      @include flexbox(row, space-between, center);
-      font-size: 12px;
-
-      strong {
-        font-weight: 600;
-        color: $secondary-color;
+      .macro-name {
+        font-weight: 700;
+        color: vars.$text-color;
       }
 
-      span {
-        font-weight: 500;
-        color: $text-muted;
+      .macro-val {
+        color: vars.$text-muted;
       }
     }
 
-    .macro-track {
-      width: 100%;
+    .macro-progress-track {
       height: 8px;
-      background-color: $secondary-light;
-      border-radius: $radius-full;
+      background-color: #E2E8E3;
+      border-radius: vars.$radius-full;
       overflow: hidden;
 
-      .macro-fill {
+      .macro-progress-fill {
         height: 100%;
-        border-radius: $radius-full;
+        border-radius: vars.$radius-full;
         transition: width 0.6s ease;
 
-        &.macro-protein {
-          background-color: $primary-color;
+        &.protein-fill {
+          background-color: vars.$primary-color;
         }
 
-        &.macro-carbs {
-          background-color: #EAB308;
+        &.carbs-fill {
+          background-color: #D97706;
         }
 
-        &.macro-fat {
-          background-color: #3B82F6;
+        &.fat-fill {
+          background-color: #2563EB;
         }
       }
     }
   }
-}
 
-// ----------------------------------------------------
-// Details Tab: Metabolism Card
-// ----------------------------------------------------
-.metabolism-card {
-  @include flexbox(column, flex-start, stretch, 8px);
-  padding: 16px;
-  background-color: $bg-light;
-  border: 1px solid $border-color;
-  border-radius: $radius-lg;
+  .metabolism-detail-row {
+    @include mixins.flexbox(row, space-between, center);
+    padding: 6px 0;
+    border-bottom: 1px solid vars.$border-color;
+    font-size: 0.74rem;
 
-  h3 {
-    margin: 0;
-    font-size: 12px;
-    font-weight: 700;
-    color: $secondary-color;
-    padding-bottom: 2px;
-  }
-
-  .metabolism-row {
-    @include flexbox(row, space-between, center);
-    font-size: 12px;
+    &:last-child {
+      border-bottom: none;
+    }
 
     span {
-      color: $text-muted;
+      color: vars.$text-muted;
     }
 
     strong {
-      color: $secondary-color;
-      font-weight: 700;
+      color: vars.$text-color;
+    }
+  }
+
+  .medical-safety-callout {
+    background-color: vars.$bg-white;
+    border: 1px solid vars.$border-color;
+    border-radius: 14px;
+    padding: 10px 12px;
+
+    strong {
+      display: block;
+      font-size: 0.76rem;
+      color: vars.$secondary-color;
+      margin-bottom: 2px;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.68rem;
+      color: vars.$text-muted;
+      line-height: 1.35;
     }
   }
 }
 
-// ----------------------------------------------------
-// Details Tab: Health Warning Box
-// ----------------------------------------------------
-.calculator-health-box {
-  padding: 14px;
-  background-color: #FEF9C3;
-  border: 1px solid #FDE047;
-  border-radius: $radius-lg;
-  font-size: 11px;
-  color: #713F12;
-  line-height: 1.45;
-
-  strong {
-    display: block;
-    margin-bottom: 2px;
-    font-weight: 700;
-  }
-
-  p {
-    margin: 0;
-  }
-}
-
-// ----------------------------------------------------
-// Sticky Bottom Action Footer
-// ----------------------------------------------------
-.calculator-footer {
+// 10. Fester Footer mit Weiter-Button
+.calculator-fixed-footer {
   flex-shrink: 0;
-  background: rgba($bg-white, 0.95);
-  backdrop-filter: blur(8px);
-  border-top: 1px solid $border-color;
-  padding: 14px 20px;
+  background-color: vars.$bg-white;
+  border-top: 1px solid vars.$border-color;
+  padding: 10px 16px;
+  padding-bottom: max(10px, env(safe-area-inset-bottom, 10px));
   z-index: 20;
-  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.04);
 
-  .cta-continue-button {
-    @include flexbox(row, center, center, 8px);
+  .cta-continue-pill-button {
     width: 100%;
-    padding: 14px 24px;
-    background-color: $primary-color;
-    color: $bg-white;
-    font-size: 15px;
-    font-weight: 700;
+    height: 48px;
+    background-color: vars.$primary-color;
+    color: vars.$bg-white;
     border: none;
-    border-radius: $radius-lg;
+    border-radius: vars.$radius-full;
+    font-size: 0.92rem;
+    font-weight: 800;
     cursor: pointer;
-    box-shadow: $shadow-button;
-    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 4px 14px rgba(39, 143, 57, 0.25);
+    @include mixins.flexbox(row, center, center);
+    transition: transform 0.15s ease, background-color 0.15s ease;
 
     &:hover {
-      background-color: $primary-dark;
+      background-color: vars.$primary-dark;
+      transform: translateY(-1px);
     }
 
     &:active {
-      transform: scale(0.98);
-    }
-
-    .arrow-icon {
-      font-size: 18px;
-      line-height: 1;
+      transform: translateY(0);
     }
   }
 }

@@ -22,7 +22,12 @@ export const routes: Routes = [
     path: 'calculator',
     loadComponent: () =>
       import('./features/calculator/calculator.component').then((m) => m.CalculatorComponent),
-    title: 'Down Kilos – Mein Kalorienbedarf',
+    title: 'Down Kilos – Dein persönlicher Abnehmplan',
+  },
+  {
+    path: 'plan',
+    redirectTo: 'calculator',
+    pathMatch: 'full',
   },
   {
     path: 'retailers',

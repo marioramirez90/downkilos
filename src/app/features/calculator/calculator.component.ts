@@ -1,18 +1,16 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { StorageService } from '../../core/services/storage.service';
 import { CalorieCalculatorService } from '../../core/services/calorie-calculator.service';
 import { CalorieCalculationResult } from '../../core/models/calorie-calculation.model';
 import { UserProfile } from '../../core/models/user-profile.model';
-
 import { HamburgerButtonComponent } from '../../shared/components/hamburger-button/hamburger-button.component';
-import { TranslatePipe } from '../../core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-calculator',
   standalone: true,
-  imports: [CommonModule, HamburgerButtonComponent, TranslatePipe],
+  imports: [CommonModule, HamburgerButtonComponent],
   templateUrl: './calculator.component.html',
   styleUrl: './calculator.component.scss'
 })
@@ -21,44 +19,69 @@ export class CalculatorComponent implements OnInit {
   private storageService = inject(StorageService);
   private calorieService = inject(CalorieCalculatorService);
 
-  activeTab = signal<'overview' | 'details'>('overview');
-  calc = signal<CalorieCalculationResult | null>(null);
+  readonly activeTab = signal<'overview' | 'details'>('overview');
 
-  async ngOnInit() {
-    let profile = await this.storageService.loadProfile();
-    if (!profile) {
-      // Default fallback profile matching Lisa Müller from reference
-      profile = {
-        id: 'guest_profile',
-        name: 'Lisa Müller',
-        birthDate: '1990-05-14',
-        gender: 'female',
-        currentWeight: 78,
-        height: 168,
-        activityLevel: 'sedentary',
-        goal: 'lose_weight',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-    }
+  // Reaktives Profil aus dem Storage
+  readonly profile = computed<UserProfile>(() => {
+    const stored = this.storageService.profile();
+    if (stored) return stored;
+    // Lisa Müller Fallback falls noch kein Profil existiert
+    return {
+      id: 'guest_profile',
+      name: 'Lisa Müller',
+      birthDate: '1990-05-14',
+      gender: 'female',
+      currentWeight: 78,
+      height: 168,
+      activityLevel: 'sedentary',
+      goal: 'lose_weight',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+  });
 
-    const result = this.calorieService.calculate(profile);
-    this.calc.set(result);
+  // Automatische Neuberechnung bei jeder Profiländerung
+  readonly calc = computed<CalorieCalculationResult>(() => {
+    return this.calorieService.calculate(this.profile());
+  });
+
+  readonly userFirstName = computed<string>(() => {
+    const name = this.profile().name || 'Lisa';
+    return name.trim().split(' ')[0];
+  });
+
+  readonly formattedTargetKcal = computed<string>(() => {
+    return Math.round(this.calc().dailyTargetKcal).toLocaleString('de-DE');
+  });
+
+  readonly formattedTdee = computed<string>(() => {
+    return Math.round(this.calc().tdee).toLocaleString('de-DE');
+  });
+
+  readonly formattedBmr = computed<string>(() => {
+    return Math.round(this.calc().bmr).toLocaleString('de-DE');
+  });
+
+  readonly calorieRatio = computed<number>(() => {
+    const res = this.calc();
+    if (!res || !res.tdee) return 0.75;
+    return Math.min(1, Math.max(0.1, res.dailyTargetKcal / res.tdee));
+  });
+
+  readonly calorieDashOffset = computed<number>(() => {
+    const circumference = 478; // 2 * PI * 76 ≈ 477.52
+    return Math.round(circumference * (1 - this.calorieRatio()));
+  });
+
+  async ngOnInit(): Promise<void> {
+    await this.storageService.loadProfile();
   }
 
-  getStrokeOffset(res: CalorieCalculationResult): number {
-    const totalCircumference = 427; // 2 * PI * 68 ≈ 427.25
-    if (!res || !res.tdee) return totalCircumference * 0.2;
-    // Percentage ratio of target vs maintenance
-    const ratio = Math.min(1, Math.max(0.1, res.dailyTargetKcal / res.tdee));
-    return totalCircumference * (1 - ratio);
-  }
-
-  goBack() {
+  goBack(): void {
     this.router.navigate(['/onboarding']);
   }
 
-  goToRetailers() {
+  goToRetailers(): void {
     this.router.navigate(['/retailers']);
   }
 }

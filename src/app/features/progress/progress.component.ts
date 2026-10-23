@@ -286,6 +286,10 @@ export class ProgressComponent implements OnInit {
     window.URL.revokeObjectURL(url);
   }
 
+  goToCaloriePlan(): void {
+    this.router.navigate(['/calculator']);
+  }
+
   async executeReset(): Promise<void> {
     await this.storageService.resetAllData();
     this.showResetConfirm = false;

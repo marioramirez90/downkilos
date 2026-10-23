@@ -207,7 +207,7 @@ export class RetailersComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/onboarding']);
+    this.router.navigate(['/calculator']);
   }
 
   /**

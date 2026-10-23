@@ -73,4 +73,46 @@ describe('CalorieCalculatorService', () => {
     expect(forecast.weeklyLossKg).toBeCloseTo(0.3, 1);
     expect(forecast.monthlyLossMinKg).toBeGreaterThan(0);
   });
+
+  it('should protect minors (< 18) by setting isMinor and deficit to 0', () => {
+    const minorProfile: UserProfile = {
+      id: 'minor',
+      name: 'Tim',
+      birthDate: '2012-05-10', // ~14 years old
+      gender: 'male',
+      currentWeight: 55,
+      height: 165,
+      activityLevel: 'moderate',
+      goal: 'lose_weight',
+      createdAt: '',
+      updatedAt: ''
+    };
+
+    const result = service.calculate(minorProfile);
+    expect(result.isMinor).toBe(true);
+    expect(result.deficit).toBe(0);
+    expect(result.dailyTargetKcal).toBe(result.tdee);
+    expect(result.fourWeekLossKg).toBe(0);
+  });
+
+  it('should provide realistic 4-week outlook based on NIH energy balance principles', () => {
+    const adultProfile: UserProfile = {
+      id: 'adult',
+      name: 'Lisa',
+      birthDate: '1990-05-14',
+      gender: 'female',
+      currentWeight: 78,
+      height: 168,
+      activityLevel: 'sedentary',
+      goal: 'lose_weight',
+      createdAt: '',
+      updatedAt: ''
+    };
+
+    const result = service.calculate(adultProfile);
+    expect(result.isMinor).toBe(false);
+    expect(result.deficit).toBe(300);
+    expect(result.fourWeekLossKg).toBeCloseTo(1.1, 1);
+    expect(result.fourWeekLossText).toContain('1 kg');
+  });
 });

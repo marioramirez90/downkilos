@@ -26,5 +26,8 @@ export interface CalorieCalculationResult {
   isUnderSafeMinimum: boolean;
   safeMinimumKcal: number;
   calculatedAge: number;
+  isMinor: boolean;
+  fourWeekLossKg: number;
+  fourWeekLossText: string;
   notes?: string[];
 }

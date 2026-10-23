@@ -12,15 +12,14 @@ import { HamburgerButtonComponent } from '../../shared/components/hamburger-butt
   imports: [CommonModule, BottomNavComponent, HamburgerButtonComponent],
   template: `
     <div class="flex flex-col h-full bg-[#FFFFFF] overflow-hidden">
-      <!-- Main Scrollable Area -->
-      <div class="flex-1 px-5 pt-4 pb-4 space-y-4 min-h-0 overflow-y-auto">
-        <!-- Header -->
-        <div class="flex items-center justify-between pb-1">
+      <!-- Bereich A: Fester Header mit Tag-Auswahl -->
+      <header class="flex-shrink-0 px-5 pt-4 pb-2 bg-white border-b border-[#F0F4F1] z-10 space-y-2">
+        <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
             <button
               type="button"
               (click)="goBack()"
-              class="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-[#103A2A] hover:bg-[#F1F5F2] active:scale-95 transition-transform"
+              class="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-[#103A2A] hover:bg-[#F1F5F2] active:scale-95 transition-transform cursor-pointer"
               aria-label="Zurück"
             >
               <svg class="w-6 h-6 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -37,7 +36,7 @@ import { HamburgerButtonComponent } from '../../shared/components/hamburger-butt
             <button
               type="button"
               (click)="showPlanInfo.set(!showPlanInfo())"
-              class="w-9 h-9 rounded-full bg-[#F1F5F2] hover:bg-[#E5F5E8] flex items-center justify-center text-[#278F39] transition-colors"
+              class="w-9 h-9 rounded-full bg-[#F1F5F2] hover:bg-[#E5F5E8] flex items-center justify-center text-[#278F39] transition-colors cursor-pointer"
               title="Info zum Plan"
             >
               <span class="text-sm font-bold">ℹ️</span>
@@ -51,7 +50,7 @@ import { HamburgerButtonComponent } from '../../shared/components/hamburger-butt
             <p>
               Dein Plan ist kalorien- und budgetoptimiert für Netto Marken-Discount. Du kannst jede Mahlzeit flexibel gegen passende Alternativen austauschen!
             </p>
-            <button (click)="showPlanInfo.set(false)" class="text-xs font-bold text-[#278F39] ml-2">✕</button>
+            <button (click)="showPlanInfo.set(false)" class="text-xs font-bold text-[#278F39] ml-2 cursor-pointer">✕</button>
           </div>
         }
 
@@ -70,10 +69,13 @@ import { HamburgerButtonComponent } from '../../shared/components/hamburger-butt
             </button>
           }
         </div>
+      </header>
 
+      <!-- Bereich B: Scrollbarer Inhalt -->
+      <main class="flex-1 px-5 py-4 space-y-3 min-h-0 overflow-y-auto">
         <!-- 4 Meal Cards (Matching Screen 5) -->
         @if (plannerService.currentDayPlan(); as day) {
-          <div class="space-y-3 pt-1">
+          <div class="space-y-3">
             <!-- 1. Frühstück -->
             <div
               (click)="openSwapModal('breakfast')"
@@ -187,19 +189,25 @@ import { HamburgerButtonComponent } from '../../shared/components/hamburger-butt
             <span>{{ plannerService.currentDayTotals().cost.toFixed(2).replace('.', ',') }} € Kosten (ca.)</span>
           </div>
         </div>
+      </main>
 
-        <!-- Action Button: Plan anpassen -->
-        <div class="pt-1">
+      <!-- Bereich C: Fester unterer Bereich mit Hauptbutton und Navigationsleiste -->
+      <footer class="flex-shrink-0 bg-white border-t border-[#E3EBE4] z-20">
+        <!-- Hauptbutton "Plan anpassen" unmittelbar über der Navigationsleiste -->
+        <div class="px-5 py-2.5 bg-white border-b border-[#F0F4F1]">
           <button
             type="button"
             (click)="openSwapModal('lunch')"
-            class="w-full py-4 px-6 rounded-2xl bg-[#278F39] hover:bg-[#217A30] active:scale-[0.98] text-white font-bold text-sm sm:text-base shadow-button flex items-center justify-center gap-2 transition-all cursor-pointer"
+            class="w-full py-3.5 px-6 rounded-2xl bg-[#278F39] hover:bg-[#217A30] active:scale-[0.98] text-white font-bold text-sm sm:text-base shadow-button flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
             <span>Plan anpassen</span>
             <span class="text-lg">→</span>
           </button>
         </div>
-      </div>
+
+        <!-- Untere Navigationsleiste -->
+        <app-bottom-nav></app-bottom-nav>
+      </footer>
 
       <!-- Meal Swap Modal / Drawer -->
       @if (swappingMealType(); as mealType) {
@@ -242,9 +250,6 @@ import { HamburgerButtonComponent } from '../../shared/components/hamburger-butt
           </div>
         </div>
       }
-
-      <!-- Bottom Navigation -->
-      <app-bottom-nav></app-bottom-nav>
     </div>
   `,
   styles: [`

@@ -208,7 +208,7 @@ import { HamburgerButtonComponent } from '../../shared/components/hamburger-butt
       </div>
 
       <!-- Static Bottom Action Footer: Always visible at bottom -->
-      <footer class="flex-shrink-0 bg-white/95 backdrop-blur-md border-t border-[#E3EBE4] px-5 py-3.5 z-20 shadow-[0_-4px_16px_rgba(0,0,0,0.04)]">
+      <footer class="flex-shrink-0 bg-white/95 backdrop-blur-md border-t border-[#E3EBE4] px-5 py-3.5 z-20 shadow-[0_-4px_16px_rgba(0,0,0,0.04)] safe-area-bottom">
         <button
           type="button"
           (click)="confirmSelection()"

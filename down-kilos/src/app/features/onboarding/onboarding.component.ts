@@ -263,7 +263,7 @@ import { HamburgerButtonComponent } from '../../shared/components/hamburger-butt
       </div>
 
       <!-- Static Bottom Action Footer: "Weiter" button is 100% fixed at the bottom -->
-      <footer class="flex-shrink-0 bg-white/95 backdrop-blur-md border-t border-[#E3EBE4] px-5 py-3 space-y-2.5 z-20 shadow-[0_-4px_16px_rgba(0,0,0,0.04)]">
+      <footer class="flex-shrink-0 bg-white/95 backdrop-blur-md border-t border-[#E3EBE4] px-5 py-3 space-y-2.5 z-20 shadow-[0_-4px_16px_rgba(0,0,0,0.04)] safe-area-bottom">
         <!-- Progress bar (Step 1 of onboarding) -->
         <div class="flex items-center justify-center gap-1.5">
           <div class="w-16 h-1.5 rounded-full bg-[#278F39]"></div>

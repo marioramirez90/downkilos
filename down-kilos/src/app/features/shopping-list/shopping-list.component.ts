@@ -14,15 +14,14 @@ import { HamburgerButtonComponent } from '../../shared/components/hamburger-butt
   imports: [CommonModule, FormsModule, BottomNavComponent, HamburgerButtonComponent],
   template: `
     <div class="flex flex-col h-full bg-[#FFFFFF] overflow-hidden">
-      <!-- Main Scrollable Content Area -->
-      <div class="flex-1 px-5 pt-4 pb-4 space-y-3.5 min-h-0 overflow-y-auto">
-        <!-- Header -->
+      <!-- Bereich A: Fester Header mit Kategoriefilter -->
+      <header class="flex-shrink-0 px-5 pt-4 pb-2 bg-white border-b border-[#F0F4F1] z-10 space-y-2">
         <div class="flex items-center justify-between pb-1">
           <div class="flex items-center gap-3">
             <button
               type="button"
               (click)="goBack()"
-              class="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-[#103A2A] hover:bg-[#F1F5F2] active:scale-95 transition-transform"
+              class="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-[#103A2A] hover:bg-[#F1F5F2] active:scale-95 transition-transform cursor-pointer"
               aria-label="Zurück"
             >
               <svg class="w-6 h-6 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -40,14 +39,14 @@ import { HamburgerButtonComponent } from '../../shared/components/hamburger-butt
             <button
               type="button"
               (click)="showAddModal.set(true)"
-              class="px-2.5 py-1 text-xs font-bold rounded-full bg-[#E5F5E8] text-[#278F39] hover:bg-[#D4EED8] transition-colors"
+              class="px-2.5 py-1 text-xs font-bold rounded-full bg-[#E5F5E8] text-[#278F39] hover:bg-[#D4EED8] transition-colors cursor-pointer"
             >
               + Artikel
             </button>
             <button
               type="button"
               (click)="showInfo.set(!showInfo())"
-              class="w-8 h-8 rounded-full bg-[#F1F5F2] hover:bg-[#E5F5E8] flex items-center justify-center text-[#278F39] transition-colors text-xs font-bold"
+              class="w-8 h-8 rounded-full bg-[#F1F5F2] hover:bg-[#E5F5E8] flex items-center justify-center text-[#278F39] transition-colors text-xs font-bold cursor-pointer"
               title="Info"
             >
               ℹ️
@@ -61,7 +60,7 @@ import { HamburgerButtonComponent } from '../../shared/components/hamburger-butt
             <p>
               Diese Einkaufsliste wurde automatisch aus deinen geplanten Mahlzeiten berechnet. Mengen sind auf ganze Netto-Verpackungen gerundet.
             </p>
-            <button (click)="showInfo.set(false)" class="text-xs font-bold text-[#278F39] ml-2">✕</button>
+            <button (click)="showInfo.set(false)" class="text-xs font-bold text-[#278F39] ml-2 cursor-pointer">✕</button>
           </div>
         }
 
@@ -118,9 +117,12 @@ import { HamburgerButtonComponent } from '../../shared/components/hamburger-butt
             Getreide
           </button>
         </div>
+      </header>
 
+      <!-- Bereich B: Scrollbarer Inhalt -->
+      <main class="flex-1 px-5 py-4 space-y-3 min-h-0 overflow-y-auto">
         <!-- Items List (Matching Screen 6) -->
-        <div class="space-y-2 pt-1">
+        <div class="space-y-2">
           @for (item of shoppingService.filteredItems(); track item.id) {
             <div
               class="p-2.5 sm:p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 select-none"
@@ -176,7 +178,7 @@ import { HamburgerButtonComponent } from '../../shared/components/hamburger-butt
                   <button
                     type="button"
                     (click)="shoppingService.removeCustomItem(item.id)"
-                    class="text-xs text-red-400 hover:text-red-600 p-1"
+                    class="text-xs text-red-400 hover:text-red-600 p-1 cursor-pointer"
                     title="Löschen"
                   >
                     ✕
@@ -200,21 +202,25 @@ import { HamburgerButtonComponent } from '../../shared/components/hamburger-butt
             {{ priceService.formatPrice(shoppingService.summary().totalCost) }}
           </span>
         </div>
+      </main>
 
-        <!-- Action Button (Matching Screen 6) -->
-        <div class="pt-1">
+      <!-- Bereich C: Fester unterer Bereich mit Hauptbutton und Navigationsleiste -->
+      <footer class="flex-shrink-0 bg-white border-t border-[#E3EBE4] z-20">
+        <!-- Hauptbutton "Liste im Markt öffnen" unmittelbar über der Navigationsleiste -->
+        <div class="px-5 py-2.5 bg-white border-b border-[#F0F4F1]">
           <button
             type="button"
             (click)="openListInStore()"
-            class="w-full py-4 px-6 rounded-2xl bg-[#278F39] hover:bg-[#217A30] active:scale-[0.98] text-white font-bold text-sm sm:text-base shadow-button flex items-center justify-center gap-2 transition-all cursor-pointer"
+            class="w-full py-3.5 px-6 rounded-2xl bg-[#278F39] hover:bg-[#217A30] active:scale-[0.98] text-white font-bold text-sm sm:text-base shadow-button flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
             <span>Liste im Markt öffnen</span>
             <span class="text-lg">→</span>
           </button>
-      </div>
+        </div>
 
-      <!-- Persistent 5-Icon Bottom Navigation -->
-      <app-bottom-nav></app-bottom-nav>
+        <!-- Untere Navigationsleiste -->
+        <app-bottom-nav></app-bottom-nav>
+      </footer>
 
       <!-- Add Custom Item Modal -->
       @if (showAddModal()) {
@@ -222,7 +228,7 @@ import { HamburgerButtonComponent } from '../../shared/components/hamburger-butt
           <div class="bg-white rounded-3xl p-5 w-full max-w-sm space-y-4 shadow-xl border border-[#E3EBE4]">
             <div class="flex justify-between items-center">
               <h3 class="text-sm font-extrabold text-[#103A2A]">Artikel hinzufügen</h3>
-              <button (click)="showAddModal.set(false)" class="text-[#627264] hover:text-[#103A2A] font-bold">✕</button>
+              <button (click)="showAddModal.set(false)" class="text-[#627264] hover:text-[#103A2A] font-bold cursor-pointer">✕</button>
             </div>
 
             <div class="space-y-2">
@@ -248,14 +254,14 @@ import { HamburgerButtonComponent } from '../../shared/components/hamburger-butt
               <button
                 type="button"
                 (click)="showAddModal.set(false)"
-                class="flex-1 py-2.5 rounded-xl bg-[#F1F5F2] text-xs font-semibold text-[#627264]"
+                class="flex-1 py-2.5 rounded-xl bg-[#F1F5F2] text-xs font-semibold text-[#627264] cursor-pointer"
               >
                 Abbrechen
               </button>
               <button
                 type="button"
                 (click)="addCustomItem()"
-                class="flex-1 py-2.5 rounded-xl bg-[#278F39] text-white text-xs font-bold hover:bg-[#217A30]"
+                class="flex-1 py-2.5 rounded-xl bg-[#278F39] text-white text-xs font-bold hover:bg-[#217A30] cursor-pointer"
               >
                 Hinzufügen
               </button>
@@ -263,9 +269,6 @@ import { HamburgerButtonComponent } from '../../shared/components/hamburger-butt
           </div>
         </div>
       }
-
-      <!-- Bottom Navigation -->
-      <app-bottom-nav></app-bottom-nav>
     </div>
   `,
   styles: [`

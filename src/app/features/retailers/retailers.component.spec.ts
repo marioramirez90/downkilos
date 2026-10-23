@@ -41,10 +41,11 @@ describe('RetailersComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should show location prompt section', () => {
+  it('should show market selection section with Netto and other retailers', () => {
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toContain('Wo möchtest du einkaufen?');
-    expect(el.textContent).toContain('Aktuellen Standort ermitteln');
+    expect(el.textContent).toContain('Dein Markt');
+    expect(el.textContent).toContain('Netto');
+    expect(el.textContent).toContain('Weitere Märkte');
   });
 
   it('should handle GPS location request when clicking locateMe', async () => {

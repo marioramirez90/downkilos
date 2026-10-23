@@ -1,3 +1,8 @@
+@use 'sass:color';
+@use '../../../styles/abstracts/variables' as *;
+@use '../../../styles/abstracts/mixins' as *;
+@use '../../../styles/components/buttons' as *;
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -9,6 +14,479 @@
   }
 }
 
-.animate-fade-in {
+:host {
+  display: block;
+  height: 100%;
+}
+
+.calculator-container {
+  @include flexbox(column, space-between, stretch);
+  height: 100%;
+  background-color: $bg-white;
+  overflow: hidden;
+}
+
+// ----------------------------------------------------
+// Header & Navigation Tabs
+// ----------------------------------------------------
+.calculator-header {
+  @include flexbox(column, flex-start, stretch);
+  flex-shrink: 0;
+  padding: 16px 20px 8px;
+  background-color: $bg-white;
+  border-bottom: 1px solid $border-color-light;
+  z-index: 10;
+
+  .header-top-row {
+    @include flexbox(row, space-between, center);
+    padding-bottom: 4px;
+
+    .header-title-group {
+      @include flexbox(row, flex-start, center, 12px);
+
+      button {
+        @include inline-flexbox(row, center, center);
+        width: 40px;
+        height: 40px;
+        margin-left: -4px;
+        background: transparent;
+        border: none;
+        border-radius: $radius-full;
+        color: $secondary-color;
+        cursor: pointer;
+        transition: background-color 0.2s ease, transform 0.1s ease;
+
+        svg {
+          width: 24px;
+          height: 24px;
+          stroke-width: 2.5;
+        }
+
+        &:hover {
+          background-color: $secondary-light;
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 800;
+        color: $secondary-color;
+        letter-spacing: -0.02em;
+
+        @include respond-to('mobile') {
+          font-size: 18px;
+        }
+      }
+    }
+  }
+
+  .calculator-tabs-bar {
+    @include flexbox(row, flex-start, center, 4px);
+    background-color: $secondary-light;
+    padding: 4px;
+    border-radius: $radius-lg;
+    margin: 8px 0 4px;
+    max-width: 280px;
+    user-select: none;
+
+    button {
+      flex: 1;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      border: none;
+      border-radius: $radius-md;
+      background: transparent;
+      color: $text-muted;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+
+      &:hover {
+        color: $secondary-color;
+      }
+
+      &.active {
+        background-color: $primary-color;
+        color: $bg-white;
+        box-shadow: $shadow-sm;
+      }
+    }
+  }
+}
+
+// ----------------------------------------------------
+// Scrollable Content Area
+// ----------------------------------------------------
+.calculator-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px 20px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.calculator-overview-tab {
+  @include flexbox(column, flex-start, stretch, 16px);
   animation: fadeIn 0.2s ease-out forwards;
+}
+
+.calculator-details-tab {
+  @include flexbox(column, flex-start, stretch, 16px);
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+// ----------------------------------------------------
+// Calorie Gauge (Circular Progress Ring)
+// ----------------------------------------------------
+.gauge-card {
+  @include flexbox(column, center, center);
+  padding: 8px 0;
+
+  .gauge-wrapper {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    @include inline-flexbox(row, center, center);
+
+    svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+
+      .gauge-circle-track {
+        // Light green background track matching the mockup
+        stroke: $border-color-green;
+        stroke-width: 12px;
+        fill: transparent;
+      }
+
+      .gauge-circle-progress {
+        // Dark green active progress
+        stroke: $primary-color;
+        stroke-width: 12px;
+        stroke-linecap: round;
+        fill: transparent;
+        transition: stroke-dashoffset 1s ease-out;
+      }
+    }
+
+    .gauge-center-content {
+      position: absolute;
+      inset: 0;
+      @include flexbox(column, center, center);
+      text-align: center;
+      user-select: none;
+
+      strong {
+        font-size: 36px;
+        font-weight: 800;
+        color: $secondary-color;
+        line-height: 1;
+        letter-spacing: -0.02em;
+      }
+
+      span {
+        font-size: 13px;
+        font-weight: 600;
+        color: $text-muted;
+        margin-top: 2px;
+      }
+
+      small {
+        font-size: 11px;
+        font-weight: 500;
+        color: $text-light;
+        margin-top: 6px;
+      }
+    }
+  }
+}
+
+// ----------------------------------------------------
+// Two Side-by-Side Metric Cards
+// ----------------------------------------------------
+.calculator-metrics-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+
+  .calculator-metric-card {
+    @include flexbox(column, space-between, stretch);
+    padding: 14px;
+    background-color: $bg-card;
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-sm;
+
+    strong {
+      display: block;
+      font-size: 17px;
+      font-weight: 800;
+      color: $secondary-color;
+      line-height: 1.2;
+    }
+
+    span {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: $text-color;
+      margin-top: 4px;
+    }
+
+    small {
+      display: block;
+      font-size: 10px;
+      color: $text-muted;
+      margin-top: 4px;
+    }
+
+    .deficit-header {
+      @include flexbox(row, flex-start, center, 4px);
+
+      .flame-emoji {
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+// ----------------------------------------------------
+// Green Info Callout Box
+// ----------------------------------------------------
+.calculator-info-box {
+  @include flexbox(row, flex-start, flex-start, 10px);
+  padding: 14px;
+  background-color: $primary-light;
+  border: 1px solid $border-color-green;
+  border-radius: $radius-lg;
+
+  .info-icon {
+    font-size: 16px;
+    color: $primary-color;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 500;
+    color: $secondary-color;
+    line-height: 1.45;
+  }
+}
+
+// ----------------------------------------------------
+// Forecast Section
+// ----------------------------------------------------
+.calculator-forecast-section {
+  @include flexbox(column, flex-start, stretch, 8px);
+  padding-top: 4px;
+
+  h3 {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: $secondary-color;
+    letter-spacing: -0.01em;
+  }
+
+  .forecast-cards-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+
+    .forecast-card {
+      @include flexbox(column, center, center);
+      padding: 12px;
+      background-color: $bg-light;
+      border: 1px solid $border-color;
+      border-radius: $radius-lg;
+      text-align: center;
+
+      strong {
+        display: block;
+        font-size: 15px;
+        font-weight: 800;
+        color: $secondary-color;
+      }
+
+      span {
+        display: block;
+        font-size: 11px;
+        color: $text-muted;
+        margin-top: 2px;
+      }
+    }
+  }
+}
+
+// ----------------------------------------------------
+// Details Tab: Macros Breakdown
+// ----------------------------------------------------
+.macros-breakdown-card {
+  @include flexbox(column, flex-start, stretch, 12px);
+  padding: 16px;
+  background-color: $bg-card;
+  border: 1px solid $border-color;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+
+  h3 {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 700;
+    color: $secondary-color;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .macro-bar-item {
+    @include flexbox(column, flex-start, stretch, 4px);
+
+    .macro-label-row {
+      @include flexbox(row, space-between, center);
+      font-size: 12px;
+
+      strong {
+        font-weight: 600;
+        color: $secondary-color;
+      }
+
+      span {
+        font-weight: 500;
+        color: $text-muted;
+      }
+    }
+
+    .macro-track {
+      width: 100%;
+      height: 8px;
+      background-color: $secondary-light;
+      border-radius: $radius-full;
+      overflow: hidden;
+
+      .macro-fill {
+        height: 100%;
+        border-radius: $radius-full;
+        transition: width 0.6s ease;
+
+        &.macro-protein {
+          background-color: $primary-color;
+        }
+
+        &.macro-carbs {
+          background-color: #EAB308;
+        }
+
+        &.macro-fat {
+          background-color: #3B82F6;
+        }
+      }
+    }
+  }
+}
+
+// ----------------------------------------------------
+// Details Tab: Metabolism Card
+// ----------------------------------------------------
+.metabolism-card {
+  @include flexbox(column, flex-start, stretch, 8px);
+  padding: 16px;
+  background-color: $bg-light;
+  border: 1px solid $border-color;
+  border-radius: $radius-lg;
+
+  h3 {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: $secondary-color;
+    padding-bottom: 2px;
+  }
+
+  .metabolism-row {
+    @include flexbox(row, space-between, center);
+    font-size: 12px;
+
+    span {
+      color: $text-muted;
+    }
+
+    strong {
+      color: $secondary-color;
+      font-weight: 700;
+    }
+  }
+}
+
+// ----------------------------------------------------
+// Details Tab: Health Warning Box
+// ----------------------------------------------------
+.calculator-health-box {
+  padding: 14px;
+  background-color: #FEF9C3;
+  border: 1px solid #FDE047;
+  border-radius: $radius-lg;
+  font-size: 11px;
+  color: #713F12;
+  line-height: 1.45;
+
+  strong {
+    display: block;
+    margin-bottom: 2px;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+// ----------------------------------------------------
+// Sticky Bottom Action Footer
+// ----------------------------------------------------
+.calculator-footer {
+  flex-shrink: 0;
+  background: rgba($bg-white, 0.95);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid $border-color;
+  padding: 14px 20px;
+  z-index: 20;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.04);
+
+  .cta-continue-button {
+    @include flexbox(row, center, center, 8px);
+    width: 100%;
+    padding: 14px 24px;
+    background-color: $primary-color;
+    color: $bg-white;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: $radius-lg;
+    cursor: pointer;
+    box-shadow: $shadow-button;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+
+    &:hover {
+      background-color: $primary-dark;
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+
+    .arrow-icon {
+      font-size: 18px;
+      line-height: 1;
+    }
+  }
 }

@@ -52,6 +52,31 @@ export const DE_TRANSLATIONS = {
     STEP_ACTIVITY: 'Aktivitätslevel',
     CALCULATING: 'Dein Kalorienbedarf wird berechnet...'
   },
+  CALCULATOR: {
+    HEADER_TITLE: 'Mein Kalorienbedarf',
+    TAB_OVERVIEW: 'Übersicht',
+    TAB_DETAILS: 'Details',
+    DAILY_TARGET: 'Tagesziel',
+    MAINTENANCE: 'Erhaltungsbedarf',
+    MAINTENANCE_SUB: '(um dein Gewicht zu halten)',
+    DEFICIT: 'Kaloriendefizit',
+    DEFICIT_SUB: '(pro Tag)',
+    INFO_MESSAGE: 'Mit {{target}} kcal pro Tag erreichst du dein Ziel auf gesunde und nachhaltige Weise.',
+    FORECAST_TITLE: 'Dein voraussichtlicher Fortschritt',
+    PER_WEEK: 'pro Woche',
+    PER_MONTH: 'pro Monat',
+    MACROS_TITLE: 'Optimale Nährstoffverteilung (Schätzwerte)',
+    PROTEIN: 'Eiweiß',
+    CARBS: 'Kohlenhydrate',
+    FAT: 'Fette',
+    METABOLISM_TITLE: 'Stoffwechselanalyse',
+    BMR: 'Ruheenergieverbrauch (BMR):',
+    TDEE: 'Gesamtenergieverbrauch (TDEE):',
+    FORMULA: 'Angewandte Formel:',
+    HEALTH_NOTE: 'Gesundheitshinweis:',
+    HEALTH_TEXT: 'Diese Werte sind Schätzwerte für gesunde Erwachsene. Besondere Situationen wie Schwangerschaft, Stillzeit oder medizinische Vorerkrankungen erfordern ärztliche Absprache.',
+    CONTINUE_BTN: 'Weiter zum Mahlzeitenplan'
+  },
   DASHBOARD: {
     GREETING: 'Hallo, {{name}}!',
     TODAY: 'Heute',
@@ -174,7 +199,14 @@ export const DE_TRANSLATIONS = {
     EXPAND_10: 'Radius auf 10 km erweitern',
     EXPAND_20: 'Auf 20 km erweitern',
     BUDGET_LABEL: 'Dein Wochenbudget für Lebensmittel',
-    CONFIRM_SELECTION: 'Auswahl bestätigen'
+    CONFIRM_SELECTION: 'Auswahl bestätigen',
+    MOCKUP_SUBTITLE: 'Wähle deinen bevorzugten Markt, damit wir dir passende Produkte und Preise anzeigen können.',
+    YOUR_LOCATION: 'Dein Standort',
+    DEFAULT_LOCATION: '10115 Berlin - Mitte',
+    CHANGE: 'Ändern',
+    OTHER_RETAILERS: 'Weitere Märkte',
+    WEEKLY_BUDGET: 'Dein Wochenbudget',
+    CONFIRM_BTN: 'Auswahl bestätigen'
   },
   PROGRESS: {
     HEADER_TITLE: 'Mein Fortschritt',

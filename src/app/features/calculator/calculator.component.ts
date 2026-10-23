@@ -7,11 +7,12 @@ import { CalorieCalculationResult } from '../../core/models/calorie-calculation.
 import { UserProfile } from '../../core/models/user-profile.model';
 
 import { HamburgerButtonComponent } from '../../shared/components/hamburger-button/hamburger-button.component';
+import { TranslatePipe } from '../../core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-calculator',
   standalone: true,
-  imports: [CommonModule, HamburgerButtonComponent],
+  imports: [CommonModule, HamburgerButtonComponent, TranslatePipe],
   templateUrl: './calculator.component.html',
   styleUrl: './calculator.component.scss'
 })

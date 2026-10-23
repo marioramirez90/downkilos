@@ -1,5 +1,5 @@
 <div class="retailers-container">
-  <!-- Bereich A: Fester Header -->
+  <!-- Fixed Header -->
   <header class="retailers-header">
     <div class="header-main">
       <div class="title-group">
@@ -7,297 +7,126 @@
           type="button"
           (click)="goBack()"
           class="back-button"
-          aria-label="Zurück"
+          aria-label="Zurück zum Kalorienrechner"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.75 19.5L8.25 12l7.5-7.5" />
           </svg>
         </button>
         <h1>{{ 'RETAILERS.HEADER_TITLE' | translate }}</h1>
       </div>
-      <div class="header-actions">
-        <button
-          type="button"
-          (click)="showApiKeySettings.set(!showApiKeySettings())"
-          class="settings-button"
-          title="Google Maps API-Schlüssel einstellen"
-        >
-          ⚙️
-        </button>
-        <app-hamburger-button></app-hamburger-button>
+      <app-hamburger-button></app-hamburger-button>
+    </div>
+
+    <p>{{ 'RETAILERS.MOCKUP_SUBTITLE' | translate }}</p>
+  </header>
+
+  <!-- Scrollable Inhaltsbereich (Screen 4 Mockup) -->
+  <main class="retailers-body">
+    <!-- 1. Netto Card (Aktiver Markt) -->
+    <div
+      class="netto-brand-card"
+      [class.selected]="selectedRetailer() === 'netto'"
+      (click)="selectRetailer('netto')"
+      role="button"
+      tabindex="0"
+    >
+      <div class="netto-logo-box">
+        <span class="netto-yellow-badge">Netto</span>
+        <span class="netto-subtext">Marken-Discount</span>
+      </div>
+
+      <div class="netto-check-indicator">
+        @if (selectedRetailer() === 'netto') {
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+          </svg>
+        }
       </div>
     </div>
 
-    <p>{{ 'RETAILERS.HEADER_SUBTITLE' | translate }}</p>
-  </header>
+    <!-- 2. Weitere Märkte (REWE, EDEKA, ALDI, Lidl mit Radio Buttons) -->
+    <section class="other-retailers-section">
+      <h3>{{ 'RETAILERS.OTHER_RETAILERS' | translate }}</h3>
 
-  <!-- Bereich B: Scrollbarer Inhaltsbereich -->
-  <div class="retailers-body">
-
-    <!-- Optional: Google Maps API Configuration Modal / Dropdown -->
-    @if (showApiKeySettings()) {
-      <div class="api-settings-panel">
-        <div class="panel-header">
-          <span>🗺️ {{ 'RETAILERS.API_KEY_TITLE' | translate }}</span>
-          <button (click)="showApiKeySettings.set(false)">✕</button>
+      <div class="retailers-list">
+        <!-- REWE -->
+        <div
+          class="retailer-row-card"
+          (click)="selectRetailer('rewe')"
+          role="button"
+          tabindex="0"
+        >
+          <div class="retailer-left-box">
+            <span class="rewe-badge">REWE</span>
+            <strong>REWE</strong>
+          </div>
+          <div class="radio-indicator"></div>
         </div>
-        <p>{{ 'RETAILERS.API_KEY_DESC' | translate }}</p>
-        <div class="panel-input-row">
-          <input
-            type="text"
-            [(ngModel)]="apiKeyInput"
-            placeholder="AIzaSy..."
-          />
-          <button type="button" (click)="saveApiKey()">
-            {{ 'COMMON.SAVE' | translate }}
-          </button>
+
+        <!-- EDEKA -->
+        <div
+          class="retailer-row-card"
+          (click)="selectRetailer('edeka')"
+          role="button"
+          tabindex="0"
+        >
+          <div class="retailer-left-box">
+            <span class="edeka-badge">E</span>
+            <strong>EDEKA</strong>
+          </div>
+          <div class="radio-indicator"></div>
+        </div>
+
+        <!-- ALDI -->
+        <div
+          class="retailer-row-card"
+          (click)="selectRetailer('aldi')"
+          role="button"
+          tabindex="0"
+        >
+          <div class="retailer-left-box">
+            <span class="aldi-badge">ALDI</span>
+            <strong>ALDI</strong>
+          </div>
+          <div class="radio-indicator"></div>
+        </div>
+
+        <!-- Lidl -->
+        <div
+          class="retailer-row-card"
+          (click)="selectRetailer('lidl')"
+          role="button"
+          tabindex="0"
+        >
+          <div class="retailer-left-box">
+            <span class="lidl-badge">Lidl</span>
+            <strong>Lidl</strong>
+          </div>
+          <div class="radio-indicator"></div>
         </div>
       </div>
-    }
-
-    <!-- 1. Bereich: Wo möchtest du einkaufen? -->
-    <section class="location-section">
-      <h2>{{ 'RETAILERS.WHERE_SHOP' | translate }}</h2>
-
-      <!-- Option A: Aktuellen Standort ermitteln (GPS) -->
-      <button
-        type="button"
-        (click)="locateMe()"
-        [disabled]="locationService.isLocating()"
-        class="location-gps-button"
-      >
-        @if (locationService.isLocating()) {
-          <div class="spinner"></div>
-          <span>{{ 'RETAILERS.GPS_LOCATING' | translate }}</span>
-        } @else {
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <circle cx="12" cy="12" r="3" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 2v3m0 14v3M2 12h3m14 0h3" />
-          </svg>
-          <span>{{ 'RETAILERS.GPS_BUTTON' | translate }}</span>
-        }
-      </button>
-
-      <!-- Option B: Adresse manuell eingeben -->
-      <div class="manual-address-wrapper">
-        <label>{{ 'RETAILERS.MANUAL_LABEL' | translate }}</label>
-        <div class="address-input-group">
-          <div class="input-with-icon">
-            <input
-              type="text"
-              [formControl]="addressControl"
-              [placeholder]="'RETAILERS.ADDRESS_PLACEHOLDER' | translate"
-              (keyup.enter)="submitManualAddress()"
-            />
-            <span class="icon">📍</span>
-          </div>
-          <button
-            type="button"
-            (click)="submitManualAddress()"
-            [disabled]="locationService.isLocating() || !addressControl.value"
-            class="search-button"
-          >
-            {{ 'RETAILERS.SEARCH_BTN' | translate }}
-          </button>
-        </div>
-      </div>
-
-      <!-- Error Notification -->
-      @if (locationService.errorMessage()) {
-        <div class="error-banner">
-          <span>⚠️</span>
-          <p>{{ locationService.errorMessage() }}</p>
-          <button (click)="locationService.errorMessage.set(null)">✕</button>
-        </div>
-      }
-
-      <!-- Confirmed Location Badge -->
-      @if (confirmedLocation(); as loc) {
-        <div class="confirmed-location-card">
-          <div class="location-info">
-            <span class="status-icon">✅</span>
-            <div class="address-details">
-              <span>{{ 'RETAILERS.CONFIRMED_LOCATION' | translate }}</span>
-              <p>{{ loc.formattedAddress }}</p>
-            </div>
-          </div>
-          <span class="origin-tag">
-            {{ loc.isGps ? ('RETAILERS.GPS_TAG' | translate) : ('RETAILERS.ADDRESS_TAG' | translate) }}
-          </span>
-        </div>
-      }
     </section>
 
-    <!-- 2. Interaktive Google-Karte & Marker -->
-    @if (confirmedLocation()) {
-      <section class="map-section">
-        <div class="section-header">
-          <h2>{{ 'RETAILERS.MAP_TITLE' | translate }}</h2>
-          <span class="stores-count">
-            {{ nearbyStoresService.stores().length }} {{ 'RETAILERS.STORES_FOUND' | translate }}
-          </span>
-        </div>
-
-        <app-store-map
-          [userLocation]="confirmedLocation()"
-          [stores]="nearbyStoresService.stores()"
-          [selectedStore]="selectedStore()"
-          (storeSelected)="onSelectStore($event)"
-          (routeRequested)="openRoute($event)"
-        ></app-store-map>
-      </section>
-    }
-
-    <!-- Coming Soon Banner -->
+    <!-- Coming Soon Hinweis-Pill -->
     @if (comingSoonNotice()) {
-      <div class="coming-soon-banner">
-        <span>ℹ️ {{ comingSoonNotice() }}</span>
-        <button type="button" (click)="comingSoonNotice.set(null)">✕</button>
+      <div class="notice-callout">
+        <span>ℹ️</span>
+        <p>{{ comingSoonNotice() }}</p>
       </div>
     }
 
-    <!-- 3. Gefundene Supermärkte -->
-    @if (confirmedLocation()) {
-      <section class="stores-section">
-        <div class="section-header">
-          <h2>{{ 'RETAILERS.NEARBY_TITLE' | translate }} ({{ nearbyStoresService.searchRadiusKm() }} km)</h2>
-          <div class="radius-selector">
-            <button
-              type="button"
-              (click)="expandRadius(5)"
-              [class.active]="nearbyStoresService.searchRadiusKm() === 5"
-            >
-              5 km
-            </button>
-            <button
-              type="button"
-              (click)="expandRadius(10)"
-              [class.active]="nearbyStoresService.searchRadiusKm() === 10"
-            >
-              10 km
-            </button>
-            <button
-              type="button"
-              (click)="expandRadius(20)"
-              [class.active]="nearbyStoresService.searchRadiusKm() === 20"
-            >
-              20 km
-            </button>
-          </div>
-        </div>
-
-        @if (nearbyStoresService.isSearching()) {
-          <div class="searching-state">
-            <div class="spinner"></div>
-            <p>{{ 'RETAILERS.SEARCHING_STORES' | translate }}</p>
-          </div>
-        } @else {
-          <div class="stores-list">
-            @for (store of nearbyStoresService.stores(); track store.id) {
-              <div
-                class="store-card"
-                [class.selected]="store.isAvailable && selectedStore()?.id === store.id"
-              >
-                <!-- Upper Row: Brand Badge, Name, Distance & Selection Checkmark -->
-                <div class="store-top-row">
-                  <div class="store-main-info">
-                    <!-- Brand Badge -->
-                    @if (store.isAvailable) {
-                      <div class="netto-brand-badge">
-                        <span class="netto-name">Netto</span>
-                        <span class="netto-sub">Marken-Discount</span>
-                      </div>
-                    } @else {
-                      <div class="generic-brand-badge">
-                        <span>{{ store.brand }}</span>
-                      </div>
-                    }
-
-                    <!-- Store Details -->
-                    <div class="store-text">
-                      <div class="store-headline">
-                        <h3>{{ store.brand }}</h3>
-                        @if (!store.isAvailable) {
-                          <span class="coming-soon-pill">{{ 'RETAILERS.COMING_SOON' | translate }}</span>
-                        }
-                      </div>
-                      <p>{{ store.street || store.name }}</p>
-                      @if (store.city) {
-                        <p class="city-line">{{ store.postalCode }} {{ store.city }}</p>
-                      }
-                    </div>
-                  </div>
-
-                  <!-- Distance Label -->
-                  <div class="distance-badge">
-                    <span>{{ store.distanceKm }} km</span>
-                    <small>{{ 'RETAILERS.AIR_LINE' | translate }}</small>
-                  </div>
-                </div>
-
-                <!-- Lower Row: Actions -->
-                <div class="store-actions-row">
-                  <button
-                    type="button"
-                    (click)="openRoute(store)"
-                    class="route-link-button"
-                  >
-                    <span>🗺️</span>
-                    <span>{{ 'RETAILERS.SHOW_ROUTE' | translate }}</span>
-                  </button>
-
-                  @if (store.isAvailable) {
-                    <button
-                      type="button"
-                      (click)="onSelectStore(store)"
-                      class="select-store-button"
-                      [class.chosen]="selectedStore()?.id === store.id"
-                    >
-                      {{ selectedStore()?.id === store.id ? ('RETAILERS.SELECTED' | translate) : ('RETAILERS.SELECT_THIS_NETTO' | translate) }}
-                    </button>
-                  } @else {
-                    <span class="unavailable-label">
-                      {{ 'RETAILERS.SOON_AVAILABLE' | translate }}
-                    </span>
-                  }
-                </div>
-              </div>
-            } @empty {
-              <div class="empty-stores-notice">
-                <span>🔍</span>
-                <p>{{ 'RETAILERS.NO_STORES' | translate }}</p>
-                <div class="empty-actions">
-                  <button type="button" (click)="expandRadius(10)">
-                    {{ 'RETAILERS.EXPAND_10' | translate }}
-                  </button>
-                  <button type="button" (click)="expandRadius(20)">
-                    {{ 'RETAILERS.EXPAND_20' | translate }}
-                  </button>
-                </div>
-              </div>
-            }
-          </div>
-        }
-      </section>
-    }
-
-    <!-- 4. Wochenbudget Slider -->
+    <!-- 3. Dein Wochenbudget (Screen 4 Mockup) -->
     <section class="budget-section">
-      <div class="budget-header">
-        <label for="budgetSlider">{{ 'RETAILERS.BUDGET_LABEL' | translate }}</label>
-        <div class="budget-badge">
-          <input
-            type="number"
-            min="20"
-            max="150"
-            step="5"
-            [(ngModel)]="weeklyBudget"
-          />
+      <div class="budget-headline-row">
+        <h3>{{ 'RETAILERS.WEEKLY_BUDGET' | translate }}</h3>
+        <div class="budget-value-box">
+          <strong>{{ weeklyBudget }}</strong>
           <span>€</span>
         </div>
       </div>
 
-      <div class="slider-wrapper">
+      <div class="slider-box">
         <input
           id="budgetSlider"
           type="range"
@@ -306,24 +135,24 @@
           step="5"
           [(ngModel)]="weeklyBudget"
         />
-        <div class="slider-labels">
+        <div class="slider-scale-row">
           <span>20 €</span>
           <span>100 €</span>
         </div>
       </div>
     </section>
+  </main>
 
-  </div>
-
-  <!-- Bereich C: Fester unterer Aktionsbereich -->
+  <!-- Sticky Footer Button -->
   <footer class="retailers-footer">
     <button
       type="button"
       (click)="confirmSelection()"
       class="confirm-button"
+      [disabled]="selectedRetailer() !== 'netto'"
     >
-      <span>{{ 'RETAILERS.CONFIRM_SELECTION' | translate }}</span>
-      <span>→</span>
+      <span>{{ 'RETAILERS.CONFIRM_BTN' | translate }}</span>
+      <span class="btn-arrow">→</span>
     </button>
   </footer>
 </div>

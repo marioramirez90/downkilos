@@ -19,7 +19,6 @@ import { StoreMapComponent } from '../../shared/components/store-map/store-map.c
     FormsModule,
     ReactiveFormsModule,
     HamburgerButtonComponent,
-    StoreMapComponent,
     TranslatePipe
   ],
   templateUrl: './retailers.component.html',
@@ -39,12 +38,47 @@ export class RetailersComponent implements OnInit {
 
   // Selected store and user location
   selectedStore = signal<StoreBranch | null>(null);
+  selectedRetailer = signal<'netto' | 'rewe' | 'edeka' | 'aldi' | 'lidl' | null>(null);
   confirmedLocation = signal<UserLocation | null>(null);
+  showLocationChange = signal<boolean>(false);
 
   weeklyBudget = 40;
   comingSoonNotice = signal<string | null>(null);
   showApiKeySettings = signal<boolean>(false);
   apiKeyInput = '';
+
+  selectRetailer(retailer: 'netto' | 'rewe' | 'edeka' | 'aldi' | 'lidl'): void {
+    if (retailer === 'netto') {
+      this.selectedRetailer.set('netto');
+      this.comingSoonNotice.set(null);
+      const nettoBranch: StoreBranch = {
+        id: 'netto-berlin-1',
+        placeId: 'netto-berlin-mitte',
+        retailerId: 'netto',
+        retailerName: 'Netto Marken-Discount',
+        brand: 'Netto Marken-Discount',
+        name: 'Netto Marken-Discount',
+        street: 'Friedrichstraße 100',
+        postalCode: '10115',
+        city: 'Berlin',
+        formattedAddress: 'Friedrichstraße 100, 10115 Berlin',
+        lat: 52.5200,
+        lng: 13.3880,
+        distanceKm: 0.5,
+        isAvailable: true
+      };
+      this.selectedStore.set(nettoBranch);
+    } else {
+      const names: Record<string, string> = {
+        rewe: 'REWE',
+        edeka: 'EDEKA',
+        aldi: 'ALDI',
+        lidl: 'Lidl'
+      };
+      const name = names[retailer] || retailer;
+      this.comingSoonNotice.set(`${name}: Dieser Händler wird demnächst für den automatischen Einkauf unterstützt.`);
+    }
+  }
 
   async ngOnInit(): Promise<void> {
     const saved = await this.retailerService.loadPreference();
@@ -52,6 +86,9 @@ export class RetailersComponent implements OnInit {
       this.weeklyBudget = saved.weeklyBudget || 40;
       if (saved.branch) {
         this.selectedStore.set(saved.branch);
+        if (saved.branch.retailerId === 'netto') {
+          this.selectedRetailer.set('netto');
+        }
       }
       if (saved.userLocation) {
         this.confirmedLocation.set(saved.userLocation);

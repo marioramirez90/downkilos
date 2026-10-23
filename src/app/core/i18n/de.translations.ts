@@ -271,7 +271,7 @@ export const DE_TRANSLATIONS = {
     RECIPES: 'Rezepte',
     PROGRESS: 'Mein Fortschritt & Vitalwerte',
     ADMIN: 'Admin-Konsole',
-    CALCULATOR: 'Kalorienbedarf berechnen',
+    CALCULATOR: 'Mein Kalorienziel',
     RETAILERS: 'Filialen & Supermärkte',
     SECTION_ADMIN: 'Verwaltung',
     SECTION_SETTINGS: 'Einstellungen',

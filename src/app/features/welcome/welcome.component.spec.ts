@@ -36,12 +36,17 @@ describe('WelcomeComponent', () => {
     expect(el.textContent).toContain('Kostenlos starten');
   });
 
-  it('should navigate to onboarding on clicking "Kostenlos starten"', () => {
+  it('should navigate to /how-it-works on clicking "Kostenlos starten"', () => {
     component.startOnboarding();
-    expect(router.navigate).toHaveBeenCalledWith(['/onboarding']);
+    expect(router.navigate).toHaveBeenCalledWith(['/how-it-works']);
   });
 
-  it('should show notice on clicking "Anmelden" without faking login', () => {
+  it('should navigate to /how-it-works on clicking "Ohne Login fortfahren"', () => {
+    component.continueGuest();
+    expect(router.navigate).toHaveBeenCalledWith(['/how-it-works']);
+  });
+
+  it('should show notice on clicking "Jetzt anmelden" without faking login', () => {
     component.showLoginNotice();
     expect(component.showLoginInfo).toBe(true);
   });

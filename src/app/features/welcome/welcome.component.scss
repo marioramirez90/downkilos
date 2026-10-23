@@ -1,11 +1,10 @@
 @use '../../../styles/abstracts/variables' as *;
 @use '../../../styles/abstracts/mixins' as *;
-@use '../../../styles/components/buttons' as *;
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-4px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
@@ -14,69 +13,84 @@
 }
 
 .welcome-container {
-  @include flexbox(column, space-between, stretch);
-  height: 100%;
-  background-color: $bg-white;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  background-color: #FFFFFF;
   overflow: hidden;
+  max-width: 440px;
+  margin: 0 auto;
+  position: relative;
 
   .welcome-header {
-    @include flexbox(row, space-between, center);
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
     flex-shrink: 0;
-    padding: 20px 24px 8px;
-    background-color: $bg-white;
-    border-bottom: 1px solid $border-color-light;
+    padding: 16px 24px 6px;
+    background-color: #FFFFFF;
     z-index: 10;
   }
 
   .welcome-content {
     flex: 1;
-    padding: 12px 24px;
-    overflow-y: auto;
     min-height: 0;
-    @include flexbox(column, flex-start, stretch, 16px);
+    padding: 4px 24px 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
 
     .headline-section {
-      padding-top: 4px;
+      padding-top: 2px;
 
       h1 {
         margin: 0;
-        font-size: 32px;
+        font-size: 29px;
         font-weight: 800;
-        line-height: 1.15;
-        color: $secondary-color;
-        letter-spacing: -0.02em;
+        line-height: 1.16;
+        color: #103A2A;
+        letter-spacing: -0.025em;
 
-        @media screen and (max-width: 390px) {
-          font-size: 28px;
+        @media screen and (max-width: 380px) {
+          font-size: 26px;
         }
       }
 
       p {
         margin: 8px 0 0;
-        font-size: 15px;
-        color: $text-muted;
-        line-height: 1.45;
-        max-width: 340px;
+        font-size: 14.5px;
+        color: #66716D;
+        line-height: 1.42;
+        max-width: 320px;
 
-        @media screen and (max-width: 390px) {
-          font-size: 13.5px;
+        @media screen and (max-width: 380px) {
+          font-size: 13px;
         }
       }
     }
 
     .hero-section {
-      @include flexbox(row, center, center);
       position: relative;
       margin: 8px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
 
       .hero-photo-wrapper {
         position: relative;
         width: 100%;
-        aspect-ratio: 4 / 3;
-        border-radius: 28px;
+        max-height: 310px;
+        aspect-ratio: 4 / 3.2;
+        border-radius: 26px;
         overflow: hidden;
-        border: 2px solid rgba(255, 255, 255, 0.7);
-        box-shadow: $shadow-md;
+        border: 2px solid rgba(255, 255, 255, 0.9);
+        box-shadow: 0 10px 25px -5px rgba(16, 58, 42, 0.12);
 
         img {
           width: 100%;
@@ -89,23 +103,24 @@
         .hero-overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(to top, rgba(0, 0, 0, 0.2), transparent);
+          background: linear-gradient(to top, rgba(0, 0, 0, 0.15), transparent 40%);
           pointer-events: none;
         }
       }
 
       .hero-badge {
         position: absolute;
-        right: -8px;
+        right: -6px;
         top: 50%;
         transform: translateY(-50%) rotate(1deg);
         background-color: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(4px);
-        padding: 10px 14px;
-        border-radius: $radius-lg;
-        border: 1px solid $primary-light;
-        box-shadow: $shadow-sm;
-        @include flexbox(column, flex-start, flex-start);
+        backdrop-filter: blur(6px);
+        padding: 9px 13px;
+        border-radius: 16px;
+        border: 1px solid #E5F5E8;
+        box-shadow: 0 4px 12px rgba(16, 58, 42, 0.1);
+        display: flex;
+        flex-direction: column;
         max-width: 135px;
         z-index: 10;
         transition: transform 0.2s ease;
@@ -115,20 +130,20 @@
         }
 
         span {
-          font-size: 14px;
+          font-size: 13px;
           font-weight: 700;
           line-height: 1.25;
-          color: $secondary-color;
+          color: #103A2A;
         }
 
         svg {
-          width: 24px;
-          height: 24px;
-          stroke: $primary-color;
-          stroke-width: 2;
+          width: 22px;
+          height: 22px;
+          stroke: #278F39;
+          stroke-width: 2.2;
           stroke-linecap: round;
           stroke-linejoin: round;
-          margin-top: -4px;
+          margin-top: -3px;
           align-self: flex-end;
         }
       }
@@ -137,52 +152,105 @@
 
   .welcome-footer {
     flex-shrink: 0;
-    padding: 12px 24px;
-    background-color: $bg-white;
-    border-top: 1px solid $border-color-light;
-    @include flexbox(column, flex-start, stretch, 8px);
+    padding: 12px 24px calc(26px + env(safe-area-inset-bottom, 0px));
+    background-color: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    align-items: center;
     z-index: 20;
 
-    .login-secondary-btn {
-      @include flexbox(row, center, center, 8px);
+    .welcome-pill-btn {
       width: 100%;
-      padding: 12px 20px;
-      background-color: transparent;
-      border: 1px solid $border-color;
-      border-radius: $radius-lg;
-      color: $secondary-color;
-      font-size: 14px;
+      height: 52px;
+      min-height: 52px;
+      border-radius: 9999px;
+      font-size: 16px;
       font-weight: 700;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      transition: all 0.2s ease;
+      border: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      text-decoration: none;
 
-      &:hover {
-        background-color: $secondary-light;
-        border-color: $border-color-green;
+      &.primary {
+        background-color: #278F39;
+        color: #FFFFFF;
+        box-shadow: 0 4px 14px rgba(39, 143, 57, 0.25);
+
+        &:hover {
+          background-color: #217a30;
+          transform: translateY(-1px);
+          box-shadow: 0 6px 18px rgba(39, 143, 57, 0.32);
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
       }
 
-      .badge-soon {
-        padding: 3px 8px;
-        background-color: $secondary-light;
-        color: $primary-color;
-        border-radius: $radius-full;
-        font-size: 10px;
+      &.secondary {
+        background-color: #EEF2EF;
+        color: #374151;
+        box-shadow: none;
+
+        &:hover {
+          background-color: #E2E8E4;
+          transform: translateY(-1px);
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+      }
+    }
+
+    .login-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      font-size: 13px;
+      margin-top: 1px;
+
+      .have-account-text {
+        color: #6B7280;
+        font-weight: 500;
+      }
+
+      .login-link-btn {
+        background: transparent;
+        border: none;
+        color: #278F39;
         font-weight: 700;
-        letter-spacing: 0.02em;
-        text-transform: uppercase;
+        font-size: 13px;
+        cursor: pointer;
+        padding: 2px 4px;
+        text-decoration: none;
+        transition: opacity 0.15s ease;
+
+        &:hover {
+          text-decoration: underline;
+          opacity: 0.85;
+        }
       }
     }
 
     .login-info-bubble {
-      margin-top: 4px;
+      margin-top: 2px;
+      width: 100%;
       text-align: center;
-      padding: 8px 12px;
-      border-radius: $radius-lg;
-      background-color: $primary-light;
-      border: 1px solid $border-color-green;
-      color: $secondary-color;
-      font-size: 11px;
+      padding: 9px 14px;
+      border-radius: 14px;
+      background-color: #E5F5E8;
+      border: 1px solid rgba(39, 143, 57, 0.2);
+      color: #103A2A;
+      font-size: 12px;
       font-weight: 600;
+      line-height: 1.35;
       animation: fadeIn 0.25s ease-out forwards;
     }
   }

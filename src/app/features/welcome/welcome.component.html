@@ -1,11 +1,10 @@
 <div class="welcome-container">
-  <!-- Bereich A: Header mit Logo und Hamburger-Menü -->
+  <!-- Bereich A: Header mit Logo -->
   <header class="welcome-header">
     <app-logo size="md"></app-logo>
-    <app-hamburger-button></app-hamburger-button>
   </header>
 
-  <!-- Bereich B: Scrollbarer Inhalt (Headline & Hero-Bereich) -->
+  <!-- Bereich B: Inhalt (Headline & Hero-Bereich) -->
   <main class="welcome-content">
     <div class="headline-section">
       <h1>
@@ -42,28 +41,41 @@
 
   <!-- Bereich C: Fester unterer Bereich mit Buttons -->
   <footer class="welcome-footer">
-    <app-button
-      variant="primary"
-      size="lg"
-      [fullWidth]="true"
-      [iconRight]="true"
-      (clicked)="startOnboarding()"
-    >
-      {{ 'WELCOME.START_FREE' | translate }}
-    </app-button>
-
-    <!-- Zweiter, optisch dezenter Button: Anmelden mit "Bald verfügbar" -->
+    <!-- Hauptbutton: Kostenlos starten → -->
     <button
       type="button"
-      (click)="showLoginNotice()"
-      class="login-secondary-btn"
+      id="btn-start-free"
+      class="welcome-pill-btn primary"
+      (click)="startOnboarding()"
     >
-      <span>{{ 'WELCOME.LOGIN_BTN' | translate }}</span>
-      <span class="badge-soon">{{ 'WELCOME.SOON_BADGE' | translate }}</span>
+      <span>{{ 'WELCOME.START_FREE_ARROW' | translate }}</span>
     </button>
 
+    <!-- Zweiter Button: Ohne Login fortfahren -->
+    <button
+      type="button"
+      id="btn-continue-guest"
+      class="welcome-pill-btn secondary"
+      (click)="continueGuest()"
+    >
+      <span>{{ 'WELCOME.CONTINUE_GUEST' | translate }}</span>
+    </button>
+
+    <!-- Dezente Option: Bereits ein Konto? Jetzt anmelden -->
+    <div class="login-row">
+      <span class="have-account-text">{{ 'WELCOME.HAVE_ACCOUNT' | translate }}</span>
+      <button
+        type="button"
+        id="btn-login-notice"
+        (click)="showLoginNotice()"
+        class="login-link-btn"
+      >
+        {{ 'WELCOME.LOGIN_ACTION' | translate }}
+      </button>
+    </div>
+
     @if (showLoginInfo) {
-      <div class="login-info-bubble">
+      <div class="login-info-bubble" role="status" aria-live="polite">
         {{ 'WELCOME.LOGIN_NOTICE' | translate }}
       </div>
     }

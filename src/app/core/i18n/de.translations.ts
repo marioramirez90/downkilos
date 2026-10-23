@@ -35,7 +35,7 @@ export const DE_TRANSLATIONS = {
   WELCOME: {
     HEADLINE_1: 'Gesünder essen.',
     HEADLINE_2: 'Einfacher abnehmen.',
-    SUBTITLE: 'Individuelle Mahlzeitenpläne, passend zu deinem Alltag und deinem Lieblingsmarkt.',
+    SUBTITLE: 'Entdecke die Kalorien deiner Lebensmittel und kaufe bewusster bei deinem Lieblingsmarkt ein.',
     BADGE_LINE1: 'Kleine Schritte.',
     BADGE_LINE2: 'Große Ergebnisse.',
     START_FREE: 'Kostenlos starten',
@@ -44,8 +44,8 @@ export const DE_TRANSLATIONS = {
     SOON_BADGE: 'Bald verfügbar',
     CONTINUE_GUEST: 'Ohne Login fortfahren',
     HAVE_ACCOUNT: 'Bereits ein Konto?',
-    LOGIN_ACTION: 'Anmelden',
-    LOGIN_NOTICE: 'Bald verfügbar – du kannst Down Kilos direkt ohne Registrierung nutzen!'
+    LOGIN_ACTION: 'Jetzt anmelden',
+    LOGIN_NOTICE: 'Die Anmeldung ist bald verfügbar. Du kannst Down Kilos bereits kostenlos ohne Konto nutzen.'
   },
   ONBOARDING: {
     STEP_GENDER: 'Geschlecht',

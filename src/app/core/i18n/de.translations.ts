@@ -51,6 +51,27 @@ export const DE_TRANSLATIONS = {
     STEP_ACTIVITY: 'Aktivitätslevel',
     CALCULATING: 'Dein Kalorienbedarf wird berechnet...'
   },
+  DASHBOARD: {
+    GREETING: 'Hallo, {{name}}!',
+    TODAY: 'Heute',
+    CALORIE_GOAL_TITLE: 'Dein heutiges Kalorienziel',
+    REMAINING_LABEL: 'kcal übrig',
+    EATEN_OF_TARGET: 'von {{target}} kcal',
+    DAILY_TARGET: 'Tagesbedarf',
+    PLANNED_LABEL: 'Geplant',
+    EATEN_LABEL: 'Bereits gegessen',
+    WHAT_TO_EAT_TITLE: 'Was möchtest du heute essen?',
+    CHOICE_DISCOVER_TITLE: 'Lebensmittel entdecken',
+    CHOICE_DISCOVER_DESC: 'Schau dir an, welche Produkte es bei deinem Supermarkt gibt und wie viele Kalorien sie haben.',
+    CHOICE_RECIPES_TITLE: 'Rezepte entdecken',
+    CHOICE_RECIPES_DESC: 'Du möchtest etwas kochen? Finde passende Gerichte mit Zutaten, Preisen und Anleitungen.',
+    CHOICE_MEALS_TITLE: 'Tagesideen erhalten',
+    CHOICE_MEALS_DESC: 'Du weißt nicht, was du essen sollst? Lass dir verschiedene Mahlzeiten vorschlagen.',
+    CART_CHECK_TITLE: 'Reicht mein Einkauf für mein Ziel?',
+    CART_CHECK_DESC: 'Verteile deine eingekauften Lebensmittel auf mehrere Tage.',
+    PANTRY_TITLE: 'Digitaler Vorrat & Resteverwertung',
+    FOOD_LOG_TITLE: 'Heutiges Ernährungsprotokoll'
+  },
   DISCOVER: {
     TITLE: 'Supermarkt-Sortiment',
     SUBTITLE: 'Echte Nährwerte & Kalorien pro Packung',
@@ -109,7 +130,18 @@ export const DE_TRANSLATIONS = {
     IN_STOCK: 'Vorrat',
     BUY_ITEM: 'Kaufen',
     CLEAR_COMPLETED: 'Erledigte löschen',
-    CLEAR_ALL: 'Liste leeren'
+    CLEAR_ALL: 'Liste leeren',
+    DURATION_CHECK_BTN: 'Reicht mein Einkauf für mein Ziel?',
+    DURATION_CHECK_SUB: 'Verteile die Kalorien auf mehrere Tage',
+    DURATION_MODAL_TITLE: 'Was kann ich aus meinem Einkauf essen?',
+    DURATION_MODAL_SUB: 'Dein Einkauf enthält eine Gesamtkalorienmenge, die nicht an einem Tag gegessen werden muss.',
+    DAYS_PLAN_LABEL: 'Auf wie viele Tage möchtest du den Einkauf aufteilen?',
+    AVG_PER_DAY: 'Durchschnitt pro Tag',
+    TARGET_PER_DAY: 'Dein tägliches Kalorienziel',
+    PERISHABILITY_TITLE: 'Lagerung & Frische-Tipps',
+    DISTRIBUTION_TITLE: 'Beispielhafte Tagesverteilung',
+    DAY_PREFIX: 'Tag',
+    CLOSE: 'Schließen'
   },
   RETAILERS: {
     TITLE: 'Supermärkte in deiner Nähe',

@@ -11,7 +11,7 @@ export type PriceStatus =
 
 export type DataQualityStatus = 'verified' | 'partial' | 'pending';
 
-export type ProductCategory = 'fruits_veg' | 'meat_fish' | 'dairy' | 'grains' | 'pantry' | 'ready_meal' | 'all';
+export type ProductCategory = 'fruits_veg' | 'meat_fish' | 'dairy' | 'grains' | 'pantry' | 'ready_meal' | 'beverages' | 'all';
 
 export type ProductDataSource = 
   | 'open_prices' 

@@ -166,4 +166,28 @@ describe('PackageCalorieCalculatorService (Down Kilos 3.0 Tests)', () => {
     expect(calcMissingNutrition.totalCostEuro).toBe(2.49);
     expect(calcMissingNutrition.totalCalories).toBeNull();
   });
+
+  // TEST 7: Reicht mein Einkauf für mein Ziel? (Down Kilos Master-Prompt V4.0)
+  it('Test 7 – Cart Duration: berechnet Tagesdurchschnitt, Status und Frischehinweise', () => {
+    // Fall A: Exakt passend (6.000 kcal für 3 Tage bei 2.000 kcal Tagesziel)
+    const planOptimal = service.calculateCartDuration(6000, 2000, 3);
+    expect(planOptimal.averageCaloriesPerDay).toBe(2000);
+    expect(planOptimal.differencePerDay).toBe(0);
+    expect(planOptimal.status).toBe('optimal');
+    expect(planOptimal.recommendedDays).toBe(3);
+    expect(planOptimal.perishabilityTips.length).toBeGreaterThan(0);
+
+    // Fall B: Überschuss (5.000 kcal für 2 Tage bei 2.000 kcal Ziel -> 2.500 kcal/Tag)
+    const planExceeds = service.calculateCartDuration(5000, 2000, 2);
+    expect(planExceeds.averageCaloriesPerDay).toBe(2500);
+    expect(planExceeds.differencePerDay).toBe(500);
+    expect(planExceeds.status).toBe('exceeds');
+    expect(planExceeds.recommendedDays).toBe(3);
+
+    // Fall C: Zu geringe Zufuhr (< 1.200 kcal/Tag Sicherheitsgrenze)
+    const planTooLow = service.calculateCartDuration(2000, 2000, 2);
+    expect(planTooLow.averageCaloriesPerDay).toBe(1000);
+    expect(planTooLow.status).toBe('too_low');
+    expect(planTooLow.feedbackMessage).toContain('1.200 kcal');
+  });
 });

@@ -73,6 +73,7 @@ export class DiscoverComponent {
     { id: 'pantry', label: '🥫 Vorrat & Dosen' },
     { id: 'fruits_veg', label: '🍏 Obst & Gemüse' },
     { id: 'meat_fish', label: '🥩 Fleisch & Fisch' },
+    { id: 'beverages', label: '🥤 Getränke' },
     { id: 'ready_meal', label: '🍲 Fertiggerichte' },
     { id: 'low_cal', label: '🌱 Kalorienarm (<40 kcal)' },
     { id: 'high_protein', label: '💪 Proteinreich (>10g)' },

@@ -21,6 +21,18 @@ export interface ItemTotalsCalculation {
   totalCalories: number | null;
 }
 
+export interface CartDurationPlan {
+  totalCalories: number;
+  dailyCalorieTarget: number;
+  plannedDays: number;
+  averageCaloriesPerDay: number;
+  differencePerDay: number;
+  status: 'optimal' | 'exceeds' | 'deficit' | 'too_low';
+  feedbackMessage: string;
+  recommendedDays: number;
+  perishabilityTips: string[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -200,6 +212,59 @@ export class PackageCalorieCalculatorService {
       totalCostEuro,
       packageCalories,
       totalCalories
+    };
+  }
+
+  /**
+   * Berechnet, wie lange der Einkauf für ein Kalorienziel reicht (Down Kilos Master-Prompt V4.0)
+   * und gibt eine fundierte, ernährungsphysiologisch neutrale Rückmeldung.
+   */
+  calculateCartDuration(
+    totalCalories: number,
+    dailyCalorieTarget: number,
+    plannedDays: number
+  ): CartDurationPlan {
+    const safeDays = Math.max(1, Math.min(14, Math.round(plannedDays)));
+    const safeTarget = Math.max(800, dailyCalorieTarget || 2000);
+    const averageCaloriesPerDay = Math.round(totalCalories / safeDays);
+    const differencePerDay = averageCaloriesPerDay - safeTarget;
+
+    const recommendedDays = Math.max(1, Math.round(totalCalories / safeTarget));
+
+    let status: 'optimal' | 'exceeds' | 'deficit' | 'too_low';
+    let feedbackMessage: string;
+
+    if (averageCaloriesPerDay < 1200) {
+      status = 'too_low';
+      feedbackMessage = `Achtung: Bei ${safeDays} Tagen beträgt der Durchschnitt nur ${averageCaloriesPerDay} kcal/Tag. Das liegt unter einer gesunden Mindestzufuhr von 1.200 kcal. Plane weniger Tage ein oder ergänze nahrhafte Grundlebensmittel.`;
+    } else if (differencePerDay > 150) {
+      status = 'exceeds';
+      feedbackMessage = `Bei ${safeDays} Tagen liegt die geplante Zufuhr bei ${averageCaloriesPerDay} kcal/Tag (+${differencePerDay} kcal über deinem Tagesziel). Tipp: Verteile den Einkauf auf ${recommendedDays} Tage oder passe Portionsgrößen an.`;
+    } else if (differencePerDay < -250) {
+      status = 'deficit';
+      feedbackMessage = `Bei ${safeDays} Tagen hast du durchschnittlich ${averageCaloriesPerDay} kcal/Tag (${Math.abs(differencePerDay)} kcal unter Tagesziel). Dies entspricht einem moderaten Kaloriendefizit.`;
+    } else {
+      status = 'optimal';
+      feedbackMessage = `Perfekt ausgewogen! Dein Einkauf reicht ideal für ${safeDays} Tage und entspricht exakt deinem täglichen Kalorienziel von ${safeTarget} kcal.`;
+    }
+
+    const perishabilityTips = [
+      'Frische Fleisch- und Geflügelprodukte (z.B. Hähnchen) an Tag 1 bis 2 verzehren oder einfrieren.',
+      'Frisches Obst wie Bananen trocken und getrennt von Äpfeln lagern, um vorzeitige Reife zu vermeiden.',
+      'Brot und Toast stets luftdicht verschließen oder portionsweise einfrieren.',
+      'Konserven (z.B. Kidneybohnen) und Getreide (Haferflocken, Reis) sind monatelang haltbar.'
+    ];
+
+    return {
+      totalCalories,
+      dailyCalorieTarget: safeTarget,
+      plannedDays: safeDays,
+      averageCaloriesPerDay,
+      differencePerDay,
+      status,
+      feedbackMessage,
+      recommendedDays,
+      perishabilityTips
     };
   }
 }

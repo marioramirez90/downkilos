@@ -1,23 +1,28 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { TranslatePipe } from '../../core/i18n/translate.pipe';
 import { StorageService } from '../../core/services/storage.service';
 import { CalorieCalculatorService } from '../../core/services/calorie-calculator.service';
 import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-nav.component';
 import { UserProfile } from '../../core/models/user-profile.model';
 import { RetailerPreference } from '../../core/models/retailer.model';
 import { CalorieCalculationResult } from '../../core/models/calorie-calculation.model';
-
 import { HamburgerButtonComponent } from '../../shared/components/hamburger-button/hamburger-button.component';
-
 import { FoodLogService } from '../../core/services/food-log.service';
 import { PantryService } from '../../core/services/pantry.service';
+import { ShoppingListService } from '../../core/services/shopping-list.service';
 import { LoggedFoodItem } from '../../core/models/food-log.model';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, BottomNavComponent, HamburgerButtonComponent],
+  imports: [
+    CommonModule,
+    BottomNavComponent,
+    HamburgerButtonComponent,
+    TranslatePipe
+  ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -27,6 +32,7 @@ export class DashboardComponent implements OnInit {
   private calorieService = inject(CalorieCalculatorService);
   foodLogService = inject(FoodLogService);
   pantryService = inject(PantryService);
+  shoppingService = inject(ShoppingListService);
 
   profile = signal<UserProfile | null>(null);
   retailerPref = signal<RetailerPreference | null>(null);

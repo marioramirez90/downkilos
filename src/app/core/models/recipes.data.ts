@@ -650,5 +650,259 @@ export const RECIPES_DATA: Recipe[] = [
     ],
     mealPrepTips: 'Möhrensticks in einer Dose mit einem feuchten Tuch aufbewahrt bleiben den ganzen Tag knackig.',
     storageTips: 'Möhren im Gemüsefach des Kühlschranks lagern.'
+  },
+  {
+    id: 'rec-toast-egg',
+    title: 'Goldgelbes Toast mit Spiegelei & Tomate',
+    subtitle: 'Klassisches schnelles Frühstück – 2 Scheiben Toast mit frischem Spiegelei',
+    mealType: 'breakfast',
+    dietType: 'vegetarian',
+    imageUrl: 'images/meals/overnight-oats.jpg',
+    prepTimeMinutes: 3,
+    cookTimeMinutes: 5,
+    difficulty: 'Einfach',
+    calories: 310,
+    protein: 17.5,
+    carbs: 26.0,
+    fat: 14.5,
+    pricePerPortion: 0.65,
+    fullPackageCost: 4.97,
+    defaultServings: 1,
+    allergens: ['Ei', 'Gluten'],
+    ingredients: [
+      {
+        productId: 'netto-toast-500',
+        name: 'Butter Toastbrot',
+        amount: 2,
+        unit: 'Scheiben (50 g)',
+        portionCost: 0.15,
+        packageSize: '500 g',
+        packagePrice: 1.49,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-eggs-10stk',
+        name: 'Frische Eier Klasse M',
+        amount: 2,
+        unit: 'Stück',
+        portionCost: 0.40,
+        packageSize: '10 Stück',
+        packagePrice: 1.99,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-tomatoes-500',
+        name: 'Frische Rispentomaten',
+        amount: 50,
+        unit: 'g',
+        portionCost: 0.10,
+        packageSize: '500 g',
+        packagePrice: 1.49,
+        packagesNeeded: 1
+      }
+    ],
+    stepInstructions: [
+      'Schritt 1: Toastbrot im Toaster oder der Pfanne goldbraun rösten.',
+      'Schritt 2: 2 Eier in eine Pfanne mit wenig Rapsöl schlagen und 3 Minuten braten, bis das Eiweiß gestockt ist.',
+      'Schritt 3: Die Tomate in Scheiben schneiden, auf das Toast legen und das warme Spiegelei darauf platzieren.'
+    ],
+    mealPrepTips: 'Frisch servieren für optimalen Knusperfaktor.',
+    storageTips: 'Spiegeleier immer sofort verzehren.'
+  },
+  {
+    id: 'rec-whole-grain-cottage',
+    title: 'Vollkornbrot mit körnigem Hüttenkäse',
+    subtitle: 'Ballaststoff- und proteinreiches Abendbrot unter 300 kcal',
+    mealType: 'dinner',
+    dietType: 'vegetarian',
+    imageUrl: 'images/meals/overnight-oats.jpg',
+    prepTimeMinutes: 3,
+    cookTimeMinutes: 0,
+    difficulty: 'Einfach',
+    calories: 285,
+    protein: 21.0,
+    carbs: 32.0,
+    fat: 6.5,
+    pricePerPortion: 0.85,
+    fullPackageCost: 2.48,
+    defaultServings: 1,
+    allergens: ['Gluten', 'Milch / Laktose'],
+    ingredients: [
+      {
+        productId: 'netto-toast-500',
+        name: 'Grafschafter Brot',
+        amount: 2,
+        unit: 'Scheiben',
+        portionCost: 0.15,
+        packageSize: '500 g',
+        packagePrice: 1.49,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-cottage-cheese-200',
+        name: 'Körniger Frischkäse Halbfettstufe',
+        amount: 140,
+        unit: 'g',
+        portionCost: 0.70,
+        packageSize: '200 g Becher',
+        packagePrice: 0.99,
+        packagesNeeded: 1
+      }
+    ],
+    stepInstructions: [
+      'Schritt 1: Die Brotscheiben bereitstellen.',
+      'Schritt 2: Den körnigen Frischkäse großzügig darauf verteilen und mit etwas Schnittlauch oder Pfeffer bestreuen.'
+    ],
+    mealPrepTips: 'Schnelles Abendessen ohne Kochen.',
+    storageTips: 'Angebrochenen Frischkäse im Kühlschrank lagern.'
+  },
+  {
+    id: 'rec-chili-con-carne',
+    title: 'Feuriges Chili con Carne mit Kidneybohnen',
+    subtitle: 'Sättigende Proteinquelle mit echten Netto Bio-Kidneybohnen und Hähnchenstreifen',
+    mealType: 'lunch',
+    dietType: 'omnivore',
+    imageUrl: 'images/meals/chicken-bowl.jpg',
+    prepTimeMinutes: 8,
+    cookTimeMinutes: 18,
+    difficulty: 'Einfach',
+    calories: 510,
+    protein: 42.0,
+    carbs: 52.0,
+    fat: 11.5,
+    pricePerPortion: 2.15,
+    fullPackageCost: 7.22,
+    defaultServings: 1,
+    allergens: [],
+    ingredients: [
+      {
+        productId: 'netto-kidney-beans-400',
+        name: 'Bio Rote Kidneybohnen',
+        amount: 120,
+        unit: 'g (Abtropfgewicht)',
+        portionCost: 0.43,
+        packageSize: '400 g Dose (240 g Abtropfgewicht)',
+        packagePrice: 0.85,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-chicken-400',
+        name: 'Frisches Hähnchenbrustfilet',
+        amount: 150,
+        unit: 'g',
+        portionCost: 1.31,
+        packageSize: '400 g',
+        packagePrice: 3.49,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-brown-rice-500',
+        name: 'Bio Langkorn Naturreis',
+        amount: 50,
+        unit: 'g',
+        portionCost: 0.14,
+        packageSize: '500 g',
+        packagePrice: 1.39,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-tomatoes-500',
+        name: 'Rispentomaten',
+        amount: 90,
+        unit: 'g',
+        portionCost: 0.27,
+        packageSize: '500 g',
+        packagePrice: 1.49,
+        packagesNeeded: 1
+      }
+    ],
+    stepInstructions: [
+      'Schritt 1: Naturreis in leicht gesalzenem Wasser ca. 20 Minuten garen.',
+      'Schritt 2: Das Hähnchenfleisch in mundgerechte Würfel schneiden und in einer Pfanne mit 1 TL Rapsöl anbraten.',
+      'Schritt 3: Tomaten würfeln und zusammen mit den abgespülten Kidneybohnen zum Fleisch geben.',
+      'Schritt 4: Mit Paprikapulver, Kreuzkümmel, Salz und Chili würzen und 10 Minuten sanft köcheln lassen.',
+      'Schritt 5: Das Chili zusammen mit dem warmen Naturreis servieren.'
+    ],
+    mealPrepTips: 'Lässt sich hervorragend in größerer Menge vorkochen und einfrieren.',
+    storageTips: 'Gekühlt bis zu 3 Tage haltbar.'
+  },
+  {
+    id: 'rec-netto-sandwich',
+    title: 'Selbstgemachtes Fitness-Club-Sandwich',
+    subtitle: 'Doppeldecker-Toast mit gebratenem Hähnchen, Ei und cremigem Frischkäse',
+    mealType: 'lunch',
+    dietType: 'omnivore',
+    imageUrl: 'images/meals/chicken-bowl.jpg',
+    prepTimeMinutes: 5,
+    cookTimeMinutes: 8,
+    difficulty: 'Einfach',
+    calories: 435,
+    protein: 36.5,
+    carbs: 34.0,
+    fat: 15.0,
+    pricePerPortion: 1.82,
+    fullPackageCost: 8.45,
+    defaultServings: 1,
+    allergens: ['Ei', 'Gluten', 'Milch / Laktose'],
+    ingredients: [
+      {
+        productId: 'netto-toast-500',
+        name: 'Butter Toastbrot',
+        amount: 2,
+        unit: 'Scheiben',
+        portionCost: 0.15,
+        packageSize: '500 g',
+        packagePrice: 1.49,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-chicken-400',
+        name: 'Hähnchenbrustfilet',
+        amount: 100,
+        unit: 'g',
+        portionCost: 0.87,
+        packageSize: '400 g',
+        packagePrice: 3.49,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-eggs-10stk',
+        name: 'Frische Eier Klasse M',
+        amount: 1,
+        unit: 'Stück',
+        portionCost: 0.20,
+        packageSize: '10 Stück',
+        packagePrice: 1.99,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-tomatoes-500',
+        name: 'Rispentomaten',
+        amount: 50,
+        unit: 'g',
+        portionCost: 0.15,
+        packageSize: '500 g',
+        packagePrice: 1.49,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-cottage-cheese-200',
+        name: 'Körniger Frischkäse',
+        amount: 45,
+        unit: 'g',
+        portionCost: 0.22,
+        packageSize: '200 g',
+        packagePrice: 0.99,
+        packagesNeeded: 1
+      }
+    ],
+    stepInstructions: [
+      'Schritt 1: Hähnchenbrust in dünne Tranchen schneiden und in der Pfanne von beiden Seiten je 3 Minuten braten.',
+      'Schritt 2: Das Ei parallel als Spiegelei braten.',
+      'Schritt 3: 2 Scheiben Toastbrot rösten und dünn mit dem körnigen Frischkäse bestreichen.',
+      'Schritt 4: Mit Tomatenscheiben, gebratenem Hähnchen und Spiegelei belegen, zuklappen und diagonal halbieren.'
+    ],
+    mealPrepTips: 'Perfekt als proteinreicher Snack für unterwegs oder im Büro.',
+    storageTips: 'In Pergamentpapier gewickelt bis zu 6 Stunden transportfähig.'
   }
 ];

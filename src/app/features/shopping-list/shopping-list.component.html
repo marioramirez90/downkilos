@@ -76,6 +76,20 @@
           <span>{{ calNotice }}</span>
         </div>
       }
+
+      <!-- Reicht mein Einkauf für mein Ziel? Button (V4.0 Section 10) -->
+      <button
+        type="button"
+        (click)="openDurationModal()"
+        class="duration-launcher-btn"
+      >
+        <span class="btn-icon">⏱️</span>
+        <div class="btn-text-col">
+          <strong>{{ 'SHOPPING_LIST.DURATION_CHECK_BTN' | translate }}</strong>
+          <small>{{ 'SHOPPING_LIST.DURATION_CHECK_SUB' | translate }}</small>
+        </div>
+        <span class="btn-arrow">→</span>
+      </button>
     </div>
 
     <!-- Category Filter Pills -->
@@ -302,6 +316,106 @@
             class="confirm-btn"
           >
             {{ 'COMMON.ADD' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Modal: Reicht mein Einkauf für mein Ziel? (V4.0 Section 10) -->
+  @if (showDurationModal()) {
+    <div class="duration-modal-backdrop">
+      <div class="duration-modal-dialog">
+        <div class="duration-modal-header">
+          <div class="header-titles">
+            <h3>{{ 'SHOPPING_LIST.DURATION_MODAL_TITLE' | translate }}</h3>
+            <span>{{ 'SHOPPING_LIST.DURATION_MODAL_SUB' | translate }}</span>
+          </div>
+          <button
+            type="button"
+            (click)="closeDurationModal()"
+            class="modal-close-btn"
+            aria-label="Schließen"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="duration-modal-body">
+          <!-- Tage-Auswahl -->
+          <div class="days-selector-card">
+            <label>{{ 'SHOPPING_LIST.DAYS_PLAN_LABEL' | translate }}</label>
+            <div class="days-pills-row">
+              @for (d of [1, 2, 3, 5, 7]; track d) {
+                <button
+                  type="button"
+                  (click)="setDays(d)"
+                  class="day-pill-btn"
+                  [class.active]="plannedDays() === d"
+                >
+                  {{ d }} {{ d === 1 ? 'Tag' : 'Tage' }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Analyse-Karten -->
+          <div class="duration-metrics-grid">
+            <div class="metric-card">
+              <span>{{ 'SHOPPING_LIST.AVG_PER_DAY' | translate }}</span>
+              <strong>{{ durationPlan().averageCaloriesPerDay | number }} kcal</strong>
+              <small>{{ 'SHOPPING_LIST.TARGET_PER_DAY' | translate }}: {{ durationPlan().dailyCalorieTarget }} kcal</small>
+            </div>
+            <div class="metric-card" [class.optimal]="durationPlan().status === 'optimal'" [class.warning]="durationPlan().status === 'exceeds' || durationPlan().status === 'too_low'">
+              <span>Differenz / Tag</span>
+              <strong>
+                {{ durationPlan().differencePerDay > 0 ? '+' : '' }}{{ durationPlan().differencePerDay }} kcal
+              </strong>
+              <small>{{ durationPlan().status }}</small>
+            </div>
+          </div>
+
+          <!-- Fundiertes Feedback -->
+          <div class="feedback-card" [class.optimal]="durationPlan().status === 'optimal'" [class.exceeds]="durationPlan().status === 'exceeds'" [class.too-low]="durationPlan().status === 'too_low'">
+            <p>{{ durationPlan().feedbackMessage }}</p>
+          </div>
+
+          <!-- Beispielhafte Tagesverteilung -->
+          <div class="distribution-section">
+            <h4>{{ 'SHOPPING_LIST.DISTRIBUTION_TITLE' | translate }}</h4>
+            <div class="day-cards-list">
+              @for (i of [1, 2, 3]; track i) {
+                @if (i <= plannedDays()) {
+                  <div class="day-plan-card">
+                    <div class="day-header">
+                      <span>{{ 'SHOPPING_LIST.DAY_PREFIX' | translate }} {{ i }}</span>
+                      <strong>~ {{ durationPlan().averageCaloriesPerDay | number }} kcal</strong>
+                    </div>
+                    <small>Portionen aus deinem Einkauf gleichmäßig verteilt</small>
+                  </div>
+                }
+              }
+            </div>
+          </div>
+
+          <!-- Lagerung & Frische-Tipps -->
+          <div class="perishability-box">
+            <h4>❄️ {{ 'SHOPPING_LIST.PERISHABILITY_TITLE' | translate }}</h4>
+            <ul>
+              @for (tip of durationPlan().perishabilityTips; track tip) {
+                <li>{{ tip }}</li>
+              }
+            </ul>
+          </div>
+        </div>
+
+        <div class="duration-modal-footer">
+          <button
+            type="button"
+            (click)="closeDurationModal()"
+            class="duration-close-btn"
+          >
+            {{ 'SHOPPING_LIST.CLOSE' | translate }}
           </button>
         </div>
       </div>

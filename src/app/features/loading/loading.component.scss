@@ -1,0 +1,101 @@
+@use '../../../styles/abstracts/variables' as vars;
+
+:host {
+  display: block;
+  height: 100%;
+}
+
+.loading-screen {
+  height: 100dvh;
+  background-color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  max-width: 480px;
+  margin: 0 auto;
+
+  .loader-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+
+    .ring-spinner-wrapper {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .ring-spinner-svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+
+        .ring-bg {
+          fill: none;
+          stroke: #E5F5E8;
+          stroke-width: 10;
+        }
+
+        .ring-accent {
+          fill: none;
+          stroke: #278F39;
+          stroke-width: 10;
+          stroke-linecap: round;
+          stroke-dasharray: 314;
+          stroke-dashoffset: 210;
+          animation: spinRing 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+      }
+
+      .ring-logo-center {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .leaf-icon {
+          width: 42px;
+          height: 42px;
+          object-fit: contain;
+        }
+      }
+    }
+
+    .loader-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #103A2A;
+      margin: 0;
+      letter-spacing: -0.02em;
+    }
+
+    .loader-message {
+      font-size: 0.88rem;
+      color: #55695C;
+      margin: 0;
+      max-width: 260px;
+      line-height: 1.4;
+    }
+  }
+}
+
+@keyframes spinRing {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring-accent {
+    animation: none !important;
+  }
+}

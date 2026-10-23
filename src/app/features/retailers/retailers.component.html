@@ -7,21 +7,21 @@
           type="button"
           (click)="goBack()"
           class="back-button"
-          aria-label="Zurück zum Kalorienrechner"
+          aria-label="Zurück zum Kalorienbedarf"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.75 19.5L8.25 12l7.5-7.5" />
           </svg>
         </button>
-        <h1>{{ 'RETAILERS.HEADER_TITLE' | translate }}</h1>
+        <h1>Dein Markt</h1>
       </div>
       <app-hamburger-button></app-hamburger-button>
     </div>
 
-    <p>{{ 'RETAILERS.MOCKUP_SUBTITLE' | translate }}</p>
+    <p>Wähle deinen Lieblingssupermarkt. Wir zeigen dir passende Lebensmittel und ihre Kalorien.</p>
   </header>
 
-  <!-- Scrollable Inhaltsbereich (Screen 4 Mockup) -->
+  <!-- Scrollable Inhaltsbereich -->
   <main class="retailers-body">
     <!-- 1. Netto Card (Aktiver Markt) -->
     <div
@@ -45,9 +45,9 @@
       </div>
     </div>
 
-    <!-- 2. Weitere Märkte (REWE, EDEKA, ALDI, Lidl mit Radio Buttons) -->
+    <!-- 2. Weitere Märkte (REWE, EDEKA, ALDI, Lidl mit Coming Soon) -->
     <section class="other-retailers-section">
-      <h3>{{ 'RETAILERS.OTHER_RETAILERS' | translate }}</h3>
+      <h3>Weitere Märkte</h3>
 
       <div class="retailers-list">
         <!-- REWE -->
@@ -81,7 +81,7 @@
         <!-- ALDI Nord -->
         <div
           class="retailer-row-card"
-          (click)="selectRetailer('aldi_nord')"
+          (click)="selectRetailer('aldi-nord')"
           role="button"
           tabindex="0"
         >
@@ -95,7 +95,7 @@
         <!-- ALDI Süd -->
         <div
           class="retailer-row-card"
-          (click)="selectRetailer('aldi_sued')"
+          (click)="selectRetailer('aldi-sued')"
           role="button"
           tabindex="0"
         >
@@ -152,16 +152,16 @@
 
     <!-- Coming Soon Hinweis-Pill -->
     @if (comingSoonNotice()) {
-      <div class="notice-callout">
+      <div class="notice-callout animate-fade-in">
         <span>ℹ️</span>
         <p>{{ comingSoonNotice() }}</p>
       </div>
     }
 
-    <!-- 3. Dein Wochenbudget (Screen 4 Mockup) -->
+    <!-- 3. Dein Wochenbudget -->
     <section class="budget-section">
       <div class="budget-headline-row">
-        <h3>{{ 'RETAILERS.WEEKLY_BUDGET' | translate }}</h3>
+        <h3>Dein Wochenbudget</h3>
         <div class="budget-value-box">
           <strong>{{ weeklyBudget }}</strong>
           <span>€</span>
@@ -186,14 +186,15 @@
   </main>
 
   <!-- Sticky Footer Button -->
-  <footer class="retailers-footer">
+  <footer class="retailers-footer safe-area-bottom">
     <button
       type="button"
       (click)="confirmSelection()"
       class="confirm-button"
+      id="btn-confirm-retailer"
       [disabled]="selectedRetailer() !== 'netto'"
     >
-      <span>{{ 'RETAILERS.CONFIRM_BTN' | translate }}</span>
+      <span>Weiter</span>
       <span class="btn-arrow">→</span>
     </button>
   </footer>

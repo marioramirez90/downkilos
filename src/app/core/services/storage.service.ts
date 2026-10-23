@@ -191,8 +191,8 @@ export class StorageService {
     const defaultPref: RetailerPreference = {
       retailerId: 'netto',
       retailerName: 'Netto Marken-Discount',
-      postalCode: '10115',
-      city: 'Berlin – Mitte',
+      postalCode: '',
+      city: '',
       weeklyBudget: 40
     };
     this.retailerPref.set(defaultPref);

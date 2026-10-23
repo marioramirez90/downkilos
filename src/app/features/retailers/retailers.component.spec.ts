@@ -2,17 +2,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { RetailersComponent } from './retailers.component';
 import { RetailerService } from '../../core/services/retailer.service';
-import { LocationService } from '../../core/services/location.service';
-import { NearbyStoresService } from '../../core/services/nearby-stores.service';
-import { StoreBranch, UserLocation } from '../../core/models/retailer.model';
 
 describe('RetailersComponent', () => {
   let component: RetailersComponent;
   let fixture: ComponentFixture<RetailersComponent>;
   let router: Router;
   let retailerService: RetailerService;
-  let locationService: LocationService;
-  let nearbyStoresService: NearbyStoresService;
 
   beforeEach(async () => {
     localStorage.clear();
@@ -23,8 +18,6 @@ describe('RetailersComponent', () => {
 
     router = TestBed.inject(Router);
     retailerService = TestBed.inject(RetailerService);
-    locationService = TestBed.inject(LocationService);
-    nearbyStoresService = TestBed.inject(NearbyStoresService);
     vi.spyOn(router, 'navigate').mockResolvedValue(true);
 
     fixture = TestBed.createComponent(RetailersComponent);
@@ -41,101 +34,59 @@ describe('RetailersComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should show market selection section with Netto and other retailers', () => {
+  it('should show Dein Markt and market selection with Netto and other retailers', () => {
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toContain('Wo kaufst du am liebsten ein?');
+    expect(el.textContent).toContain('Dein Markt');
+    expect(el.textContent).toContain('Wähle deinen Lieblingssupermarkt');
     expect(el.textContent).toContain('Netto');
+    expect(el.textContent).toContain('Marken-Discount');
     expect(el.textContent).toContain('Weitere Märkte');
+    expect(el.textContent).toContain('REWE');
+    expect(el.textContent).toContain('EDEKA');
+    expect(el.textContent).toContain('Lidl');
+    expect(el.textContent).toContain('Coming soon');
   });
 
-  it('should handle GPS location request when clicking locateMe', async () => {
-    const mockLoc: UserLocation = {
-      lat: 52.52,
-      lng: 13.40,
-      formattedAddress: 'Alexanderplatz 1, 10178 Berlin',
-      postalCode: '10178',
-      city: 'Berlin',
-      isGps: true
-    };
-    vi.spyOn(locationService, 'getCurrentPosition').mockResolvedValue(mockLoc);
-    vi.spyOn(nearbyStoresService, 'searchStores').mockResolvedValue([]);
+  it('should select Netto by default and clear any coming soon notice', () => {
+    expect(component.selectedRetailer()).toBe('netto');
+    expect(component.comingSoonNotice()).toBeNull();
+  });
 
-    await component.locateMe();
+  it('should show a coming soon notice when selecting a non-Netto retailer', () => {
+    component.selectRetailer('rewe');
     fixture.detectChanges();
 
-    expect(component.confirmedLocation()?.formattedAddress).toBe('Alexanderplatz 1, 10178 Berlin');
-    expect(component.addressControl.value).toBe('Alexanderplatz 1, 10178 Berlin');
+    expect(component.comingSoonNotice()).toContain('REWE: Coming soon');
+    expect(component.comingSoonNotice()).toContain('Netto Marken-Discount verfügbar');
   });
 
-  it('should handle manual address submission and search nearby stores', async () => {
-    const mockLoc: UserLocation = {
-      lat: 53.55,
-      lng: 9.99,
-      formattedAddress: 'Mönckebergstraße 1, 20095 Hamburg',
-      postalCode: '20095',
-      city: 'Hamburg',
-      isGps: false
-    };
-    vi.spyOn(locationService, 'geocodeAddress').mockResolvedValue(mockLoc);
-    const searchSpy = vi.spyOn(nearbyStoresService, 'searchStores').mockResolvedValue([]);
+  it('should allow selecting Netto again after clicking another market', () => {
+    component.selectRetailer('edeka');
+    expect(component.comingSoonNotice()).not.toBeNull();
 
-    component.addressControl.setValue('Hamburg');
-    await component.submitManualAddress();
-    fixture.detectChanges();
-
-    expect(searchSpy).toHaveBeenCalledWith(mockLoc, 5);
-    expect(component.confirmedLocation()?.city).toBe('Hamburg');
+    component.selectRetailer('netto');
+    expect(component.selectedRetailer()).toBe('netto');
+    expect(component.comingSoonNotice()).toBeNull();
   });
 
-  it('should allow selecting Netto branch and save on confirm', async () => {
-    const nettoStore: StoreBranch = {
-      id: 'netto-test',
-      placeId: 'netto-place-1',
-      retailerId: 'netto',
-      retailerName: 'Netto Marken-Discount',
-      brand: 'Netto Marken-Discount',
-      name: 'Netto Marken-Discount',
-      street: 'Hauptstraße 10',
-      postalCode: '10115',
-      city: 'Berlin',
-      formattedAddress: 'Hauptstraße 10, 10115 Berlin',
-      lat: 52.53,
-      lng: 13.38,
-      distanceKm: 0.8,
-      isAvailable: true
-    };
-
-    component.onSelectStore(nettoStore);
-    expect(component.selectedStore()?.id).toBe('netto-test');
-
+  it('should save preference without inventing fake addresses and navigate to /loading', async () => {
     const saveSpy = vi.spyOn(retailerService, 'savePreference');
+    component.weeklyBudget = 45;
+
     await component.confirmSelection();
 
-    expect(saveSpy).toHaveBeenCalled();
-    expect(router.navigate).toHaveBeenCalledWith(['/how-it-works']);
+    expect(saveSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        retailerId: 'netto',
+        retailerName: 'Netto Marken-Discount',
+        weeklyBudget: 45
+      })
+    );
+    expect(router.navigate).toHaveBeenCalledWith(['/loading']);
   });
 
-  it('should show coming soon notice when selecting non-Netto store', () => {
-    const reweStore: StoreBranch = {
-      id: 'rewe-test',
-      retailerId: 'rewe',
-      retailerName: 'REWE',
-      brand: 'REWE',
-      name: 'REWE',
-      street: 'Kastanienallee 5',
-      postalCode: '10435',
-      city: 'Berlin',
-      formattedAddress: 'Kastanienallee 5, 10435 Berlin',
-      lat: 52.54,
-      lng: 13.41,
-      distanceKm: 1.2,
-      isAvailable: false
-    };
-
-    component.onSelectStore(reweStore);
-    fixture.detectChanges();
-
-    expect(component.comingSoonNotice()).toContain('REWE');
-    expect(component.comingSoonNotice()).toContain('demnächst');
+  it('should navigate back to /calculator when clicking back button', () => {
+    component.goBack();
+    expect(router.navigate).toHaveBeenCalledWith(['/calculator']);
   });
 });

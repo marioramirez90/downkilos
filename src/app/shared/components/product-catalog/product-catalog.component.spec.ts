@@ -32,7 +32,7 @@ describe('ProductCatalogComponent', () => {
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('Hähnchenbrustfilet');
     expect(el.textContent).toContain('Haferflocken');
-    expect(el.textContent).toContain('Verifiziert');
+    expect(el.textContent).toContain('Netto-Angebot');
   });
 
   it('should open price editor when clicking on price action', () => {
@@ -42,7 +42,7 @@ describe('ProductCatalogComponent', () => {
 
     expect(component.editingProduct()).toBe(prod);
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toContain('Preis für Netto eintragen');
+    expect(el.textContent).toContain('Netto-Preis eintragen / anpassen');
   });
 
   it('should save updated user price when confirmed in modal', () => {

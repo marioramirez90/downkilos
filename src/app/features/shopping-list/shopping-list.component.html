@@ -20,6 +20,9 @@
 
       <!-- Info & Add Action -->
       <div class="flex items-center gap-1.5">
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FFF200] text-[#ED1C24] border border-[#E6DB00]">
+          Netto
+        </span>
         <app-hamburger-button></app-hamburger-button>
         <button
           type="button"
@@ -42,9 +45,12 @@
     <!-- Info Notice -->
     @if (showInfo()) {
       <div class="p-3.5 rounded-2xl bg-[#E5F5E8] border border-[#CDE9D2] text-xs text-[#103A2A] leading-relaxed animate-fade-in flex justify-between items-start">
-        <p>
-          Diese Einkaufsliste wurde automatisch aus deinen geplanten Mahlzeiten berechnet. Mengen sind auf ganze Netto-Verpackungen gerundet.
-        </p>
+        <div class="space-y-1">
+          <p class="font-bold">Echte Netto Marken-Discount Produkte</p>
+          <p>
+            Mengen basieren auf ganzen Netto-Packungsgrößen. Preise werden als aktuelle Angebote oder zuletzt bekannte Filialpreise geführt. Keine Fantasiepreise.
+          </p>
+        </div>
         <button (click)="showInfo.set(false)" class="text-xs font-bold text-[#278F39] ml-2 cursor-pointer">✕</button>
       </div>
     }
@@ -111,12 +117,12 @@
       @for (item of shoppingService.filteredItems(); track item.id) {
         <div
           class="p-2.5 sm:p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 select-none"
-          [ngClass]="item.isChecked
+          [ngClass]="item.isChecked || item.inPantry
             ? 'bg-[#F8FAF9] border-[#E3EBE4] opacity-80'
             : 'bg-white border-[#E3EBE4] shadow-soft-sm hover:border-[#278F39]/50'"
         >
           <!-- Left: Checkbox & Product Image -->
-          <div class="flex items-center gap-3 min-w-0">
+          <div class="flex items-center gap-3 min-w-0 flex-1">
             <!-- Checkbox -->
             <button
               type="button"
@@ -136,39 +142,77 @@
 
             <!-- Thumbnail -->
             <div class="w-12 h-12 rounded-xl overflow-hidden bg-[#F6F8F6] border border-[#E3EBE4] flex-shrink-0">
-              <img [src]="item.imageUrl" [alt]="item.name" class="w-full h-full object-cover" />
+              <img [src]="item.imageUrl" [alt]="item.name" class="w-full h-full object-cover" loading="lazy" />
             </div>
 
             <!-- Text labels -->
-            <div class="min-w-0">
-              <h4
-                class="text-xs sm:text-sm font-bold text-[#103A2A] truncate"
-                [class.line-through]="item.isChecked"
-                [class.text-[#627264]]="item.isChecked"
-              >
-                {{ item.name }}
-              </h4>
-              <span class="text-[11px] text-[#627264] block">
-                {{ item.packageSize }}
-              </span>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <h4
+                  class="text-xs sm:text-sm font-bold text-[#103A2A] truncate"
+                  [class.line-through]="item.isChecked"
+                  [class.text-[#627264]]="item.isChecked"
+                >
+                  {{ item.name }}
+                </h4>
+                @if (item.brand) {
+                  <span class="text-[9px] font-semibold text-[#627264] px-1 bg-[#F1F5F2] rounded">
+                    {{ item.brand }}
+                  </span>
+                }
+              </div>
+              <div class="flex items-center gap-2 mt-0.5 text-[11px] text-[#627264] flex-wrap">
+                <span>{{ item.packageCount }}x {{ item.packageSize }}</span>
+                @if (item.priceStatus) {
+                  <span
+                    class="text-[9px] font-bold px-1.5 py-0.2 rounded"
+                    [ngClass]="priceService.getStatusBadge(item.priceStatus).bgClass + ' ' + priceService.getStatusBadge(item.priceStatus).textClass"
+                  >
+                    {{ priceService.getStatusBadge(item.priceStatus).badgeText }}
+                  </span>
+                }
+                @if (item.observationDate) {
+                  <span class="text-[9px] text-[#94A3B8]">
+                    {{ priceService.formatObservationDate(item.observationDate) }}
+                  </span>
+                }
+              </div>
             </div>
           </div>
 
-          <!-- Right: Price -->
-          <div class="flex items-center gap-2 flex-shrink-0">
-            <span class="text-xs sm:text-sm font-black text-[#103A2A]">
-              {{ priceService.formatPrice(item.totalCost) }}
+          <!-- Right: Price & Pantry Action -->
+          <div class="flex flex-col items-end justify-between flex-shrink-0 gap-1">
+            <span
+              class="text-xs sm:text-sm font-black"
+              [ngClass]="item.inPantry ? 'text-[#94A3B8] line-through' : (item.totalCost !== null ? 'text-[#103A2A]' : 'text-[#D97706] text-xs font-semibold')"
+            >
+              {{ item.inPantry ? 'Im Vorrat' : priceService.formatPrice(item.totalCost) }}
             </span>
-            @if (item.isCustom) {
+            
+            <div class="flex items-center gap-1.5">
               <button
                 type="button"
-                (click)="shoppingService.removeCustomItem(item.id)"
-                class="text-xs text-red-400 hover:text-red-600 p-1 cursor-pointer"
-                title="Löschen"
+                (click)="shoppingService.toggleInPantry(item.id)"
+                class="text-[10px] font-semibold px-1.5 py-0.5 rounded cursor-pointer transition-colors"
+                [ngClass]="item.inPantry
+                  ? 'bg-[#E5F5E8] text-[#278F39] font-bold'
+                  : 'bg-[#F1F5F2] text-[#627264] hover:bg-[#E2EDE5]'"
+                [title]="item.inPantry ? 'Aus Vorrat entfernen' : 'Bereits im Vorrat vorhanden (kostet 0 €)'"
               >
-                ✕
+                {{ item.inPantry ? '✓ Vorrat' : 'Vorrat?' }}
               </button>
-            }
+
+              @if (item.isCustom) {
+                <button
+                  type="button"
+                  (click)="shoppingService.removeCustomItem(item.id)"
+                  class="text-xs text-red-400 hover:text-red-600 p-0.5 cursor-pointer"
+                  title="Löschen"
+                >
+                  ✕
+                </button>
+              }
+            </div>
           </div>
         </div>
       } @empty {
@@ -178,14 +222,65 @@
       }
     </div>
 
-    <!-- Bottom Summary Row (Matching Screen 6) -->
-    <div class="p-3.5 rounded-2xl bg-[#F6F8F6] border border-[#E3EBE4] flex items-center justify-between mt-2">
-      <span class="text-xs font-bold text-[#103A2A]">
-        Gesamtsumme (ca.)
-      </span>
-      <span class="text-base sm:text-lg font-black text-[#103A2A]">
-        {{ priceService.formatPrice(shoppingService.summary().totalCost) }}
-      </span>
+    <!-- Optional Budget Buffer Selector -->
+    <div class="p-3 rounded-2xl bg-[#F6F8F6] border border-[#E3EBE4] space-y-2 mt-2">
+      <div class="flex items-center justify-between text-xs">
+        <span class="font-semibold text-[#17241D]">Budget-Sicherheitspuffer:</span>
+        <div class="flex gap-1">
+          <button
+            type="button"
+            (click)="shoppingService.setBudgetBuffer(0)"
+            class="px-2 py-0.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer"
+            [ngClass]="shoppingService.budgetBufferPercent() === 0 ? 'bg-[#278F39] text-white' : 'bg-white text-[#627264] border border-[#E3EBE4]'"
+          >
+            0%
+          </button>
+          <button
+            type="button"
+            (click)="shoppingService.setBudgetBuffer(5)"
+            class="px-2 py-0.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer"
+            [ngClass]="shoppingService.budgetBufferPercent() === 5 ? 'bg-[#278F39] text-white' : 'bg-white text-[#627264] border border-[#E3EBE4]'"
+          >
+            +5%
+          </button>
+          <button
+            type="button"
+            (click)="shoppingService.setBudgetBuffer(10)"
+            class="px-2 py-0.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer"
+            [ngClass]="shoppingService.budgetBufferPercent() === 10 ? 'bg-[#278F39] text-white' : 'bg-white text-[#627264] border border-[#E3EBE4]'"
+          >
+            +10%
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Summary Row (Matching Screen 6 with Estimate / Incomplete Notice) -->
+    <div class="p-3.5 rounded-2xl bg-[#F6F8F6] border border-[#E3EBE4] space-y-2 mt-2">
+      <div class="flex items-center justify-between">
+        <div class="space-y-0.5">
+          <span class="text-xs font-bold text-[#103A2A] block">
+            Gesamtsumme ({{ shoppingService.summary().checkedItems }}/{{ shoppingService.summary().totalItems }} erledigt)
+          </span>
+          @if (shoppingService.summary().budgetBufferPercent > 0) {
+            <span class="text-[10px] text-[#627264] block">
+              Inkl. {{ shoppingService.summary().budgetBufferPercent }}% Puffer (+{{ priceService.formatPrice(shoppingService.summary().budgetBufferAmount) }})
+            </span>
+          }
+        </div>
+        <span class="text-base sm:text-lg font-black text-[#103A2A]">
+          {{ priceService.formatPrice(shoppingService.summary().totalCostWithBuffer) }}
+        </span>
+      </div>
+
+      <!-- Schätzungs- oder Unvollständigkeits-Hinweis -->
+      @if (shoppingService.summary().estimateNotice; as notice) {
+        <div class="pt-1 border-t border-[#E3EBE4] flex items-center gap-1.5 text-[10px]"
+             [ngClass]="shoppingService.summary().hasMissingPrices ? 'text-[#D97706]' : 'text-[#2563EB]'">
+          <span>ℹ️</span>
+          <span class="font-semibold">{{ notice }}</span>
+        </div>
+      }
     </div>
   </main>
 

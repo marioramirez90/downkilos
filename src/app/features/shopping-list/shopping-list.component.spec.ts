@@ -33,17 +33,17 @@ describe('ShoppingListComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should render items matching reference image (Hähnchenbrustfilet, Vollkornreis, etc.)', () => {
+  it('should render items matching reference image (Hähnchenbrustfilet, Naturreis, etc.)', () => {
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('Hähnchenbrustfilet');
-    expect(el.textContent).toContain('Vollkornreis');
+    expect(el.textContent).toContain('Naturreis');
     expect(el.textContent).toContain('Brokkoli');
     expect(el.textContent).toContain('Haferflocken');
   });
 
   it('should render total sum in summary row', () => {
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toContain('Gesamtsumme (ca.)');
+    expect(el.textContent).toContain('Gesamtsumme');
     expect(el.textContent).toMatch(/\d+[.,]\d{2}\s*€/);
   });
 

@@ -74,7 +74,18 @@
         <span>Einkaufsliste (Netto)</span>
       </a>
 
-      <!-- 4. Rezepte & Produkte -->
+      <!-- 4. Netto-Produkte (Neuer eigener Bildschirm) -->
+      <a
+        routerLink="/netto-products"
+        (click)="closeMenu()"
+        routerLinkActive="bg-[#E5F5E8] text-[#278F39] font-bold"
+        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-[#103A2A] hover:bg-[#F6F8F6] transition-colors"
+      >
+        <span class="text-base">🏷️</span>
+        <span>Netto-Produkte</span>
+      </a>
+
+      <!-- 5. Rezepte & Produkte -->
       <a
         routerLink="/recipes"
         (click)="closeMenu()"
@@ -85,7 +96,7 @@
         <span>Rezepte & Netto-Sortiment</span>
       </a>
 
-      <!-- 5. Mein Fortschritt -->
+      <!-- 6. Mein Fortschritt -->
       <a
         routerLink="/progress"
         (click)="closeMenu()"
@@ -94,6 +105,23 @@
       >
         <span class="text-base">📈</span>
         <span>Mein Fortschritt & Vitalwerte</span>
+      </a>
+
+      <div class="pt-2 pb-1 border-t border-[#F0F4F1] my-1">
+        <span class="px-3.5 text-[10px] font-bold uppercase tracking-wider text-[#7A8E80]">
+          Verwaltung
+        </span>
+      </div>
+
+      <!-- Admin-Konsole -->
+      <a
+        routerLink="/admin"
+        (click)="closeMenu()"
+        routerLinkActive="bg-[#E5F5E8] text-[#278F39] font-bold"
+        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-[#103A2A] hover:bg-[#F6F8F6] transition-colors"
+      >
+        <span class="text-base">🔐</span>
+        <span>Netto Admin-Konsole</span>
       </a>
 
       <div class="pt-2 pb-1 border-t border-[#F0F4F1] my-1">

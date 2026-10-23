@@ -1,0 +1,45 @@
+<div class="flex flex-col h-full bg-[#FFFFFF] overflow-hidden">
+  <!-- Bereich A: Fester Header -->
+  <header class="flex-shrink-0 px-5 pt-4 pb-2 border-b border-[#F0F4F1] bg-white z-10">
+    <div class="flex items-center justify-between pb-2">
+      <div class="flex items-center gap-2">
+        <app-logo size="sm"></app-logo>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-extrabold text-[#103A2A] tracking-tight">
+            Netto-Produkte
+          </h1>
+          <span class="text-[10px] text-[#627264] block">
+            Verifizierte Artikel & Preise (ohne Hund)
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FFF200] text-[#ED1C24] border border-[#E6DB00]">
+          Netto Marken-Discount
+        </span>
+        <app-hamburger-button></app-hamburger-button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Bereich B: Scrollbarer Inhalt -->
+  <main class="flex-1 min-h-0 overflow-y-auto px-5 py-4 space-y-4">
+    <app-product-catalog></app-product-catalog>
+  </main>
+
+  <!-- Bereich C: Fester Footer mit Hauptbutton und Navigationsleiste -->
+  <footer class="flex-shrink-0 bg-white border-t border-[#E3EBE4] z-20">
+    <div class="px-5 py-2.5 bg-white border-b border-[#F0F4F1]">
+      <button
+        type="button"
+        (click)="goToShoppingList()"
+        class="w-full py-3.5 px-6 rounded-2xl bg-[#278F39] hover:bg-[#217A30] active:scale-[0.98] text-white font-bold text-sm sm:text-base shadow-button flex items-center justify-center gap-2 transition-all cursor-pointer"
+      >
+        <span>Zur Einkaufsliste</span>
+        <span class="text-lg">→</span>
+      </button>
+    </div>
+    <app-bottom-nav></app-bottom-nav>
+  </footer>
+</div>

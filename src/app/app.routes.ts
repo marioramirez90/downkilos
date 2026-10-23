@@ -52,7 +52,19 @@ export const routes: Routes = [
     path: 'recipes',
     loadComponent: () =>
       import('./features/recipes/recipes.component').then((m) => m.RecipesComponent),
-    title: 'Down Kilos – Rezepte',
+    title: 'Down Kilos – Rezepte & Netto-Sortiment',
+  },
+  {
+    path: 'netto-products',
+    loadComponent: () =>
+      import('./features/netto-products/netto-products.component').then((m) => m.NettoProductsComponent),
+    title: 'Down Kilos – Netto-Produkte',
+  },
+  {
+    path: 'admin',
+    loadComponent: () =>
+      import('./features/admin/admin.component').then((m) => m.AdminComponent),
+    title: 'Down Kilos – Administratorbereich',
   },
   {
     path: 'progress',

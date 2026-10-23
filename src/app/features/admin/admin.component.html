@@ -1,0 +1,531 @@
+<div class="flex flex-col h-full bg-[#FFFFFF] overflow-hidden">
+  <!-- Bereich A: Header -->
+  <header class="flex-shrink-0 px-5 pt-4 pb-2 border-b border-[#F0F4F1] bg-white z-10 space-y-2">
+    <div class="flex items-center justify-between pb-1">
+      <div class="flex items-center gap-3">
+        <button
+          type="button"
+          (click)="goBack()"
+          class="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-[#103A2A] hover:bg-[#F1F5F2] active:scale-95 transition-transform cursor-pointer"
+          aria-label="Zurück"
+        >
+          <svg class="w-6 h-6 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+          </svg>
+        </button>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-extrabold text-[#103A2A] tracking-tight">
+            Netto Admin-Konsole
+          </h1>
+          <span class="text-[10px] text-[#627264] block">
+            Datenquellen, Sortiment & Preisverläufe
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <app-logo size="sm"></app-logo>
+        @if (isAuthenticated()) {
+          <button
+            type="button"
+            (click)="logout()"
+            class="px-2.5 py-1 text-xs font-bold rounded-xl bg-[#F1F5F2] text-[#627264] hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer"
+          >
+            Abmelden
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Sub-Navigation Tabs (nur sichtbar wenn authentifiziert) -->
+    @if (isAuthenticated()) {
+      <div class="flex p-1 bg-[#F1F5F2] rounded-2xl select-none overflow-x-auto no-scrollbar text-xs">
+        <button
+          type="button"
+          (click)="activeTab.set('products')"
+          class="flex-1 py-1.5 px-3 font-bold rounded-xl transition-all cursor-pointer whitespace-nowrap text-center"
+          [ngClass]="activeTab() === 'products' ? 'bg-[#278F39] text-white shadow-soft-sm' : 'text-[#627264] hover:text-[#103A2A]'"
+        >
+          Sortiment ({{ productService.products().length }})
+        </button>
+        <button
+          type="button"
+          (click)="activeTab.set('import')"
+          class="flex-1 py-1.5 px-3 font-bold rounded-xl transition-all cursor-pointer whitespace-nowrap text-center"
+          [ngClass]="activeTab() === 'import' ? 'bg-[#278F39] text-white shadow-soft-sm' : 'text-[#627264] hover:text-[#103A2A]'"
+        >
+          CSV/JSON Import
+        </button>
+        <button
+          type="button"
+          (click)="activeTab.set('history')"
+          class="flex-1 py-1.5 px-3 font-bold rounded-xl transition-all cursor-pointer whitespace-nowrap text-center"
+          [ngClass]="activeTab() === 'history' ? 'bg-[#278F39] text-white shadow-soft-sm' : 'text-[#627264] hover:text-[#103A2A]'"
+        >
+          Preishistorie ({{ productService.priceHistory().length }})
+        </button>
+        <button
+          type="button"
+          (click)="activeTab.set('logs')"
+          class="flex-1 py-1.5 px-3 font-bold rounded-xl transition-all cursor-pointer whitespace-nowrap text-center"
+          [ngClass]="activeTab() === 'logs' ? 'bg-[#278F39] text-white shadow-soft-sm' : 'text-[#627264] hover:text-[#103A2A]'"
+        >
+          Sync-Logs ({{ productService.importLogs().length }})
+        </button>
+      </div>
+    }
+  </header>
+
+  <!-- Toast Notification -->
+  @if (notification(); as notif) {
+    <div
+      class="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-2xl shadow-xl text-xs font-bold animate-bounce flex items-center gap-2"
+      [ngClass]="notif.type === 'success' ? 'bg-[#278F39] text-white' : 'bg-red-600 text-white'"
+    >
+      <span>{{ notif.type === 'success' ? '✓' : '⚠️' }}</span>
+      <span>{{ notif.message }}</span>
+    </div>
+  }
+
+  <!-- Bereich B: Inhalt -->
+  <main class="flex-1 px-5 py-4 min-h-0 overflow-y-auto space-y-4">
+    <!-- Falls nicht eingeloggt: PIN-Abfrage -->
+    @if (!isAuthenticated()) {
+      <div class="max-w-sm mx-auto my-12 p-6 bg-white rounded-3xl border border-[#E3EBE4] shadow-soft-lg space-y-4 text-center">
+        <div class="w-12 h-12 mx-auto rounded-2xl bg-[#E5F5E8] flex items-center justify-center text-xl">
+          🔒
+        </div>
+        <div class="space-y-1">
+          <h2 class="text-base font-extrabold text-[#103A2A]">Admin-Bereich geschützt</h2>
+          <p class="text-xs text-[#627264]">
+            Bitte gib deinen Admin-PIN ein, um Sortiment, Datenquellen und Netto-Preise zu verwalten.
+          </p>
+        </div>
+
+        <div class="space-y-2">
+          <input
+            type="password"
+            [(ngModel)]="pinInput"
+            (keyup.enter)="checkPin()"
+            placeholder="PIN eingeben (Standard: 4200)"
+            class="w-full text-center tracking-widest text-lg font-mono py-3 px-4 rounded-2xl border border-[#DCE4DE] focus:outline-none focus:border-[#278F39]"
+          />
+          @if (authError(); as err) {
+            <p class="text-[11px] text-red-500 font-semibold">{{ err }}</p>
+          }
+        </div>
+
+        <button
+          type="button"
+          (click)="checkPin()"
+          class="w-full py-3 rounded-2xl bg-[#278F39] hover:bg-[#217A30] text-white font-bold text-sm shadow-button transition-all cursor-pointer"
+        >
+          Entsperren
+        </button>
+
+        <p class="text-[10px] text-[#94A3B8]">
+          Gastprofile und die reguläre App bleiben ohne Login voll nutzbar.
+        </p>
+      </div>
+    } @else {
+      <!-- TAB 1: SORTIMENT -->
+      @if (activeTab() === 'products') {
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-[#103A2A]">
+              Echte Netto-Produkte verwalten
+            </span>
+            <button
+              type="button"
+              (click)="openAddModal()"
+              class="py-1.5 px-3 rounded-xl bg-[#278F39] text-white text-xs font-bold hover:bg-[#217A30] shadow-soft-sm cursor-pointer flex items-center gap-1"
+            >
+              <span>+</span>
+              <span>Neues Produkt</span>
+            </button>
+          </div>
+
+          <div class="space-y-2">
+            @for (p of productService.products(); track p.id) {
+              <div class="p-3 rounded-2xl bg-white border border-[#E3EBE4] shadow-soft-sm flex items-center justify-between gap-3">
+                <img [src]="p.imageUrl" [alt]="p.name" class="w-12 h-12 rounded-xl object-cover border border-[#E3EBE4] bg-[#F6F8F6] flex-shrink-0" />
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[9px] font-bold text-[#627264]">{{ p.brand }}</span>
+                    @if (p.ean) {
+                      <span class="text-[9px] text-[#94A3B8]">EAN: {{ p.ean }}</span>
+                    }
+                  </div>
+                  <h4 class="text-xs font-bold text-[#103A2A] truncate">{{ p.name }}</h4>
+                  <div class="flex items-center gap-2 text-[10px] text-[#627264]">
+                    <span>{{ p.packageSize }}</span>
+                    <span>•</span>
+                    <span class="font-bold text-[#103A2A]">{{ priceService.formatPrice(p.price) }}</span>
+                    <span
+                      class="text-[8px] font-bold px-1.5 py-0.2 rounded"
+                      [ngClass]="priceService.getStatusBadge(p.priceStatus).bgClass + ' ' + priceService.getStatusBadge(p.priceStatus).textClass"
+                    >
+                      {{ priceService.getStatusBadge(p.priceStatus).badgeText }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1.5 flex-shrink-0">
+                  <button
+                    type="button"
+                    (click)="openEditModal(p)"
+                    class="px-2.5 py-1 rounded-lg bg-[#F1F5F2] hover:bg-[#E2EDE5] text-[#103A2A] text-xs font-semibold cursor-pointer"
+                  >
+                    Bearbeiten
+                  </button>
+                  <button
+                    type="button"
+                    (click)="deleteProduct(p.id, p.name)"
+                    class="w-7 h-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold flex items-center justify-center cursor-pointer"
+                    title="Produkt löschen"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- TAB 2: IMPORT (CSV / JSON) -->
+      @if (activeTab() === 'import') {
+        <div class="space-y-4 max-w-xl mx-auto bg-white p-5 rounded-3xl border border-[#E3EBE4] shadow-soft-sm">
+          <div class="space-y-1">
+            <h3 class="text-sm font-extrabold text-[#103A2A]">
+              Verifizierte Netto-Daten importieren
+            </h3>
+            <p class="text-xs text-[#627264]">
+              Importiere offizielle Netto-Wochenangebote oder verifizierte Artikeldaten via JSON oder CSV.
+            </p>
+          </div>
+
+          <div class="flex gap-2">
+            <button
+              type="button"
+              (click)="importFormat = 'json'"
+              class="flex-1 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer"
+              [ngClass]="importFormat === 'json' ? 'bg-[#278F39] text-white' : 'bg-[#F1F5F2] text-[#627264]'"
+            >
+              JSON Import
+            </button>
+            <button
+              type="button"
+              (click)="importFormat = 'csv'"
+              class="flex-1 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer"
+              [ngClass]="importFormat === 'csv' ? 'bg-[#278F39] text-white' : 'bg-[#F1F5F2] text-[#627264]'"
+            >
+              CSV Import
+            </button>
+          </div>
+
+          <div class="space-y-1">
+            <label class="block text-xs font-semibold text-[#17241D]">
+              {{ importFormat === 'json' ? 'JSON Datenstruktur:' : 'CSV Daten (Semikolon-getrennt):' }}
+            </label>
+            <textarea
+              [(ngModel)]="importDataText"
+              rows="8"
+              class="w-full p-3 font-mono text-[11px] rounded-2xl border border-[#DCE4DE] focus:outline-none focus:border-[#278F39] bg-[#F8FAF9]"
+              [placeholder]="importFormat === 'json'
+                ? '[{\n  &quot;ean&quot;: &quot;4311501712090&quot;,\n  &quot;name&quot;: &quot;Bio Möhren&quot;,\n  &quot;brand&quot;: &quot;BioBio&quot;,\n  &quot;price&quot;: 1.19,\n  &quot;validFrom&quot;: &quot;2026-10-20&quot;,\n  &quot;validUntil&quot;: &quot;2026-10-25&quot;\n}]'
+                : 'EAN;Name;Marke;Kategorie;Menge;Gramm;Preis;GueltigVon;GueltigBis;Region\n4311501712090;Bio Möhren;BioBio;fruits_veg;1 kg;1000;1.19;2026-10-20;2026-10-25;Bundesweit'"
+            ></textarea>
+          </div>
+
+          <button
+            type="button"
+            (click)="executeImport()"
+            class="w-full py-3 rounded-2xl bg-[#278F39] hover:bg-[#217A30] text-white font-bold text-xs shadow-button cursor-pointer"
+          >
+            Daten verarbeiten & aktualisieren
+          </button>
+        </div>
+      }
+
+      <!-- TAB 3: PREISHISTORIE -->
+      @if (activeTab() === 'history') {
+        <div class="space-y-3">
+          <div class="space-y-1">
+            <h3 class="text-xs font-bold text-[#103A2A]">
+              Lückenlose Preisbeobachtungen
+            </h3>
+            <p class="text-[11px] text-[#627264]">
+              Ein neuer Preis überschreibt niemals unkontrolliert vorherige Werte. Alle Einträge bleiben nachvollziehbar.
+            </p>
+          </div>
+
+          <div class="space-y-2">
+            @for (h of productService.priceHistory(); track h.id) {
+              <div class="p-3 rounded-2xl bg-white border border-[#E3EBE4] shadow-soft-sm flex items-center justify-between text-xs">
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-extrabold text-[#103A2A]">{{ priceService.formatPrice(h.price) }}</span>
+                    <span
+                      class="text-[8px] font-bold px-1.5 py-0.2 rounded"
+                      [ngClass]="priceService.getStatusBadge(h.priceStatus).bgClass + ' ' + priceService.getStatusBadge(h.priceStatus).textClass"
+                    >
+                      {{ priceService.getStatusBadge(h.priceStatus).badgeText }}
+                    </span>
+                  </div>
+                  <span class="text-[10px] text-[#627264] block mt-0.5">
+                    {{ h.priceSource }} • {{ h.regionBranch || 'Bundesweit' }}
+                  </span>
+                  @if (h.notes) {
+                    <span class="text-[9px] text-[#94A3B8] italic block">{{ h.notes }}</span>
+                  }
+                </div>
+                <div class="text-right text-[10px] text-[#94A3B8]">
+                  <span>Beobachtet: {{ priceService.formatObservationDate(h.observedDate) }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- TAB 4: SYNC LOGS -->
+      @if (activeTab() === 'logs') {
+        <div class="space-y-3">
+          <div class="space-y-1">
+            <h3 class="text-xs font-bold text-[#103A2A]">
+              Protokollierte Synchronisationen & Adapter
+            </h3>
+            <p class="text-[11px] text-[#627264]">
+              Erfolgreiche und fehlgeschlagene Aktualisierungen aus Open Food Facts, Open Prices und Netto-Angeboten.
+            </p>
+          </div>
+
+          <div class="space-y-2">
+            @for (log of productService.importLogs(); track log.id) {
+              <div class="p-3 rounded-2xl bg-white border border-[#E3EBE4] shadow-soft-sm space-y-1 text-xs">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-[#103A2A]">{{ log.sourceAdapter }}</span>
+                  <span
+                    class="text-[9px] font-bold px-2 py-0.5 rounded-full"
+                    [ngClass]="log.status === 'success' ? 'bg-[#E5F5E8] text-[#278F39]' : 'bg-red-50 text-red-600'"
+                  >
+                    {{ log.status.toUpperCase() }}
+                  </span>
+                </div>
+                <div class="flex items-center gap-3 text-[10px] text-[#627264]">
+                  <span>Gescannt: {{ log.itemsScanned }}</span>
+                  <span>Neu: {{ log.itemsImported }}</span>
+                  <span>Aktualisiert: {{ log.itemsUpdated }}</span>
+                  <span>Fehler: {{ log.itemsFailed }}</span>
+                </div>
+                <div class="text-[9px] text-[#94A3B8]">
+                  Zeitpunkt: {{ log.timestamp }}
+                  @if (log.details) {
+                    • {{ log.details }}
+                  }
+                </div>
+              </div>
+            } @empty {
+              <div class="text-center py-8 text-xs text-[#627264]">
+                Bisher keine automatischen Sync-Logs vorhanden.
+              </div>
+            }
+          </div>
+        </div>
+      }
+    }
+  </main>
+
+  <!-- Bereich C: Footer -->
+  <footer class="flex-shrink-0 bg-white border-t border-[#E3EBE4] z-20">
+    <app-bottom-nav></app-bottom-nav>
+  </footer>
+
+  <!-- Product Add / Edit Modal -->
+  @if (showProductModal()) {
+    <div class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fade-in"
+         (click)="closeModal()">
+      <div class="bg-white rounded-3xl p-5 w-full max-w-lg space-y-3 shadow-2xl border border-[#E3EBE4] max-h-[90vh] overflow-y-auto"
+           (click)="$event.stopPropagation()">
+        
+        <div class="flex justify-between items-center">
+          <h3 class="text-sm font-extrabold text-[#103A2A]">
+            {{ isEditing() ? 'Produkt bearbeiten' : 'Neues Netto-Produkt anlegen' }}
+          </h3>
+          <button (click)="closeModal()" class="text-[#627264] hover:text-[#103A2A] font-bold cursor-pointer">✕</button>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <!-- Barcode mit Auto-Lookup -->
+          <div>
+            <label class="block font-semibold text-[#17241D] mb-1">Barcode / EAN-13:</label>
+            <div class="flex gap-2">
+              <input
+                type="text"
+                [(ngModel)]="formEan"
+                placeholder="z.B. 4311501712090"
+                class="flex-1 px-3 py-2 rounded-xl border border-[#DCE4DE] focus:outline-none focus:border-[#278F39]"
+              />
+              <button
+                type="button"
+                (click)="autoFetchOffForForm()"
+                class="px-3 py-2 rounded-xl bg-[#E5F5E8] text-[#278F39] font-bold hover:bg-[#D4EED8] cursor-pointer whitespace-nowrap"
+                title="Sucht Barcode in Open Food Facts und füllt Nährwerte & Foto automatisch"
+              >
+                OFF-Abruf ⚡
+              </button>
+            </div>
+            <p class="text-[10px] text-[#94A3B8] mt-0.5">
+              Lädt automatisch das offizielle Verpackungsfoto & Nährwerte von Open Food Facts.
+            </p>
+          </div>
+
+          <!-- Name & Marke -->
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block font-semibold text-[#17241D] mb-1">Produktname:</label>
+              <input
+                type="text"
+                [(ngModel)]="formName"
+                placeholder="z.B. Bio Speisemöhren"
+                class="w-full px-3 py-2 rounded-xl border border-[#DCE4DE] focus:outline-none focus:border-[#278F39]"
+              />
+            </div>
+            <div>
+              <label class="block font-semibold text-[#17241D] mb-1">Marke (Eigenmarke):</label>
+              <input
+                type="text"
+                [(ngModel)]="formBrand"
+                placeholder="z.B. BioBio, Gutes Land, Markttag"
+                class="w-full px-3 py-2 rounded-xl border border-[#DCE4DE] focus:outline-none focus:border-[#278F39]"
+              />
+            </div>
+          </div>
+
+          <!-- Kategorie & Packungsgröße -->
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="block font-semibold text-[#17241D] mb-1">Kategorie:</label>
+              <select
+                [(ngModel)]="formCategory"
+                class="w-full px-2 py-2 rounded-xl border border-[#DCE4DE] bg-white focus:outline-none focus:border-[#278F39]"
+              >
+                <option value="fruits_veg">Obst & Gemüse</option>
+                <option value="meat_fish">Fleisch & Fisch</option>
+                <option value="dairy">Milch & Kühlung</option>
+                <option value="grains">Getreide & Reis</option>
+                <option value="pantry">Vorrat</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-semibold text-[#17241D] mb-1">Packungsgröße:</label>
+              <input
+                type="text"
+                [(ngModel)]="formPackageSize"
+                placeholder="1 kg"
+                class="w-full px-3 py-2 rounded-xl border border-[#DCE4DE] focus:outline-none focus:border-[#278F39]"
+              />
+            </div>
+            <div>
+              <label class="block font-semibold text-[#17241D] mb-1">Gewicht in Gramm:</label>
+              <input
+                type="number"
+                [(ngModel)]="formPackageGrams"
+                placeholder="1000"
+                class="w-full px-3 py-2 rounded-xl border border-[#DCE4DE] focus:outline-none focus:border-[#278F39]"
+              />
+            </div>
+          </div>
+
+          <!-- Preis & Status -->
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block font-semibold text-[#17241D] mb-1">Preis in €:</label>
+              <input
+                type="number"
+                step="0.01"
+                [(ngModel)]="formPrice"
+                placeholder="1.19"
+                class="w-full px-3 py-2 rounded-xl border border-[#DCE4DE] focus:outline-none focus:border-[#278F39]"
+              />
+            </div>
+            <div>
+              <label class="block font-semibold text-[#17241D] mb-1">Preisstatus:</label>
+              <select
+                [(ngModel)]="formPriceStatus"
+                class="w-full px-2 py-2 rounded-xl border border-[#DCE4DE] bg-white focus:outline-none focus:border-[#278F39]"
+              >
+                <option value="confirmed_offer">Aktuell bestätigtes Netto-Angebot</option>
+                <option value="last_observed">Zuletzt beobachteter Preis</option>
+                <option value="user_reported">Selbst eingetragener Preis</option>
+                <option value="licensed_data">Lizenzierte Daten</option>
+                <option value="unknown">Preis unbekannt</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Bild-URL & Lizenz -->
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block font-semibold text-[#17241D] mb-1">Produktbild URL:</label>
+              <input
+                type="text"
+                [(ngModel)]="formImageUrl"
+                class="w-full px-3 py-2 rounded-xl border border-[#DCE4DE] focus:outline-none focus:border-[#278F39]"
+              />
+            </div>
+            <div>
+              <label class="block font-semibold text-[#17241D] mb-1">Bildlizenz:</label>
+              <input
+                type="text"
+                [(ngModel)]="formImageLicense"
+                class="w-full px-3 py-2 rounded-xl border border-[#DCE4DE] focus:outline-none focus:border-[#278F39]"
+              />
+            </div>
+          </div>
+
+          <!-- Nährwerte je 100g -->
+          <div>
+            <label class="block font-semibold text-[#17241D] mb-1">Nährwerte je 100 g:</label>
+            <div class="grid grid-cols-4 gap-2">
+              <div>
+                <span class="text-[10px] text-[#627264]">kcal</span>
+                <input type="number" [(ngModel)]="formCalories" class="w-full px-2 py-1.5 rounded-lg border border-[#DCE4DE]" />
+              </div>
+              <div>
+                <span class="text-[10px] text-[#627264]">Protein (g)</span>
+                <input type="number" step="0.1" [(ngModel)]="formProtein" class="w-full px-2 py-1.5 rounded-lg border border-[#DCE4DE]" />
+              </div>
+              <div>
+                <span class="text-[10px] text-[#627264]">Carbs (g)</span>
+                <input type="number" step="0.1" [(ngModel)]="formCarbs" class="w-full px-2 py-1.5 rounded-lg border border-[#DCE4DE]" />
+              </div>
+              <div>
+                <span class="text-[10px] text-[#627264]">Fett (g)</span>
+                <input type="number" step="0.1" [(ngModel)]="formFat" class="w-full px-2 py-1.5 rounded-lg border border-[#DCE4DE]" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-2 pt-2">
+          <button
+            type="button"
+            (click)="closeModal()"
+            class="flex-1 py-2.5 rounded-xl bg-[#F1F5F2] text-xs font-semibold text-[#627264] cursor-pointer"
+          >
+            Abbrechen
+          </button>
+          <button
+            type="button"
+            (click)="saveProduct()"
+            class="flex-1 py-2.5 rounded-xl bg-[#278F39] text-white text-xs font-bold hover:bg-[#217A30] cursor-pointer shadow-button"
+          >
+            Speichern
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

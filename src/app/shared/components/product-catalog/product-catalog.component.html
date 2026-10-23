@@ -1,11 +1,19 @@
 <div class="space-y-4">
+  <!-- Toast Notification -->
+  @if (addedToast(); as msg) {
+    <div class="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-[#103A2A] text-white px-4 py-2.5 rounded-2xl shadow-xl text-xs font-bold flex items-center gap-2 animate-bounce">
+      <span>✓</span>
+      <span>{{ msg }}</span>
+    </div>
+  }
+
   <!-- Search & Category Filters -->
   <div class="space-y-2">
     <div class="relative">
       <input
         type="text"
         [(ngModel)]="searchQuery"
-        placeholder="Netto-Produkte suchen (z.B. Skyr, Reis, Hähnchen)..."
+        placeholder="Netto-Produkte suchen (z.B. Skyr, Reis, Hähnchen, EAN)..."
         class="w-full pl-9 pr-4 py-2.5 rounded-2xl bg-[#F6F8F6] border border-[#E3EBE4] text-xs text-[#17241D] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#278F39]"
       />
       <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[#627264] text-xs">
@@ -21,77 +29,288 @@
           (click)="selectedCategory.set(cat.id)"
           class="py-1 px-3 rounded-full font-semibold transition-all select-none whitespace-nowrap cursor-pointer"
           [ngClass]="selectedCategory() === cat.id
-            ? 'bg-[#278F39] text-white'
+            ? 'bg-[#278F39] text-white shadow-soft-sm'
             : 'bg-[#F1F5F2] text-[#627264] hover:bg-[#E2EDE5]'"
         >
           {{ cat.label }}
         </button>
       }
     </div>
+
+    <!-- Status Filter Pills -->
+    <div class="flex items-center gap-1.5 text-[10px] text-[#627264] overflow-x-auto pb-1 no-scrollbar">
+      <span class="font-bold whitespace-nowrap">Filter:</span>
+      <button
+        type="button"
+        (click)="selectedStatusFilter.set('all')"
+        class="px-2 py-0.5 rounded-lg font-semibold cursor-pointer"
+        [ngClass]="selectedStatusFilter() === 'all' ? 'bg-[#103A2A] text-white' : 'bg-[#F6F8F6] hover:bg-[#E2EDE5]'"
+      >
+        Alle Status
+      </button>
+      <button
+        type="button"
+        (click)="selectedStatusFilter.set('confirmed_offer')"
+        class="px-2 py-0.5 rounded-lg font-semibold cursor-pointer"
+        [ngClass]="selectedStatusFilter() === 'confirmed_offer' ? 'bg-[#278F39] text-white' : 'bg-[#E5F5E8] text-[#278F39]'"
+      >
+        Netto-Angebote
+      </button>
+      <button
+        type="button"
+        (click)="selectedStatusFilter.set('last_observed')"
+        class="px-2 py-0.5 rounded-lg font-semibold cursor-pointer"
+        [ngClass]="selectedStatusFilter() === 'last_observed' ? 'bg-[#2563EB] text-white' : 'bg-[#EFF6FF] text-[#2563EB]'"
+      >
+        Zuletzt beobachtet
+      </button>
+      <button
+        type="button"
+        (click)="selectedStatusFilter.set('unknown')"
+        class="px-2 py-0.5 rounded-lg font-semibold cursor-pointer"
+        [ngClass]="selectedStatusFilter() === 'unknown' ? 'bg-[#D97706] text-white' : 'bg-[#FEF3C7] text-[#D97706]'"
+      >
+        Preise offen
+      </button>
+    </div>
   </div>
 
   <!-- Products List -->
-  <div class="space-y-2.5">
+  <div class="space-y-3">
     @for (item of filteredProducts(); track item.id) {
-      <div class="p-3 rounded-2xl bg-white border border-[#E3EBE4] shadow-soft-sm flex items-center justify-between gap-3">
-        <!-- Product Image -->
-        <div class="w-14 h-14 rounded-xl overflow-hidden bg-[#F6F8F6] flex-shrink-0 border border-[#E3EBE4]">
-          <img
-            [src]="item.imageUrl"
-            [alt]="item.name"
-            class="w-full h-full object-cover"
-            loading="lazy"
-          />
-        </div>
-
-        <!-- Product Details -->
-        <div class="flex-1 min-w-0">
-          <span class="text-[10px] font-bold text-[#627264] block truncate">
-            {{ item.brand }}
-          </span>
-          <h4 class="text-xs font-bold text-[#103A2A] truncate">
-            {{ item.name }}
-          </h4>
-          <span class="text-[11px] text-[#627264] block">
-            {{ item.packageSize }}
-          </span>
-          <!-- Status Badge -->
-          <div class="flex items-center gap-1.5 mt-1">
-            <span
-              class="text-[9px] font-bold px-1.5 py-0.5 rounded-md"
-              [ngClass]="[priceService.getStatusBadge(item.priceStatus).bgClass, priceService.getStatusBadge(item.priceStatus).textClass]"
-            >
-              {{ priceService.getStatusBadge(item.priceStatus).label }}
+      <div
+        (click)="openProductDetails(item)"
+        class="p-3.5 rounded-2xl bg-white border border-[#E3EBE4] hover:border-[#278F39] shadow-soft-sm transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
+      >
+        <!-- Product Main Info (Left) -->
+        <div class="flex items-center gap-3 min-w-0 flex-1">
+          <!-- Product Packaging Image -->
+          <div class="w-16 h-16 rounded-xl overflow-hidden bg-[#F6F8F6] flex-shrink-0 border border-[#E3EBE4] relative">
+            <img
+              [src]="item.imageUrl"
+              [alt]="item.name"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
+            />
+            <span class="absolute top-1 left-1 text-[8px] font-bold px-1 py-0.2 rounded bg-[#FFF200] text-[#ED1C24] shadow-xs">
+              Netto
             </span>
-            @if (item.ean) {
-              <span class="text-[9px] text-[#94A3B8]">EAN: {{ item.ean.slice(-6) }}</span>
-            }
+          </div>
+
+          <!-- Product Details -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="text-[10px] font-bold text-[#627264] truncate">
+                {{ item.brand }}
+              </span>
+              @if (item.ean) {
+                <span class="text-[9px] text-[#94A3B8]">EAN: {{ item.ean }}</span>
+              }
+            </div>
+
+            <h4 class="text-xs sm:text-sm font-bold text-[#103A2A] truncate group-hover:text-[#278F39] transition-colors">
+              {{ item.name }}
+            </h4>
+
+            <div class="flex items-center gap-2 mt-0.5 text-[11px] text-[#627264] flex-wrap">
+              <span class="font-semibold">{{ item.packageSize }}</span>
+              <span>•</span>
+              <span class="text-[#278F39] font-bold">🔥 {{ item.nutrition.caloriesPer100g }} kcal/100g</span>
+            </div>
+
+            <!-- Status Badge & Date -->
+            <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
+              <span
+                class="text-[9px] font-bold px-2 py-0.5 rounded-md"
+                [ngClass]="[priceService.getStatusBadge(item.priceStatus, item.validUntil).bgClass, priceService.getStatusBadge(item.priceStatus, item.validUntil).textClass]"
+              >
+                {{ priceService.getStatusBadge(item.priceStatus, item.validUntil).badgeText }}
+              </span>
+              <span class="text-[9px] text-[#94A3B8]">
+                Stand: {{ priceService.formatObservationDate(item.lastUpdated) }}
+              </span>
+            </div>
           </div>
         </div>
 
-        <!-- Price & Edit Action -->
-        <div class="flex flex-col items-end justify-between flex-shrink-0">
-          <span
-            class="font-black text-sm"
-            [ngClass]="item.price !== null ? 'text-[#103A2A]' : 'text-[#D97706] text-xs font-semibold'"
-          >
-            {{ priceService.formatPrice(item.price) }}
-          </span>
+        <!-- Price & Action (Right) -->
+        <div class="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center border-t sm:border-t-0 pt-2 sm:pt-0 border-[#F0F4F1] flex-shrink-0 gap-2">
+          <div class="text-left sm:text-right">
+            <span
+              class="font-black text-sm sm:text-base block"
+              [ngClass]="item.price !== null ? 'text-[#103A2A]' : 'text-[#D97706] text-xs font-semibold'"
+            >
+              {{ priceService.formatPrice(item.price) }}
+            </span>
+            @if (item.priceUnit && item.price !== null) {
+              <span class="text-[9px] text-[#94A3B8] block">
+                {{ item.priceUnit }}
+              </span>
+            }
+          </div>
+
+          <!-- Button: Zur Einkaufsliste -->
           <button
             type="button"
-            (click)="openPriceEditor(item)"
-            class="text-[10px] text-[#278F39] hover:underline font-semibold mt-2 cursor-pointer"
+            (click)="addProductToShoppingList(item, $event)"
+            class="py-1.5 px-3 rounded-xl bg-[#278F39] hover:bg-[#217A30] active:scale-95 text-white font-bold text-xs shadow-soft-sm flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap"
+            title="Artikel zur Einkaufsliste hinzufügen"
           >
-            {{ item.price !== null ? 'Preis anpassen' : 'Preis eintragen' }}
+            <span>+</span>
+            <span>Zur Einkaufsliste</span>
           </button>
         </div>
       </div>
     } @empty {
-      <div class="text-center py-6 text-xs text-[#627264]">
-        Keine Produkte für diesen Suchbegriff gefunden.
+      <div class="text-center py-10 bg-[#F6F8F6] rounded-2xl border border-[#E3EBE4] space-y-1">
+        <p class="text-xs font-bold text-[#103A2A]">Keine passenden Netto-Produkte gefunden.</p>
+        <p class="text-[11px] text-[#627264]">Passe deine Suche an oder wechsle die Kategorie.</p>
       </div>
     }
   </div>
+
+  <!-- Product Detail Modal (Section 7 requirement: Nährwerte, Zutaten, Preisquelle) -->
+  @if (selectedProductDetails(); as prod) {
+    <div class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fade-in"
+         (click)="closeProductDetails()">
+      <div class="bg-white rounded-3xl p-5 w-full max-w-md space-y-4 shadow-2xl border border-[#E3EBE4] max-h-[90vh] overflow-y-auto"
+           (click)="$event.stopPropagation()">
+        
+        <!-- Header -->
+        <div class="flex justify-between items-start gap-2">
+          <div>
+            <span class="text-[10px] font-bold text-[#627264] uppercase tracking-wider block">
+              {{ prod.brand }} • Netto Marken-Discount
+            </span>
+            <h3 class="text-base font-extrabold text-[#103A2A]">
+              {{ prod.name }}
+            </h3>
+            <span class="text-xs text-[#627264]">{{ prod.packageSize }}</span>
+          </div>
+          <button
+            type="button"
+            (click)="closeProductDetails()"
+            class="w-8 h-8 rounded-full bg-[#F1F5F2] hover:bg-[#E2EDE5] text-[#103A2A] font-bold text-sm flex items-center justify-center cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
+
+        <!-- Product Image & Price Summary -->
+        <div class="p-3.5 rounded-2xl bg-[#F6F8F6] border border-[#E3EBE4] flex items-center gap-4">
+          <img [src]="prod.imageUrl" [alt]="prod.name" class="w-20 h-20 rounded-xl object-cover bg-white border border-[#E3EBE4]" />
+          <div class="space-y-1 flex-1">
+            <div class="flex items-center justify-between">
+              <span class="text-lg font-black text-[#103A2A]">{{ priceService.formatPrice(prod.price) }}</span>
+              <span
+                class="text-[10px] font-bold px-2 py-0.5 rounded-md"
+                [ngClass]="[priceService.getStatusBadge(prod.priceStatus, prod.validUntil).bgClass, priceService.getStatusBadge(prod.priceStatus, prod.validUntil).textClass]"
+              >
+                {{ priceService.getStatusBadge(prod.priceStatus, prod.validUntil).label }}
+              </span>
+            </div>
+            <p class="text-[11px] text-[#627264]">
+              <strong>Quelle:</strong> {{ prod.priceSource || 'Netto Sortimentsdaten' }}
+            </p>
+            <p class="text-[10px] text-[#94A3B8]">
+              Beobachtet am: {{ priceService.formatObservationDate(prod.lastUpdated) }}
+              @if (prod.regionBranch) {
+                • {{ prod.regionBranch }}
+              }
+            </p>
+          </div>
+        </div>
+
+        <!-- Nutritional Breakdown Table -->
+        <div class="space-y-2">
+          <h4 class="text-xs font-bold text-[#103A2A] flex items-center gap-1.5">
+            <span>🥗</span>
+            <span>Nährwerte je 100 g</span>
+          </h4>
+          <div class="grid grid-cols-4 gap-2 text-center text-xs">
+            <div class="p-2 rounded-xl bg-[#F6F8F6] border border-[#E3EBE4]">
+              <span class="text-[10px] text-[#627264] block">Kalorien</span>
+              <span class="font-extrabold text-[#103A2A]">{{ prod.nutrition.caloriesPer100g }} kcal</span>
+            </div>
+            <div class="p-2 rounded-xl bg-[#F6F8F6] border border-[#E3EBE4]">
+              <span class="text-[10px] text-[#627264] block">Eiweiß</span>
+              <span class="font-extrabold text-[#278F39]">{{ prod.nutrition.proteinPer100g }} g</span>
+            </div>
+            <div class="p-2 rounded-xl bg-[#F6F8F6] border border-[#E3EBE4]">
+              <span class="text-[10px] text-[#627264] block">Kohlenhydrate</span>
+              <span class="font-extrabold text-[#103A2A]">{{ prod.nutrition.carbsPer100g }} g</span>
+            </div>
+            <div class="p-2 rounded-xl bg-[#F6F8F6] border border-[#E3EBE4]">
+              <span class="text-[10px] text-[#627264] block">Fett</span>
+              <span class="font-extrabold text-[#103A2A]">{{ prod.nutrition.fatPer100g }} g</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ingredients & Allergens -->
+        @if (prod.ingredientsText) {
+          <div class="space-y-1 text-xs">
+            <h4 class="font-bold text-[#103A2A]">Zutaten:</h4>
+            <p class="text-[#627264] text-[11px] leading-relaxed bg-[#F6F8F6] p-2.5 rounded-xl border border-[#E3EBE4]">
+              {{ prod.ingredientsText }}
+            </p>
+          </div>
+        }
+
+        @if (prod.allergens && prod.allergens.length > 0) {
+          <div class="space-y-1 text-xs">
+            <h4 class="font-bold text-[#103A2A]">Allergene:</h4>
+            <div class="flex gap-1 flex-wrap">
+              @for (allergen of prod.allergens; track allergen) {
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#D97706] font-semibold">
+                  {{ allergen }}
+                </span>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Price History for Product -->
+        <div class="space-y-1 text-xs">
+          <h4 class="font-bold text-[#103A2A]">Preisverlauf & Beobachtungen:</h4>
+          <div class="space-y-1 max-h-28 overflow-y-auto">
+            @for (entry of getProductPriceHistory(prod.id); track entry.id) {
+              <div class="p-2 rounded-lg bg-[#F8FAF9] border border-[#E3EBE4] flex items-center justify-between text-[11px]">
+                <span class="font-bold text-[#103A2A]">{{ priceService.formatPrice(entry.price) }}</span>
+                <span class="text-[10px] text-[#627264]">{{ entry.priceSource }} ({{ priceService.formatObservationDate(entry.observedDate) }})</span>
+              </div>
+            } @empty {
+              <p class="text-[10px] text-[#94A3B8]">Noch keine weiteren Preisverläufe protokolliert.</p>
+            }
+          </div>
+        </div>
+
+        <!-- License & Attribution -->
+        <div class="p-2 rounded-xl bg-[#F1F5F2] text-[10px] text-[#627264] space-y-0.5">
+          <p><strong>Bildquelle:</strong> {{ prod.imageSource || 'Open Food Facts' }}</p>
+          <p><strong>Lizenz:</strong> {{ prod.imageLicense }}</p>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex gap-2 pt-2">
+          <button
+            type="button"
+            (click)="openPriceEditor(prod)"
+            class="flex-1 py-2.5 rounded-xl bg-[#F1F5F2] hover:bg-[#E2EDE5] text-[#103A2A] text-xs font-bold transition-all cursor-pointer"
+          >
+            Preis korrigieren
+          </button>
+          <button
+            type="button"
+            (click)="addProductToShoppingList(prod); closeProductDetails()"
+            class="flex-1 py-2.5 rounded-xl bg-[#278F39] hover:bg-[#217A30] text-white text-xs font-bold transition-all cursor-pointer shadow-button"
+          >
+            Zur Einkaufsliste
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 
   <!-- Price Edit Modal -->
   @if (editingProduct(); as prod) {
@@ -99,7 +318,7 @@
       <div class="bg-white rounded-3xl p-5 w-full max-w-sm space-y-4 shadow-xl border border-[#E3EBE4]">
         <div class="flex justify-between items-center">
           <h3 class="text-sm font-extrabold text-[#103A2A]">
-            Preis für Netto eintragen
+            Netto-Preis eintragen / anpassen
           </h3>
           <button
             type="button"
@@ -136,7 +355,7 @@
             <span class="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-[#627264]">€</span>
           </div>
           <p class="text-[10px] text-[#627264]">
-            Deine Eingabe wird lokal gespeichert und als „Selbst erfasst“ gekennzeichnet.
+            Dein Eintrag wird in den Preisverlauf aufgenommen und als „Selbst erfasst“ gekennzeichnet.
           </p>
         </div>
 

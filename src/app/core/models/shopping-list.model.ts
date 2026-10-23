@@ -1,9 +1,11 @@
-import { ProductCategory } from './product.model';
+import { ProductCategory, PriceStatus } from './product.model';
 
 export interface ShoppingListItem {
   id: string;
   productId?: string;
+  ean?: string;
   name: string;
+  brand?: string;
   category: ProductCategory;
   imageUrl: string;
   neededAmount: number;
@@ -14,6 +16,11 @@ export interface ShoppingListItem {
   totalCost: number | null;
   isChecked: boolean;
   isCustom?: boolean;
+  priceStatus?: PriceStatus;
+  priceSource?: string;
+  observationDate?: string;
+  isOlderPrice?: boolean;
+  inPantry?: boolean; // Vorrat vorhanden
 }
 
 export interface ShoppingListSummary {
@@ -21,4 +28,10 @@ export interface ShoppingListSummary {
   checkedItems: number;
   totalCost: number;
   isComplete: boolean;
+  hasOlderPrices: boolean;
+  hasMissingPrices: boolean;
+  budgetBufferPercent: number;
+  budgetBufferAmount: number;
+  totalCostWithBuffer: number;
+  estimateNotice?: string;
 }

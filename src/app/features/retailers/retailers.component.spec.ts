@@ -43,7 +43,7 @@ describe('RetailersComponent', () => {
 
   it('should show market selection section with Netto and other retailers', () => {
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toContain('Dein Markt');
+    expect(el.textContent).toContain('Wo kaufst du am liebsten ein?');
     expect(el.textContent).toContain('Netto');
     expect(el.textContent).toContain('Weitere Märkte');
   });
@@ -112,7 +112,7 @@ describe('RetailersComponent', () => {
     await component.confirmSelection();
 
     expect(saveSpy).toHaveBeenCalled();
-    expect(router.navigate).toHaveBeenCalledWith(['/dashboard']);
+    expect(router.navigate).toHaveBeenCalledWith(['/how-it-works']);
   });
 
   it('should show coming soon notice when selecting non-Netto store', () => {

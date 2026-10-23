@@ -1,241 +1,161 @@
 <div class="dashboard-container">
-  <!-- Main Scrollable Dashboard Content -->
-  <div class="dashboard-scroll-area">
+  <!-- Scrollable Inhaltsbereich (Bereich A & Bereich B) -->
+  <main class="dashboard-body">
     <!-- Top Greeting Header -->
-    <div class="greeting-row">
-      <div class="greeting-text-box">
+    <header class="greeting-header">
+      <div class="greeting-text">
         <h1>{{ 'DASHBOARD.GREETING' | translate:{ name: userFirstName() } }}</h1>
-        <p>{{ 'DASHBOARD.TODAY' | translate }} • {{ todayDateFormatted() }}</p>
+        <p>{{ todayDateFormatted() }}</p>
       </div>
 
-      <!-- Top Right Actions: Hamburger Menu + Profile -->
-      <div class="top-actions-box">
+      <div class="header-actions">
         <app-hamburger-button></app-hamburger-button>
         <button
           type="button"
           (click)="goToProfileEdit()"
-          class="profile-quick-btn"
-          title="Profil bearbeiten"
+          class="settings-btn"
+          aria-label="Profil bearbeiten"
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="3" />
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
           </svg>
         </button>
       </div>
-    </div>
+    </header>
 
-    <!-- Großer Kalorienring: Dein heutiges Kalorienziel -->
-    <div class="calorie-goal-card">
-      <div class="goal-card-top">
-        <h2>{{ 'DASHBOARD.CALORIE_GOAL_TITLE' | translate }}</h2>
-        <span class="remaining-highlight">
-          {{ remainingKcal() }} {{ 'DASHBOARD.REMAINING_LABEL' | translate }}
-        </span>
+    <!-- BEREICH A: DEIN KALORIENZIEL -->
+    <section class="calorie-target-card">
+      <div class="card-caption">
+        <h2>Dein Kalorienziel für heute</h2>
       </div>
 
-      <div class="ring-and-macros-row">
-        <!-- Calorie Circular Progress Ring -->
-        <div class="calorie-circle-box">
-          <svg viewBox="0 0 120 120">
+      <!-- Großer, schöner Kalorienring -->
+      <div class="gauge-center-wrapper">
+        <div class="calorie-gauge">
+          <svg viewBox="0 0 130 130">
+            <!-- Hellgrüne Hintergrund-Ringbahn -->
             <circle
-              cx="60"
-              cy="60"
-              r="50"
-              class="circle-bg"
+              cx="65"
+              cy="65"
+              r="56"
+              class="gauge-bg-ring"
             />
+            <!-- Dunkelgrüner aktiver Fortschrittsbogen -->
             <circle
-              cx="60"
-              cy="60"
-              r="50"
-              class="circle-progress"
-              [attr.stroke-dasharray]="314"
+              cx="65"
+              cy="65"
+              r="56"
+              class="gauge-active-ring"
+              stroke-dasharray="352"
               [attr.stroke-dashoffset]="calorieDashOffset()"
             />
           </svg>
-          <!-- Center Text inside ring -->
-          <div class="circle-inner-text">
-            <span class="num">{{ eatenKcal() | number }}</span>
-            <span class="sub">{{ 'DASHBOARD.EATEN_OF_TARGET' | translate:{ target: targetKcal() | number } }}</span>
-          </div>
-        </div>
 
-        <!-- Daily Macro Progress Bars -->
-        <div class="macros-progress-col">
-          <!-- Eiweiß -->
-          <div class="macro-row">
-            <div class="macro-labels">
-              <span>Eiweiß</span>
-              <span>{{ eatenProtein() }} / {{ targetProtein() }} g</span>
-            </div>
-            <div class="macro-track">
-              <div class="macro-fill protein" [style.width.%]="macroRatio(eatenProtein(), targetProtein())"></div>
-            </div>
-          </div>
-
-          <!-- Kohlenhydrate -->
-          <div class="macro-row">
-            <div class="macro-labels">
-              <span>Kohlenhydrate</span>
-              <span>{{ eatenCarbs() }} / {{ targetCarbs() }} g</span>
-            </div>
-            <div class="macro-track">
-              <div class="macro-fill carbs" [style.width.%]="macroRatio(eatenCarbs(), targetCarbs())"></div>
-            </div>
-          </div>
-
-          <!-- Fett -->
-          <div class="macro-row">
-            <div class="macro-labels">
-              <span>Fett</span>
-              <span>{{ eatenFat() }} / {{ targetFat() }} g</span>
-            </div>
-            <div class="macro-track">
-              <div class="macro-fill fat" [style.width.%]="macroRatio(eatenFat(), targetFat())"></div>
-            </div>
+          <!-- Zentrumstext -->
+          <div class="gauge-text-content">
+            <strong>{{ targetKcal() | number }}</strong>
+            <span>kcal</span>
+            <small>Tagesziel</small>
           </div>
         </div>
       </div>
 
-      <!-- Detail-Leiste: Gegessen vs. Geplant -->
-      <div class="calorie-breakdown-row">
-        <div class="breakdown-pill">
-          <small>{{ 'DASHBOARD.EATEN_LABEL' | translate }}</small>
-          <strong>{{ eatenKcal() }} kcal</strong>
+      <!-- Kompakte Messwerte: Bereits gegessen & Noch verfügbar -->
+      <div class="calorie-compact-metrics">
+        <div class="metric-item eaten">
+          <small>Bereits gegessen</small>
+          <strong>{{ eatenKcal() | number }} kcal</strong>
         </div>
-        <div class="breakdown-pill">
-          <small>{{ 'DASHBOARD.PLANNED_LABEL' | translate }}</small>
-          <strong>{{ plannedKcal() }} kcal</strong>
-        </div>
-        <div class="breakdown-pill">
-          <small>{{ 'DASHBOARD.DAILY_TARGET' | translate }}</small>
-          <strong>{{ targetKcal() }} kcal</strong>
-        </div>
-      </div>
-    </div>
-
-    <!-- NEUER MASTER-PROMPT V4 BEREICH: "Was möchtest du heute essen?" (3 gleichberechtigte Wege) -->
-    <section class="what-to-eat-section">
-      <h2>{{ 'DASHBOARD.WHAT_TO_EAT_TITLE' | translate }}</h2>
-
-      <div class="eating-options-grid">
-        <!-- Weg A: Lebensmittel entdecken -->
-        <div class="eating-card choice-discover" (click)="goToDiscover()">
-          <div class="card-icon">🥗</div>
-          <div class="card-content">
-            <h3>{{ 'DASHBOARD.CHOICE_DISCOVER_TITLE' | translate }}</h3>
-            <p>{{ 'DASHBOARD.CHOICE_DISCOVER_DESC' | translate }}</p>
-          </div>
-          <span class="card-arrow">→</span>
-        </div>
-
-        <!-- Weg B: Rezepte entdecken -->
-        <div class="eating-card choice-recipes" (click)="goToRecipes()">
-          <div class="card-icon">🍲</div>
-          <div class="card-content">
-            <h3>{{ 'DASHBOARD.CHOICE_RECIPES_TITLE' | translate }}</h3>
-            <p>{{ 'DASHBOARD.CHOICE_RECIPES_DESC' | translate }}</p>
-          </div>
-          <span class="card-arrow">→</span>
-        </div>
-
-        <!-- Weg C: Tagesideen erhalten -->
-        <div class="eating-card choice-meals" (click)="goToMealPlanner()">
-          <div class="card-icon">💡</div>
-          <div class="card-content">
-            <h3>{{ 'DASHBOARD.CHOICE_MEALS_TITLE' | translate }}</h3>
-            <p>{{ 'DASHBOARD.CHOICE_MEALS_DESC' | translate }}</p>
-          </div>
-          <span class="card-arrow">→</span>
+        <div class="metric-divider"></div>
+        <div class="metric-item remaining">
+          <small>Noch verfügbar</small>
+          <strong>{{ remainingKcal() | number }} kcal</strong>
         </div>
       </div>
     </section>
 
-    <!-- Digitaler Vorrat & Resteverwertung -->
-    @if (pantryService.items().length > 0) {
-      <div class="pantry-banner">
-        <div class="pantry-top">
-          <div class="pantry-title">
-            <span>📦</span>
-            <h3>{{ 'DASHBOARD.PANTRY_TITLE' | translate }}</h3>
-          </div>
-          <span class="pantry-count">
-            {{ pantryService.items().length }} Vorräte
-          </span>
-        </div>
-
-        <p>
-          <strong>Reste-Tipp:</strong> Du hast noch {{ pantryService.items()[0].name }} ({{ pantryService.items()[0].remainingQuantityGrams }} {{ pantryService.items()[0].unit }}) übrig!
-        </p>
-
-        <div class="pantry-actions">
-          <small>Haltbarkeit: {{ pantryService.items()[0].maxStorageDays }} Tage</small>
-          <button type="button" (click)="goToRecipes()">
-            Passende Rezepte anzeigen →
-          </button>
-        </div>
-      </div>
-    }
-
-    <!-- Heutiges Ernährungsprotokoll: Geplant vs. Tatsächlich gegessen -->
-    <div class="food-log-card">
-      <div class="log-header">
-        <div>
-          <h3>{{ 'DASHBOARD.FOOD_LOG_TITLE' | translate }}</h3>
-          <span>Gegessen: {{ eatenKcal() }} kcal | Geplant: {{ plannedKcal() }} kcal</span>
-        </div>
-        <button type="button" (click)="goToDiscover()">
-          + Hinzufügen
-        </button>
+    <!-- BEREICH B: LEBENSMITTEL BEI NETTO ENTDECKEN -->
+    <section class="netto-discover-section">
+      <div class="discover-section-header">
+        <h2>Was möchtest du heute essen?</h2>
+        <p>Entdecke Lebensmittel bei Netto und prüfe ihre Kalorien.</p>
       </div>
 
-      <div class="log-items-list">
-        @for (item of foodLogService.dailyLog(); track item.id) {
-          <div class="log-item-row">
-            <div class="log-item-details">
-              <div class="title-line">
-                <strong>{{ item.name }}</strong>
-                <small>({{ item.amount }} {{ item.unit }})</small>
+      <!-- Suchleiste -->
+      <div class="search-input-box">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+          placeholder="Eier, Toast, Bananen, Getränke ..."
+          aria-label="Lebensmittel bei Netto suchen"
+        />
+        @if (searchQuery()) {
+          <button type="button" (click)="searchQuery.set('')" class="clear-search-btn">✕</button>
+        }
+      </div>
+
+      <!-- Ausgewählte Netto-Produkte (Karten) -->
+      <div class="featured-products-grid">
+        @for (item of filteredFeaturedProducts(); track item.product.id) {
+          <div
+            class="product-feature-card"
+            (click)="openProduct(item.product)"
+            role="button"
+            tabindex="0"
+          >
+            <div class="card-image-box">
+              <img
+                [src]="item.product.imageUrl"
+                [alt]="item.product.name"
+                loading="lazy"
+              />
+              <span class="netto-badge-pill">Netto</span>
+            </div>
+
+            <div class="card-info-box">
+              <h3>{{ item.product.name }}</h3>
+
+              <div class="calorie-badges-row">
+                @if (item.pieceInfo) {
+                  <span class="calorie-chip piece">
+                    {{ item.pieceInfo.calories }} kcal / {{ item.pieceInfo.unitName }}
+                  </span>
+                } @else if (item.servingCalories) {
+                  <span class="calorie-chip piece">
+                    {{ item.servingCalories }} kcal / Port.
+                  </span>
+                }
+                @if (item.packageCalories) {
+                  <span class="calorie-chip package">
+                    {{ item.packageCalories }} kcal (Packung)
+                  </span>
+                }
               </div>
-              <span class="macro-line">
-                🔥 {{ item.calories }} kcal • 🥩 {{ item.protein }}g E • 🍞 {{ item.carbs }}g KH
-              </span>
-            </div>
 
-            <div class="log-item-actions">
-              <!-- Status Toggle: Geplant vs Gegessen -->
-              <button
-                type="button"
-                (click)="toggleItemStatus(item.id)"
-                class="status-toggle-btn"
-                [class.eaten]="item.status === 'eaten'"
-              >
-                {{ item.status === 'eaten' ? '✓ Gegessen' : '⏳ Geplant' }}
-              </button>
-
-              <button
-                type="button"
-                (click)="removeLoggedItem(item.id)"
-                class="remove-log-btn"
-                title="Eintrag entfernen"
-              >
-                ✕
-              </button>
+              <div class="card-footer-line">
+                <strong class="product-price">{{ item.priceFormatted }}</strong>
+                <span class="card-action-link">Prüfen →</span>
+              </div>
             </div>
-          </div>
-        } @empty {
-          <div class="empty-log-box">
-            <span>🥗</span>
-            <p>Heute noch keine Lebensmittel eingetragen.</p>
-            <small>Wähle oben eine Mahlzeit aus oder entdecke Netto-Lebensmittel.</small>
           </div>
         }
       </div>
-    </div>
-  </div>
 
-  <!-- Bereich C: Fester Footer mit Navigation -->
-  <footer class="dashboard-footer">
-    <app-bottom-nav></app-bottom-nav>
-  </footer>
+      <!-- Button: Alle Netto-Produkte entdecken -->
+      <button
+        type="button"
+        (click)="goToAllProducts()"
+        class="browse-all-products-btn"
+      >
+        <span>Alle Netto-Produkte entdecken</span>
+        <span class="arrow-symbol">→</span>
+      </button>
+    </section>
+  </main>
+
+  <!-- Dauerhaft sichtbare untere Navigationsleiste -->
+  <app-bottom-nav></app-bottom-nav>
 </div>

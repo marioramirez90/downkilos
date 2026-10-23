@@ -61,7 +61,7 @@
             <span class="rewe-badge">REWE</span>
             <strong>REWE</strong>
           </div>
-          <div class="radio-indicator"></div>
+          <span class="coming-soon-pill">Coming soon</span>
         </div>
 
         <!-- EDEKA -->
@@ -75,21 +75,35 @@
             <span class="edeka-badge">E</span>
             <strong>EDEKA</strong>
           </div>
-          <div class="radio-indicator"></div>
+          <span class="coming-soon-pill">Coming soon</span>
         </div>
 
-        <!-- ALDI -->
+        <!-- ALDI Nord -->
         <div
           class="retailer-row-card"
-          (click)="selectRetailer('aldi')"
+          (click)="selectRetailer('aldi_nord')"
           role="button"
           tabindex="0"
         >
           <div class="retailer-left-box">
             <span class="aldi-badge">ALDI</span>
-            <strong>ALDI</strong>
+            <strong>Aldi Nord</strong>
           </div>
-          <div class="radio-indicator"></div>
+          <span class="coming-soon-pill">Coming soon</span>
+        </div>
+
+        <!-- ALDI Süd -->
+        <div
+          class="retailer-row-card"
+          (click)="selectRetailer('aldi_sued')"
+          role="button"
+          tabindex="0"
+        >
+          <div class="retailer-left-box">
+            <span class="aldi-badge">ALDI</span>
+            <strong>Aldi Süd</strong>
+          </div>
+          <span class="coming-soon-pill">Coming soon</span>
         </div>
 
         <!-- Lidl -->
@@ -103,7 +117,35 @@
             <span class="lidl-badge">Lidl</span>
             <strong>Lidl</strong>
           </div>
-          <div class="radio-indicator"></div>
+          <span class="coming-soon-pill">Coming soon</span>
+        </div>
+
+        <!-- Penny -->
+        <div
+          class="retailer-row-card"
+          (click)="selectRetailer('penny')"
+          role="button"
+          tabindex="0"
+        >
+          <div class="retailer-left-box">
+            <span class="penny-badge">Penny</span>
+            <strong>Penny</strong>
+          </div>
+          <span class="coming-soon-pill">Coming soon</span>
+        </div>
+
+        <!-- Kaufland -->
+        <div
+          class="retailer-row-card"
+          (click)="selectRetailer('kaufland')"
+          role="button"
+          tabindex="0"
+        >
+          <div class="retailer-left-box">
+            <span class="kaufland-badge">K</span>
+            <strong>Kaufland</strong>
+          </div>
+          <span class="coming-soon-pill">Coming soon</span>
         </div>
       </div>
     </section>

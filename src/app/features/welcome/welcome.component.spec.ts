@@ -40,4 +40,9 @@ describe('WelcomeComponent', () => {
     component.startOnboarding();
     expect(router.navigate).toHaveBeenCalledWith(['/onboarding']);
   });
+
+  it('should show notice on clicking "Anmelden" without faking login', () => {
+    component.showLoginNotice();
+    expect(component.showLoginInfo).toBe(true);
+  });
 });

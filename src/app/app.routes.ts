@@ -31,6 +31,12 @@ export const routes: Routes = [
     title: 'Down Kilos – Dein Markt',
   },
   {
+    path: 'how-it-works',
+    loadComponent: () =>
+      import('./features/how-it-works/how-it-works.component').then((m) => m.HowItWorksComponent),
+    title: 'Down Kilos – So funktioniert Down Kilos',
+  },
+  {
     path: 'dashboard',
     loadComponent: () =>
       import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent),

@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { DashboardComponent } from './dashboard.component';
 import { StorageService } from '../../core/services/storage.service';
-import { CalorieCalculatorService } from '../../core/services/calorie-calculator.service';
 import { ShoppingListService } from '../../core/services/shopping-list.service';
 import { UserProfile } from '../../core/models/user-profile.model';
 
@@ -57,32 +56,35 @@ describe('DashboardComponent', () => {
     expect(el.textContent).toContain('Hallo, Lisa!');
   });
 
-  it('should render calorie ring, eaten and target calories', () => {
+  it('should render Area A: Dein Kalorienziel für heute with eaten and remaining calories', () => {
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toMatch(/1[.,]?487/);
-    expect(el.textContent).toContain('Tagesbedarf');
-    expect(el.textContent).toContain('kcal übrig');
+    expect(el.textContent).toContain('Dein Kalorienziel für heute');
+    expect(el.textContent).toContain('Bereits gegessen');
+    expect(el.textContent).toContain('Noch verfügbar');
+    expect(component.targetKcal()).toBeGreaterThan(0);
   });
 
-  it('should render macro progress bars for Eiweiß, Kohlenhydrate, Fett', () => {
+  it('should render Area B: Was möchtest du heute essen? with Netto products', () => {
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toContain('Eiweiß');
-    expect(el.textContent).toContain('Kohlenhydrate');
-    expect(el.textContent).toContain('Fett');
+    expect(el.textContent).toContain('Was möchtest du heute essen?');
+    expect(el.textContent).toContain('Entdecke Lebensmittel bei Netto');
+    expect(component.featuredProducts().length).toBeGreaterThan(0);
   });
 
-  it('should navigate to meal planner when clicking Mahlzeiten planen', () => {
-    component.goToMealPlanner();
-    expect(router.navigate).toHaveBeenCalledWith(['/meal-planner']);
+  it('should filter featured products when searching', () => {
+    component.searchQuery.set('Toast');
+    fixture.detectChanges();
+    const filtered = component.filteredFeaturedProducts();
+    expect(filtered.some(f => f.product.name.toLowerCase().includes('toast'))).toBe(true);
   });
 
-  it('should navigate to shopping list when clicking Einkaufsliste öffnen', () => {
-    component.goToShoppingList();
-    expect(router.navigate).toHaveBeenCalledWith(['/shopping-list']);
+  it('should navigate to /discover when clicking Alle Netto-Produkte entdecken', () => {
+    component.goToAllProducts();
+    expect(router.navigate).toHaveBeenCalledWith(['/discover']);
   });
 
-  // TEST 10: Dashboard & Trennung von Einkaufen vs. Essen
-  it('Test 10 – Dashboard: Hinzufügen zur Einkaufsliste darf die gegessenen Tageskalorien nicht verändern', () => {
+  // TEST H / Test 10: Dashboard & Trennung von Einkaufen vs. Essen
+  it('Test H – Dashboard: Hinzufügen zur Einkaufsliste darf die gegessenen Tageskalorien nicht verändern', () => {
     const initialEatenCalories = component.foodLogService.dailySummary().eatenCalories;
     const shoppingService = TestBed.inject(ShoppingListService);
 

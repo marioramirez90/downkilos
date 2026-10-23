@@ -93,7 +93,7 @@ export class OnboardingComponent implements OnInit {
       };
 
       await this.storageService.saveProfile(profile);
-      this.router.navigate(['/calculator']);
+      this.router.navigate(['/retailers']);
     } finally {
       this.isSubmitting = false;
     }

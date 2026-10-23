@@ -47,11 +47,11 @@ describe('OnboardingComponent', () => {
     expect(component.form.get('currentWeight')?.valid).toBe(false);
   });
 
-  it('should save profile and navigate to /calculator on submit', async () => {
+  it('should save profile and navigate to /retailers on submit', async () => {
     const saveSpy = vi.spyOn(storageService, 'saveProfile');
     await component.onSubmit();
     expect(saveSpy).toHaveBeenCalled();
-    expect(router.navigate).toHaveBeenCalledWith(['/calculator']);
+    expect(router.navigate).toHaveBeenCalledWith(['/retailers']);
   });
 
   it('should update activityLevel when selectActivity is called', () => {

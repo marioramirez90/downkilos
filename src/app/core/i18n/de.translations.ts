@@ -5,8 +5,9 @@ export const DE_TRANSLATIONS = {
   },
   NAV: {
     HOME: 'Home',
+    PRODUCTS: 'Produkte',
     PLAN: 'Plan',
-    DISCOVER: 'Lebensmittel',
+    DISCOVER: 'Produkte',
     RECIPES: 'Rezepte',
     SHOPPING_LIST: 'Einkaufsliste',
     MORE: 'Mehr'
@@ -38,10 +39,13 @@ export const DE_TRANSLATIONS = {
     BADGE_LINE1: 'Kleine Schritte.',
     BADGE_LINE2: 'Große Ergebnisse.',
     START_FREE: 'Kostenlos starten',
+    START_FREE_ARROW: 'Kostenlos starten →',
+    LOGIN_BTN: 'Anmelden',
+    SOON_BADGE: 'Bald verfügbar',
     CONTINUE_GUEST: 'Ohne Login fortfahren',
     HAVE_ACCOUNT: 'Bereits ein Konto?',
-    LOGIN_ACTION: 'Jetzt anmelden',
-    LOGIN_NOTICE: 'Coming soon – du kannst Down Kilos direkt ohne Registrierung nutzen!'
+    LOGIN_ACTION: 'Anmelden',
+    LOGIN_NOTICE: 'Bald verfügbar – du kannst Down Kilos direkt ohne Registrierung nutzen!'
   },
   ONBOARDING: {
     STEP_GENDER: 'Geschlecht',
@@ -172,7 +176,7 @@ export const DE_TRANSLATIONS = {
   RETAILERS: {
     TITLE: 'Supermärkte in deiner Nähe',
     SUBTITLE: 'Finde die besten Angebote und Filialen',
-    HEADER_TITLE: 'Dein Markt',
+    HEADER_TITLE: 'Wo kaufst du am liebsten ein?',
     HEADER_SUBTITLE: 'Finde echte Supermärkte in deiner direkten Umgebung für deinen Ernährungsplan.',
     API_KEY_TITLE: 'Google Maps API-Schlüssel',
     API_KEY_DESC: 'Benötigte APIs: Maps JavaScript API, Places API und Geocoding API.',
@@ -200,13 +204,37 @@ export const DE_TRANSLATIONS = {
     EXPAND_20: 'Auf 20 km erweitern',
     BUDGET_LABEL: 'Dein Wochenbudget für Lebensmittel',
     CONFIRM_SELECTION: 'Auswahl bestätigen',
-    MOCKUP_SUBTITLE: 'Wähle deinen bevorzugten Markt, damit wir dir passende Produkte und Preise anzeigen können.',
+    MOCKUP_SUBTITLE: 'Wähle deinen Supermarkt. Down Kilos hilft dir, die Kalorien deiner Lebensmittel im Blick zu behalten.',
     YOUR_LOCATION: 'Dein Standort',
     DEFAULT_LOCATION: '10115 Berlin - Mitte',
     CHANGE: 'Ändern',
     OTHER_RETAILERS: 'Weitere Märkte',
     WEEKLY_BUDGET: 'Dein Wochenbudget',
-    CONFIRM_BTN: 'Auswahl bestätigen'
+    CONFIRM_BTN: 'Weiter',
+    CONTINUE_BTN: 'Weiter'
+  },
+  HOW_IT_WORKS: {
+    HEADER_TITLE: 'So funktioniert Down Kilos',
+    SKIP_BTN: 'Überspringen',
+    DISCOVER_BTN: 'Down Kilos entdecken →',
+    NEXT_BTN: 'Weiter →',
+    PREV_BTN: 'Zurück',
+    SCENE_1_TITLE: 'Supermarkt-Einkauf',
+    SCENE_1_TEXT: 'Weißt du eigentlich, wie viele Kalorien dein Einkauf enthält?',
+    SCENE_1_DESC: 'Viele Menschen kaufen Lebensmittel ein, ohne genau zu wissen, wie viele Kalorien eine vollständige Packung oder Mahlzeit enthält.',
+    SCENE_2_TITLE: 'Der Salat',
+    SCENE_2_TEXT: 'Manchmal steckt mehr in einer Mahlzeit, als du denkst.',
+    SCENE_2_DESC: 'Zutaten und Dressing bestimmen gemeinsam die Gesamtkalorien.',
+    SCENE_2_NOTE: '* Beispielwerte zur Veranschaulichung',
+    SCENE_3_TITLE: 'Down Kilos',
+    SCENE_3_TEXT: 'Down Kilos zeigt dir, was wirklich drinsteckt.',
+    SCENE_3_DESC: 'Kalorien pro Stück, pro 100 g, der ganzen Packung und der Preis – transparent auf einen Blick.',
+    SCENE_4_TITLE: 'Intelligente Einkaufsliste',
+    SCENE_4_TEXT: 'Stell deinen Einkauf selbst zusammen. Behalte Geld und Kalorien im Blick.',
+    SCENE_4_DESC: 'Die App berechnet automatisch die Kosten und die gesamten Kalorien aller gekauften Packungen.',
+    SCENE_5_TITLE: 'Dein Begleiter',
+    SCENE_5_TEXT: 'Dein Supermarkt. Dein Essen. Dein Kalorienziel.',
+    SCENE_5_DESC: 'Keine Verbote, keine vorgeschriebenen Mahlzeiten. Du entscheidest selbst, was du isst.'
   },
   PROGRESS: {
     HEADER_TITLE: 'Mein Fortschritt',

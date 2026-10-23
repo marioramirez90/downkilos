@@ -223,6 +223,24 @@
               border-radius: 4px;
             }
 
+            .penny-badge {
+              padding: 2px 8px;
+              background-color: #CD141D;
+              color: $bg-white;
+              font-size: 10px;
+              font-weight: 900;
+              border-radius: 4px;
+            }
+
+            .kaufland-badge {
+              padding: 2px 8px;
+              background-color: #E2001A;
+              color: $bg-white;
+              font-size: 10px;
+              font-weight: 900;
+              border-radius: 4px;
+            }
+
             strong {
               font-size: 13px;
               font-weight: 700;
@@ -230,12 +248,15 @@
             }
           }
 
-          .radio-indicator {
-            width: 18px;
-            height: 18px;
+          .coming-soon-pill {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
             border-radius: $radius-full;
-            border: 2px solid $border-color;
-            background-color: $bg-white;
+            background-color: $bg-light;
+            color: $text-muted;
+            border: 1px solid $border-color;
+            letter-spacing: 0.02em;
           }
         }
       }

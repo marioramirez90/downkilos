@@ -1,0 +1,218 @@
+<div class="how-it-works-container">
+  <!-- Top Progress & Skip Bar -->
+  <header class="intro-header">
+    <div class="progress-segments">
+      @for (scene of scenes; track scene.id; let idx = $index) {
+        <button
+          type="button"
+          (click)="goToScene(idx)"
+          class="segment-pill"
+          [class.active]="idx === currentSceneIndex()"
+          [class.completed]="idx < currentSceneIndex()"
+          [attr.aria-label]="'Szene ' + (idx + 1)"
+        ></button>
+      }
+    </div>
+
+    <button
+      type="button"
+      (click)="skipIntro()"
+      class="skip-button"
+    >
+      {{ 'HOW_IT_WORKS.SKIP_BTN' | translate }}
+    </button>
+  </header>
+
+  <!-- Interactive Scene Stage -->
+  <main class="intro-stage">
+    @switch (currentSceneIndex()) {
+      <!-- SZENE 1: Supermarkt-Einkauf -->
+      @case (0) {
+        <div class="scene-card animate-slide-in">
+          <div class="scene-illustration shopping-scene">
+            <div class="cart-visual-box">
+              <span class="main-emoji">🛒</span>
+              <div class="floating-items">
+                <span class="float-item item-salad">🥗</span>
+                <span class="float-item item-bread">🍞</span>
+                <span class="float-item item-eggs">🥚</span>
+                <span class="float-item item-yogurt">🥛</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="scene-text-box">
+            <span class="scene-badge">{{ 'HOW_IT_WORKS.SCENE_1_TITLE' | translate }}</span>
+            <h2>{{ 'HOW_IT_WORKS.SCENE_1_TEXT' | translate }}</h2>
+            <p>{{ 'HOW_IT_WORKS.SCENE_1_DESC' | translate }}</p>
+          </div>
+        </div>
+      }
+
+      <!-- SZENE 2: Der Salat & versteckte Kalorien -->
+      @case (1) {
+        <div class="scene-card animate-slide-in">
+          <div class="scene-illustration salad-scene">
+            <div class="salad-calc-card">
+              <div class="salad-item">
+                <span class="item-icon">🥗</span>
+                <div class="item-meta">
+                  <strong>Grüner Salat</strong>
+                  <small>120 kcal</small>
+                </div>
+              </div>
+              <span class="math-operator">+</span>
+              <div class="salad-item">
+                <span class="item-icon">🥣</span>
+                <div class="item-meta">
+                  <strong>Dressing</strong>
+                  <small class="highlight-def">280 kcal</small>
+                </div>
+              </div>
+              <span class="math-operator">=</span>
+              <div class="salad-total">
+                <strong>400 kcal</strong>
+              </div>
+            </div>
+            <small class="sample-disclaimer">{{ 'HOW_IT_WORKS.SCENE_2_NOTE' | translate }}</small>
+          </div>
+
+          <div class="scene-text-box">
+            <span class="scene-badge">{{ 'HOW_IT_WORKS.SCENE_2_TITLE' | translate }}</span>
+            <h2>{{ 'HOW_IT_WORKS.SCENE_2_TEXT' | translate }}</h2>
+            <p>{{ 'HOW_IT_WORKS.SCENE_2_DESC' | translate }}</p>
+          </div>
+        </div>
+      }
+
+      <!-- SZENE 3: Down Kilos Nährwert-Transparenz -->
+      @case (2) {
+        <div class="scene-card animate-slide-in">
+          <div class="scene-illustration scan-scene">
+            <div class="phone-mockup-card">
+              <div class="mockup-header">
+                <span class="netto-tag">Netto</span>
+                <strong>Vollkorn Toastbrot</strong>
+              </div>
+              <div class="mockup-metrics-grid">
+                <div class="mockup-metric">
+                  <small>Je 100 g</small>
+                  <strong>245 kcal</strong>
+                </div>
+                <div class="mockup-metric highlight">
+                  <small>1 Scheibe</small>
+                  <strong>62 kcal</strong>
+                </div>
+                <div class="mockup-metric">
+                  <small>Packung</small>
+                  <strong>1.225 kcal</strong>
+                </div>
+                <div class="mockup-metric price">
+                  <small>Preis</small>
+                  <strong>1,39 €</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="scene-text-box">
+            <span class="scene-badge">{{ 'HOW_IT_WORKS.SCENE_3_TITLE' | translate }}</span>
+            <h2>{{ 'HOW_IT_WORKS.SCENE_3_TEXT' | translate }}</h2>
+            <p>{{ 'HOW_IT_WORKS.SCENE_3_DESC' | translate }}</p>
+          </div>
+        </div>
+      }
+
+      <!-- SZENE 4: Einkaufsliste mit Summen -->
+      @case (3) {
+        <div class="scene-card animate-slide-in">
+          <div class="scene-illustration cart-scene">
+            <div class="cart-summary-preview">
+              <div class="cart-items-preview">
+                <div class="preview-row">
+                  <span>🍞 Toastbrot (500g)</span>
+                  <small>1,39 € • 1.225 kcal</small>
+                </div>
+                <div class="preview-row">
+                  <span>🥚 Bio Eier (10er)</span>
+                  <small>2,19 € • 780 kcal</small>
+                </div>
+                <div class="preview-row">
+                  <span>🥛 Skyr Natur (500g)</span>
+                  <small>1,49 € • 315 kcal</small>
+                </div>
+              </div>
+              <div class="cart-totals-banner">
+                <div class="total-metric">
+                  <small>Gesamtkosten</small>
+                  <strong>5,07 €</strong>
+                </div>
+                <div class="divider-line"></div>
+                <div class="total-metric">
+                  <small>Gesamtkalorien</small>
+                  <strong>2.320 kcal</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="scene-text-box">
+            <span class="scene-badge">{{ 'HOW_IT_WORKS.SCENE_4_TITLE' | translate }}</span>
+            <h2>{{ 'HOW_IT_WORKS.SCENE_4_TEXT' | translate }}</h2>
+            <p>{{ 'HOW_IT_WORKS.SCENE_4_DESC' | translate }}</p>
+          </div>
+        </div>
+      }
+
+      <!-- SZENE 5: Abschluss mit Logo -->
+      @case (4) {
+        <div class="scene-card animate-slide-in">
+          <div class="scene-illustration final-scene">
+            <div class="brand-showcase-box">
+              <app-logo size="lg"></app-logo>
+            </div>
+          </div>
+
+          <div class="scene-text-box">
+            <span class="scene-badge">{{ 'HOW_IT_WORKS.SCENE_5_TITLE' | translate }}</span>
+            <h2>{{ 'HOW_IT_WORKS.SCENE_5_TEXT' | translate }}</h2>
+            <p>{{ 'HOW_IT_WORKS.SCENE_5_DESC' | translate }}</p>
+          </div>
+        </div>
+      }
+    }
+  </main>
+
+  <!-- Sticky Bottom Actions -->
+  <footer class="intro-footer">
+    <div class="footer-button-row">
+      @if (currentSceneIndex() > 0) {
+        <button
+          type="button"
+          (click)="prevScene()"
+          class="prev-scene-button"
+        >
+          ← {{ 'HOW_IT_WORKS.PREV_BTN' | translate }}
+        </button>
+      }
+
+      @if (currentSceneIndex() < totalScenes - 1) {
+        <button
+          type="button"
+          (click)="nextScene()"
+          class="next-scene-button"
+        >
+          <span>{{ 'HOW_IT_WORKS.NEXT_BTN' | translate }}</span>
+        </button>
+      } @else {
+        <button
+          type="button"
+          (click)="finishIntro()"
+          class="finish-intro-button"
+        >
+          <span>{{ 'HOW_IT_WORKS.DISCOVER_BTN' | translate }}</span>
+        </button>
+      }
+    </div>
+  </footer>
+</div>

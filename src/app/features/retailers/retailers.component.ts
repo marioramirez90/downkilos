@@ -38,7 +38,7 @@ export class RetailersComponent implements OnInit {
 
   // Selected store and user location
   selectedStore = signal<StoreBranch | null>(null);
-  selectedRetailer = signal<'netto' | 'rewe' | 'edeka' | 'aldi' | 'lidl' | null>(null);
+  selectedRetailer = signal<string | null>(null);
   confirmedLocation = signal<UserLocation | null>(null);
   showLocationChange = signal<boolean>(false);
 
@@ -47,7 +47,7 @@ export class RetailersComponent implements OnInit {
   showApiKeySettings = signal<boolean>(false);
   apiKeyInput = '';
 
-  selectRetailer(retailer: 'netto' | 'rewe' | 'edeka' | 'aldi' | 'lidl'): void {
+  selectRetailer(retailer: string): void {
     if (retailer === 'netto') {
       this.selectedRetailer.set('netto');
       this.comingSoonNotice.set(null);
@@ -72,11 +72,14 @@ export class RetailersComponent implements OnInit {
       const names: Record<string, string> = {
         rewe: 'REWE',
         edeka: 'EDEKA',
-        aldi: 'ALDI',
-        lidl: 'Lidl'
+        aldi_nord: 'Aldi Nord',
+        aldi_sued: 'Aldi Süd',
+        lidl: 'Lidl',
+        penny: 'Penny',
+        kaufland: 'Kaufland'
       };
       const name = names[retailer] || retailer;
-      this.comingSoonNotice.set(`${name}: Dieser Händler wird demnächst für den automatischen Einkauf unterstützt.`);
+      this.comingSoonNotice.set(`${name}: Coming soon – aktuell ist Netto Marken-Discount verfügbar.`);
     }
   }
 
@@ -204,11 +207,11 @@ export class RetailersComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/calculator']);
+    this.router.navigate(['/onboarding']);
   }
 
   /**
-   * Confirm market & budget selection and navigate to Dashboard
+   * Confirm market & budget selection and navigate to How It Works (Screen 4)
    */
   async confirmSelection(): Promise<void> {
     const branch = this.selectedStore();
@@ -229,6 +232,6 @@ export class RetailersComponent implements OnInit {
     };
 
     await this.retailerService.savePreference(pref);
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/how-it-works']);
   }
 }

@@ -163,6 +163,10 @@ export class ProgressComponent implements OnInit {
     this.router.navigate(['/onboarding']);
   }
 
+  goToHowItWorks(): void {
+    this.router.navigate(['/how-it-works']);
+  }
+
   goBack(): void {
     this.router.navigate(['/dashboard']);
   }

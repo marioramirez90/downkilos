@@ -52,28 +52,20 @@
       {{ 'WELCOME.START_FREE' | translate }}
     </app-button>
 
-    <app-button
-      variant="secondary"
-      size="md"
-      [fullWidth]="true"
-      (clicked)="startOnboarding()"
+    <!-- Zweiter, optisch dezenter Button: Anmelden mit "Bald verfügbar" -->
+    <button
+      type="button"
+      (click)="showLoginNotice()"
+      class="login-secondary-btn"
     >
-      {{ 'WELCOME.CONTINUE_GUEST' | translate }}
-    </app-button>
+      <span>{{ 'WELCOME.LOGIN_BTN' | translate }}</span>
+      <span class="badge-soon">{{ 'WELCOME.SOON_BADGE' | translate }}</span>
+    </button>
 
-    <!-- Login notice -->
-    <div class="login-row">
-      <p>
-        {{ 'WELCOME.HAVE_ACCOUNT' | translate }}
-        <button type="button" (click)="showLoginNotice()">
-          {{ 'WELCOME.LOGIN_ACTION' | translate }}
-        </button>
-      </p>
-      @if (showLoginInfo) {
-        <div class="login-info-bubble">
-          {{ 'WELCOME.LOGIN_NOTICE' | translate }}
-        </div>
-      }
-    </div>
+    @if (showLoginInfo) {
+      <div class="login-info-bubble">
+        {{ 'WELCOME.LOGIN_NOTICE' | translate }}
+      </div>
+    }
   </footer>
 </div>

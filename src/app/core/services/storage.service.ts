@@ -10,6 +10,7 @@ const PROFILE_KEY = 'guest_profile';
 const LOCAL_FALLBACK_KEY = 'down_kilos_guest_profile';
 const LOCAL_RETAILER_KEY = 'down_kilos_guest_retailer';
 const LOCAL_WEIGHT_KEY = 'down_kilos_weight_history';
+const LOCAL_ONBOARDING_KEY = 'down_kilos_onboarding_completed';
 
 @Injectable({
   providedIn: 'root'
@@ -298,10 +299,23 @@ export class StorageService {
     return JSON.stringify(exportData, null, 2);
   }
 
+  isOnboardingCompleted(): boolean {
+    return localStorage.getItem(LOCAL_ONBOARDING_KEY) === 'true';
+  }
+
+  setOnboardingCompleted(completed: boolean): void {
+    if (completed) {
+      localStorage.setItem(LOCAL_ONBOARDING_KEY, 'true');
+    } else {
+      localStorage.removeItem(LOCAL_ONBOARDING_KEY);
+    }
+  }
+
   async resetAllData(): Promise<void> {
     localStorage.removeItem(LOCAL_FALLBACK_KEY);
     localStorage.removeItem(LOCAL_RETAILER_KEY);
     localStorage.removeItem(LOCAL_WEIGHT_KEY);
+    localStorage.removeItem(LOCAL_ONBOARDING_KEY);
     localStorage.removeItem('down_kilos_shopping_list_checked');
     localStorage.removeItem('down_kilos_swapped_meals');
     localStorage.removeItem('down_kilos_user_custom_prices');
@@ -311,3 +325,4 @@ export class StorageService {
     this.retailerPref.set(null);
   }
 }
+

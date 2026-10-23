@@ -11,515 +11,421 @@
 .dashboard-container {
   @include flexbox(column, space-between, stretch);
   height: 100%;
-  background-color: $bg-white;
+  background-color: $bg-light;
   overflow: hidden;
+}
 
-  .dashboard-scroll-area {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    padding: 16px 20px;
-    @include flexbox(column, flex-start, stretch, 16px);
+// ----------------------------------------------------
+// Scrollable Content Body
+// ----------------------------------------------------
+.dashboard-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px 20px 24px;
+  -webkit-overflow-scrolling: touch;
+  @include flexbox(column, flex-start, stretch, 18px);
+}
 
-    .greeting-row {
-      @include flexbox(row, space-between, center);
-      padding-bottom: 2px;
+// ----------------------------------------------------
+// Top Greeting Header
+// ----------------------------------------------------
+.greeting-header {
+  @include flexbox(row, space-between, center);
+  padding: 4px 0 2px;
 
-      .greeting-text-box {
-        h1 {
-          margin: 0;
-          font-size: 24px;
-          font-weight: 800;
-          color: $secondary-color;
-          letter-spacing: -0.02em;
+  .greeting-text {
+    @include flexbox(column, flex-start, flex-start, 2px);
 
-          @media screen and (max-width: 390px) {
-            font-size: 20px;
-          }
-        }
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 800;
+      color: $secondary-color;
+      letter-spacing: -0.02em;
 
-        p {
-          margin: 2px 0 0;
-          font-size: 12px;
-          font-weight: 500;
-          color: $text-muted;
-        }
-      }
-
-      .top-actions-box {
-        @include flexbox(row, flex-end, center, 8px);
-
-        .profile-quick-btn {
-          width: 40px;
-          height: 40px;
-          border-radius: $radius-full;
-          background-color: $bg-light;
-          border: none;
-          color: $primary-color;
-          cursor: pointer;
-          @include inline-flexbox(row, center, center);
-          transition: background-color 0.2s ease;
-
-          &:hover {
-            background-color: $primary-light;
-          }
-
-          svg {
-            width: 20px;
-            height: 20px;
-            stroke-width: 2;
-          }
-        }
+      @include respond-to('mobile') {
+        font-size: 20px;
       }
     }
 
-    .calorie-goal-card {
-      padding: 16px;
-      border-radius: $radius-xl;
-      background-color: $bg-white;
+    p {
+      margin: 0;
+      font-size: 12px;
+      font-weight: 600;
+      color: $text-muted;
+    }
+  }
+
+  .header-actions {
+    @include flexbox(row, flex-end, center, 6px);
+
+    .settings-btn {
+      @include inline-flexbox(row, center, center);
+      width: 38px;
+      height: 38px;
       border: 1px solid $border-color;
-      box-shadow: $shadow-sm;
-      @include flexbox(column, flex-start, stretch, 14px);
+      border-radius: $radius-full;
+      background-color: $bg-white;
+      color: $secondary-color;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
 
-      .goal-card-top {
-        @include flexbox(row, space-between, center);
+      svg {
+        width: 18px;
+        height: 18px;
+      }
 
-        h2 {
-          margin: 0;
-          font-size: 12px;
-          font-weight: 800;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          color: $secondary-color;
+      &:hover {
+        background-color: $secondary-light;
+      }
+    }
+  }
+}
+
+// ----------------------------------------------------
+// BEREICH A: DEIN KALORIENZIEL
+// ----------------------------------------------------
+.calorie-target-card {
+  padding: 18px 20px;
+  background-color: $bg-white;
+  border-radius: $radius-xl;
+  border: 1px solid $border-color;
+  box-shadow: $shadow-sm;
+  @include flexbox(column, center, stretch, 16px);
+
+  .card-caption {
+    text-align: center;
+
+    h2 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 800;
+      color: $secondary-color;
+      letter-spacing: -0.01em;
+    }
+  }
+
+  .gauge-center-wrapper {
+    @include flexbox(row, center, center);
+    padding: 4px 0;
+
+    .calorie-gauge {
+      position: relative;
+      width: 150px;
+      height: 150px;
+      @include inline-flexbox(row, center, center);
+
+      svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+
+        .gauge-bg-ring {
+          // Hellgrüner Ringhintergrund
+          stroke: $border-color-green;
+          stroke-width: 10px;
+          fill: transparent;
         }
 
-        .remaining-highlight {
+        .gauge-active-ring {
+          // Dunkelgrüner aktiver Fortschrittsbogen
+          stroke: $primary-color;
+          stroke-width: 10px;
+          stroke-linecap: round;
+          fill: transparent;
+          transition: stroke-dashoffset 0.8s ease-out;
+        }
+      }
+
+      .gauge-text-content {
+        position: absolute;
+        inset: 0;
+        @include flexbox(column, center, center);
+        text-align: center;
+        user-select: none;
+
+        strong {
+          font-size: 28px;
+          font-weight: 800;
+          color: $secondary-color;
+          line-height: 1;
+        }
+
+        span {
           font-size: 12px;
+          font-weight: 600;
+          color: $text-muted;
+          margin-top: 2px;
+        }
+
+        small {
+          font-size: 10px;
           font-weight: 700;
           color: $primary-color;
-        }
-      }
-
-      .ring-and-macros-row {
-        @include flexbox(row, flex-start, center, 16px);
-
-        .calorie-circle-box {
-          position: relative;
-          width: 130px;
-          height: 130px;
-          flex-shrink: 0;
-          @include inline-flexbox(row, center, center);
-
-          svg {
-            width: 100%;
-            height: 100%;
-            transform: rotate(-90deg);
-
-            .circle-bg {
-              stroke: $border-color;
-              stroke-width: 10;
-              fill: transparent;
-            }
-
-            .circle-progress {
-              stroke: $primary-color;
-              stroke-width: 10;
-              stroke-linecap: round;
-              fill: transparent;
-              transition: stroke-dashoffset 1s ease-out;
-            }
-          }
-
-          .circle-inner-text {
-            position: absolute;
-            inset: 0;
-            @include flexbox(column, center, center);
-            text-align: center;
-            user-select: none;
-
-            .num {
-              font-size: 22px;
-              font-weight: 900;
-              line-height: 1;
-              color: $secondary-color;
-            }
-
-            .sub {
-              font-size: 10px;
-              font-weight: 600;
-              color: $text-muted;
-              margin-top: 4px;
-            }
-          }
-        }
-
-        .macros-progress-col {
-          flex: 1;
-          @include flexbox(column, flex-start, stretch, 10px);
-
-          .macro-row {
-            @include flexbox(column, flex-start, stretch, 4px);
-
-            .macro-labels {
-              @include flexbox(row, space-between, center);
-              font-size: 11px;
-
-              span:first-child {
-                font-weight: 700;
-                color: $secondary-color;
-              }
-
-              span:last-child {
-                font-weight: 600;
-                color: $text-muted;
-              }
-            }
-
-            .macro-track {
-              width: 100%;
-              height: 6px;
-              border-radius: $radius-full;
-              background-color: $bg-light;
-              overflow: hidden;
-
-              .macro-fill {
-                height: 100%;
-                border-radius: $radius-full;
-                transition: width 0.4s ease;
-
-                &.protein { background-color: $primary-color; }
-                &.carbs { background-color: #EAB308; }
-                &.fat { background-color: #F97316; }
-              }
-            }
-          }
-        }
-      }
-
-      .calorie-breakdown-row {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 6px;
-        padding-top: 4px;
-        border-top: 1px solid $border-color-light;
-
-        .breakdown-pill {
-          padding: 8px 6px;
-          border-radius: $radius-md;
-          background-color: $bg-light;
-          text-align: center;
-          @include flexbox(column, center, center, 2px);
-
-          small {
-            font-size: 9px;
-            font-weight: 600;
-            color: $text-muted;
-          }
-
-          strong {
-            font-size: 12px;
-            font-weight: 800;
-            color: $secondary-color;
-          }
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          margin-top: 4px;
         }
       }
     }
+  }
 
-    // SECTION "Was möchtest du heute essen?" (3 Pathways)
-    .what-to-eat-section {
-      @include flexbox(column, flex-start, stretch, 10px);
+  .calorie-compact-metrics {
+    @include flexbox(row, space-around, center);
+    padding: 10px 14px;
+    background-color: $bg-light;
+    border-radius: $radius-lg;
+    border: 1px solid $border-color-light;
 
-      h2 {
-        margin: 0;
-        font-size: 14px;
+    .metric-item {
+      @include flexbox(column, center, center, 2px);
+      flex: 1;
+
+      small {
+        font-size: 11px;
+        font-weight: 600;
+        color: $text-muted;
+      }
+
+      strong {
+        font-size: 15px;
         font-weight: 800;
         color: $secondary-color;
       }
 
-      .eating-options-grid {
-        @include flexbox(column, flex-start, stretch, 8px);
-
-        .eating-card {
-          padding: 14px 16px;
-          border-radius: $radius-xl;
-          border: 1px solid $border-color;
-          background-color: $bg-white;
-          cursor: pointer;
-          @include flexbox(row, space-between, center, 12px);
-          transition: all 0.2s ease;
-          box-shadow: $shadow-sm;
-
-          .card-icon {
-            font-size: 24px;
-            flex-shrink: 0;
-          }
-
-          .card-content {
-            flex: 1;
-            min-width: 0;
-
-            h3 {
-              margin: 0;
-              font-size: 13px;
-              font-weight: 800;
-              color: $secondary-color;
-            }
-
-            p {
-              margin: 2px 0 0;
-              font-size: 11px;
-              color: $text-muted;
-              line-height: 1.35;
-            }
-          }
-
-          .card-arrow {
-            font-size: 16px;
-            color: $text-muted;
-            transition: transform 0.2s ease, color 0.2s ease;
-          }
-
-          &:hover {
-            border-color: $primary-color;
-
-            .card-arrow {
-              transform: translateX(3px);
-              color: $primary-color;
-            }
-          }
-
-          &.choice-discover {
-            background: linear-gradient(135deg, rgba(39, 143, 57, 0.06), rgba(39, 143, 57, 0.02));
-            border-color: $border-color-green;
-          }
-
-          &.choice-recipes {
-            background-color: $bg-white;
-          }
-
-          &.choice-meals {
-            background-color: $bg-white;
-          }
-        }
+      &.remaining strong {
+        color: $primary-color;
       }
     }
 
-    .pantry-banner {
-      padding: 14px;
-      border-radius: $radius-xl;
-      background-color: $primary-light;
-      border: 1px solid $border-color-green;
+    .metric-divider {
+      width: 1px;
+      height: 28px;
+      background-color: $border-color;
+    }
+  }
+}
+
+// ----------------------------------------------------
+// BEREICH B: LEBENSMITTEL BEI NETTO ENTDECKEN
+// ----------------------------------------------------
+.netto-discover-section {
+  @include flexbox(column, flex-start, stretch, 14px);
+
+  .discover-section-header {
+    @include flexbox(column, flex-start, flex-start, 2px);
+
+    h2 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 800;
+      color: $secondary-color;
+      letter-spacing: -0.01em;
+    }
+
+    p {
+      margin: 0;
+      font-size: 12px;
+      color: $text-muted;
+    }
+  }
+
+  // Suchleiste
+  .search-input-box {
+    position: relative;
+    @include flexbox(row, flex-start, center);
+    background-color: $bg-white;
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    padding: 10px 14px;
+    box-shadow: $shadow-sm;
+    transition: border-color 0.2s ease;
+
+    &:focus-within {
+      border-color: $primary-color;
+    }
+
+    .search-icon {
+      font-size: 14px;
+      margin-right: 8px;
+      color: $text-muted;
+    }
+
+    input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      color: $text-color;
+      outline: none;
+
+      &::placeholder {
+        color: $text-light;
+      }
+    }
+
+    .clear-search-btn {
+      border: none;
+      background: transparent;
+      color: $text-muted;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 2px 6px;
+
+      &:hover {
+        color: $secondary-color;
+      }
+    }
+  }
+
+  // Kuratierte Produktkarten (Grid)
+  .featured-products-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+
+    @include respond-to('mobile') {
+      gap: 8px;
+    }
+
+    .product-feature-card {
+      background-color: $bg-white;
+      border: 1px solid $border-color;
+      border-radius: $radius-lg;
+      overflow: hidden;
       box-shadow: $shadow-sm;
-      @include flexbox(column, flex-start, stretch, 8px);
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      @include flexbox(column, space-between, stretch);
 
-      .pantry-top {
-        @include flexbox(row, space-between, center);
+      &:hover {
+        transform: translateY(-2px);
+        border-color: $border-color-green;
+        box-shadow: $shadow-md;
+      }
 
-        .pantry-title {
-          @include flexbox(row, flex-start, center, 6px);
+      .card-image-box {
+        position: relative;
+        width: 100%;
+        height: 100px;
+        background-color: #F8FAF8;
+        overflow: hidden;
 
-          h3 {
-            margin: 0;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+
+        .netto-badge-pill {
+          position: absolute;
+          top: 6px;
+          left: 6px;
+          padding: 2px 6px;
+          background-color: #FFF200;
+          color: #ED1C24;
+          font-size: 9px;
+          font-weight: 900;
+          border-radius: 4px;
+          letter-spacing: -0.01em;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+        }
+      }
+
+      .card-info-box {
+        padding: 10px 10px 8px;
+        @include flexbox(column, space-between, stretch, 6px);
+        flex: 1;
+
+        h3 {
+          margin: 0;
+          font-size: 12px;
+          font-weight: 700;
+          color: $secondary-color;
+          line-height: 1.3;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          min-height: 31px;
+        }
+
+        .calorie-badges-row {
+          @include flexbox(column, flex-start, stretch, 3px);
+
+          .calorie-chip {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-align: center;
+
+            &.piece {
+              background-color: $primary-light;
+              color: $primary-color;
+            }
+
+            &.package {
+              background-color: $bg-light;
+              color: $text-muted;
+              border: 1px solid $border-color-light;
+            }
+          }
+        }
+
+        .card-footer-line {
+          @include flexbox(row, space-between, center);
+          margin-top: 4px;
+          padding-top: 4px;
+          border-top: 1px solid $border-color-light;
+
+          .product-price {
             font-size: 12px;
             font-weight: 800;
             color: $secondary-color;
           }
-        }
 
-        .pantry-count {
-          font-size: 10px;
-          font-weight: 700;
-          padding: 2px 8px;
-          border-radius: $radius-full;
-          background-color: $primary-color;
-          color: $bg-white;
-        }
-      }
-
-      p {
-        margin: 0;
-        font-size: 11px;
-        color: $secondary-color;
-        line-height: 1.4;
-      }
-
-      .pantry-actions {
-        @include flexbox(row, space-between, center);
-        padding-top: 4px;
-
-        small {
-          font-size: 10px;
-          color: $primary-color;
-          font-weight: 600;
-        }
-
-        button {
-          background: transparent;
-          border: none;
-          font-size: 11px;
-          font-weight: 700;
-          color: $primary-color;
-          cursor: pointer;
-
-          &:hover {
-            text-decoration: underline;
-          }
-        }
-      }
-    }
-
-    .food-log-card {
-      padding: 16px;
-      border-radius: $radius-xl;
-      background-color: $bg-white;
-      border: 1px solid $border-color;
-      box-shadow: $shadow-sm;
-      @include flexbox(column, flex-start, stretch, 12px);
-
-      .log-header {
-        @include flexbox(row, space-between, center);
-
-        h3 {
-          margin: 0;
-          font-size: 13px;
-          font-weight: 800;
-          color: $secondary-color;
-        }
-
-        span {
-          font-size: 10px;
-          color: $text-muted;
-          display: block;
-        }
-
-        button {
-          background: transparent;
-          border: none;
-          font-size: 12px;
-          font-weight: 700;
-          color: $primary-color;
-          cursor: pointer;
-
-          &:hover {
-            text-decoration: underline;
-          }
-        }
-      }
-
-      .log-items-list {
-        @include flexbox(column, flex-start, stretch, 8px);
-
-        .log-item-row {
-          padding: 10px 0;
-          border-bottom: 1px solid $border-color-light;
-          @include flexbox(row, space-between, center, 8px);
-
-          &:last-child {
-            border-bottom: none;
-          }
-
-          .log-item-details {
-            flex: 1;
-            min-width: 0;
-
-            .title-line {
-              @include flexbox(row, flex-start, center, 6px);
-
-              strong {
-                font-size: 12px;
-                color: $secondary-color;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-              }
-
-              small {
-                font-size: 10px;
-                color: $text-muted;
-                flex-shrink: 0;
-              }
-            }
-
-            .macro-line {
-              font-size: 10px;
-              color: $text-muted;
-              display: block;
-              margin-top: 2px;
-            }
-          }
-
-          .log-item-actions {
-            @include flexbox(row, flex-end, center, 6px);
-            flex-shrink: 0;
-
-            .status-toggle-btn {
-              padding: 4px 8px;
-              border-radius: $radius-md;
-              font-size: 10px;
-              font-weight: 700;
-              border: 1px solid #FFE082;
-              background-color: #FFF9E6;
-              color: #B45309;
-              cursor: pointer;
-              transition: all 0.15s ease;
-
-              &.eaten {
-                background-color: $primary-color;
-                color: $bg-white;
-                border-color: $primary-color;
-              }
-            }
-
-            .remove-log-btn {
-              width: 24px;
-              height: 24px;
-              border-radius: $radius-full;
-              background-color: $bg-light;
-              border: none;
-              color: $text-muted;
-              font-size: 11px;
-              cursor: pointer;
-              @include inline-flexbox(row, center, center);
-
-              &:hover {
-                background-color: #FEE2E2;
-                color: $danger-color;
-              }
-            }
-          }
-        }
-
-        .empty-log-box {
-          text-align: center;
-          padding: 24px 12px;
-          background-color: $bg-light;
-          border-radius: $radius-lg;
-          @include flexbox(column, center, center, 4px);
-
-          span {
-            font-size: 24px;
-          }
-
-          p {
-            margin: 0;
-            font-size: 12px;
-            font-weight: 700;
-            color: $secondary-color;
-          }
-
-          small {
+          .card-action-link {
             font-size: 10px;
-            color: $text-muted;
+            font-weight: 700;
+            color: $primary-color;
           }
         }
       }
     }
   }
 
-  .dashboard-footer {
-    flex-shrink: 0;
-    background-color: $bg-white;
-    border-top: 1px solid $border-color;
-    z-index: 20;
+  // Button: Alle Netto-Produkte entdecken
+  .browse-all-products-btn {
+    @include flexbox(row, center, center, 8px);
+    width: 100%;
+    padding: 13px 20px;
+    background-color: $primary-color;
+    color: $bg-white;
+    font-size: 14px;
+    font-weight: 700;
+    border: none;
+    border-radius: $radius-lg;
+    cursor: pointer;
+    box-shadow: $shadow-button;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+
+    &:hover {
+      background-color: $primary-dark;
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+
+    .arrow-symbol {
+      font-size: 16px;
+      line-height: 1;
+    }
   }
 }

@@ -61,4 +61,30 @@ describe('StorageService', () => {
     await service.deleteProfile();
     expect(service.profile()).toBeNull();
   });
+
+  it('should track weight entries and update history', async () => {
+    const initialCount = service.weightHistory().length;
+    await service.addWeightEntry(67.5, '2026-10-23', 'Testgewicht');
+
+    const updated = service.weightHistory();
+    const entry = updated.find(e => e.date === '2026-10-23');
+    expect(entry).toBeDefined();
+    expect(entry?.weight).toBe(67.5);
+    expect(entry?.note).toBe('Testgewicht');
+  });
+
+  it('should export all data as valid JSON', async () => {
+    const exported = service.exportDataJson();
+    const parsed = JSON.parse(exported);
+    expect(parsed.app).toBe('Down Kilos');
+    expect(parsed.version).toBe('1.0.0');
+    expect(Array.isArray(parsed.weightHistory)).toBe(true);
+  });
+
+  it('should reset all local data', async () => {
+    await service.addWeightEntry(65.0, '2026-10-24');
+    await service.resetAllData();
+    expect(service.profile()).toBeNull();
+    expect(service.weightHistory().length).toBe(0);
+  });
 });

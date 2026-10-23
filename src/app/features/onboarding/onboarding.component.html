@@ -315,12 +315,14 @@
       <div class="w-16 h-1.5 rounded-full bg-[#E3EBE4]"></div>
     </div>
 
-    <!-- Submit Button (Linked to form via form="onboardingForm") -->
+    <!-- Submit Button (Linked to form via form="onboardingForm" and direct click) -->
     <button
       type="submit"
       form="onboardingForm"
+      (click)="onSubmit()"
       [disabled]="form.invalid || isSubmitting"
       class="w-full h-[52px] rounded-full bg-[#278F39] hover:bg-[#217A30] active:scale-[0.98] text-white font-bold text-base shadow-button flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+      id="btn-onboarding-continue"
     >
       <span>Weiter</span>
       <span class="text-lg">→</span>

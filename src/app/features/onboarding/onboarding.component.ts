@@ -52,6 +52,19 @@ export class OnboardingComponent implements OnInit {
       return;
     }
 
+    if (this.route.snapshot.queryParamMap.get('testUser') === 'true') {
+      this.form.patchValue({
+        name: 'Mario',
+        birthDate: '1990-05-14',
+        gender: 'male',
+        height: 180,
+        currentWeight: 82,
+        activityLevel: 'moderate',
+        goal: 'lose_weight'
+      });
+      return;
+    }
+
     const existing = await this.storageService.loadProfile();
     if (existing) {
       this.form.patchValue({

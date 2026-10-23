@@ -59,7 +59,7 @@
     @if (activeTab() === 'overview') {
       <!-- Persönliche Begrüßung -->
       <section class="personal-greeting-section">
-        <h2 class="user-greeting-title">Hallo {{ userFirstName() }}! 👋</h2>
+        <h2 class="user-greeting-title">Hallo {{ userFirstName() }}!</h2>
         <p class="greeting-subtitle">
           Hier ist dein persönlicher Kalorienbedarf, berechnet aus deinen Angaben. So weißt du,
           wie viele Kalorien du täglich essen kannst, um dein Ziel zu erreichen.
@@ -94,7 +94,7 @@
           <div class="ring-center-text">
             <span class="ring-number">{{ formattedTargetKcal() }}</span>
             <span class="ring-unit">kcal</span>
-            <span class="ring-sub">Tagesziel</span>
+            <span class="ring-sub">Dein Tagesziel</span>
           </div>
         </div>
       </section>
@@ -115,11 +115,11 @@
         <div class="metric-card">
           <div class="metric-top-row">
             <span class="flame-icon">🔥</span>
-            <span class="metric-val">-{{ calc().deficit }}</span>
+            <span class="metric-val">{{ deficitDisplay() }}</span>
             <span class="metric-unit">kcal</span>
           </div>
           <div class="metric-title">Tägliches Defizit</div>
-          <div class="metric-sub">(für gesundes Abnehmen)</div>
+          <div class="metric-sub">{{ deficitSubtitle() }}</div>
         </div>
       </section>
 
@@ -133,9 +133,8 @@
           </svg>
         </div>
         <p class="explanation-text">
-          <strong>Mit {{ formattedTargetKcal() }} kcal pro Tag erreichst du</strong>
-          ein moderates Kaloriendefizit. Das kann dir helfen, auf gesunde und nachhaltige Weise
-          abzunehmen, ohne auf deine Lieblingslebensmittel verzichten zu müssen.
+          <strong>{{ explanationHeadline() }}</strong>
+          {{ explanationBody() }}
         </p>
       </section>
 
@@ -143,7 +142,7 @@
       <section class="outlook-section">
         <h3 class="outlook-heading">Deine mögliche Entwicklung</h3>
 
-        @if (calc().isMinor) {
+        @if (calc()?.isMinor) {
           <div class="youth-safety-box">
             <p>
               Für Jugendliche unter 18 Jahren empfehlen wir keine pauschale Gewichtsabnahme ohne ärztliche Begleitung.
@@ -184,75 +183,77 @@
       </section>
     } @else {
       <!-- TAB 2: DETAILS (Makronährstoffe & Stoffwechselanalyse) -->
-      <div class="details-tab-content">
-        <!-- Makronährstoffe -->
-        <section class="macros-breakdown-card">
-          <h2 class="details-section-title">Optimale Nährstoffverteilung</h2>
-          <p class="details-section-subtitle">Ausgewogene Verteilung für Sättigung und Muskelerhalt</p>
+      @if (calc(); as c) {
+        <div class="details-tab-content">
+          <!-- Makronährstoffe -->
+          <section class="macros-breakdown-card">
+            <h2 class="details-section-title">Optimale Nährstoffverteilung</h2>
+            <p class="details-section-subtitle">Ausgewogene Verteilung für Sättigung und Muskelerhalt</p>
 
-          <!-- Eiweiß -->
-          <div class="macro-item">
-            <div class="macro-text-row">
-              <strong class="macro-name">Eiweiß (Protein)</strong>
-              <span class="macro-val">{{ calc().macros.proteinGrams }} g ({{ calc().macros.proteinPercentage }}%)</span>
+            <!-- Eiweiß -->
+            <div class="macro-item">
+              <div class="macro-text-row">
+                <strong class="macro-name">Eiweiß (Protein)</strong>
+                <span class="macro-val">{{ c.macros.proteinGrams }} g ({{ c.macros.proteinPercentage }}%)</span>
+              </div>
+              <div class="macro-progress-track">
+                <div class="macro-progress-fill protein-fill" [style.width.%]="c.macros.proteinPercentage"></div>
+              </div>
             </div>
-            <div class="macro-progress-track">
-              <div class="macro-progress-fill protein-fill" [style.width.%]="calc().macros.proteinPercentage"></div>
+
+            <!-- Kohlenhydrate -->
+            <div class="macro-item">
+              <div class="macro-text-row">
+                <strong class="macro-name">Kohlenhydrate</strong>
+                <span class="macro-val">{{ c.macros.carbsGrams }} g ({{ c.macros.carbsPercentage }}%)</span>
+              </div>
+              <div class="macro-progress-track">
+                <div class="macro-progress-fill carbs-fill" [style.width.%]="c.macros.carbsPercentage"></div>
+              </div>
             </div>
-          </div>
 
-          <!-- Kohlenhydrate -->
-          <div class="macro-item">
-            <div class="macro-text-row">
-              <strong class="macro-name">Kohlenhydrate</strong>
-              <span class="macro-val">{{ calc().macros.carbsGrams }} g ({{ calc().macros.carbsPercentage }}%)</span>
+            <!-- Fette -->
+            <div class="macro-item">
+              <div class="macro-text-row">
+                <strong class="macro-name">Gesunde Fette</strong>
+                <span class="macro-val">{{ c.macros.fatGrams }} g ({{ c.macros.fatPercentage }}%)</span>
+              </div>
+              <div class="macro-progress-track">
+                <div class="macro-progress-fill fat-fill" [style.width.%]="c.macros.fatPercentage"></div>
+              </div>
             </div>
-            <div class="macro-progress-track">
-              <div class="macro-progress-fill carbs-fill" [style.width.%]="calc().macros.carbsPercentage"></div>
+          </section>
+
+          <!-- Stoffwechselanalyse -->
+          <section class="metabolism-analysis-card">
+            <h2 class="details-section-title">Stoffwechselanalyse</h2>
+
+            <div class="metabolism-detail-row">
+              <span>Ruheenergieverbrauch (BMR):</span>
+              <strong>{{ formattedBmr() }} kcal</strong>
             </div>
-          </div>
 
-          <!-- Fette -->
-          <div class="macro-item">
-            <div class="macro-text-row">
-              <strong class="macro-name">Gesunde Fette</strong>
-              <span class="macro-val">{{ calc().macros.fatGrams }} g ({{ calc().macros.fatPercentage }}%)</span>
+            <div class="metabolism-detail-row">
+              <span>Erhaltungsbedarf (TDEE):</span>
+              <strong>{{ formattedTdee() }} kcal</strong>
             </div>
-            <div class="macro-progress-track">
-              <div class="macro-progress-fill fat-fill" [style.width.%]="calc().macros.fatPercentage"></div>
+
+            <div class="metabolism-detail-row">
+              <span>Wissenschaftliche Formel:</span>
+              <strong>Mifflin-St. Jeor</strong>
             </div>
+          </section>
+
+          <!-- Medizinischer Sicherheitshinweis -->
+          <div class="medical-safety-callout">
+            <strong>Gesundheitshinweis</strong>
+            <p>
+              Diese Werte sind wissenschaftlich begründete Richtwerte für Erwachsene.
+              Bei Schwangerschaft, Stillzeit oder Vorerkrankungen sollte die Ernährung individuell mit ärztlichen Fachkräften abgestimmt werden.
+            </p>
           </div>
-        </section>
-
-        <!-- Stoffwechselanalyse -->
-        <section class="metabolism-analysis-card">
-          <h2 class="details-section-title">Stoffwechselanalyse</h2>
-
-          <div class="metabolism-detail-row">
-            <span>Ruheenergieverbrauch (BMR):</span>
-            <strong>{{ formattedBmr() }} kcal</strong>
-          </div>
-
-          <div class="metabolism-detail-row">
-            <span>Erhaltungsbedarf (TDEE):</span>
-            <strong>{{ formattedTdee() }} kcal</strong>
-          </div>
-
-          <div class="metabolism-detail-row">
-            <span>Wissenschaftliche Formel:</span>
-            <strong>Mifflin-St. Jeor</strong>
-          </div>
-        </section>
-
-        <!-- Medizinischer Sicherheitshinweis -->
-        <div class="medical-safety-callout">
-          <strong>Gesundheitshinweis</strong>
-          <p>
-            Diese Werte sind wissenschaftlich begründete Richtwerte für Erwachsene.
-            Bei Schwangerschaft, Stillzeit oder Vorerkrankungen sollte die Ernährung individuell mit ärztlichen Fachkräften abgestimmt werden.
-          </p>
         </div>
-      </div>
+      }
     }
   </main>
 

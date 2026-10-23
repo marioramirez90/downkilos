@@ -219,26 +219,24 @@ export class StorageService {
       }
     }
 
-    // Default seed history if profile is present
+    // Only record real starting weight if a profile is present
     const currentProf = this.profile();
-    const currWeight = currentProf?.currentWeight ?? 68.5;
-    const startWeight = currWeight + 3.5;
+    if (currentProf && currentProf.currentWeight) {
+      const today = new Date().toISOString().split('T')[0];
+      const initialHistory: WeightEntry[] = [
+        {
+          id: 'w_' + Date.now(),
+          date: today,
+          weight: currentProf.currentWeight,
+          note: 'Startgewicht'
+        }
+      ];
+      this.saveWeightHistory(initialHistory);
+      return initialHistory;
+    }
 
-    const today = new Date();
-    const d1 = new Date(today.getTime() - 21 * 86400000).toISOString().split('T')[0];
-    const d2 = new Date(today.getTime() - 14 * 86400000).toISOString().split('T')[0];
-    const d3 = new Date(today.getTime() - 7 * 86400000).toISOString().split('T')[0];
-    const d4 = today.toISOString().split('T')[0];
-
-    const defaultHistory: WeightEntry[] = [
-      { id: 'w1', date: d1, weight: Number(startWeight.toFixed(1)), note: 'Start der Reise' },
-      { id: 'w2', date: d2, weight: Number((startWeight - 1.2).toFixed(1)), note: 'Erste Woche geschafft' },
-      { id: 'w3', date: d3, weight: Number((startWeight - 2.4).toFixed(1)), note: 'Guter Ernährungsrhythmus' },
-      { id: 'w4', date: d4, weight: Number(currWeight.toFixed(1)), note: 'Aktuelle Messung' }
-    ];
-
-    this.saveWeightHistory(defaultHistory);
-    return defaultHistory;
+    this.weightHistory.set([]);
+    return [];
   }
 
   saveWeightHistory(history: WeightEntry[]): void {

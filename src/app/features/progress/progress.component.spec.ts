@@ -68,7 +68,10 @@ describe('ProgressComponent', () => {
     expect(latest?.weight).toBe(67.2);
   });
 
-  it('should generate svg chart points for multiple entries', () => {
+  it('should generate svg chart points for multiple entries', async () => {
+    await storageService.addWeightEntry(72, '2026-10-01');
+    await storageService.addWeightEntry(70, '2026-10-08');
+    fixture.detectChanges();
     const points = component.chartPoints();
     expect(points.length).toBeGreaterThanOrEqual(2);
     expect(component.chartLinePoints().length).toBeGreaterThan(0);

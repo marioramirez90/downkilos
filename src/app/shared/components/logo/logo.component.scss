@@ -1,1 +1,75 @@
-// Styles for LogoComponent
+@use '../../../../styles/abstracts/variables' as vars;
+@use '../../../../styles/abstracts/mixins' as mixins;
+
+.logo-container {
+  @include mixins.flexbox(row, flex-start, center, 10px);
+  user-select: none;
+
+  &.centered {
+    justify-content: center;
+  }
+
+  .logo-full-image {
+    display: block;
+    width: auto;
+    object-fit: contain;
+
+    &.size-sm {
+      height: 28px;
+    }
+
+    &.size-md {
+      height: 38px;
+    }
+
+    &.size-lg {
+      height: 56px;
+    }
+  }
+
+  .leaf-icon-box {
+    @include mixins.flexbox(row, center, center);
+    flex-shrink: 0;
+
+    img {
+      object-fit: contain;
+      width: auto;
+    }
+  }
+
+  .logo-text-box {
+    @include mixins.flexbox(column, center, flex-start);
+
+    .brand-title {
+      font-weight: 800;
+      color: vars.$secondary-color;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+
+      &.size-sm { font-size: 1.125rem; }
+      &.size-md { font-size: 1.5rem; }
+      &.size-lg { font-size: 2rem; }
+    }
+
+    .brand-tagline {
+      font-size: 9px;
+      font-weight: 700;
+      color: vars.$primary-color;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}

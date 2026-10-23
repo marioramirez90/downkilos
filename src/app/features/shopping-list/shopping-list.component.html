@@ -255,27 +255,44 @@
       </div>
     </div>
 
-    <!-- Bottom Summary Row (Matching Screen 6 with Estimate / Incomplete Notice) -->
-    <div class="p-3.5 rounded-2xl bg-[#F6F8F6] border border-[#E3EBE4] space-y-2 mt-2">
+    <!-- Bottom Summary Row: Dual Cost Breakdown (Tatsächlicher Einkauf vs Rechnerische Portionskosten) -->
+    <div class="p-3.5 rounded-2xl bg-[#F6F8F6] border-2 border-[#278F39]/20 space-y-2.5 mt-2">
       <div class="flex items-center justify-between">
-        <div class="space-y-0.5">
-          <span class="text-xs font-bold text-[#103A2A] block">
-            Gesamtsumme ({{ shoppingService.summary().checkedItems }}/{{ shoppingService.summary().totalItems }} erledigt)
-          </span>
-          @if (shoppingService.summary().budgetBufferPercent > 0) {
-            <span class="text-[10px] text-[#627264] block">
-              Inkl. {{ shoppingService.summary().budgetBufferPercent }}% Puffer (+{{ priceService.formatPrice(shoppingService.summary().budgetBufferAmount) }})
-            </span>
-          }
-        </div>
-        <span class="text-base sm:text-lg font-black text-[#103A2A]">
-          {{ priceService.formatPrice(shoppingService.summary().totalCostWithBuffer) }}
+        <span class="text-[11px] font-extrabold uppercase tracking-wider text-[#278F39]">
+          Netto Einkaufskosten
+        </span>
+        <span class="text-[10px] text-[#627264]">
+          {{ shoppingService.summary().checkedItems }} von {{ shoppingService.summary().totalItems }} Artikeln erledigt
         </span>
       </div>
 
+      <div class="grid grid-cols-2 gap-2">
+        <div class="p-2.5 rounded-xl bg-white border border-[#E3EBE4]">
+          <span class="text-[9px] font-bold text-[#627264] uppercase block">Rechnerische Portionskosten</span>
+          <span class="text-base font-extrabold text-[#278F39] block mt-0.5">
+            {{ priceService.formatPrice(shoppingService.summary().totalPortionCost) }}
+          </span>
+          <span class="text-[8px] text-[#627264] block leading-tight">Effektiv verzehrter Anteil</span>
+        </div>
+
+        <div class="p-2.5 rounded-xl bg-[#FFF9E6] border border-[#FFE082]">
+          <span class="text-[9px] font-bold text-[#B45309] uppercase block">Tatsächlicher Kassenbon</span>
+          <span class="text-base font-extrabold text-[#B45309] block mt-0.5">
+            {{ priceService.formatPrice(shoppingService.summary().totalCostWithBuffer) }}
+          </span>
+          <span class="text-[8px] text-[#B45309]/80 block leading-tight">Alle ganzen Packungen</span>
+        </div>
+      </div>
+
+      @if (shoppingService.summary().budgetBufferPercent > 0) {
+        <span class="text-[10px] text-[#627264] block">
+          Inkl. {{ shoppingService.summary().budgetBufferPercent }}% Puffer (+{{ priceService.formatPrice(shoppingService.summary().budgetBufferAmount) }})
+        </span>
+      }
+
       <!-- Schätzungs- oder Unvollständigkeits-Hinweis -->
       @if (shoppingService.summary().estimateNotice; as notice) {
-        <div class="pt-1 border-t border-[#E3EBE4] flex items-center gap-1.5 text-[10px]"
+        <div class="pt-1.5 border-t border-[#E3EBE4] flex items-center gap-1.5 text-[10px]"
              [ngClass]="shoppingService.summary().hasMissingPrices ? 'text-[#D97706]' : 'text-[#2563EB]'">
           <span>ℹ️</span>
           <span class="font-semibold">{{ notice }}</span>

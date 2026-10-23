@@ -43,7 +43,7 @@ describe('ShoppingListComponent', () => {
 
   it('should render total sum in summary row', () => {
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toContain('Gesamtsumme');
+    expect(el.textContent).toContain('Einkaufskosten');
     expect(el.textContent).toMatch(/\d+[.,]\d{2}\s*€/);
   });
 

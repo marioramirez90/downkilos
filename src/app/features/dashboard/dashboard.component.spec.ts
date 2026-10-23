@@ -58,7 +58,7 @@ describe('DashboardComponent', () => {
 
   it('should render calorie ring, eaten and target calories', () => {
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toMatch(/1[.,]250/);
+    expect(el.textContent).toMatch(/1[.,]?487/);
     expect(el.textContent).toContain('Tagesbedarf');
     expect(el.textContent).toContain('kcal übrig');
   });

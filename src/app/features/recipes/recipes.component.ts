@@ -6,10 +6,12 @@ import { HamburgerButtonComponent } from '../../shared/components/hamburger-butt
 import { RECIPES_DATA } from '../../core/models/recipes.data';
 import { Recipe } from '../../core/models/recipe.model';
 
+import { RouterModule } from '@angular/router';
+
 @Component({
   selector: 'app-recipes',
   standalone: true,
-  imports: [CommonModule, BottomNavComponent, ProductCatalogComponent, HamburgerButtonComponent],
+  imports: [CommonModule, RouterModule, BottomNavComponent, ProductCatalogComponent, HamburgerButtonComponent],
   templateUrl: './recipes.component.html',
   styleUrl: './recipes.component.scss'
 })

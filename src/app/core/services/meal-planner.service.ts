@@ -4,7 +4,7 @@ import { RECIPES_DATA } from '../models/recipes.data';
 import { StorageService } from './storage.service';
 import { DietaryPreference } from '../models/user-profile.model';
 
-const STORAGE_PLAN_KEY = 'down_kilos_meal_plan';
+const STORAGE_PLAN_KEY = 'down_kilos_meal_plan_v2';
 
 @Injectable({
   providedIn: 'root'
@@ -27,12 +27,12 @@ export class MealPlannerService {
     if (!day) {
       return { calories: 1800, cost: 6.40, protein: 120, carbs: 228, fat: 48 };
     }
-    const meals = [day.breakfast, day.lunch, day.snack, day.dinner];
+    const meals = [day.breakfast, day.lunch, day.snack, day.dinner].filter(Boolean);
     const calories = meals.reduce((sum, m) => sum + (m?.calories || 0), 0);
     const cost = Math.round(meals.reduce((sum, m) => sum + (m?.pricePerPortion || 0), 0) * 100) / 100;
-    const protein = meals.reduce((sum, m) => sum + (m?.protein || 0), 0);
-    const carbs = meals.reduce((sum, m) => sum + (m?.carbs || 0), 0);
-    const fat = meals.reduce((sum, m) => sum + (m?.fat || 0), 0);
+    const protein = Math.round(meals.reduce((sum, m) => sum + (m?.protein || 0), 0) * 10) / 10;
+    const carbs = Math.round(meals.reduce((sum, m) => sum + (m?.carbs || 0), 0) * 10) / 10;
+    const fat = Math.round(meals.reduce((sum, m) => sum + (m?.fat || 0), 0) * 10) / 10;
 
     return { calories, cost, protein, carbs, fat };
   });
@@ -48,25 +48,61 @@ export class MealPlannerService {
       return;
     }
 
-    // Default 7-day plan matching Screen 5 from reference
+    const plan = this.generateDiverseWeeklyPlan();
+    this.weeklyPlan.set(plan);
+    this.savePlan(plan);
+  }
+
+  generateWeeklyPlan(): void {
+    const plan = this.generateDiverseWeeklyPlan();
+    this.weeklyPlan.set(plan);
+    this.savePlan(plan);
+  }
+
+  /**
+   * Generiert einen abwechslungsreichen 7-Tage-Plan ohne ständige Wiederholungen.
+   * Berücksichtigt gezielt Resteverwertung (z.B. Hähnchenreste am Folgetag).
+   */
+  generateDiverseWeeklyPlan(): DayPlan[] {
     const days = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
-    const defaultBreakfast = this.getRecipeById('rec-overnight-oats')!;
-    const defaultLunch = this.getRecipeById('rec-chicken-bowl')!;
-    const defaultSnack = this.getRecipeById('rec-skyr-snack')!;
-    const defaultDinner = this.getRecipeById('rec-lentil-curry')!;
+    
+    // Abwechslungsreiche Rezeptauswahl
+    const rScrambled = this.getRecipeById('rec-scrambled-eggs')!;
+    const rOats = this.getRecipeById('rec-overnight-oats')!;
+    const rPancakes = this.getRecipeById('rec-quark-pancakes')!;
 
-    const initialPlan: DayPlan[] = days.map((dayName, idx) => ({
-      dayIndex: idx,
-      dayName: idx === 0 ? 'Heute' : idx === 1 ? 'Morgen' : dayName,
-      dateStr: this.getDateForDayOffset(idx),
-      breakfast: defaultBreakfast,
-      lunch: defaultLunch,
-      snack: defaultSnack,
-      dinner: defaultDinner
-    }));
+    const rChickenRice = this.getRecipeById('rec-chicken-rice-pan')!;
+    const rChickenPaprika = this.getRecipeById('rec-chicken-paprika-stirfry')!;
+    const rLentils = this.getRecipeById('rec-red-lentil-curry')!;
 
-    this.weeklyPlan.set(initialPlan);
-    this.savePlan(initialPlan);
+    const rBakedPotatoes = this.getRecipeById('rec-baked-potatoes-quark')!;
+    const rBroccoliOmelette = this.getRecipeById('rec-broccoli-omelette')!;
+
+    const rSkyrSnack = this.getRecipeById('rec-skyr-berry-snack')!;
+    const rCarrotSnack = this.getRecipeById('rec-carrot-cottage-snack')!;
+
+    const rotation = [
+      { b: rScrambled, l: rChickenRice, s: rSkyrSnack, d: rBakedPotatoes },
+      { b: rOats, l: rChickenPaprika, s: rCarrotSnack, d: rBroccoliOmelette },
+      { b: rPancakes, l: rLentils, s: rSkyrSnack, d: rScrambled },
+      { b: rOats, l: rChickenRice, s: rCarrotSnack, d: rBakedPotatoes },
+      { b: rScrambled, l: rChickenPaprika, s: rSkyrSnack, d: rBroccoliOmelette },
+      { b: rPancakes, l: rLentils, s: rCarrotSnack, d: rBakedPotatoes },
+      { b: rOats, l: rChickenRice, s: rSkyrSnack, d: rBroccoliOmelette }
+    ];
+
+    return days.map((dayName, idx) => {
+      const rot = rotation[idx % rotation.length];
+      return {
+        dayIndex: idx,
+        dayName: idx === 0 ? 'Heute' : idx === 1 ? 'Morgen' : dayName,
+        dateStr: this.getDateForDayOffset(idx),
+        breakfast: rot.b || rScrambled,
+        lunch: rot.l || rChickenRice,
+        snack: rot.s || rSkyrSnack,
+        dinner: rot.d || rBakedPotatoes
+      };
+    });
   }
 
   getRecipeById(id: string): Recipe | undefined {
@@ -79,7 +115,7 @@ export class MealPlannerService {
       if (diet === 'vegan' && r.dietType !== 'vegan') return false;
       if (diet === 'vegetarian' && r.dietType === 'omnivore') return false;
 
-      // Exclude allergens
+      // Allergene ausschließen
       if (excludedAllergens.length > 0) {
         const hasAllergen = r.allergens.some(a => excludedAllergens.includes(a));
         if (hasAllergen) return false;
@@ -106,6 +142,12 @@ export class MealPlannerService {
     if (index >= 0 && index < 7) {
       this.currentDayIndex.set(index);
     }
+  }
+
+  regeneratePlan(): void {
+    const newPlan = this.generateDiverseWeeklyPlan();
+    this.weeklyPlan.set(newPlan);
+    this.savePlan(newPlan);
   }
 
   private savePlan(plan: DayPlan[]): void {

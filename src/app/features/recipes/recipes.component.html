@@ -49,34 +49,51 @@
       <!-- Recipe List -->
       <div class="space-y-3 animate-fade-in">
         @for (recipe of allRecipes; track recipe.id) {
-          <div class="p-3 bg-white rounded-2xl border border-[#E3EBE4] hover:border-[#278F39] shadow-soft-sm flex gap-3 transition-all">
-            <img
-              [src]="recipe.imageUrl"
-              [alt]="recipe.title"
-              class="w-20 h-20 rounded-xl object-cover flex-shrink-0"
-            />
-            <div class="flex-1 min-w-0 flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between gap-1">
-                  <span class="text-[9px] font-bold uppercase tracking-wider text-[#278F39] bg-[#E5F5E8] px-2 py-0.5 rounded-full">
-                    {{ getMealTypeLabel(recipe.mealType) }}
+          <a
+            [routerLink]="['/recipes', recipe.id]"
+            class="block p-3.5 bg-white rounded-2xl border border-[#E3EBE4] hover:border-[#278F39] hover:shadow-soft transition-all cursor-pointer group"
+          >
+            <div class="flex gap-3">
+              <img
+                [src]="recipe.imageUrl"
+                [alt]="recipe.title"
+                class="w-20 h-20 rounded-xl object-cover flex-shrink-0 group-hover:scale-[1.02] transition-transform"
+              />
+              <div class="flex-1 min-w-0 flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between gap-1">
+                    <span class="text-[9px] font-bold uppercase tracking-wider text-[#278F39] bg-[#E5F5E8] px-2 py-0.5 rounded-full">
+                      {{ getMealTypeLabel(recipe.mealType) }}
+                    </span>
+                    <span class="text-[11px] font-extrabold text-[#278F39]">
+                      {{ recipe.pricePerPortion.toFixed(2).replace('.', ',') }} € <span class="text-[9px] font-normal text-[#627264]">/ Port.</span>
+                    </span>
+                  </div>
+                  <h3 class="text-xs sm:text-sm font-bold text-[#103A2A] mt-1 line-clamp-1 group-hover:text-[#278F39] transition-colors">
+                    {{ recipe.title }}
+                  </h3>
+                </div>
+
+                <!-- Dual Cost Badge & Meta -->
+                <div class="mt-1 flex items-center justify-between text-[10px]">
+                  <span class="text-[#B45309] font-medium bg-[#FFF9E6] px-1.5 py-0.5 rounded border border-[#FFE082]">
+                    Neukauf Packungen: {{ recipe.fullPackageCost.toFixed(2).replace('.', ',') }} €
                   </span>
-                  <span class="text-xs font-bold text-[#103A2A]">
-                    {{ recipe.pricePerPortion.toFixed(2).replace('.', ',') }} €
+                  <span class="text-[#278F39] font-bold group-hover:translate-x-0.5 transition-transform">
+                    Rezept ansehen →
                   </span>
                 </div>
-                <h3 class="text-xs sm:text-sm font-bold text-[#103A2A] mt-1 line-clamp-1">
-                  {{ recipe.title }}
-                </h3>
-              </div>
-
-              <div class="flex items-center gap-3 text-[11px] text-[#627264]">
-                <span>🔥 {{ recipe.calories }} kcal</span>
-                <span>⏱️ {{ recipe.prepTimeMinutes }} Min.</span>
-                <span>🥩 {{ recipe.protein }}g Eiweiß</span>
               </div>
             </div>
-          </div>
+
+            <!-- Nährwerte & Zeit Leiste -->
+            <div class="mt-2.5 pt-2 border-t border-[#F0F4F1] flex items-center justify-between text-[11px] text-[#627264]">
+              <span class="font-medium">🔥 {{ recipe.calories }} kcal</span>
+              <span class="font-medium">⏱️ {{ recipe.prepTimeMinutes + recipe.cookTimeMinutes }} Min.</span>
+              <span class="font-medium">🥩 {{ recipe.protein }}g Eiweiß</span>
+              <span class="font-medium">🥗 {{ recipe.ingredients.length }} Zutaten</span>
+            </div>
+          </a>
         }
       </div>
     }

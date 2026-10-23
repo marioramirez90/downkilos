@@ -37,6 +37,12 @@ export const routes: Routes = [
     title: 'Down Kilos – Dashboard',
   },
   {
+    path: 'discover',
+    loadComponent: () =>
+      import('./features/discover/discover.component').then((m) => m.DiscoverComponent),
+    title: 'Down Kilos – Lebensmittel entdecken',
+  },
+  {
     path: 'meal-planner',
     loadComponent: () =>
       import('./features/meal-planner/meal-planner.component').then((m) => m.MealPlannerComponent),
@@ -53,6 +59,12 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/recipes/recipes.component').then((m) => m.RecipesComponent),
     title: 'Down Kilos – Rezepte & Netto-Sortiment',
+  },
+  {
+    path: 'recipes/:id',
+    loadComponent: () =>
+      import('./features/recipes/recipe-detail/recipe-detail.component').then((m) => m.RecipeDetailComponent),
+    title: 'Down Kilos – Rezeptdetails & Kochanleitung',
   },
   {
     path: 'netto-products',

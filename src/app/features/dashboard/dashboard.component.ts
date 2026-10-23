@@ -10,6 +10,10 @@ import { CalorieCalculationResult } from '../../core/models/calorie-calculation.
 
 import { HamburgerButtonComponent } from '../../shared/components/hamburger-button/hamburger-button.component';
 
+import { FoodLogService } from '../../core/services/food-log.service';
+import { PantryService } from '../../core/services/pantry.service';
+import { LoggedFoodItem } from '../../core/models/food-log.model';
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -21,16 +25,12 @@ export class DashboardComponent implements OnInit {
   private router = inject(Router);
   private storageService = inject(StorageService);
   private calorieService = inject(CalorieCalculatorService);
+  foodLogService = inject(FoodLogService);
+  pantryService = inject(PantryService);
 
   profile = signal<UserProfile | null>(null);
   retailerPref = signal<RetailerPreference | null>(null);
   calculation = signal<CalorieCalculationResult | null>(null);
-
-  // Calorie & Macro Mock consumption for demonstration
-  eatenKcal = signal<number>(1250);
-  eatenProtein = signal<number>(78);
-  eatenCarbs = signal<number>(120);
-  eatenFat = signal<number>(42);
 
   async ngOnInit() {
     let p = await this.storageService.loadProfile();
@@ -79,8 +79,16 @@ export class DashboardComponent implements OnInit {
     return this.calculation()?.dailyTargetKcal || 2000;
   }
 
+  eatenKcal(): number {
+    return this.foodLogService.eatenCalories();
+  }
+
+  plannedKcal(): number {
+    return this.foodLogService.plannedCalories();
+  }
+
   remainingKcal(): number {
-    return Math.max(0, this.targetKcal() - this.eatenKcal());
+    return this.foodLogService.remainingCalories();
   }
 
   calorieDashOffset(): number {
@@ -93,12 +101,24 @@ export class DashboardComponent implements OnInit {
     return this.calculation()?.macros.proteinGrams || 150;
   }
 
+  eatenProtein(): number {
+    return this.foodLogService.eatenProtein();
+  }
+
   targetCarbs(): number {
     return this.calculation()?.macros.carbsGrams || 250;
   }
 
+  eatenCarbs(): number {
+    return this.foodLogService.eatenCarbs();
+  }
+
   targetFat(): number {
     return this.calculation()?.macros.fatGrams || 70;
+  }
+
+  eatenFat(): number {
+    return this.foodLogService.eatenFat();
   }
 
   macroRatio(eaten: number, target: number): number {
@@ -139,6 +159,14 @@ export class DashboardComponent implements OnInit {
     return this.retailerPref()?.weeklyBudget || 40;
   }
 
+  goToDiscover() {
+    this.router.navigate(['/discover']);
+  }
+
+  goToRecipes() {
+    this.router.navigate(['/recipes']);
+  }
+
   goToMealPlanner() {
     this.router.navigate(['/meal-planner']);
   }
@@ -153,5 +181,13 @@ export class DashboardComponent implements OnInit {
 
   goToRetailers() {
     this.router.navigate(['/retailers']);
+  }
+
+  toggleItemStatus(id: string) {
+    this.foodLogService.toggleStatus(id);
+  }
+
+  removeLoggedItem(id: string) {
+    this.foodLogService.removeItem(id);
   }
 }

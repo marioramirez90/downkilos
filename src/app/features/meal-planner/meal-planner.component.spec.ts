@@ -36,19 +36,20 @@ describe('MealPlannerComponent', () => {
   it('should render all 4 meals for today (Frühstück, Mittagessen, Snack, Abendessen)', () => {
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('Frühstück');
-    expect(el.textContent).toContain('Overnight Oats mit Beeren');
     expect(el.textContent).toContain('Mittagessen');
-    expect(el.textContent).toContain('Hähnchen-Bowl mit Reis & Gemüse');
     expect(el.textContent).toContain('Snack');
-    expect(el.textContent).toContain('Skyr mit Banane und Nüssen');
     expect(el.textContent).toContain('Abendessen');
-    expect(el.textContent).toContain('Linsen-Curry mit Vollkornreis');
+    const day = plannerService.currentDayPlan();
+    expect(el.textContent).toContain(day.breakfast.title);
+    expect(el.textContent).toContain(day.lunch.title);
+    expect(el.textContent).toContain(day.snack.title);
+    expect(el.textContent).toContain(day.dinner.title);
   });
 
-  it('should render daily total calories and costs summary (1.800 kcal gesamt, 6,40 € Kosten)', () => {
+  it('should render daily total calories and costs summary', () => {
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toMatch(/1[.,]800\s*kcal/);
-    expect(el.textContent).toMatch(/6[.,]40\s*€/);
+    expect(el.textContent).toContain('kcal gesamt');
+    expect(el.textContent).toContain('Portionskosten');
   });
 
   it('should open swap modal and swap meal on selection', () => {

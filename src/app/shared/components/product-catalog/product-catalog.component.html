@@ -291,14 +291,14 @@
           <p><strong>Lizenz:</strong> {{ prod.imageLicense }}</p>
         </div>
 
-        <!-- Actions -->
+        <!-- Actions (Keine manuelle Preiserfassung im normalen UI) -->
         <div class="flex gap-2 pt-2">
           <button
             type="button"
-            (click)="openPriceEditor(prod)"
+            (click)="closeProductDetails()"
             class="flex-1 py-2.5 rounded-xl bg-[#F1F5F2] hover:bg-[#E2EDE5] text-[#103A2A] text-xs font-bold transition-all cursor-pointer"
           >
-            Preis korrigieren
+            Schließen
           </button>
           <button
             type="button"
@@ -306,73 +306,6 @@
             class="flex-1 py-2.5 rounded-xl bg-[#278F39] hover:bg-[#217A30] text-white text-xs font-bold transition-all cursor-pointer shadow-button"
           >
             Zur Einkaufsliste
-          </button>
-        </div>
-      </div>
-    </div>
-  }
-
-  <!-- Price Edit Modal -->
-  @if (editingProduct(); as prod) {
-    <div class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fade-in">
-      <div class="bg-white rounded-3xl p-5 w-full max-w-sm space-y-4 shadow-xl border border-[#E3EBE4]">
-        <div class="flex justify-between items-center">
-          <h3 class="text-sm font-extrabold text-[#103A2A]">
-            Netto-Preis eintragen / anpassen
-          </h3>
-          <button
-            type="button"
-            (click)="closePriceEditor()"
-            class="text-[#627264] hover:text-[#103A2A] font-bold text-base cursor-pointer"
-          >
-            ✕
-          </button>
-        </div>
-
-        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-[#F6F8F6]">
-          <img [src]="prod.imageUrl" [alt]="prod.name" class="w-10 h-10 object-cover rounded-lg" />
-          <div class="min-w-0">
-            <span class="text-[10px] text-[#627264] block">{{ prod.brand }}</span>
-            <span class="text-xs font-bold text-[#103A2A] block truncate">{{ prod.name }} ({{ prod.packageSize }})</span>
-          </div>
-        </div>
-
-        <div class="space-y-1.5">
-          <label for="newPriceInput" class="block text-xs font-semibold text-[#17241D]">
-            Tatsächlicher Filialpreis in €:
-          </label>
-          <div class="relative">
-            <input
-              id="newPriceInput"
-              type="number"
-              step="0.01"
-              min="0.10"
-              max="99.99"
-              [(ngModel)]="tempPriceInput"
-              class="w-full pl-4 pr-10 py-3 rounded-2xl border border-[#DCE4DE] text-base font-bold text-[#103A2A] focus:outline-none focus:border-[#278F39]"
-              placeholder="z.B. 1,99"
-            />
-            <span class="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-[#627264]">€</span>
-          </div>
-          <p class="text-[10px] text-[#627264]">
-            Dein Eintrag wird in den Preisverlauf aufgenommen und als „Selbst erfasst“ gekennzeichnet.
-          </p>
-        </div>
-
-        <div class="flex gap-2 pt-2">
-          <button
-            type="button"
-            (click)="closePriceEditor()"
-            class="flex-1 py-3 rounded-2xl bg-[#F1F5F2] text-[#627264] font-semibold text-xs hover:bg-[#E5F5E8] cursor-pointer"
-          >
-            Abbrechen
-          </button>
-          <button
-            type="button"
-            (click)="saveNewPrice()"
-            class="flex-1 py-3 rounded-2xl bg-[#278F39] text-white font-bold text-xs hover:bg-[#217A30] cursor-pointer"
-          >
-            Speichern
           </button>
         </div>
       </div>

@@ -64,101 +64,177 @@
     @if (plannerService.currentDayPlan(); as day) {
       <div class="space-y-3">
         <!-- 1. Frühstück -->
-        <div
-          (click)="openSwapModal('breakfast')"
-          class="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E3EBE4] shadow-soft-sm hover:shadow-soft flex items-center justify-between gap-3 cursor-pointer transition-all active:scale-[0.99] select-none"
-        >
+        <div class="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E3EBE4] shadow-soft-sm hover:shadow-soft flex items-center justify-between gap-3 transition-all select-none">
           <div class="flex-1 min-w-0">
-            <span class="text-[11px] font-bold text-[#627264] uppercase tracking-wider block">
-              Frühstück
-            </span>
-            <h3 class="text-sm font-bold text-[#103A2A] truncate mt-0.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-[#627264] uppercase tracking-wider block">
+                Frühstück
+              </span>
+              <button
+                type="button"
+                (click)="openSwapModal('breakfast')"
+                class="text-[11px] font-bold text-[#278F39] hover:underline cursor-pointer"
+              >
+                Tauschen ⇄
+              </button>
+            </div>
+            <h3
+              (click)="viewRecipe(day.breakfast)"
+              class="text-sm font-bold text-[#103A2A] truncate mt-0.5 hover:text-[#278F39] cursor-pointer"
+            >
               {{ day.breakfast.title }}
             </h3>
             <div class="flex items-center gap-1.5 text-xs text-[#55695C] font-semibold mt-1">
               <span>🔥 {{ day.breakfast.calories }} kcal</span>
               <span>•</span>
-              <span>{{ day.breakfast.pricePerPortion.toFixed(2).replace('.', ',') }} €</span>
+              <span>{{ day.breakfast.pricePerPortion.toFixed(2).replace('.', ',') }} € / Port.</span>
             </div>
+            <button
+              type="button"
+              (click)="viewRecipe(day.breakfast)"
+              class="mt-1 text-[10px] font-bold text-[#278F39] hover:underline cursor-pointer block"
+            >
+              Anleitung & Netto-Zutaten ansehen →
+            </button>
           </div>
 
           <!-- Dish Image -->
-          <div class="w-16 h-16 rounded-2xl overflow-hidden bg-[#F6F8F6] flex-shrink-0 border border-[#E3EBE4] shadow-2xs">
+          <div
+            (click)="viewRecipe(day.breakfast)"
+            class="w-16 h-16 rounded-2xl overflow-hidden bg-[#F6F8F6] flex-shrink-0 border border-[#E3EBE4] shadow-2xs cursor-pointer hover:scale-105 transition-transform"
+          >
             <img [src]="day.breakfast.imageUrl" [alt]="day.breakfast.title" class="w-full h-full object-cover" />
           </div>
         </div>
 
         <!-- 2. Mittagessen -->
-        <div
-          (click)="openSwapModal('lunch')"
-          class="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E3EBE4] shadow-soft-sm hover:shadow-soft flex items-center justify-between gap-3 cursor-pointer transition-all active:scale-[0.99] select-none"
-        >
+        <div class="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E3EBE4] shadow-soft-sm hover:shadow-soft flex items-center justify-between gap-3 transition-all select-none">
           <div class="flex-1 min-w-0">
-            <span class="text-[11px] font-bold text-[#627264] uppercase tracking-wider block">
-              Mittagessen
-            </span>
-            <h3 class="text-sm font-bold text-[#103A2A] truncate mt-0.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-[#627264] uppercase tracking-wider block">
+                Mittagessen
+              </span>
+              <button
+                type="button"
+                (click)="openSwapModal('lunch')"
+                class="text-[11px] font-bold text-[#278F39] hover:underline cursor-pointer"
+              >
+                Tauschen ⇄
+              </button>
+            </div>
+            <h3
+              (click)="viewRecipe(day.lunch)"
+              class="text-sm font-bold text-[#103A2A] truncate mt-0.5 hover:text-[#278F39] cursor-pointer"
+            >
               {{ day.lunch.title }}
             </h3>
             <div class="flex items-center gap-1.5 text-xs text-[#55695C] font-semibold mt-1">
               <span>🔥 {{ day.lunch.calories }} kcal</span>
               <span>•</span>
-              <span>{{ day.lunch.pricePerPortion.toFixed(2).replace('.', ',') }} €</span>
+              <span>{{ day.lunch.pricePerPortion.toFixed(2).replace('.', ',') }} € / Port.</span>
             </div>
+            <button
+              type="button"
+              (click)="viewRecipe(day.lunch)"
+              class="mt-1 text-[10px] font-bold text-[#278F39] hover:underline cursor-pointer block"
+            >
+              Anleitung & Netto-Zutaten ansehen →
+            </button>
           </div>
 
           <!-- Dish Image -->
-          <div class="w-16 h-16 rounded-2xl overflow-hidden bg-[#F6F8F6] flex-shrink-0 border border-[#E3EBE4] shadow-2xs">
+          <div
+            (click)="viewRecipe(day.lunch)"
+            class="w-16 h-16 rounded-2xl overflow-hidden bg-[#F6F8F6] flex-shrink-0 border border-[#E3EBE4] shadow-2xs cursor-pointer hover:scale-105 transition-transform"
+          >
             <img [src]="day.lunch.imageUrl" [alt]="day.lunch.title" class="w-full h-full object-cover" />
           </div>
         </div>
 
         <!-- 3. Snack -->
-        <div
-          (click)="openSwapModal('snack')"
-          class="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E3EBE4] shadow-soft-sm hover:shadow-soft flex items-center justify-between gap-3 cursor-pointer transition-all active:scale-[0.99] select-none"
-        >
+        <div class="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E3EBE4] shadow-soft-sm hover:shadow-soft flex items-center justify-between gap-3 transition-all select-none">
           <div class="flex-1 min-w-0">
-            <span class="text-[11px] font-bold text-[#627264] uppercase tracking-wider block">
-              Snack
-            </span>
-            <h3 class="text-sm font-bold text-[#103A2A] truncate mt-0.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-[#627264] uppercase tracking-wider block">
+                Snack
+              </span>
+              <button
+                type="button"
+                (click)="openSwapModal('snack')"
+                class="text-[11px] font-bold text-[#278F39] hover:underline cursor-pointer"
+              >
+                Tauschen ⇄
+              </button>
+            </div>
+            <h3
+              (click)="viewRecipe(day.snack)"
+              class="text-sm font-bold text-[#103A2A] truncate mt-0.5 hover:text-[#278F39] cursor-pointer"
+            >
               {{ day.snack.title }}
             </h3>
             <div class="flex items-center gap-1.5 text-xs text-[#55695C] font-semibold mt-1">
               <span>🔥 {{ day.snack.calories }} kcal</span>
               <span>•</span>
-              <span>{{ day.snack.pricePerPortion.toFixed(2).replace('.', ',') }} €</span>
+              <span>{{ day.snack.pricePerPortion.toFixed(2).replace('.', ',') }} € / Port.</span>
             </div>
+            <button
+              type="button"
+              (click)="viewRecipe(day.snack)"
+              class="mt-1 text-[10px] font-bold text-[#278F39] hover:underline cursor-pointer block"
+            >
+              Anleitung & Netto-Zutaten ansehen →
+            </button>
           </div>
 
           <!-- Dish Image -->
-          <div class="w-16 h-16 rounded-2xl overflow-hidden bg-[#F6F8F6] flex-shrink-0 border border-[#E3EBE4] shadow-2xs">
+          <div
+            (click)="viewRecipe(day.snack)"
+            class="w-16 h-16 rounded-2xl overflow-hidden bg-[#F6F8F6] flex-shrink-0 border border-[#E3EBE4] shadow-2xs cursor-pointer hover:scale-105 transition-transform"
+          >
             <img [src]="day.snack.imageUrl" [alt]="day.snack.title" class="w-full h-full object-cover" />
           </div>
         </div>
 
         <!-- 4. Abendessen -->
-        <div
-          (click)="openSwapModal('dinner')"
-          class="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E3EBE4] shadow-soft-sm hover:shadow-soft flex items-center justify-between gap-3 cursor-pointer transition-all active:scale-[0.99] select-none"
-        >
+        <div class="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E3EBE4] shadow-soft-sm hover:shadow-soft flex items-center justify-between gap-3 transition-all select-none">
           <div class="flex-1 min-w-0">
-            <span class="text-[11px] font-bold text-[#627264] uppercase tracking-wider block">
-              Abendessen
-            </span>
-            <h3 class="text-sm font-bold text-[#103A2A] truncate mt-0.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-[#627264] uppercase tracking-wider block">
+                Abendessen
+              </span>
+              <button
+                type="button"
+                (click)="openSwapModal('dinner')"
+                class="text-[11px] font-bold text-[#278F39] hover:underline cursor-pointer"
+              >
+                Tauschen ⇄
+              </button>
+            </div>
+            <h3
+              (click)="viewRecipe(day.dinner)"
+              class="text-sm font-bold text-[#103A2A] truncate mt-0.5 hover:text-[#278F39] cursor-pointer"
+            >
               {{ day.dinner.title }}
             </h3>
             <div class="flex items-center gap-1.5 text-xs text-[#55695C] font-semibold mt-1">
               <span>🔥 {{ day.dinner.calories }} kcal</span>
               <span>•</span>
-              <span>{{ day.dinner.pricePerPortion.toFixed(2).replace('.', ',') }} €</span>
+              <span>{{ day.dinner.pricePerPortion.toFixed(2).replace('.', ',') }} € / Port.</span>
             </div>
+            <button
+              type="button"
+              (click)="viewRecipe(day.dinner)"
+              class="mt-1 text-[10px] font-bold text-[#278F39] hover:underline cursor-pointer block"
+            >
+              Anleitung & Netto-Zutaten ansehen →
+            </button>
           </div>
 
           <!-- Dish Image -->
-          <div class="w-16 h-16 rounded-2xl overflow-hidden bg-[#F6F8F6] flex-shrink-0 border border-[#E3EBE4] shadow-2xs">
+          <div
+            (click)="viewRecipe(day.dinner)"
+            class="w-16 h-16 rounded-2xl overflow-hidden bg-[#F6F8F6] flex-shrink-0 border border-[#E3EBE4] shadow-2xs cursor-pointer hover:scale-105 transition-transform"
+          >
             <img [src]="day.dinner.imageUrl" [alt]="day.dinner.title" class="w-full h-full object-cover" />
           </div>
         </div>
@@ -173,22 +249,38 @@
       </div>
       <div class="flex items-center gap-1.5">
         <span>🛒</span>
-        <span>{{ plannerService.currentDayTotals().cost.toFixed(2).replace('.', ',') }} € Kosten (ca.)</span>
+        <span>{{ plannerService.currentDayTotals().cost.toFixed(2).replace('.', ',') }} € Portionskosten</span>
       </div>
     </div>
   </main>
 
   <!-- Bereich C: Fester unterer Bereich mit Hauptbutton und Navigationsleiste -->
   <footer class="flex-shrink-0 bg-white border-t border-[#E3EBE4] z-20">
-    <!-- Hauptbutton "Plan anpassen" unmittelbar über der Navigationsleiste -->
-    <div class="px-5 py-2.5 bg-white border-b border-[#F0F4F1]">
+    <!-- Feedback Banner -->
+    @if (addedToShoppingList()) {
+      <div class="py-1 px-3 bg-[#E5F5E8] border-b border-[#278F39] text-[#278F39] text-[11px] font-bold text-center animate-fade-in">
+        ✓ Alle Tageszutaten wurden zur Einkaufsliste zusammengefasst!
+      </div>
+    }
+
+    <!-- Feste Hauptbuttons -->
+    <div class="px-5 py-2.5 bg-white border-b border-[#F0F4F1] flex gap-2">
       <button
         type="button"
-        (click)="openSwapModal('lunch')"
-        class="w-full py-3.5 px-6 rounded-2xl bg-[#278F39] hover:bg-[#217A30] active:scale-[0.98] text-white font-bold text-sm sm:text-base shadow-button flex items-center justify-center gap-2 transition-all cursor-pointer"
+        (click)="regeneratePlan()"
+        class="py-3 px-3.5 rounded-2xl bg-[#F6F8F6] hover:bg-[#E5F5E8] border border-[#E3EBE4] text-[#103A2A] font-bold text-xs flex items-center justify-center gap-1 transition-all cursor-pointer"
+        title="Abwechslungsreichen Wochenplan neu berechnen"
       >
-        <span>Plan anpassen</span>
-        <span class="text-lg">→</span>
+        <span>🔄 Neu mischen</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="addDayToShoppingList()"
+        class="flex-1 py-3 px-4 rounded-2xl bg-[#278F39] hover:bg-[#217A30] active:scale-[0.98] text-white font-bold text-xs sm:text-sm shadow-button flex items-center justify-center gap-2 transition-all cursor-pointer"
+      >
+        <span>🛒 Tageszutaten einkaufen</span>
+        <span>→</span>
       </button>
     </div>
 

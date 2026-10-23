@@ -1,0 +1,391 @@
+<div class="flex flex-col h-full bg-[#FFFFFF] overflow-hidden">
+  <!-- Bereich A: Fester Header -->
+  <header class="flex-shrink-0 px-5 pt-4 pb-2 border-b border-[#F0F4F1] bg-white z-10 space-y-2.5">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <app-logo size="sm"></app-logo>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-extrabold text-[#103A2A] tracking-tight">
+            Lebensmittel entdecken
+          </h1>
+          <span class="text-[10px] text-[#627264] block">
+            Finde passende Netto-Produkte für dein Kalorienziel & Budget
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FFF200] text-[#ED1C24] border border-[#E6DB00]">
+          Netto
+        </span>
+        <app-hamburger-button></app-hamburger-button>
+      </div>
+    </div>
+
+    <!-- Quick Actions Banner: Verbleibendes Kalorienbudget -->
+    <div class="p-2.5 rounded-2xl bg-[#E5F5E8] border border-[#CDE9D2] flex items-center justify-between text-xs">
+      <div class="flex items-center gap-2">
+        <span class="text-base">🎯</span>
+        <div>
+          <span class="font-bold text-[#103A2A] block">
+            Noch {{ remainingCalories() }} kcal für heute übrig
+          </span>
+          <span class="text-[10px] text-[#278F39]">
+            Ziel: {{ foodLogService.targetCalories() }} kcal
+          </span>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        (click)="filterByRemainingKcal.set(!filterByRemainingKcal())"
+        class="py-1 px-2.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer"
+        [ngClass]="filterByRemainingKcal()
+          ? 'bg-[#278F39] text-white shadow-soft-sm'
+          : 'bg-white text-[#278F39] border border-[#278F39]/40 hover:bg-[#D4EED8]'"
+      >
+        {{ filterByRemainingKcal() ? '✓ Budget-Filter aktiv' : 'Passt ins Budget?' }}
+      </button>
+    </div>
+
+    <!-- Suchleiste & Sortierung -->
+    <div class="flex gap-2">
+      <div class="relative flex-1">
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          placeholder="Lebensmittel suchen (z.B. Bananen, Skyr, Eier, Hähnchen)..."
+          class="w-full pl-9 pr-3 py-2 rounded-2xl bg-[#F6F8F6] border border-[#E3EBE4] text-xs text-[#17241D] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#278F39]"
+        />
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[#627264] text-xs">
+          🔍
+        </span>
+      </div>
+
+      <!-- Sortierung Dropdown -->
+      <select
+        [ngModel]="activeSortBy()"
+        (ngModelChange)="activeSortBy.set($event)"
+        class="px-2.5 py-2 rounded-2xl bg-[#F6F8F6] border border-[#E3EBE4] text-xs font-semibold text-[#103A2A] focus:outline-none focus:border-[#278F39]"
+      >
+        <option value="relevance">Sortieren</option>
+        <option value="price_asc">Günstigste zuerst</option>
+        <option value="calories_asc">Wenigste Kalorien</option>
+        <option value="protein_desc">Meistes Eiweiß</option>
+      </select>
+    </div>
+
+    <!-- Filter Pills (Kategorie, Kalorien, Protein, Budget) -->
+    <div class="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar select-none text-[11px]">
+      @for (pill of categoryPills; track pill.id) {
+        <button
+          type="button"
+          (click)="activeCategoryFilter.set(pill.id)"
+          class="py-1 px-3 rounded-full font-semibold transition-all whitespace-nowrap cursor-pointer"
+          [ngClass]="activeCategoryFilter() === pill.id
+            ? 'bg-[#278F39] text-white shadow-soft-sm'
+            : 'bg-[#F1F5F2] text-[#627264] hover:bg-[#E2EDE5]'"
+        >
+          {{ pill.label }}
+        </button>
+      }
+    </div>
+  </header>
+
+  <!-- Toast Message -->
+  @if (toastMessage(); as msg) {
+    <div class="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-[#103A2A] text-white px-4 py-2 rounded-2xl shadow-xl text-xs font-bold animate-bounce flex items-center gap-2">
+      <span>✓</span>
+      <span>{{ msg }}</span>
+    </div>
+  }
+
+  <!-- Bereich B: Scrollbare Produktkarten -->
+  <main class="flex-1 min-h-0 overflow-y-auto px-5 py-4 space-y-3.5">
+    <div class="flex items-center justify-between text-xs text-[#627264]">
+      <span class="font-bold">{{ filteredProducts().length }} Netto-Produkte gefunden</span>
+      <button (click)="goToRecipes()" class="text-[#278F39] hover:underline font-semibold cursor-pointer">
+        Rezeptideen ansehen →
+      </button>
+    </div>
+
+    <div class="space-y-3">
+      @for (prod of filteredProducts(); track prod.id) {
+        <div class="p-4 rounded-3xl bg-white border border-[#E3EBE4] hover:border-[#278F39] shadow-soft-sm transition-all flex flex-col gap-3 group">
+          <!-- Top Row: Bild, Name, Marke, Preis -->
+          <div class="flex items-start gap-3.5">
+            <!-- Produktbild -->
+            <div class="w-20 h-20 rounded-2xl overflow-hidden bg-[#F6F8F6] border border-[#E3EBE4] flex-shrink-0 relative">
+              <img [src]="prod.imageUrl" [alt]="prod.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+              <span class="absolute top-1 left-1 text-[8px] font-bold px-1.5 py-0.2 rounded bg-[#FFF200] text-[#ED1C24] shadow-xs">
+                Netto
+              </span>
+            </div>
+
+            <!-- Details -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="text-[10px] font-bold text-[#627264] uppercase tracking-wider">{{ prod.brand }}</span>
+                @if (prod.isLowCalorie) {
+                  <span class="text-[9px] font-semibold text-[#278F39] bg-[#E5F5E8] px-1.5 py-0.2 rounded-md">Kalorienarm</span>
+                }
+                @if (prod.isHighProtein) {
+                  <span class="text-[9px] font-semibold text-[#2563EB] bg-[#EFF6FF] px-1.5 py-0.2 rounded-md">Proteinreich</span>
+                }
+              </div>
+
+              <h3 class="text-sm font-extrabold text-[#103A2A] leading-snug line-clamp-2 mt-0.5">
+                {{ prod.name }}
+              </h3>
+
+              <div class="flex items-center gap-2 mt-1 text-[11px] text-[#627264]">
+                <span class="font-bold text-[#103A2A]">{{ prod.packageSize }}</span>
+                @if (prod.edibleYieldPercent && prod.edibleYieldPercent < 1.0) {
+                  <span class="text-[10px] text-[#D97706] font-semibold" title="Unterscheidung Verkaufsgewicht vs. essbare Menge">
+                    ({{ Math.round(prod.edibleYieldPercent * 100) }}% essbar)
+                  </span>
+                }
+              </div>
+
+              <!-- Preis der vollständigen Packung -->
+              <div class="flex items-baseline gap-1.5 mt-1">
+                <span class="text-base font-black text-[#103A2A]">
+                  {{ priceService.formatPrice(prod.price) }}
+                </span>
+                @if (prod.priceUnit && prod.price !== null) {
+                  <span class="text-[10px] text-[#94A3B8]">({{ prod.priceUnit }})</span>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Nährwerte-Aufteilung (100g, Portion, Packung) -->
+          <div class="p-2.5 rounded-2xl bg-[#F8FAF9] border border-[#E3EBE4] grid grid-cols-3 gap-2 text-center text-xs">
+            <!-- 100g -->
+            <div>
+              <span class="text-[9px] text-[#627264] block font-semibold">Je 100 g</span>
+              <span class="font-extrabold text-[#103A2A] block">{{ prod.nutrition.caloriesPer100g }} kcal</span>
+              <span class="text-[9px] text-[#278F39]">{{ prod.nutrition.proteinPer100g }}g E</span>
+            </div>
+
+            <!-- Übliche Portion -->
+            <div class="border-x border-[#E3EBE4] px-1">
+              <span class="text-[9px] text-[#627264] block font-semibold truncate" [title]="prod.servingUnit || 'Portion'">
+                {{ prod.servingUnit || 'Portion' }}
+              </span>
+              <span class="font-extrabold text-[#278F39] block">{{ getServingCalories(prod) }} kcal</span>
+              <span class="text-[9px] text-[#627264]">{{ prod.servingSizeGrams }}g</span>
+            </div>
+
+            <!-- Ganze Packung essbar -->
+            <div>
+              <span class="text-[9px] text-[#627264] block font-semibold">Ganze Packung</span>
+              <span class="font-extrabold text-[#103A2A] block">{{ getTotalPackageEdibleCalories(prod) }} kcal</span>
+              <span class="text-[9px] text-[#94A3B8]">essbar</span>
+            </div>
+          </div>
+
+          <!-- Status-Badge & Aktualität -->
+          <div class="flex items-center justify-between text-[10px] text-[#627264] px-1">
+            <span
+              class="font-bold px-2 py-0.5 rounded-md"
+              [ngClass]="priceService.getStatusBadge(prod.priceStatus, prod.validUntil).bgClass + ' ' + priceService.getStatusBadge(prod.priceStatus, prod.validUntil).textClass"
+            >
+              {{ priceService.getStatusBadge(prod.priceStatus, prod.validUntil).badgeText }}
+            </span>
+            <span class="text-[#94A3B8]">
+              Stand: {{ priceService.formatObservationDate(prod.lastUpdated) }}
+            </span>
+          </div>
+
+          <!-- Aktionsbuttons (Zum Tagesplan & Auf Einkaufsliste) -->
+          <div class="flex gap-2 pt-1">
+            <button
+              type="button"
+              (click)="openLogModal(prod)"
+              class="flex-1 py-2.5 px-3 rounded-2xl bg-[#E5F5E8] hover:bg-[#D4EED8] active:scale-95 text-[#278F39] font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <span>+</span>
+              <span>Zum Tagesplan</span>
+            </button>
+
+            <button
+              type="button"
+              (click)="addToShoppingList(prod)"
+              class="flex-1 py-2.5 px-3 rounded-2xl bg-[#278F39] hover:bg-[#217A30] active:scale-95 text-white font-bold text-xs shadow-soft-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <span>🛒</span>
+              <span>Auf Einkaufsliste</span>
+            </button>
+          </div>
+        </div>
+      } @empty {
+        <div class="text-center py-12 bg-[#F6F8F6] rounded-3xl border border-[#E3EBE4] space-y-2">
+          <span class="text-2xl">🔍</span>
+          <p class="text-xs font-bold text-[#103A2A]">Keine Lebensmittel für diese Kriterien gefunden.</p>
+          <p class="text-[11px] text-[#627264]">Passe deine Filter oder dein verbleibendes Kalorienbudget an.</p>
+        </div>
+      }
+    </div>
+  </main>
+
+  <!-- Bereich C: Fester Footer mit Hauptbutton und Navigationsleiste -->
+  <footer class="flex-shrink-0 bg-white border-t border-[#E3EBE4] z-20">
+    <div class="px-5 py-2.5 bg-white border-b border-[#F0F4F1] flex gap-2">
+      <button
+        type="button"
+        (click)="goToRecipes()"
+        class="flex-1 py-3 px-4 rounded-2xl bg-[#F1F5F2] hover:bg-[#E2EDE5] text-[#103A2A] font-bold text-xs transition-all cursor-pointer text-center"
+      >
+        🍲 Rezepte ansehen
+      </button>
+      <button
+        type="button"
+        (click)="goToShoppingList()"
+        class="flex-1 py-3 px-4 rounded-2xl bg-[#278F39] hover:bg-[#217A30] text-white font-bold text-xs shadow-button transition-all cursor-pointer text-center flex items-center justify-center gap-1.5"
+      >
+        <span>Einkaufsliste</span>
+        <span>→</span>
+      </button>
+    </div>
+    <app-bottom-nav></app-bottom-nav>
+  </footer>
+
+  <!-- Modal: Lebensmittel zum Tagesplan hinzufügen mit Portionsauswahl -->
+  @if (selectedProductForLog(); as p) {
+    <div class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fade-in"
+         (click)="closeLogModal()">
+      <div class="bg-white rounded-3xl p-5 w-full max-w-sm space-y-4 shadow-2xl border border-[#E3EBE4]"
+           (click)="$event.stopPropagation()">
+        
+        <!-- Header -->
+        <div class="flex justify-between items-start">
+          <div>
+            <span class="text-[10px] font-bold text-[#627264] uppercase">{{ p.brand }}</span>
+            <h3 class="text-sm font-extrabold text-[#103A2A]">{{ p.name }}</h3>
+          </div>
+          <button (click)="closeLogModal()" class="w-7 h-7 rounded-full bg-[#F1F5F2] text-xs font-bold text-[#103A2A] cursor-pointer">✕</button>
+        </div>
+
+        <!-- Portionsschnellauswahl -->
+        <div class="space-y-1.5 text-xs">
+          <label class="block font-semibold text-[#17241D]">Wie viel möchtest du essen?</label>
+          <div class="grid grid-cols-4 gap-1.5 text-center">
+            <button
+              type="button"
+              (click)="setPredefinedAmount(100)"
+              class="py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer"
+              [ngClass]="customAmountGrams === 100 ? 'bg-[#278F39] text-white border-[#278F39]' : 'bg-[#F8FAF9] text-[#103A2A] border-[#E3EBE4]'"
+            >
+              100 g
+            </button>
+            <button
+              type="button"
+              (click)="setPredefinedAmount(150)"
+              class="py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer"
+              [ngClass]="customAmountGrams === 150 ? 'bg-[#278F39] text-white border-[#278F39]' : 'bg-[#F8FAF9] text-[#103A2A] border-[#E3EBE4]'"
+            >
+              150 g
+            </button>
+            <button
+              type="button"
+              (click)="setPredefinedAmount(200)"
+              class="py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer"
+              [ngClass]="customAmountGrams === 200 ? 'bg-[#278F39] text-white border-[#278F39]' : 'bg-[#F8FAF9] text-[#103A2A] border-[#E3EBE4]'"
+            >
+              200 g
+            </button>
+            <button
+              type="button"
+              (click)="setPredefinedAmount(p.servingSizeGrams || 120)"
+              class="py-1.5 rounded-xl border text-[11px] font-bold transition-all cursor-pointer"
+              [ngClass]="customAmountGrams === (p.servingSizeGrams || 120) ? 'bg-[#278F39] text-white border-[#278F39]' : 'bg-[#F8FAF9] text-[#103A2A] border-[#E3EBE4]'"
+            >
+              1 Portion
+            </button>
+          </div>
+
+          <!-- Eigene Gramm-Eingabe -->
+          <div class="pt-1.5">
+            <div class="relative">
+              <input
+                type="number"
+                min="10"
+                max="2000"
+                step="10"
+                [(ngModel)]="customAmountGrams"
+                class="w-full pl-3 pr-10 py-2.5 rounded-xl border border-[#DCE4DE] text-sm font-bold text-[#103A2A] focus:outline-none focus:border-[#278F39]"
+              />
+              <span class="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-xs text-[#627264]">Gramm</span>
+            </div>
+            @if (p.edibleYieldPercent && p.edibleYieldPercent < 1.0) {
+              <p class="text-[10px] text-[#D97706] mt-1 font-semibold">
+                ℹ️ Essbarer Anteil: ca. {{ Math.round(customAmountGrams * p.edibleYieldPercent) }} g ({{ Math.round((1 - p.edibleYieldPercent) * 100) }}% Schale/Abfall)
+              </p>
+            }
+          </div>
+        </div>
+
+        <!-- Automatische Kalorien- & Makroberechnung für gewählte Menge -->
+        <div class="p-3 rounded-2xl bg-[#E5F5E8] border border-[#CDE9D2] flex items-center justify-between text-xs">
+          <div>
+            <span class="text-[10px] text-[#278F39] font-bold block uppercase">Ergibt für deinen Tag:</span>
+            <span class="text-base font-black text-[#103A2A]">
+              {{ Math.round((p.nutrition.caloriesPer100g / 100) * (customAmountGrams * (p.edibleYieldPercent || 1.0))) }} kcal
+            </span>
+          </div>
+          <div class="text-right text-[11px] text-[#103A2A]">
+            <span class="block">🥩 {{ Math.round((p.nutrition.proteinPer100g / 100) * (customAmountGrams * (p.edibleYieldPercent || 1.0)) * 10) / 10 }}g Eiweiß</span>
+            <span class="text-[10px] text-[#627264]">
+              Anteil: {{ Math.round((((p.nutrition.caloriesPer100g / 100) * (customAmountGrams * (p.edibleYieldPercent || 1.0))) / foodLogService.targetCalories()) * 100) }}% des Tagesziels
+            </span>
+          </div>
+        </div>
+
+        <!-- Mahlzeitentyp & Status (Geplant vs. Gegessen) -->
+        <div class="space-y-2 text-xs">
+          <div>
+            <label class="block font-semibold text-[#17241D] mb-1">Mahlzeit:</label>
+            <select [(ngModel)]="selectedMealType" class="w-full px-3 py-2 rounded-xl border border-[#DCE4DE] bg-white">
+              <option value="breakfast">Frühstück</option>
+              <option value="lunch">Mittagessen</option>
+              <option value="dinner">Abendessen</option>
+              <option value="snack">Snack</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-[#17241D] mb-1">Status:</label>
+            <div class="flex gap-2">
+              <button
+                type="button"
+                (click)="selectedLogStatus = 'planned'"
+                class="flex-1 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                [ngClass]="selectedLogStatus === 'planned' ? 'bg-[#103A2A] text-white' : 'bg-[#F1F5F2] text-[#627264]'"
+              >
+                Für heute geplant
+              </button>
+              <button
+                type="button"
+                (click)="selectedLogStatus = 'eaten'"
+                class="flex-1 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                [ngClass]="selectedLogStatus === 'eaten' ? 'bg-[#278F39] text-white' : 'bg-[#F1F5F2] text-[#627264]'"
+              >
+                ✓ Bereits gegessen
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Confirm Button -->
+        <button
+          type="button"
+          (click)="confirmAddToDay()"
+          class="w-full py-3 rounded-2xl bg-[#278F39] hover:bg-[#217A30] active:scale-95 text-white font-bold text-xs shadow-button transition-all cursor-pointer"
+        >
+          Zum Tagesplan hinzufügen
+        </button>
+      </div>
+    </div>
+  }
+</div>

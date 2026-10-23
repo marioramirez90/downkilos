@@ -21,9 +21,7 @@ export class ProductCatalogComponent {
   searchQuery = '';
   selectedCategory = signal<ProductCategory>('all');
   selectedStatusFilter = signal<string>('all');
-  editingProduct = signal<ProductItem | null>(null);
   selectedProductDetails = signal<ProductItem | null>(null);
-  tempPriceInput: number | null = null;
   addedToast = signal<string | null>(null);
 
   readonly categories: { id: ProductCategory; label: string }[] = [
@@ -54,27 +52,6 @@ export class ProductCatalogComponent {
 
   closeProductDetails() {
     this.selectedProductDetails.set(null);
-  }
-
-  openPriceEditor(item: ProductItem, event?: MouseEvent) {
-    if (event) {
-      event.stopPropagation();
-    }
-    this.editingProduct.set(item);
-    this.tempPriceInput = item.price !== null ? item.price : 1.99;
-  }
-
-  closePriceEditor() {
-    this.editingProduct.set(null);
-    this.tempPriceInput = null;
-  }
-
-  saveNewPrice() {
-    const prod = this.editingProduct();
-    if (prod && this.tempPriceInput !== null && this.tempPriceInput > 0) {
-      this.productService.updateUserPrice(prod.id, this.tempPriceInput);
-      this.closePriceEditor();
-    }
   }
 
   addProductToShoppingList(item: ProductItem, event?: MouseEvent) {

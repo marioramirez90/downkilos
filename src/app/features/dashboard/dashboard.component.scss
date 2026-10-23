@@ -114,6 +114,19 @@
     padding: 0;
     @include mixins.flexbox(column, center, center);
 
+    &.clickable-widget {
+      cursor: pointer;
+      transition: transform 0.15s ease;
+
+      &:hover {
+        transform: scale(1.02);
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
+    }
+
     .ring-svg-container {
       position: relative;
       width: 152px;
@@ -294,6 +307,17 @@
     flex: 1;
     @include mixins.flexbox(row, flex-start, center, 8px);
 
+    &.clickable-col {
+      cursor: pointer;
+      border-radius: 12px;
+      padding: 4px 6px;
+      transition: background-color 0.15s ease;
+
+      &:hover {
+        background-color: rgba(39, 143, 57, 0.08);
+      }
+    }
+
     .icon-circle {
       width: 32px;
       height: 32px;
@@ -311,10 +335,23 @@
     .status-info {
       @include mixins.flexbox(column, center, flex-start, 0px);
 
+      .status-label-row {
+        @include mixins.flexbox(row, flex-start, center, 6px);
+      }
+
       .status-label {
         font-size: 0.68rem;
         color: vars.$text-muted;
         font-weight: 400;
+      }
+
+      .tap-hint-badge {
+        font-size: 0.6rem;
+        font-weight: 700;
+        color: vars.$primary-color;
+        background-color: vars.$primary-light;
+        padding: 1px 5px;
+        border-radius: vars.$radius-full;
       }
 
       .status-value {
@@ -599,3 +636,657 @@
     transform: translate(-50%, 0);
   }
 }
+
+// ==========================================
+// 11. Ernährungstagebuch Drawer & Modals
+// ==========================================
+.diary-backdrop,
+.add-food-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(16, 58, 42, 0.45);
+  backdrop-filter: blur(3px);
+  z-index: 90;
+  animation: backdropFade 0.2s ease-out;
+}
+
+.diary-drawer {
+  position: fixed;
+  inset-x: 0;
+  bottom: 0;
+  max-width: 540px;
+  margin: 0 auto;
+  height: 86dvh;
+  background-color: vars.$bg-white;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.16);
+  z-index: 95;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUpDrawer 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+  .diary-header {
+    padding: 16px 20px 12px;
+    background-color: #FAFCF9;
+    border-bottom: 1px solid vars.$border-color;
+    flex-shrink: 0;
+
+    .diary-header-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+
+      .diary-title-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .diary-badge-icon {
+          font-size: 1.25rem;
+        }
+
+        .diary-title {
+          margin: 0;
+          font-size: 1.25rem;
+          font-weight: 800;
+          color: vars.$secondary-color;
+          letter-spacing: -0.02em;
+        }
+      }
+
+      .diary-close-btn {
+        background: vars.$primary-light;
+        color: vars.$primary-color;
+        border: none;
+        border-radius: vars.$radius-full;
+        padding: 6px 14px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+
+        &:hover {
+          background-color: vars.$primary-color;
+          color: vars.$bg-white;
+        }
+      }
+    }
+
+    .diary-date-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+
+      .date-arrow-btn {
+        background: transparent;
+        border: 1px solid vars.$border-color;
+        border-radius: vars.$radius-full;
+        width: 28px;
+        height: 28px;
+        font-size: 1.1rem;
+        color: vars.$secondary-color;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s ease;
+
+        &:hover {
+          background-color: vars.$primary-light;
+          border-color: vars.$primary-color;
+        }
+      }
+
+      .date-display-label {
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: vars.$text-color;
+        min-width: 140px;
+        text-align: center;
+      }
+    }
+  }
+
+  .diary-scrollable-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .diary-summary-box {
+      background: linear-gradient(135deg, #F3FBF5 0%, #E9F7EC 100%);
+      border: 1px solid #D1EEDB;
+      border-radius: 16px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+
+      .summary-stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+
+        .stat-caption {
+          font-size: 0.68rem;
+          color: vars.$text-muted;
+          font-weight: 500;
+        }
+
+        .stat-number {
+          font-size: 0.95rem;
+          font-weight: 800;
+          color: vars.$secondary-color;
+
+          &.stat-highlight-green {
+            color: vars.$primary-color;
+          }
+        }
+      }
+
+      .summary-divider {
+        width: 1px;
+        height: 28px;
+        background-color: #D1EEDB;
+      }
+    }
+
+    .meals-list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+
+      .meal-card-section {
+        background-color: #FAFDFB;
+        border: 1px solid vars.$border-color;
+        border-radius: 16px;
+        padding: 12px 14px;
+
+        .meal-header-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 8px;
+
+          .meal-title-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            .meal-symbol {
+              font-size: 1.2rem;
+            }
+
+            .meal-meta {
+              display: flex;
+              flex-direction: column;
+
+              .meal-name {
+                margin: 0;
+                font-size: 0.92rem;
+                font-weight: 800;
+                color: vars.$secondary-color;
+              }
+
+              .meal-cals-count {
+                font-size: 0.72rem;
+                font-weight: 600;
+                color: vars.$primary-color;
+              }
+            }
+          }
+
+          .add-meal-entry-btn {
+            background-color: vars.$primary-light;
+            color: vars.$primary-color;
+            border: none;
+            border-radius: vars.$radius-full;
+            padding: 5px 12px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s ease;
+
+            &:hover {
+              background-color: vars.$primary-color;
+              color: vars.$bg-white;
+            }
+          }
+        }
+
+        .meal-items-stack {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+
+          .logged-food-row {
+            background-color: vars.$bg-white;
+            border: 1px solid #EBF1ED;
+            border-radius: 10px;
+            padding: 8px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .food-info-col {
+              display: flex;
+              flex-direction: column;
+              min-width: 0;
+              flex: 1;
+
+              .food-name {
+                font-size: 0.82rem;
+                font-weight: 700;
+                color: vars.$text-color;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+              }
+
+              .food-portion {
+                font-size: 0.68rem;
+                color: vars.$text-muted;
+              }
+            }
+
+            .food-actions-col {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+
+              .food-kcal-badge {
+                font-size: 0.75rem;
+                font-weight: 700;
+                color: vars.$secondary-color;
+                background-color: #F2F7F4;
+                padding: 3px 7px;
+                border-radius: 6px;
+              }
+
+              .food-del-btn {
+                background: transparent;
+                border: none;
+                cursor: pointer;
+                font-size: 0.85rem;
+                opacity: 0.65;
+                padding: 2px;
+                transition: opacity 0.15s ease;
+
+                &:hover {
+                  opacity: 1;
+                }
+              }
+            }
+          }
+
+          .empty-meal-hint {
+            padding: 10px;
+            text-align: center;
+            font-size: 0.74rem;
+            color: vars.$text-muted;
+            font-style: italic;
+          }
+        }
+      }
+    }
+  }
+}
+
+// 12. Modal: Lebensmitteleingabe (+ Hinzufügen)
+.add-food-modal,
+.quick-add-modal {
+  position: fixed;
+  inset-x: 16px;
+  bottom: 24px;
+  max-width: 460px;
+  margin: 0 auto;
+  max-height: 82dvh;
+  background-color: vars.$bg-white;
+  border-radius: 20px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.22);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  padding: 18px 20px;
+  animation: modalScaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+
+  .modal-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+
+    .modal-title {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: vars.$secondary-color;
+    }
+
+    .modal-x-btn {
+      background: transparent;
+      border: none;
+      font-size: 1.15rem;
+      color: vars.$text-muted;
+      cursor: pointer;
+      padding: 2px 6px;
+
+      &:hover {
+        color: vars.$text-color;
+      }
+    }
+  }
+
+  .modal-tab-row {
+    display: flex;
+    gap: 8px;
+    background-color: #F0F4F1;
+    padding: 3px;
+    border-radius: vars.$radius-full;
+    margin-bottom: 14px;
+
+    .modal-tab-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 7px 12px;
+      border-radius: vars.$radius-full;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: vars.$text-muted;
+      cursor: pointer;
+      transition: all 0.15s ease;
+
+      &.active {
+        background-color: vars.$bg-white;
+        color: vars.$secondary-color;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      }
+    }
+  }
+
+  .netto-tab-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .netto-search-field input {
+      width: 100%;
+      height: 38px;
+      padding: 0 14px;
+      border: 1px solid vars.$border-color;
+      border-radius: vars.$radius-full;
+      font-size: 0.82rem;
+      outline: none;
+
+      &:focus {
+        border-color: vars.$primary-color;
+      }
+    }
+
+    .netto-modal-products-list {
+      max-height: 280px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+
+      .netto-modal-item-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 10px;
+        border: 1px solid #EBF1ED;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+
+        &:hover {
+          background-color: #F5FAF6;
+        }
+
+        .netto-item-img {
+          width: 38px;
+          height: 38px;
+          object-fit: contain;
+          border-radius: 8px;
+          background-color: vars.$bg-white;
+        }
+
+        .netto-item-meta {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          min-width: 0;
+
+          .item-brand {
+            font-size: 0.62rem;
+            color: vars.$text-muted;
+            text-transform: uppercase;
+          }
+
+          .item-name {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: vars.$text-color;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          .item-cals {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: vars.$primary-color;
+          }
+        }
+
+        .netto-item-plus-btn {
+          width: 26px;
+          height: 26px;
+          border-radius: vars.$radius-full;
+          background-color: vars.$primary-light;
+          color: vars.$primary-color;
+          border: none;
+          font-weight: 800;
+          font-size: 14px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+    }
+  }
+
+  .manual-tab-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .form-group-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      label {
+        font-size: 0.74rem;
+        font-weight: 700;
+        color: vars.$secondary-color;
+      }
+
+      input {
+        height: 40px;
+        padding: 0 12px;
+        border: 1px solid vars.$border-color;
+        border-radius: 10px;
+        font-size: 0.85rem;
+        outline: none;
+
+        &:focus {
+          border-color: vars.$primary-color;
+        }
+      }
+    }
+
+    .form-row-two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .submit-manual-food-btn {
+      margin-top: 6px;
+      height: 42px;
+      background-color: vars.$primary-color;
+      color: vars.$bg-white;
+      border: none;
+      border-radius: vars.$radius-full;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+
+      &:hover:not(:disabled) {
+        background-color: vars.$primary-dark;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  // Quick Add Product Card
+  .quick-product-hero {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background-color: #F5FAF6;
+    border-radius: 14px;
+    margin-bottom: 12px;
+
+    .quick-prod-img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      border-radius: 10px;
+      background-color: vars.$bg-white;
+    }
+
+    .quick-prod-details {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      .quick-prod-name {
+        font-size: 0.9rem;
+        font-weight: 800;
+        color: vars.$secondary-color;
+      }
+
+      .quick-prod-cals {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: vars.$primary-color;
+      }
+    }
+  }
+
+  .quick-choose-heading {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: vars.$text-muted;
+    margin: 0 0 10px;
+  }
+
+  .meal-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+
+    .quick-meal-btn {
+      background-color: vars.$bg-white;
+      border: 1px solid vars.$border-color;
+      border-radius: 12px;
+      padding: 10px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+
+      span {
+        font-size: 1.3rem;
+      }
+
+      strong {
+        font-size: 0.78rem;
+        color: vars.$secondary-color;
+      }
+
+      &:hover {
+        border-color: vars.$primary-color;
+        background-color: vars.$primary-light;
+      }
+    }
+  }
+
+  .quick-add-cart-btn {
+    background-color: #F2F5F2;
+    border: none;
+    border-radius: vars.$radius-full;
+    padding: 9px 14px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: vars.$text-color;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: #E2EBE3;
+    }
+  }
+}
+
+@keyframes slideUpDrawer {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes modalScaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes backdropFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+

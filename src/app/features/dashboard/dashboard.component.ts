@@ -12,6 +12,8 @@ import { RetailerService } from '../../core/services/retailer.service';
 import { ProductItem } from '../../core/models/product.model';
 import { UserProfile } from '../../core/models/user-profile.model';
 import { CalorieCalculationResult } from '../../core/models/calorie-calculation.model';
+import { MealType } from '../../core/models/recipe.model';
+import { FoodLogItem } from '../../core/models/food-log.model';
 
 export interface DashboardProductCard {
   id: string;
@@ -47,6 +49,22 @@ export class DashboardComponent implements OnInit {
   readonly searchQuery = signal<string>('');
   readonly marketLocation = signal<string>('10115 Berlin – Mitte');
   readonly toastMessage = signal<string | null>(null);
+
+  // Ernährungstagebuch State (Section 11.4 & Section 12)
+  readonly isDiaryOpen = signal<boolean>(false);
+  readonly selectedMealForAdd = signal<MealType | null>(null);
+  readonly addFoodMode = signal<'netto' | 'manual'>('netto');
+  readonly quickProductForAdd = signal<ProductItem | null>(null);
+  readonly nettoFilterQuery = signal<string>('');
+
+  // Manuelle Lebensmitteleingabe
+  readonly manualName = signal<string>('');
+  readonly manualCalories = signal<number | null>(null);
+  readonly manualPortion = signal<string>('1 Portion');
+
+  // Datum im Tagebuch
+  readonly diaryDate = signal<Date>(new Date());
+  readonly Math = Math;
 
   async ngOnInit(): Promise<void> {
     try {
@@ -199,6 +217,130 @@ export class DashboardComponent implements OnInit {
 
     return result;
   });
+
+  readonly availableNettoProducts = computed<ProductItem[]>(() => {
+    const all = this.productService.products();
+    const query = this.nettoFilterQuery().trim().toLowerCase();
+    if (!query) return all.slice(0, 16);
+    return all.filter(p => p.name.toLowerCase().includes(query) || (p.brand && p.brand.toLowerCase().includes(query))).slice(0, 16);
+  });
+
+  readonly formattedDiaryDate = computed(() => {
+    const d = this.diaryDate();
+    const now = new Date();
+    const isToday = now.getFullYear() === d.getFullYear() && now.getMonth() === d.getMonth() && now.getDate() === d.getDate();
+    const options: Intl.DateTimeFormatOptions = { weekday: 'short', day: 'numeric', month: 'short' };
+    const dateStr = d.toLocaleDateString('de-DE', options);
+    return isToday ? `Heute, ${dateStr}` : dateStr;
+  });
+
+  openDiary(): void {
+    this.isDiaryOpen.set(true);
+  }
+
+  closeDiary(): void {
+    this.isDiaryOpen.set(false);
+    this.selectedMealForAdd.set(null);
+    this.quickProductForAdd.set(null);
+  }
+
+  previousDiaryDay(): void {
+    const d = new Date(this.diaryDate());
+    d.setDate(d.getDate() - 1);
+    this.diaryDate.set(d);
+  }
+
+  nextDiaryDay(): void {
+    const d = new Date(this.diaryDate());
+    d.setDate(d.getDate() + 1);
+    this.diaryDate.set(d);
+  }
+
+  openAddModal(mealType: MealType): void {
+    this.selectedMealForAdd.set(mealType);
+    this.addFoodMode.set('netto');
+    this.nettoFilterQuery.set('');
+    this.manualName.set('');
+    this.manualCalories.set(null);
+    this.manualPortion.set('1 Portion');
+  }
+
+  closeAddModal(): void {
+    this.selectedMealForAdd.set(null);
+  }
+
+  onProductPlusClick(product: ProductItem, event: MouseEvent): void {
+    event.stopPropagation();
+    this.quickProductForAdd.set(product);
+  }
+
+  closeQuickAddModal(): void {
+    this.quickProductForAdd.set(null);
+  }
+
+  confirmQuickAddProduct(mealType: MealType): void {
+    const p = this.quickProductForAdd();
+    if (!p) return;
+
+    this.foodLogService.logProduct(p, mealType, undefined, 'eaten');
+    this.quickProductForAdd.set(null);
+    this.toastMessage.set(`✓ "${p.name}" zu ${this.getMealLabel(mealType)} hinzugefügt!`);
+    setTimeout(() => this.toastMessage.set(null), 2500);
+  }
+
+  addProductToMeal(product: ProductItem): void {
+    const meal = this.selectedMealForAdd() || 'snack';
+    this.foodLogService.logProduct(product, meal, undefined, 'eaten');
+    this.closeAddModal();
+    this.toastMessage.set(`✓ "${product.name}" zu ${this.getMealLabel(meal)} hinzugefügt!`);
+    setTimeout(() => this.toastMessage.set(null), 2500);
+  }
+
+  submitManualFood(): void {
+    const name = this.manualName().trim();
+    const cals = this.manualCalories();
+    if (!name || cals === null || cals <= 0) return;
+
+    const meal = this.selectedMealForAdd() || 'snack';
+    this.foodLogService.addManualItem(name, cals, this.manualPortion().trim() || '1 Portion', meal, 'eaten');
+    this.closeAddModal();
+    this.toastMessage.set(`✓ "${name}" (${cals} kcal) zu ${this.getMealLabel(meal)} eingetragen!`);
+    setTimeout(() => this.toastMessage.set(null), 2500);
+  }
+
+  deleteFoodItem(id: string): void {
+    this.foodLogService.removeItem(id);
+    this.toastMessage.set('Eintrag gelöscht');
+    setTimeout(() => this.toastMessage.set(null), 2000);
+  }
+
+  getMealItems(mealType: MealType): FoodLogItem[] {
+    return this.foodLogService.getItemsForMeal(mealType);
+  }
+
+  getMealCalories(mealType: MealType): number {
+    return this.foodLogService.getCaloriesForMeal(mealType);
+  }
+
+  getMealLabel(mealType: MealType): string {
+    switch (mealType) {
+      case 'breakfast': return 'Frühstück';
+      case 'lunch': return 'Mittagessen';
+      case 'dinner': return 'Abendessen';
+      case 'snack': return 'Snacks & Getränke';
+      default: return mealType;
+    }
+  }
+
+  getMealIcon(mealType: MealType): string {
+    switch (mealType) {
+      case 'breakfast': return '🌅';
+      case 'lunch': return '☀️';
+      case 'dinner': return '🌙';
+      case 'snack': return '🍎';
+      default: return '🍽️';
+    }
+  }
 
   addToCart(product: ProductItem, event: MouseEvent): void {
     event.stopPropagation();

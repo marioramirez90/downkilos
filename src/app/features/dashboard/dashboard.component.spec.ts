@@ -135,4 +135,71 @@ describe('DashboardComponent', () => {
     component.goToSettings();
     expect(router.navigate).toHaveBeenCalledWith(['/onboarding']);
   });
+
+  it('14. should open food diary when clicking Bereits gegessen or calorie ring', () => {
+    expect(component.isDiaryOpen()).toBe(false);
+
+    component.openDiary();
+    expect(component.isDiaryOpen()).toBe(true);
+
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('.diary-drawer')).toBeTruthy();
+
+    component.closeDiary();
+    expect(component.isDiaryOpen()).toBe(false);
+  });
+
+  it('15. should open quick-add modal when clicking product plus button', () => {
+    const firstProduct = component.featuredProducts()[0].product;
+    const dummyEvent = new MouseEvent('click');
+
+    component.onProductPlusClick(firstProduct, dummyEvent);
+    expect(component.quickProductForAdd()).toBe(firstProduct);
+
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('.quick-add-modal')).toBeTruthy();
+  });
+
+  it('16. should log a Netto product into breakfast and update eaten calories reactively', () => {
+    const initialEaten = component.eatenKcal();
+    const firstProduct = component.featuredProducts()[0].product;
+
+    component.quickProductForAdd.set(firstProduct);
+    component.confirmQuickAddProduct('breakfast');
+
+    expect(component.eatenKcal()).toBeGreaterThan(initialEaten);
+    expect(component.foodLogService.getItemsForMeal('breakfast').length).toBe(1);
+    expect(component.toastMessage()).toContain(firstProduct.name);
+  });
+
+  it('17. should log a manual food item and update eaten calories', () => {
+    const initialEaten = component.eatenKcal();
+
+    component.openAddModal('lunch');
+    component.manualName.set('Vollkornnudeln mit Tomatensauce');
+    component.manualCalories.set(450);
+    component.manualPortion.set('1 Teller');
+    component.submitManualFood();
+
+    expect(component.eatenKcal()).toBe(initialEaten + 450);
+    expect(component.foodLogService.getItemsForMeal('lunch').length).toBe(1);
+    expect(component.selectedMealForAdd()).toBeNull();
+  });
+
+  it('18. should remove a logged food item and recalculate calories', () => {
+    component.openAddModal('snack');
+    component.manualName.set('Apfel');
+    component.manualCalories.set(60);
+    component.submitManualFood();
+
+    const items = component.foodLogService.getItemsForMeal('snack');
+    expect(items.length).toBeGreaterThan(0);
+    const addedId = items[0].id;
+    const eatenWithApple = component.eatenKcal();
+
+    component.deleteFoodItem(addedId);
+    expect(component.eatenKcal()).toBe(eatenWithApple - 60);
+  });
 });

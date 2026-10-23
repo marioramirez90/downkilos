@@ -79,66 +79,69 @@ export class FoodLogService {
       return;
     }
 
-    // Standard-Tagesbelegung (1 Banane, 1 Skyr, 2 Eier als Demonstration für Test 1 & Section 4)
-    const initialItems: FoodLogItem[] = [
-      {
-        id: 'log-banana-demo',
-        productId: 'netto-bananas-1kg',
-        name: 'Bio Banane Fairtrade',
-        brand: 'BioBio',
-        category: 'fruits_veg',
-        imageUrl: 'images/products/bananas.jpg',
-        mealType: 'breakfast',
-        amountGrams: 120,
-        displayQuantity: '1 Banane (ca. 120 g)',
-        calories: 107,
-        protein: 1.3,
-        carbs: 27.4,
-        fat: 0.4,
-        portionCost: 0.20,
-        status: 'eaten',
-        loggedAt: new Date().toISOString()
-      },
-      {
-        id: 'log-skyr-demo',
-        productId: 'netto-skyr-500',
-        name: 'Skyr Natur traditionell',
-        brand: 'Gutes Land',
-        category: 'dairy',
-        imageUrl: 'images/products/skyr.jpg',
-        mealType: 'breakfast',
-        amountGrams: 150,
-        displayQuantity: '1 Portion (150 g)',
-        calories: 95,
-        protein: 16.5,
-        carbs: 6.0,
-        fat: 0.3,
-        portionCost: 0.42,
-        status: 'eaten',
-        loggedAt: new Date().toISOString()
-      },
-      {
-        id: 'log-eggs-demo',
-        productId: 'netto-eggs-10stk',
-        name: 'Frische Eier Klasse M',
-        brand: 'Gut Ponholz',
-        category: 'dairy',
-        imageUrl: 'images/products/oats.jpg',
-        mealType: 'lunch',
-        amountGrams: 106,
-        displayQuantity: '2 Eier (ca. 106 g)',
-        calories: 152,
-        protein: 13.6,
-        carbs: 0.7,
-        fat: 10.5,
-        portionCost: 0.40,
-        status: 'planned',
-        loggedAt: new Date().toISOString()
-      }
-    ];
+    // Produktivmodus: Startet leer mit 0 kcal (Section 21)
+    this.loggedItems.set([]);
+  }
 
-    this.loggedItems.set(initialItems);
-    this.saveTodayLog(initialItems);
+  /**
+   * Trägt ein beliebiges Lebensmittel manuell in eine Mahlzeit ein.
+   */
+  addManualItem(
+    name: string,
+    calories: number,
+    amountText: string = '1 Portion',
+    mealType: MealType = 'snack',
+    status: 'planned' | 'eaten' = 'eaten'
+  ): void {
+    const newItem: FoodLogItem = {
+      id: `manual-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      name: name.trim() || 'Lebensmittel',
+      category: 'manual',
+      imageUrl: 'images/down-kilos-leaf.png',
+      mealType,
+      amountGrams: 100,
+      displayQuantity: amountText || '1 Portion',
+      calories: Math.max(0, Math.round(calories)),
+      protein: 0,
+      carbs: 0,
+      fat: 0,
+      portionCost: 0,
+      status,
+      loggedAt: new Date().toISOString()
+    };
+
+    const updated = [newItem, ...this.loggedItems()];
+    this.loggedItems.set(updated);
+    this.saveTodayLog(updated);
+  }
+
+  /**
+   * Trägt ein Netto-Produkt direkt als gegessen oder geplant in eine Mahlzeit ein.
+   */
+  logProduct(
+    product: ProductItem,
+    mealType: MealType = 'snack',
+    amountGrams?: number,
+    status: 'planned' | 'eaten' = 'eaten'
+  ): void {
+    const grams = amountGrams ?? product.servingSizeGrams ?? (product.packageWeightGrams > 0 ? Math.min(100, product.packageWeightGrams) : 100);
+    this.addProductToDay(product, grams, mealType, status);
+  }
+
+  /**
+   * Gibt alle Einträge einer bestimmten Mahlzeit zurück.
+   */
+  getItemsForMeal(mealType: MealType): FoodLogItem[] {
+    return this.loggedItems().filter(item => item.mealType === mealType);
+  }
+
+  /**
+   * Berechnet die bereits gegessenen Kalorien einer bestimmten Mahlzeit.
+   */
+  getCaloriesForMeal(mealType: MealType): number {
+    return this.getItemsForMeal(mealType)
+      .filter(i => i.status === 'eaten')
+      .reduce((sum, item) => sum + item.calories, 0);
   }
 
   /**

@@ -7,7 +7,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive],
   template: `
-    <nav class="w-full bg-[#FFFFFF] border-t border-[#E3EBE4] px-2 py-2 flex items-center justify-around select-none">
+    <nav class="flex-shrink-0 w-full bg-[#FFFFFF] border-t border-[#E3EBE4] px-2 py-2 flex items-center justify-around select-none z-30">
       <!-- 1. Home -->
       <a
         routerLink="/dashboard"

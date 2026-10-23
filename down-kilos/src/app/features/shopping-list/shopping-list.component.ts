@@ -12,9 +12,9 @@ import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-na
   standalone: true,
   imports: [CommonModule, FormsModule, BottomNavComponent],
   template: `
-    <div class="flex flex-col min-h-full bg-[#FFFFFF]">
-      <!-- Main Content Area -->
-      <div class="flex-1 px-5 pt-4 pb-6 space-y-3.5 overflow-y-auto">
+    <div class="flex flex-col h-full bg-[#FFFFFF] overflow-hidden">
+      <!-- Main Scrollable Content Area -->
+      <div class="flex-1 px-5 pt-4 pb-4 space-y-3.5 min-h-0 overflow-y-auto">
         <!-- Header -->
         <div class="flex items-center justify-between pb-1">
           <div class="flex items-center gap-3">
@@ -209,8 +209,10 @@ import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-na
             <span>Liste im Markt öffnen</span>
             <span class="text-lg">→</span>
           </button>
-        </div>
       </div>
+
+      <!-- Persistent 5-Icon Bottom Navigation -->
+      <app-bottom-nav></app-bottom-nav>
 
       <!-- Add Custom Item Modal -->
       @if (showAddModal()) {

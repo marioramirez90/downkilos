@@ -10,28 +10,32 @@ import { RetailerService } from '../../core/services/retailer.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="flex flex-col min-h-full px-5 pt-4 pb-6 bg-[#FFFFFF]">
-      <!-- Header -->
-      <div class="flex items-center gap-3 pb-2">
-        <button
-          type="button"
-          (click)="goBack()"
-          class="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-[#103A2A] hover:bg-[#F1F5F2] active:scale-95 transition-transform"
-          aria-label="Zurück"
-        >
-          <svg class="w-6 h-6 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-          </svg>
-        </button>
-        <h1 class="text-xl sm:text-2xl font-extrabold text-[#103A2A] tracking-tight">
-          Dein Markt
-        </h1>
-      </div>
+    <div class="flex flex-col h-full bg-[#FFFFFF] overflow-hidden">
+      <!-- Fixed Header -->
+      <header class="flex-shrink-0 px-5 pt-4 pb-2 border-b border-[#F0F4F1] bg-white z-10">
+        <div class="flex items-center gap-3 pb-1">
+          <button
+            type="button"
+            (click)="goBack()"
+            class="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-[#103A2A] hover:bg-[#F1F5F2] active:scale-95 transition-transform"
+            aria-label="Zurück"
+          >
+            <svg class="w-6 h-6 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+          </button>
+          <h1 class="text-xl sm:text-2xl font-extrabold text-[#103A2A] tracking-tight">
+            Dein Markt
+          </h1>
+        </div>
 
-      <!-- Subtitle -->
-      <p class="text-xs sm:text-[13px] text-[#55695C] leading-relaxed mb-4">
-        Wähle deinen bevorzugten Markt, damit wir dir passende Produkte und Preise anzeigen können.
-      </p>
+        <p class="text-xs text-[#55695C] leading-relaxed mt-0.5">
+          Wähle deinen bevorzugten Markt, damit wir dir passende Produkte und Preise anzeigen können.
+        </p>
+      </header>
+
+      <!-- Scrollable Retailer & Budget Content Area -->
+      <div class="flex-1 min-h-0 overflow-y-auto px-5 py-4 space-y-4">
 
       <!-- Active Netto Card (Matching Screen 4) -->
       <div class="space-y-3">
@@ -196,17 +200,19 @@ import { RetailerService } from '../../core/services/retailer.service';
         </div>
       </div>
 
-      <!-- Bottom Confirm CTA Button -->
-      <div class="pt-6 mt-auto">
+      </div>
+
+      <!-- Static Bottom Action Footer: Always visible at bottom -->
+      <footer class="flex-shrink-0 bg-white/95 backdrop-blur-md border-t border-[#E3EBE4] px-5 py-3.5 z-20 shadow-[0_-4px_16px_rgba(0,0,0,0.04)]">
         <button
-          type="submit"
+          type="button"
           (click)="confirmSelection()"
-          class="w-full py-4 px-6 rounded-2xl bg-[#278F39] hover:bg-[#217A30] active:scale-[0.98] text-white font-bold text-base shadow-button flex items-center justify-center gap-2 transition-all cursor-pointer"
+          class="w-full py-3.5 px-6 rounded-2xl bg-[#278F39] hover:bg-[#217A30] active:scale-[0.98] text-white font-bold text-base shadow-button flex items-center justify-center gap-2 transition-all cursor-pointer"
         >
           <span>Auswahl bestätigen</span>
           <span class="text-lg">→</span>
         </button>
-      </div>
+      </footer>
     </div>
   `,
   styles: [`

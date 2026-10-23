@@ -9,7 +9,7 @@ import { ButtonComponent } from '../../shared/components/button/button.component
   standalone: true,
   imports: [CommonModule, LogoComponent, ButtonComponent],
   template: `
-    <div class="flex flex-col min-h-full px-6 pt-6 pb-8 justify-between">
+    <div class="flex flex-col h-full px-6 pt-6 pb-6 justify-between overflow-y-auto">
       <!-- Top Section: Logo & Headline -->
       <div class="space-y-4">
         <!-- Logo -->

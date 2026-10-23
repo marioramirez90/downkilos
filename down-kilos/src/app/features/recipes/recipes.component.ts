@@ -2,20 +2,22 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-nav.component';
 import { ProductCatalogComponent } from '../../shared/components/product-catalog/product-catalog.component';
+import { RECIPES_DATA } from '../../core/models/recipes.data';
+import { Recipe } from '../../core/models/recipe.model';
 
 @Component({
   selector: 'app-recipes',
   standalone: true,
   imports: [CommonModule, BottomNavComponent, ProductCatalogComponent],
   template: `
-    <div class="flex flex-col min-h-full bg-[#FFFFFF]">
-      <div class="flex-1 px-5 pt-4 pb-6 space-y-4 overflow-y-auto">
-        <!-- Header -->
-        <div class="flex items-center justify-between pb-1">
+    <div class="flex flex-col h-full bg-[#FFFFFF] overflow-hidden">
+      <!-- Fixed Header -->
+      <header class="flex-shrink-0 px-5 pt-4 pb-2 border-b border-[#F0F4F1] bg-white z-10">
+        <div class="flex items-center justify-between pb-2">
           <h1 class="text-xl sm:text-2xl font-extrabold text-[#103A2A] tracking-tight">
             Rezepte & Produkte
           </h1>
-          <span class="text-[10px] font-bold px-2 py-1 rounded-full bg-[#FFF200] text-[#ED1C24]">
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FFF200] text-[#ED1C24] border border-[#E6DB00]">
             Netto
           </span>
         </div>
@@ -30,7 +32,7 @@ import { ProductCatalogComponent } from '../../shared/components/product-catalog
               ? 'bg-[#278F39] text-white shadow-soft-sm'
               : 'text-[#627264] hover:text-[#103A2A]'"
           >
-            Rezept-Ideen
+            Rezept-Ideen ({{ allRecipes.length }})
           </button>
           <button
             type="button"
@@ -43,28 +45,68 @@ import { ProductCatalogComponent } from '../../shared/components/product-catalog
             Netto-Produkte
           </button>
         </div>
+      </header>
 
+      <!-- Scrollable Content Area -->
+      <div class="flex-1 min-h-0 overflow-y-auto px-5 py-4 space-y-3">
         @if (activeTab() === 'catalog') {
           <!-- Product Catalog Component -->
           <div class="animate-fade-in">
             <app-product-catalog></app-product-catalog>
           </div>
         } @else {
-          <!-- Recipe Preview (Phase 7 preparation) -->
-          <div class="p-6 bg-[#F6F8F6] rounded-2xl border border-[#E3EBE4] text-center space-y-3 animate-fade-in">
-            <span class="text-3xl">📖</span>
-            <h2 class="text-base font-bold text-[#103A2A]">Rezeptübersicht (Phase 7)</h2>
-            <p class="text-xs text-[#55695C]">
-              In Phase 7 werden hier 20+ alltagstaugliche Gerichte mit genauen Netto-Zutaten, Nährwerten und Portionspreisen bereitgestellt.
-            </p>
+          <!-- Recipe List -->
+          <div class="space-y-3 animate-fade-in">
+            @for (recipe of allRecipes; track recipe.id) {
+              <div class="p-3 bg-white rounded-2xl border border-[#E3EBE4] hover:border-[#278F39] shadow-soft-sm flex gap-3 transition-all">
+                <img
+                  [src]="recipe.imageUrl"
+                  [alt]="recipe.title"
+                  class="w-20 h-20 rounded-xl object-cover flex-shrink-0"
+                />
+                <div class="flex-1 min-w-0 flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between gap-1">
+                      <span class="text-[9px] font-bold uppercase tracking-wider text-[#278F39] bg-[#E5F5E8] px-2 py-0.5 rounded-full">
+                        {{ getMealTypeLabel(recipe.mealType) }}
+                      </span>
+                      <span class="text-xs font-bold text-[#103A2A]">
+                        {{ recipe.pricePerPortion.toFixed(2).replace('.', ',') }} €
+                      </span>
+                    </div>
+                    <h3 class="text-xs sm:text-sm font-bold text-[#103A2A] mt-1 line-clamp-1">
+                      {{ recipe.title }}
+                    </h3>
+                  </div>
+
+                  <div class="flex items-center gap-3 text-[11px] text-[#627264]">
+                    <span>🔥 {{ recipe.calories }} kcal</span>
+                    <span>⏱️ {{ recipe.prepTimeMinutes }} Min.</span>
+                    <span>🥩 {{ recipe.protein }}g Eiweiß</span>
+                  </div>
+                </div>
+              </div>
+            }
           </div>
         }
       </div>
 
+      <!-- Static Bottom Navigation -->
       <app-bottom-nav></app-bottom-nav>
     </div>
   `
 })
 export class RecipesComponent {
-  activeTab = signal<'recipes' | 'catalog'>('catalog');
+  activeTab = signal<'recipes' | 'catalog'>('recipes');
+  readonly allRecipes: Recipe[] = RECIPES_DATA;
+
+  getMealTypeLabel(type: string): string {
+    switch (type) {
+      case 'breakfast': return 'Frühstück';
+      case 'lunch': return 'Mittagessen';
+      case 'dinner': return 'Abendessen';
+      case 'snack': return 'Snack';
+      default: return type;
+    }
+  }
 }

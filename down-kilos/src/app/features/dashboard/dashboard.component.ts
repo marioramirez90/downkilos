@@ -13,9 +13,9 @@ import { CalorieCalculationResult } from '../../core/models/calorie-calculation.
   standalone: true,
   imports: [CommonModule, BottomNavComponent],
   template: `
-    <div class="flex flex-col min-h-full bg-[#FFFFFF]">
+    <div class="flex flex-col h-full bg-[#FFFFFF] overflow-hidden">
       <!-- Main Scrollable Dashboard Content -->
-      <div class="flex-1 px-5 pt-4 pb-6 space-y-4 overflow-y-auto">
+      <div class="flex-1 px-5 pt-4 pb-4 space-y-4 min-h-0 overflow-y-auto">
         <!-- Top Greeting Header -->
         <div class="flex items-center justify-between pb-1">
           <div>

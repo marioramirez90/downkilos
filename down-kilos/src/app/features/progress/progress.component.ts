@@ -12,9 +12,9 @@ import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-na
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, BottomNavComponent],
   template: `
-    <div class="flex flex-col min-h-screen bg-[#F4F6F4]">
-      <!-- Sticky Mobile Header -->
-      <header class="sticky top-0 z-30 bg-[#FFFFFF]/95 backdrop-blur-md border-b border-[#E3EBE4] px-4 py-3">
+    <div class="flex flex-col h-full bg-[#F4F6F4] overflow-hidden">
+      <!-- Fixed Mobile Header -->
+      <header class="flex-shrink-0 bg-[#FFFFFF] border-b border-[#E3EBE4] px-4 py-3 z-10">
         <div class="max-w-md mx-auto flex items-center justify-between">
           <div>
             <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#E5F5E8] text-[#278F39] text-[10px] font-bold tracking-wide">
@@ -39,7 +39,7 @@ import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-na
         </div>
       </header>
 
-      <main class="flex-1 max-w-md w-full mx-auto px-4 pt-4 pb-24 space-y-4">
+      <main class="flex-1 min-h-0 overflow-y-auto max-w-md w-full mx-auto px-4 pt-4 pb-6 space-y-4">
         <!-- 1. Hero Weight Progress Card -->
         <section class="bg-[#FFFFFF] rounded-3xl p-5 border border-[#E3EBE4] shadow-sm relative overflow-hidden">
           <div class="absolute -top-12 -right-12 w-32 h-32 bg-[#E5F5E8] rounded-full blur-2xl pointer-events-none"></div>

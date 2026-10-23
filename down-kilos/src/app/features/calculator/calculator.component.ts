@@ -11,52 +11,56 @@ import { UserProfile } from '../../core/models/user-profile.model';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="flex flex-col min-h-full px-5 pt-4 pb-6 bg-[#FFFFFF]">
-      <!-- Header -->
-      <div class="flex items-center gap-3 pb-2">
-        <button
-          type="button"
-          (click)="goBack()"
-          class="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-[#103A2A] hover:bg-[#F1F5F2] active:scale-95 transition-transform"
-          aria-label="Zurück"
-        >
-          <svg class="w-6 h-6 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-          </svg>
-        </button>
-        <h1 class="text-xl sm:text-2xl font-extrabold text-[#103A2A] tracking-tight">
-          Mein Kalorienbedarf
-        </h1>
-      </div>
+    <div class="flex flex-col h-full bg-[#FFFFFF] overflow-hidden">
+      <!-- Fixed Header & Tabs -->
+      <header class="flex-shrink-0 px-5 pt-4 pb-2 border-b border-[#F0F4F1] bg-white z-10">
+        <div class="flex items-center gap-3 pb-1">
+          <button
+            type="button"
+            (click)="goBack()"
+            class="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-[#103A2A] hover:bg-[#F1F5F2] active:scale-95 transition-transform"
+            aria-label="Zurück"
+          >
+            <svg class="w-6 h-6 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+          </button>
+          <h1 class="text-xl sm:text-2xl font-extrabold text-[#103A2A] tracking-tight">
+            Mein Kalorienbedarf
+          </h1>
+        </div>
 
-      <!-- Segmented Tabs: Übersicht / Details -->
-      <div class="flex p-1 bg-[#F1F5F2] rounded-2xl my-3 max-w-[280px] select-none">
-        <button
-          type="button"
-          (click)="activeTab.set('overview')"
-          class="flex-1 py-1.5 px-3 text-xs font-bold rounded-xl transition-all cursor-pointer text-center"
-          [ngClass]="activeTab() === 'overview'
-            ? 'bg-[#278F39] text-white shadow-soft-sm'
-            : 'text-[#627264] hover:text-[#103A2A]'"
-        >
-          Übersicht
-        </button>
-        <button
-          type="button"
-          (click)="activeTab.set('details')"
-          class="flex-1 py-1.5 px-3 text-xs font-bold rounded-xl transition-all cursor-pointer text-center"
-          [ngClass]="activeTab() === 'details'
-            ? 'bg-[#278F39] text-white shadow-soft-sm'
-            : 'text-[#627264] hover:text-[#103A2A]'"
-        >
-          Details
-        </button>
-      </div>
+        <!-- Segmented Tabs: Übersicht / Details -->
+        <div class="flex p-1 bg-[#F1F5F2] rounded-2xl my-2 max-w-[280px] select-none">
+          <button
+            type="button"
+            (click)="activeTab.set('overview')"
+            class="flex-1 py-1.5 px-3 text-xs font-bold rounded-xl transition-all cursor-pointer text-center"
+            [ngClass]="activeTab() === 'overview'
+              ? 'bg-[#278F39] text-white shadow-soft-sm'
+              : 'text-[#627264] hover:text-[#103A2A]'"
+          >
+            Übersicht
+          </button>
+          <button
+            type="button"
+            (click)="activeTab.set('details')"
+            class="flex-1 py-1.5 px-3 text-xs font-bold rounded-xl transition-all cursor-pointer text-center"
+            [ngClass]="activeTab() === 'details'
+              ? 'bg-[#278F39] text-white shadow-soft-sm'
+              : 'text-[#627264] hover:text-[#103A2A]'"
+          >
+            Details
+          </button>
+        </div>
+      </header>
 
-      @if (calc(); as res) {
-        @if (activeTab() === 'overview') {
-          <!-- TAB 1: ÜBERSICHT (Matching Screen 3 from Reference) -->
-          <div class="space-y-4 animate-fade-in flex-1">
+      <!-- Scrollable Calculations Area -->
+      <div class="flex-1 min-h-0 overflow-y-auto px-5 py-4">
+        @if (calc(); as res) {
+          @if (activeTab() === 'overview') {
+            <!-- TAB 1: ÜBERSICHT -->
+            <div class="space-y-4 animate-fade-in">
             <!-- Calorie Circle Gauge -->
             <div class="relative flex flex-col items-center justify-center py-2">
               <div class="relative w-48 h-48 sm:w-52 sm:h-52 flex items-center justify-center">
@@ -244,19 +248,20 @@ import { UserProfile } from '../../core/models/user-profile.model';
             </div>
           </div>
         }
-
-        <!-- Bottom CTA Button -->
-        <div class="pt-4 mt-auto">
-          <button
-            type="button"
-            (click)="goToRetailers()"
-            class="w-full py-4 px-6 rounded-2xl bg-[#278F39] hover:bg-[#217A30] active:scale-[0.98] text-white font-bold text-base shadow-button flex items-center justify-center gap-2 transition-all cursor-pointer"
-          >
-            <span>Weiter zur Marktauswahl</span>
-            <span class="text-lg">→</span>
-          </button>
-        </div>
       }
+      </div>
+
+      <!-- Static Bottom Action Footer: Always visible at bottom -->
+      <footer class="flex-shrink-0 bg-white/95 backdrop-blur-md border-t border-[#E3EBE4] px-5 py-3.5 z-20 shadow-[0_-4px_16px_rgba(0,0,0,0.04)]">
+        <button
+          type="button"
+          (click)="goToRetailers()"
+          class="w-full py-3.5 px-6 rounded-2xl bg-[#278F39] hover:bg-[#217A30] active:scale-[0.98] text-white font-bold text-base shadow-button flex items-center justify-center gap-2 transition-all cursor-pointer"
+        >
+          <span>Weiter zur Marktauswahl</span>
+          <span class="text-lg">→</span>
+        </button>
+      </footer>
     </div>
   `,
   styles: [`

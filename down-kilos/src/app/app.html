@@ -1,7 +1,7 @@
-<main class="min-h-[100dvh] bg-[#EEF2EF] flex items-center justify-center sm:p-4">
+<main class="h-[100dvh] w-full bg-[#EEF2EF] flex items-center justify-center sm:p-4 overflow-hidden">
   <div class="mobile-device-frame bg-white shadow-soft-lg flex flex-col">
     <!-- Subtle mobile status bar on desktop -->
-    <header class="hidden sm:flex items-center justify-between px-7 pt-3.5 pb-1 text-xs font-semibold text-[#103A2A]/80 select-none">
+    <header class="hidden sm:flex items-center justify-between px-7 pt-3.5 pb-1 text-xs font-semibold text-[#103A2A]/80 select-none flex-shrink-0">
       <span>9:41</span>
       <!-- Dynamic island notch -->
       <div class="w-24 h-4 bg-black rounded-full flex items-center justify-end pr-2">
@@ -15,13 +15,13 @@
       </div>
     </header>
 
-    <!-- Main Router Outlet -->
-    <div class="flex-1 flex flex-col overflow-y-auto">
+    <!-- Main Router Outlet: Takes available space, does not scroll outer frame -->
+    <div class="flex-1 flex flex-col min-h-0 overflow-hidden relative">
       <router-outlet></router-outlet>
     </div>
 
-    <!-- Bottom Home Indicator -->
-    <div class="w-full flex justify-center py-2 select-none pointer-events-none">
+    <!-- Bottom Home Indicator: Fixed at bottom of phone frame -->
+    <div class="w-full flex justify-center py-1.5 select-none pointer-events-none flex-shrink-0 bg-white border-t border-[#F0F4F1]">
       <div class="w-32 h-1 bg-[#103A2A]/15 rounded-full"></div>
     </div>
   </div>

@@ -26,7 +26,8 @@
   <script>
     if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').then(
+        const swUrl = document.querySelector('base') ? new URL('sw.js', document.baseURI).href : 'sw.js';
+        navigator.serviceWorker.register(swUrl).then(
           (reg) => console.log('Down Kilos SW registered:', reg.scope),
           (err) => console.warn('Down Kilos SW registration failed:', err)
         );

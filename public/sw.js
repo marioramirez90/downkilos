@@ -1,12 +1,12 @@
 // Down Kilos Service Worker - Offline Caching & PWA Support
-const CACHE_NAME = 'down-kilos-v1.0.0';
+const CACHE_NAME = 'down-kilos-v1.0.1';
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.webmanifest',
-  '/favicon.ico',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
+  './',
+  './index.html',
+  './manifest.webmanifest',
+  './favicon.ico',
+  './icons/icon-192x192.png',
+  './icons/icon-512x512.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -41,11 +41,9 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(event.request.url);
 
-  // For API or foreign domains, try network first
-  if (url.origin !== self.location.origin) {
-    event.respondWith(
-      fetch(event.request).catch(() => caches.match(event.request))
-    );
+  // Check if request is within service worker scope (don't intercept outside portfolio pages)
+  const scopeUrl = new URL(self.registration.scope);
+  if (!url.href.startsWith(scopeUrl.href)) {
     return;
   }
 
@@ -72,9 +70,12 @@ self.addEventListener('fetch', (event) => {
         });
         return networkResponse;
       }).catch(() => {
-        // Fallback to index.html for navigation requests
+        // Fallback to index.html for navigation requests within Down Kilos scope
         if (event.request.mode === 'navigate') {
-          return caches.match('/index.html');
+          const fallbackUrl = new URL('index.html', self.registration.scope).href;
+          return caches.match(fallbackUrl).then((res) => {
+            return res || caches.match(self.registration.scope) || caches.match('./index.html');
+          });
         }
       });
     })

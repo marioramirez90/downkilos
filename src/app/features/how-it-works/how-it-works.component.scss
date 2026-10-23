@@ -1,474 +1,318 @@
-@use 'sass:color';
-@use '../../../styles/abstracts/variables' as *;
-@use '../../../styles/abstracts/mixins' as *;
-@use '../../../styles/components/buttons' as *;
-
-@keyframes slideIn {
+@keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(8px) scale(0.98);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes floatGentle {
-  0%, 100% {
     transform: translateY(0);
   }
-  50% {
-    transform: translateY(-6px);
-  }
-}
-
-:host {
-  display: block;
-  height: 100%;
 }
 
 .how-it-works-container {
-  @include flexbox(column, space-between, stretch);
-  height: 100%;
-  background-color: $bg-white;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  background-color: #FFFFFF;
+  max-width: 440px;
+  margin: 0 auto;
   overflow: hidden;
+  position: relative;
 }
 
-// ----------------------------------------------------
-// Header: Progress Segments & Skip
-// ----------------------------------------------------
+// 1. Header with Progress Segments and Skip Button
 .intro-header {
-  @include flexbox(row, space-between, center, 12px);
-  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 16px 20px 8px;
-  background-color: $bg-white;
+  background-color: #FFFFFF;
+  flex-shrink: 0;
   z-index: 10;
 
   .progress-segments {
-    @include flexbox(row, flex-start, center, 6px);
+    display: flex;
+    align-items: center;
+    gap: 6px;
     flex: 1;
+    max-width: 220px;
 
     .segment-pill {
-      flex: 1;
       height: 4px;
+      flex: 1;
+      border-radius: 2px;
+      background-color: #E5E7EB;
       border: none;
-      border-radius: $radius-full;
-      background-color: $border-color-light;
-      cursor: pointer;
       padding: 0;
-      transition: all 0.3s ease;
-
-      &.active {
-        background-color: $primary-color;
-        height: 5px;
-      }
+      cursor: pointer;
+      transition: all 0.25s ease;
 
       &.completed {
-        background-color: $border-color-green;
+        background-color: #278F39;
+      }
+
+      &.active {
+        background-color: #278F39;
+        height: 5px;
       }
     }
   }
 
   .skip-button {
-    border: none;
     background: transparent;
-    font-size: 13px;
-    font-weight: 700;
-    color: $text-muted;
+    border: none;
+    color: #6B7280;
+    font-size: 13.5px;
+    font-weight: 600;
     cursor: pointer;
     padding: 4px 8px;
-    border-radius: $radius-md;
-    transition: all 0.15s ease;
+    transition: color 0.15s ease;
 
     &:hover {
-      color: $secondary-color;
-      background-color: $secondary-light;
+      color: #103A2A;
     }
   }
 }
 
-// ----------------------------------------------------
-// Main Scene Stage
-// ----------------------------------------------------
+// 2. Main Stage
 .intro-stage {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 12px 20px 24px;
-  @include flexbox(column, center, center);
+  padding: 6px 20px 14px;
+  display: flex;
+  flex-direction: column;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   .scene-card {
-    width: 100%;
-    max-width: 360px;
-    @include flexbox(column, center, center, 20px);
-    animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: fadeIn 0.28s ease-out forwards;
 
-    // Visual Illustration area
-    .scene-illustration {
+    .scene-image-wrapper {
       width: 100%;
-      min-height: 180px;
-      padding: 20px;
-      background-color: $secondary-light;
-      border: 1px solid $border-color-green;
-      border-radius: $radius-xl;
-      @include flexbox(column, center, center);
-      box-shadow: $shadow-sm;
+      aspect-ratio: 4 / 3;
+      max-height: 275px;
+      border-radius: 22px;
+      overflow: hidden;
+      border: 1px solid #E5E7EB;
+      box-shadow: 0 8px 20px -4px rgba(16, 58, 42, 0.08);
 
-      // Szene 1: Cart
-      &.shopping-scene {
-        .cart-visual-box {
-          position: relative;
-          @include flexbox(column, center, center);
-
-          .main-emoji {
-            font-size: 64px;
-            display: block;
-          }
-
-          .floating-items {
-            @include flexbox(row, center, center, 10px);
-            margin-top: -12px;
-
-            .float-item {
-              font-size: 26px;
-              display: inline-block;
-              animation: floatGentle 2.5s ease-in-out infinite;
-
-              &.item-salad { animation-delay: 0s; }
-              &.item-bread { animation-delay: 0.4s; }
-              &.item-eggs { animation-delay: 0.8s; }
-              &.item-yogurt { animation-delay: 1.2s; }
-            }
-          }
-        }
-      }
-
-      // Szene 2: Salad calculation
-      &.salad-scene {
-        .salad-calc-card {
-          width: 100%;
-          @include flexbox(row, space-between, center, 4px);
-          background-color: $bg-white;
-          padding: 12px 14px;
-          border-radius: $radius-lg;
-          border: 1px solid $border-color;
-          box-shadow: $shadow-sm;
-
-          .salad-item {
-            @include flexbox(row, flex-start, center, 6px);
-
-            .item-icon {
-              font-size: 20px;
-            }
-
-            .item-meta {
-              @include flexbox(column, flex-start, flex-start);
-
-              strong {
-                font-size: 11px;
-                color: $secondary-color;
-              }
-
-              small {
-                font-size: 10px;
-                color: $text-muted;
-
-                &.highlight-def {
-                  color: #D97706;
-                  font-weight: 700;
-                }
-              }
-            }
-          }
-
-          .math-operator {
-            font-size: 14px;
-            font-weight: 800;
-            color: $text-muted;
-          }
-
-          .salad-total {
-            background-color: $primary-light;
-            padding: 4px 8px;
-            border-radius: $radius-sm;
-
-            strong {
-              font-size: 12px;
-              font-weight: 800;
-              color: $primary-color;
-            }
-          }
-        }
-
-        .sample-disclaimer {
-          margin-top: 8px;
-          font-size: 10px;
-          color: $text-muted;
-          font-style: italic;
-        }
-      }
-
-      // Szene 3: Scan / Smartphone Product Card
-      &.scan-scene {
-        .phone-mockup-card {
-          width: 100%;
-          background-color: $bg-white;
-          border-radius: $radius-lg;
-          padding: 12px 14px;
-          border: 1px solid $border-color;
-          box-shadow: $shadow-sm;
-          @include flexbox(column, flex-start, stretch, 10px);
-
-          .mockup-header {
-            @include flexbox(row, flex-start, center, 8px);
-
-            .netto-tag {
-              padding: 2px 6px;
-              background-color: #FFF200;
-              color: #ED1C24;
-              font-size: 10px;
-              font-weight: 900;
-              border-radius: 4px;
-            }
-
-            strong {
-              font-size: 13px;
-              color: $secondary-color;
-            }
-          }
-
-          .mockup-metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-
-            .mockup-metric {
-              padding: 6px 4px;
-              background-color: $bg-light;
-              border-radius: $radius-sm;
-              text-align: center;
-              border: 1px solid $border-color-light;
-
-              small {
-                display: block;
-                font-size: 9px;
-                color: $text-muted;
-              }
-
-              strong {
-                display: block;
-                font-size: 11px;
-                color: $secondary-color;
-                margin-top: 1px;
-              }
-
-              &.highlight {
-                background-color: $primary-light;
-                border-color: $border-color-green;
-
-                strong {
-                  color: $primary-color;
-                }
-              }
-
-              &.price strong {
-                color: $secondary-color;
-                font-weight: 800;
-              }
-            }
-          }
-        }
-      }
-
-      // Szene 4: Cart Summary
-      &.cart-scene {
-        .cart-summary-preview {
-          width: 100%;
-          background-color: $bg-white;
-          border-radius: $radius-lg;
-          padding: 12px 14px;
-          border: 1px solid $border-color;
-          box-shadow: $shadow-sm;
-          @include flexbox(column, flex-start, stretch, 10px);
-
-          .cart-items-preview {
-            @include flexbox(column, flex-start, stretch, 6px);
-
-            .preview-row {
-              @include flexbox(row, space-between, center);
-              font-size: 11px;
-
-              span {
-                color: $secondary-color;
-                font-weight: 600;
-              }
-
-              small {
-                color: $text-muted;
-              }
-            }
-          }
-
-          .cart-totals-banner {
-            @include flexbox(row, space-between, center);
-            padding: 8px 12px;
-            background-color: $primary-light;
-            border-radius: $radius-md;
-            border: 1px solid $border-color-green;
-
-            .total-metric {
-              @include flexbox(column, center, center);
-
-              small {
-                font-size: 9px;
-                color: $text-muted;
-                text-transform: uppercase;
-                font-weight: 700;
-              }
-
-              strong {
-                font-size: 13px;
-                font-weight: 800;
-                color: $primary-color;
-              }
-            }
-
-            .divider-line {
-              width: 1px;
-              height: 24px;
-              background-color: $border-color-green;
-            }
-          }
-        }
-      }
-
-      // Szene 5: Final Logo
-      &.final-scene {
-        min-height: 190px;
-        .brand-showcase-box {
-          @include flexbox(column, center, center);
-          padding: 10px 0;
-        }
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
       }
     }
 
-    // Text Content Area
     .scene-text-box {
-      text-align: center;
-      @include flexbox(column, center, center, 8px);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
 
       .scene-badge {
-        padding: 4px 12px;
-        background-color: $primary-light;
-        color: $primary-color;
-        border-radius: $radius-full;
-        font-size: 11px;
+        align-self: flex-start;
+        padding: 3px 10px;
+        background-color: #E5F5E8;
+        color: #278F39;
         font-weight: 700;
-        letter-spacing: 0.03em;
+        font-size: 11px;
+        border-radius: 9999px;
         text-transform: uppercase;
+        letter-spacing: 0.03em;
+        margin-bottom: 2px;
       }
 
       h2 {
         margin: 0;
         font-size: 20px;
         font-weight: 800;
-        color: $secondary-color;
+        color: #103A2A;
         line-height: 1.25;
         letter-spacing: -0.02em;
-
-        @include respond-to('mobile') {
-          font-size: 18px;
-        }
       }
 
       p {
-        margin: 0;
-        font-size: 13px;
-        color: $text-muted;
-        line-height: 1.5;
-        max-width: 320px;
+        margin: 2px 0 0;
+        font-size: 14px;
+        color: #4B5563;
+        line-height: 1.45;
+      }
+
+      .context-note-bubble {
+        margin-top: 8px;
+        background-color: #F8FAF9;
+        border: 1px solid #E5E7EB;
+        border-radius: 12px;
+        padding: 7px 11px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .note-icon {
+          font-size: 15px;
+          flex-shrink: 0;
+        }
+
+        .note-text {
+          font-size: 12px;
+          color: #374151;
+          font-weight: 500;
+          line-height: 1.35;
+        }
+      }
+    }
+
+    &.final-scene-card {
+      gap: 16px;
+
+      .brand-hero-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 24px 16px;
+        background: linear-gradient(180deg, #E5F5E8 0%, #FFFFFF 100%);
+        border-radius: 24px;
+        border: 1px solid rgba(39, 143, 57, 0.15);
+        box-shadow: 0 4px 14px rgba(16, 58, 42, 0.04);
+
+        .brand-tagline-pill {
+          margin-top: 12px;
+          font-size: 12.5px;
+          font-weight: 700;
+          color: #103A2A;
+          background-color: #FFFFFF;
+          padding: 5px 14px;
+          border-radius: 9999px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+          border: 1px solid rgba(39, 143, 57, 0.1);
+        }
+      }
+
+      .usp-checkmarks-list {
+        margin-top: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        text-align: left;
+
+        .usp-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 13.5px;
+          font-weight: 600;
+          color: #103A2A;
+          line-height: 1.35;
+
+          .usp-check {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background-color: #278F39;
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 800;
+            flex-shrink: 0;
+          }
+        }
       }
     }
   }
 }
 
-// ----------------------------------------------------
-// Sticky Bottom Actions
-// ----------------------------------------------------
+// 3. Footer
 .intro-footer {
   flex-shrink: 0;
-  padding: 14px 20px;
-  background: rgba($bg-white, 0.95);
-  backdrop-filter: blur(8px);
-  border-top: 1px solid $border-color-light;
+  padding: 10px 20px calc(24px + env(safe-area-inset-bottom, 0px));
+  background-color: #FFFFFF;
+  border-top: 1px solid #F3F4F6;
   z-index: 20;
 
   .footer-button-row {
-    @include flexbox(row, space-between, center, 10px);
+    display: flex;
+    gap: 10px;
+    align-items: center;
     width: 100%;
 
     .prev-scene-button {
-      padding: 14px 18px;
-      border: 1px solid $border-color;
-      background-color: $bg-white;
-      color: $text-muted;
-      border-radius: $radius-lg;
+      padding: 12px 18px;
+      height: 50px;
+      background-color: #EEF2EF;
+      color: #374151;
       font-size: 14px;
       font-weight: 700;
+      border-radius: 9999px;
+      border: none;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.18s ease;
 
       &:hover {
-        background-color: $bg-light;
-        color: $secondary-color;
+        background-color: #E2E8E4;
       }
     }
 
     .next-scene-button {
       flex: 1;
-      padding: 14px 24px;
-      background-color: $primary-color;
-      color: $bg-white;
-      border: none;
-      border-radius: $radius-lg;
+      height: 50px;
+      background-color: #278F39;
+      color: #FFFFFF;
       font-size: 15px;
       font-weight: 700;
+      border-radius: 9999px;
+      border: none;
       cursor: pointer;
-      box-shadow: $shadow-button;
-      transition: background-color 0.2s ease, transform 0.1s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(39, 143, 57, 0.22);
+      transition: all 0.18s ease;
 
       &:hover {
-        background-color: $primary-dark;
+        background-color: #217a30;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(39, 143, 57, 0.3);
       }
 
       &:active {
-        transform: scale(0.98);
+        transform: translateY(0);
       }
     }
 
     .finish-intro-button {
-      flex: 1;
-      padding: 14px 24px;
-      background-color: $primary-color;
-      color: $bg-white;
+      width: 100%;
+      height: 52px;
+      background-color: #278F39;
+      color: #FFFFFF;
+      font-size: 16px;
+      font-weight: 700;
+      border-radius: 9999px;
       border: none;
-      border-radius: $radius-lg;
-      font-size: 15px;
-      font-weight: 800;
       cursor: pointer;
-      box-shadow: $shadow-button;
-      transition: background-color 0.2s ease, transform 0.1s ease;
-      position: relative;
-      z-index: 10;
-      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(39, 143, 57, 0.25);
+      transition: all 0.18s ease;
 
       &:hover {
-        background-color: $primary-dark;
+        background-color: #217a30;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(39, 143, 57, 0.32);
       }
 
       &:active {
-        transform: scale(0.98);
+        transform: translateY(0);
       }
     }
   }

@@ -46,20 +46,22 @@ describe('HowItWorksComponent', () => {
     expect(component.currentSceneIndex()).toBe(1);
   });
 
-  it('should skip intro and mark onboarding completed', () => {
-    const markSpy = vi.spyOn(storageService, 'setOnboardingCompleted');
+  it('should skip intro and navigate to /onboarding for new users', () => {
     component.skipIntro();
-    expect(markSpy).toHaveBeenCalledWith(true);
-    expect(router.navigate).toHaveBeenCalledWith(['/dashboard']);
+    expect(router.navigate).toHaveBeenCalledWith(['/onboarding']);
   });
 
-  it('should complete intro on final scene next and navigate to dashboard', () => {
-    const markSpy = vi.spyOn(storageService, 'setOnboardingCompleted');
+  it('should complete intro on final scene next and navigate to /onboarding for new users', () => {
     component.goToScene(4);
     expect(component.currentSceneIndex()).toBe(4);
 
     component.finishIntro();
-    expect(markSpy).toHaveBeenCalledWith(true);
+    expect(router.navigate).toHaveBeenCalledWith(['/onboarding']);
+  });
+
+  it('should navigate to dashboard if onboarding was already completed', () => {
+    vi.spyOn(storageService, 'isOnboardingCompleted').mockReturnValue(true);
+    component.finishIntro();
     expect(router.navigate).toHaveBeenCalledWith(['/dashboard']);
   });
 });

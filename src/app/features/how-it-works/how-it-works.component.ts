@@ -11,6 +11,8 @@ export interface IntroScene {
   headlineKey: string;
   descKey: string;
   noteKey?: string;
+  imageSrc?: string;
+  imageAlt?: string;
 }
 
 @Component({
@@ -32,26 +34,35 @@ export class HowItWorksComponent {
       id: 1,
       titleKey: 'HOW_IT_WORKS.SCENE_1_TITLE',
       headlineKey: 'HOW_IT_WORKS.SCENE_1_TEXT',
-      descKey: 'HOW_IT_WORKS.SCENE_1_DESC'
+      descKey: 'HOW_IT_WORKS.SCENE_1_DESC',
+      imageSrc: 'images/intro/scene-1-supermarket.jpg',
+      imageAlt: 'Kundin betrachtet Nährwerttabelle im Supermarkt'
     },
     {
       id: 2,
       titleKey: 'HOW_IT_WORKS.SCENE_2_TITLE',
       headlineKey: 'HOW_IT_WORKS.SCENE_2_TEXT',
       descKey: 'HOW_IT_WORKS.SCENE_2_DESC',
-      noteKey: 'HOW_IT_WORKS.SCENE_2_NOTE'
+      noteKey: 'HOW_IT_WORKS.SCENE_2_NOTE',
+      imageSrc: 'images/intro/scene-2-portions.jpg',
+      imageAlt: 'Frische Lebensmittel, Salat mit Dressing und Portionen'
     },
     {
       id: 3,
       titleKey: 'HOW_IT_WORKS.SCENE_3_TITLE',
       headlineKey: 'HOW_IT_WORKS.SCENE_3_TEXT',
-      descKey: 'HOW_IT_WORKS.SCENE_3_DESC'
+      descKey: 'HOW_IT_WORKS.SCENE_3_DESC',
+      imageSrc: 'images/intro/scene-3-solution.jpg',
+      imageAlt: 'Smartphone mit transparenter Down Kilos Nährwertübersicht'
     },
     {
       id: 4,
       titleKey: 'HOW_IT_WORKS.SCENE_4_TITLE',
       headlineKey: 'HOW_IT_WORKS.SCENE_4_TEXT',
-      descKey: 'HOW_IT_WORKS.SCENE_4_DESC'
+      descKey: 'HOW_IT_WORKS.SCENE_4_DESC',
+      noteKey: 'HOW_IT_WORKS.SCENE_4_NOTE',
+      imageSrc: 'images/intro/scene-4-groceries.jpg',
+      imageAlt: 'Einkaufszutaten und Einkaufsliste auf Holztisch'
     },
     {
       id: 5,
@@ -85,15 +96,14 @@ export class HowItWorksComponent {
     this.finishIntro();
   }
 
-  async finishIntro(): Promise<void> {
-    try {
-      this.storageService.setOnboardingCompleted(true);
-    } catch (e) {
-      console.warn('Storage set error:', e);
+  finishIntro(): void {
+    // Wenn der Nutzer das Onboarding bereits abgeschlossen hat (Aufruf aus Mehr-Menü):
+    if (this.storageService.isOnboardingCompleted()) {
+      this.router.navigate(['/dashboard']);
+      return;
     }
-    const success = await this.router.navigate(['/dashboard']);
-    if (!success && typeof window !== 'undefined') {
-      window.location.href = '/dashboard';
-    }
+
+    // Beim ersten Start: Weiter zu Screen 3 (Mein Ziel erstellen)
+    this.router.navigate(['/onboarding']);
   }
 }

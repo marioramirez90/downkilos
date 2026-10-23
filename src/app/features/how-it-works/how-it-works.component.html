@@ -16,6 +16,7 @@
 
     <button
       type="button"
+      id="btn-skip-intro"
       (click)="skipIntro()"
       class="skip-button"
     >
@@ -26,19 +27,15 @@
   <!-- Interactive Scene Stage -->
   <main class="intro-stage">
     @switch (currentSceneIndex()) {
-      <!-- SZENE 1: Supermarkt-Einkauf -->
+      <!-- SZENE 1: Das Problem -->
       @case (0) {
-        <div class="scene-card animate-slide-in">
-          <div class="scene-illustration shopping-scene">
-            <div class="cart-visual-box">
-              <span class="main-emoji">🛒</span>
-              <div class="floating-items">
-                <span class="float-item item-salad">🥗</span>
-                <span class="float-item item-bread">🍞</span>
-                <span class="float-item item-eggs">🥚</span>
-                <span class="float-item item-yogurt">🥛</span>
-              </div>
-            </div>
+        <div class="scene-card animate-fade">
+          <div class="scene-image-wrapper">
+            <img
+              src="images/intro/scene-1-supermarket.jpg"
+              alt="Einkauf im Supermarkt vor dem Nährwertregal"
+              loading="eager"
+            />
           </div>
 
           <div class="scene-text-box">
@@ -49,70 +46,38 @@
         </div>
       }
 
-      <!-- SZENE 2: Der Salat & versteckte Kalorien -->
+      <!-- SZENE 2: Die Verwirrung -->
       @case (1) {
-        <div class="scene-card animate-slide-in">
-          <div class="scene-illustration salad-scene">
-            <div class="salad-calc-card">
-              <div class="salad-item">
-                <span class="item-icon">🥗</span>
-                <div class="item-meta">
-                  <strong>Grüner Salat</strong>
-                  <small>120 kcal</small>
-                </div>
-              </div>
-              <span class="math-operator">+</span>
-              <div class="salad-item">
-                <span class="item-icon">🥣</span>
-                <div class="item-meta">
-                  <strong>Dressing</strong>
-                  <small class="highlight-def">280 kcal</small>
-                </div>
-              </div>
-              <span class="math-operator">=</span>
-              <div class="salad-total">
-                <strong>400 kcal</strong>
-              </div>
-            </div>
-            <small class="sample-disclaimer">{{ 'HOW_IT_WORKS.SCENE_2_NOTE' | translate }}</small>
+        <div class="scene-card animate-fade">
+          <div class="scene-image-wrapper">
+            <img
+              src="images/intro/scene-2-portions.jpg"
+              alt="Frische Mahlzeiten, Portionen und Dressings"
+              loading="eager"
+            />
           </div>
 
           <div class="scene-text-box">
             <span class="scene-badge">{{ 'HOW_IT_WORKS.SCENE_2_TITLE' | translate }}</span>
             <h2>{{ 'HOW_IT_WORKS.SCENE_2_TEXT' | translate }}</h2>
             <p>{{ 'HOW_IT_WORKS.SCENE_2_DESC' | translate }}</p>
+            <div class="context-note-bubble">
+              <span class="note-icon">💡</span>
+              <span class="note-text">{{ 'HOW_IT_WORKS.SCENE_2_NOTE' | translate }}</span>
+            </div>
           </div>
         </div>
       }
 
-      <!-- SZENE 3: Down Kilos Nährwert-Transparenz -->
+      <!-- SZENE 3: Die Lösung -->
       @case (2) {
-        <div class="scene-card animate-slide-in">
-          <div class="scene-illustration scan-scene">
-            <div class="phone-mockup-card">
-              <div class="mockup-header">
-                <span class="netto-tag">Netto</span>
-                <strong>Vollkorn Toastbrot</strong>
-              </div>
-              <div class="mockup-metrics-grid">
-                <div class="mockup-metric">
-                  <small>Je 100 g</small>
-                  <strong>245 kcal</strong>
-                </div>
-                <div class="mockup-metric highlight">
-                  <small>1 Scheibe</small>
-                  <strong>62 kcal</strong>
-                </div>
-                <div class="mockup-metric">
-                  <small>Packung</small>
-                  <strong>1.225 kcal</strong>
-                </div>
-                <div class="mockup-metric price">
-                  <small>Preis</small>
-                  <strong>1,39 €</strong>
-                </div>
-              </div>
-            </div>
+        <div class="scene-card animate-fade">
+          <div class="scene-image-wrapper">
+            <img
+              src="images/intro/scene-3-solution.jpg"
+              alt="Smartphone mit transparenter Down Kilos Nährwertübersicht"
+              loading="eager"
+            />
           </div>
 
           <div class="scene-text-box">
@@ -123,60 +88,57 @@
         </div>
       }
 
-      <!-- SZENE 4: Einkaufsliste mit Summen -->
+      <!-- SZENE 4: Der Einkauf -->
       @case (3) {
-        <div class="scene-card animate-slide-in">
-          <div class="scene-illustration cart-scene">
-            <div class="cart-summary-preview">
-              <div class="cart-items-preview">
-                <div class="preview-row">
-                  <span>🍞 Toastbrot (500g)</span>
-                  <small>1,39 € • 1.225 kcal</small>
-                </div>
-                <div class="preview-row">
-                  <span>🥚 Bio Eier (10er)</span>
-                  <small>2,19 € • 780 kcal</small>
-                </div>
-                <div class="preview-row">
-                  <span>🥛 Skyr Natur (500g)</span>
-                  <small>1,49 € • 315 kcal</small>
-                </div>
-              </div>
-              <div class="cart-totals-banner">
-                <div class="total-metric">
-                  <small>Gesamtkosten</small>
-                  <strong>5,07 €</strong>
-                </div>
-                <div class="divider-line"></div>
-                <div class="total-metric">
-                  <small>Gesamtkalorien</small>
-                  <strong>2.320 kcal</strong>
-                </div>
-              </div>
-            </div>
+        <div class="scene-card animate-fade">
+          <div class="scene-image-wrapper">
+            <img
+              src="images/intro/scene-4-groceries.jpg"
+              alt="Frische Einkaufszutaten mit Einkaufsliste"
+              loading="eager"
+            />
           </div>
 
           <div class="scene-text-box">
             <span class="scene-badge">{{ 'HOW_IT_WORKS.SCENE_4_TITLE' | translate }}</span>
             <h2>{{ 'HOW_IT_WORKS.SCENE_4_TEXT' | translate }}</h2>
             <p>{{ 'HOW_IT_WORKS.SCENE_4_DESC' | translate }}</p>
+            <div class="context-note-bubble">
+              <span class="note-icon">🛒</span>
+              <span class="note-text">{{ 'HOW_IT_WORKS.SCENE_4_NOTE' | translate }}</span>
+            </div>
           </div>
         </div>
       }
 
-      <!-- SZENE 5: Abschluss mit Logo -->
+      <!-- SZENE 5: Abschluss -->
       @case (4) {
-        <div class="scene-card animate-slide-in">
-          <div class="scene-illustration final-scene">
-            <div class="brand-showcase-box">
-              <app-logo size="lg"></app-logo>
+        <div class="scene-card final-scene-card animate-fade">
+          <div class="brand-hero-box">
+            <app-logo size="lg"></app-logo>
+            <div class="brand-tagline-pill">
+              Dein Supermarkt. Dein Essen. Dein Kalorienziel.
             </div>
           </div>
 
-          <div class="scene-text-box">
-            <span class="scene-badge">{{ 'HOW_IT_WORKS.SCENE_5_TITLE' | translate }}</span>
+          <div class="scene-text-box text-center">
             <h2>{{ 'HOW_IT_WORKS.SCENE_5_TEXT' | translate }}</h2>
-            <p>{{ 'HOW_IT_WORKS.SCENE_5_DESC' | translate }}</p>
+            <p class="final-desc">{{ 'HOW_IT_WORKS.SCENE_5_DESC' | translate }}</p>
+
+            <div class="usp-checkmarks-list">
+              <div class="usp-item">
+                <span class="usp-check">✓</span>
+                <span>Kalorien pro 100g, Portion und ganzer Packung</span>
+              </div>
+              <div class="usp-item">
+                <span class="usp-check">✓</span>
+                <span>Transparente Preise und Gesamtkalorien im Einkauf</span>
+              </div>
+              <div class="usp-item">
+                <span class="usp-check">✓</span>
+                <span>Dein individuelles Kalorienziel ohne starre Verbote</span>
+              </div>
+            </div>
           </div>
         </div>
       }
@@ -189,6 +151,7 @@
       @if (currentSceneIndex() > 0) {
         <button
           type="button"
+          id="btn-prev-scene"
           (click)="prevScene()"
           class="prev-scene-button"
         >
@@ -199,6 +162,7 @@
       @if (currentSceneIndex() < totalScenes - 1) {
         <button
           type="button"
+          id="btn-next-scene"
           (click)="nextScene()"
           class="next-scene-button"
         >
@@ -210,7 +174,7 @@
           id="finish-intro-button"
           (click)="finishIntro()"
           class="finish-intro-button"
-          aria-label="Down Kilos entdecken"
+          aria-label="Mein Ziel erstellen"
         >
           <span>{{ 'HOW_IT_WORKS.DISCOVER_BTN' | translate }}</span>
         </button>

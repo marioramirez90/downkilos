@@ -5,12 +5,11 @@ import { StorageService } from '../../core/services/storage.service';
 import { CalorieCalculatorService } from '../../core/services/calorie-calculator.service';
 import { CalorieCalculationResult } from '../../core/models/calorie-calculation.model';
 import { UserProfile } from '../../core/models/user-profile.model';
-import { HamburgerButtonComponent } from '../../shared/components/hamburger-button/hamburger-button.component';
 
 @Component({
   selector: 'app-calculator',
   standalone: true,
-  imports: [CommonModule, HamburgerButtonComponent],
+  imports: [CommonModule],
   templateUrl: './calculator.component.html',
   styleUrl: './calculator.component.scss'
 })
@@ -20,6 +19,10 @@ export class CalculatorComponent implements OnInit {
   private calorieService = inject(CalorieCalculatorService);
 
   readonly activeTab = signal<'overview' | 'details'>('overview');
+
+  toggleTab(): void {
+    this.activeTab.set(this.activeTab() === 'overview' ? 'details' : 'overview');
+  }
 
   // Reaktives Profil aus dem Storage
   readonly profile = computed<UserProfile>(() => {
@@ -71,6 +74,22 @@ export class CalculatorComponent implements OnInit {
   readonly calorieDashOffset = computed<number>(() => {
     const circumference = 478; // 2 * PI * 76 ≈ 477.52
     return Math.round(circumference * (1 - this.calorieRatio()));
+  });
+
+  readonly fourWeekRangeText = computed<string>(() => {
+    if (this.calc().isMinor || this.calc().deficit <= 0) return 'Gewicht stabil';
+    const def = this.calc().deficit;
+    if (def < 250) return 'ungefähr -0,5 kg';
+    if (def <= 450) return '-0,5 bis -1,0 kg';
+    return '-1,0 bis -1,5 kg';
+  });
+
+  readonly threeMonthRangeText = computed<string>(() => {
+    if (this.calc().isMinor || this.calc().deficit <= 0) return 'Gewicht stabil';
+    const def = this.calc().deficit;
+    if (def < 250) return 'ungefähr -1,5 kg';
+    if (def <= 450) return '-2 bis -4 kg';
+    return '-4 bis -6 kg';
   });
 
   async ngOnInit(): Promise<void> {

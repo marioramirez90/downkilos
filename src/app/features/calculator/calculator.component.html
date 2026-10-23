@@ -1,5 +1,5 @@
 <div class="calculator-screen">
-  <!-- 1. Header (Zurück, Logo, Hamburger, Tabs) -->
+  <!-- 1. Header (Zurück, Titel: Mein Kalorienbedarf, Info-Icon, Tabs) -->
   <header class="calculator-header">
     <div class="header-top-row">
       <button
@@ -14,12 +14,21 @@
         </svg>
       </button>
 
-      <div class="logo-group">
-        <img src="images/down-kilos-leaf.png" alt="Down Kilos" class="leaf-logo-icon" />
-        <span class="app-brand-name">Down Kilos</span>
-      </div>
+      <h1 class="header-screen-title">Mein Kalorienbedarf</h1>
 
-      <app-hamburger-button></app-hamburger-button>
+      <button
+        type="button"
+        (click)="toggleTab()"
+        class="info-nav-btn"
+        aria-label="Informationen und Details"
+        title="Informationen und Details"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+      </button>
     </div>
 
     <!-- Segmented Tabs: Übersicht / Details -->
@@ -50,47 +59,42 @@
     @if (activeTab() === 'overview') {
       <!-- Persönliche Begrüßung -->
       <section class="personal-greeting-section">
-        <h1 class="user-greeting-title">Hallo {{ userFirstName() }}!</h1>
-        <p class="greeting-subtitle">Wir haben deinen persönlichen Kalorienbedarf berechnet.</p>
+        <h2 class="user-greeting-title">Hallo {{ userFirstName() }}! 👋</h2>
+        <p class="greeting-subtitle">
+          Hier ist dein persönlicher Kalorienbedarf, berechnet aus deinen Angaben. So weißt du,
+          wie viele Kalorien du täglich essen kannst, um dein Ziel zu erreichen.
+        </p>
       </section>
 
-      <!-- Großer kreisförmiger Kalorienring -->
+      <!-- Großer zweifarbiger Kalorienring exakt wie im Referenzdesign -->
       <section class="gauge-ring-card">
         <div class="ring-svg-container">
-          <svg viewBox="0 0 180 180" class="ring-svg">
-            <defs>
-              <linearGradient id="planRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#37C847" />
-                <stop offset="60%" stop-color="#278F39" />
-                <stop offset="100%" stop-color="#103A2A" />
-              </linearGradient>
-            </defs>
-
-            <!-- Hellgrüner Hintergrund-Track -->
-            <circle
-              cx="90"
-              cy="90"
-              r="76"
-              class="ring-bg-track"
+          <svg viewBox="0 0 200 200" class="ring-svg">
+            <!-- Hellgrüner oberer Bogen (von ~12:20 bis ~4:30) -->
+            <path
+              d="M 118.6 30.5 A 72 72 0 0 1 159 141.3"
+              fill="none"
+              stroke="#22C55E"
+              stroke-width="14"
+              stroke-linecap="round"
+              class="ring-arc-bright"
             />
-
-            <!-- Aktiver Bogen mit Farbverlauf -->
-            <circle
-              cx="90"
-              cy="90"
-              r="76"
-              class="ring-active-track"
-              stroke="url(#planRingGrad)"
-              [attr.stroke-dasharray]="478"
-              [attr.stroke-dashoffset]="calorieDashOffset()"
+            <!-- Dunkelgrüner unterer Bogen (von ~4:30 rundherum bis ~9:30) -->
+            <path
+              d="M 159 141.3 A 72 72 0 0 1 28.3 93.7"
+              fill="none"
+              stroke="#0F5132"
+              stroke-width="14"
+              stroke-linecap="round"
+              class="ring-arc-dark"
             />
           </svg>
 
           <!-- Zentrumstext -->
           <div class="ring-center-text">
-            <strong class="ring-number">{{ formattedTargetKcal() }}</strong>
+            <span class="ring-number">{{ formattedTargetKcal() }}</span>
             <span class="ring-unit">kcal</span>
-            <small class="ring-sub">Tägliches Kalorienziel</small>
+            <span class="ring-sub">Tagesziel</span>
           </div>
         </div>
       </section>
@@ -98,84 +102,85 @@
       <!-- Erhaltungsbedarf & Defizit Karten (Nebeneinander im 2-Spalten-Grid) -->
       <section class="metrics-cards-grid">
         <!-- Karte 1: Erhaltungsbedarf -->
-        <div class="metric-card maintenance-card">
-          <span class="metric-label">Dein Erhaltungsbedarf</span>
-          <strong class="metric-value">{{ formattedTdee() }} kcal</strong>
-          <p class="metric-desc">So viel Energie verbrauchst du schätzungsweise pro Tag.</p>
+        <div class="metric-card">
+          <div class="metric-top-row">
+            <span class="metric-val">{{ formattedTdee() }}</span>
+            <span class="metric-unit">kcal</span>
+          </div>
+          <div class="metric-title">Erhaltungsbedarf</div>
+          <div class="metric-sub">(um dein aktuelles Gewicht zu halten)</div>
         </div>
 
         <!-- Karte 2: Tägliches Defizit -->
-        <div class="metric-card deficit-card">
-          <div class="metric-header-row">
-            <span class="metric-label">Dein tägliches Defizit</span>
-            <svg class="flame-icon-svg" viewBox="0 0 24 24" fill="#278F39">
-              <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
-            </svg>
+        <div class="metric-card">
+          <div class="metric-top-row">
+            <span class="flame-icon">🔥</span>
+            <span class="metric-val">-{{ calc().deficit }}</span>
+            <span class="metric-unit">kcal</span>
           </div>
-          <strong class="metric-value">-{{ calc().deficit }} kcal</strong>
-          <p class="metric-desc">Das ist die Differenz zwischen deinem geschätzten Verbrauch und deinem Kalorienziel.</p>
+          <div class="metric-title">Tägliches Defizit</div>
+          <div class="metric-sub">(für gesundes Abnehmen)</div>
         </div>
       </section>
 
-      <!-- Besondere Karte: Deine mögliche Entwicklung (NIH Energy Balance Modell) -->
-      <section class="outlook-forecast-card">
-        <div class="outlook-header">
-          <div class="outlook-icon-circle">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-              <polyline points="17 6 23 6 23 12"></polyline>
-            </svg>
-          </div>
-          <h2 class="outlook-title">Deine mögliche Entwicklung</h2>
+      <!-- Hellgrüne Erklärungskarte -->
+      <section class="explanation-card">
+        <div class="explanation-icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
         </div>
+        <p class="explanation-text">
+          <strong>Mit {{ formattedTargetKcal() }} kcal pro Tag erreichst du</strong>
+          ein moderates Kaloriendefizit. Das kann dir helfen, auf gesunde und nachhaltige Weise
+          abzunehmen, ohne auf deine Lieblingslebensmittel verzichten zu müssen.
+        </p>
+      </section>
+
+      <!-- Deine mögliche Entwicklung (NIH Modell) -->
+      <section class="outlook-section">
+        <h3 class="outlook-heading">Deine mögliche Entwicklung</h3>
 
         @if (calc().isMinor) {
-          <!-- Schutz Jugendlicher unter 18 -->
           <div class="youth-safety-box">
             <p>
               Für Jugendliche unter 18 Jahren empfehlen wir keine pauschale Gewichtsabnahme ohne ärztliche Begleitung.
               Dein geschätzter Energiebedarf von <strong>{{ formattedTdee() }} kcal</strong> dient der gesunden Entwicklung und Orientierung.
             </p>
           </div>
-        } @else if (calc().deficit > 0) {
-          <!-- Erwachsene mit Abnehmziel: Wissenschaftlich fundierte Schätzung -->
-          <p class="outlook-text">
-            Wenn du dein Kalorienziel im Durchschnitt einhältst und deine Aktivität ähnlich bleibt,
-            könnte sich dein Gewicht in den nächsten vier Wochen schrittweise reduzieren.
-          </p>
+        } @else {
+          <div class="outlook-cards-grid">
+            <!-- 4 Wochen -->
+            <div class="outlook-card">
+              <div class="outlook-top-row">
+                <span class="outlook-val">{{ fourWeekRangeText() }}</span>
+                <svg class="trend-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="1 6 8.5 12 13.5 8 23 18"></polyline>
+                  <polyline points="17 18 23 18 23 12"></polyline>
+                </svg>
+              </div>
+              <span class="outlook-sub">in 4 Wochen</span>
+            </div>
 
-          <div class="outlook-estimate-badge">
-            <span class="estimate-bullet">🎯</span>
-            <strong class="estimate-text">
-              Geschätzte Veränderung nach vier Wochen: ungefähr {{ calc().fourWeekLossKg | number:'1.0-0' }} kg weniger.
-            </strong>
+            <!-- 3 Monate -->
+            <div class="outlook-card">
+              <div class="outlook-top-row">
+                <span class="outlook-val">{{ threeMonthRangeText() }}</span>
+                <svg class="trend-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="1 6 8.5 12 13.5 8 23 18"></polyline>
+                  <polyline points="17 18 23 18 23 12"></polyline>
+                </svg>
+              </div>
+              <span class="outlook-sub">in 3 Monaten</span>
+            </div>
           </div>
 
           <p class="outlook-disclaimer">
-            Deine tatsächliche Gewichtsveränderung hängt unter anderem von Aktivität, Ernährung und individuellen körperlichen Faktoren ab.
-          </p>
-        } @else {
-          <!-- Gewicht halten oder Zunehmen -->
-          <p class="outlook-text">
-            Mit deinem berechneten Energiebedarf von <strong>{{ formattedTargetKcal() }} kcal</strong> pro Tag hältst du dein Gewicht stabil im Gleichgewicht.
-          </p>
-          <p class="outlook-disclaimer">
-            Deine tatsächliche Energiebilanz passt sich deinen individuellen Aktivitäten und Nahrungsmitteln flexibel an.
+            Die tatsächliche Gewichtsveränderung kann je nach Aktivität, Ernährung und individuellen Faktoren abweichen.
           </p>
         }
-      </section>
-
-      <!-- Die wichtige motivierende Erklärung -->
-      <section class="daily-life-motivation-card">
-        <h3 class="motivation-title">Was bedeutet das für deinen Alltag?</h3>
-        <p class="motivation-body">
-          Du musst nicht auf deine Lieblingslebensmittel verzichten. Down Kilos hilft dir dabei,
-          die Kalorien deiner Einkäufe zu verstehen und passende Portionen auszuwählen.
-        </p>
-        <div class="motivation-punchline">
-          <span>💡</span>
-          <strong>Du entscheidest, was du isst. Wir übernehmen das Rechnen.</strong>
-        </div>
       </section>
     } @else {
       <!-- TAB 2: DETAILS (Makronährstoffe & Stoffwechselanalyse) -->

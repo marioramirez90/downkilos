@@ -53,11 +53,12 @@ describe('CalculatorComponent', () => {
   it('should calculate and display calories correctly on overview tab with personal greeting', () => {
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('Hallo Lisa!');
-    expect(el.textContent).toContain('Wir haben deinen persönlichen Kalorienbedarf berechnet.');
-    expect(el.textContent).toContain('Dein Erhaltungsbedarf');
-    expect(el.textContent).toContain('Dein tägliches Defizit');
+    expect(el.textContent).toContain('Hier ist dein persönlicher Kalorienbedarf');
+    expect(el.textContent).toContain('Erhaltungsbedarf');
+    expect(el.textContent).toContain('Tägliches Defizit');
     expect(el.textContent).toContain('Deine mögliche Entwicklung');
-    expect(el.textContent).toContain('Was bedeutet das für deinen Alltag?');
+    expect(el.textContent).toContain('in 4 Wochen');
+    expect(el.textContent).toContain('in 3 Monaten');
     expect(component.calc()).not.toBeNull();
     expect(component.formattedTargetKcal()).toBeTruthy();
   });
@@ -73,7 +74,7 @@ describe('CalculatorComponent', () => {
 
     component.activeTab.set('overview');
     fixture.detectChanges();
-    expect(el.textContent).toContain('Tägliches Kalorienziel');
+    expect(el.textContent).toContain('Tagesziel');
   });
 
   it('should navigate to /retailers on clicking CTA button', () => {

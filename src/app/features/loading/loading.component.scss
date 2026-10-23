@@ -20,12 +20,13 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 16px;
+    gap: 18px;
+    padding: 20px;
 
     .ring-spinner-wrapper {
       position: relative;
-      width: 120px;
-      height: 120px;
+      width: 140px;
+      height: 140px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -38,17 +39,17 @@
         .ring-bg {
           fill: none;
           stroke: #E5F5E8;
-          stroke-width: 10;
+          stroke-width: 12;
         }
 
         .ring-accent {
           fill: none;
           stroke: #278F39;
-          stroke-width: 10;
+          stroke-width: 12;
           stroke-linecap: round;
-          stroke-dasharray: 314;
-          stroke-dashoffset: 210;
-          animation: spinRing 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+          stroke-dasharray: 414;
+          stroke-dashoffset: 290;
+          animation: spinCalorieRing 1.35s cubic-bezier(0.4, 0, 0.2, 1) infinite;
         }
       }
 
@@ -60,15 +61,16 @@
         justify-content: center;
 
         .leaf-icon {
-          width: 42px;
-          height: 42px;
+          width: 50px;
+          height: 50px;
           object-fit: contain;
+          animation: leafPulse 2.8s ease-in-out infinite;
         }
       }
     }
 
     .loader-title {
-      font-size: 1.4rem;
+      font-size: 1.55rem;
       font-weight: 800;
       color: #103A2A;
       margin: 0;
@@ -76,16 +78,65 @@
     }
 
     .loader-message {
-      font-size: 0.88rem;
+      font-size: 0.9rem;
       color: #55695C;
       margin: 0;
-      max-width: 260px;
-      line-height: 1.4;
+      max-width: 280px;
+      line-height: 1.45;
+      min-height: 2.6em;
+      transition: opacity 0.2s ease;
+    }
+
+    .error-box {
+      background-color: #FEF2F2;
+      border: 1px solid #FECACA;
+      border-radius: 18px;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      max-width: 320px;
+
+      .error-icon {
+        font-size: 2rem;
+      }
+
+      .error-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #991B1B;
+        margin: 0;
+      }
+
+      .error-message {
+        font-size: 0.85rem;
+        color: #7F1D1D;
+        margin: 0;
+        line-height: 1.4;
+      }
+
+      .retry-btn {
+        margin-top: 6px;
+        background-color: #278F39;
+        color: #FFFFFF;
+        font-weight: 700;
+        font-size: 0.88rem;
+        border: none;
+        border-radius: 9999px;
+        padding: 10px 22px;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+
+        &:hover {
+          background-color: #217A30;
+        }
+      }
     }
   }
 }
 
-@keyframes spinRing {
+@keyframes spinCalorieRing {
   0% {
     transform: rotate(0deg);
   }
@@ -94,8 +145,22 @@
   }
 }
 
+@keyframes leafPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.95;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ring-accent {
+    animation: none !important;
+  }
+  .leaf-icon {
     animation: none !important;
   }
 }

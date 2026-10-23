@@ -1,17 +1,43 @@
 <div class="loading-screen">
   <div class="loader-content">
-    <!-- Spinning Calorie Ring with Leaf Icon -->
-    <div class="ring-spinner-wrapper">
-      <svg viewBox="0 0 120 120" class="ring-spinner-svg">
-        <circle cx="60" cy="60" r="50" class="ring-bg"></circle>
-        <circle cx="60" cy="60" r="50" class="ring-accent"></circle>
-      </svg>
-      <div class="ring-logo-center">
-        <img src="images/down-kilos-leaf.png" alt="Down Kilos" class="leaf-icon" />
-      </div>
-    </div>
+    @if (!hasError()) {
+      <!-- Großer animierter zweifarbiger Kalorienring mit Down-Kilos-Blatt -->
+      <div class="ring-spinner-wrapper" role="status" aria-live="polite">
+        <svg viewBox="0 0 160 160" class="ring-spinner-svg" aria-hidden="true">
+          <!-- Hellgrüner Grundring -->
+          <circle
+            cx="80"
+            cy="80"
+            r="66"
+            class="ring-bg"
+          ></circle>
+          <!-- Kräftig grünes Kreissegment mit weicher Rotation -->
+          <circle
+            cx="80"
+            cy="80"
+            r="66"
+            class="ring-accent"
+          ></circle>
+        </svg>
 
-    <h2 class="loader-title">Down Kilos</h2>
-    <p class="loader-message">{{ loadingMessage }}</p>
+        <!-- Down Kilos Blatt-Logo im Zentrum -->
+        <div class="ring-logo-center">
+          <img src="images/down-kilos-leaf.png" alt="Down Kilos" class="leaf-icon" />
+        </div>
+      </div>
+
+      <h1 class="loader-title">Down Kilos</h1>
+      <p class="loader-message">{{ loadingStep() }}</p>
+    } @else {
+      <!-- Fehleranzeige mit Wiederholungs-Option -->
+      <div class="error-box">
+        <div class="error-icon">⚠️</div>
+        <h2 class="error-title">Hinweis</h2>
+        <p class="error-message">{{ errorMessage() }}</p>
+        <button type="button" (click)="retry()" class="retry-btn">
+          Erneut versuchen
+        </button>
+      </div>
+    }
   </div>
 </div>

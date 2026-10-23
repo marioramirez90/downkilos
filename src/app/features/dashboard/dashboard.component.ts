@@ -2,24 +2,24 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { TranslatePipe } from '../../core/i18n/translate.pipe';
 import { StorageService } from '../../core/services/storage.service';
 import { CalorieCalculatorService } from '../../core/services/calorie-calculator.service';
 import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-nav.component';
-import { HamburgerButtonComponent } from '../../shared/components/hamburger-button/hamburger-button.component';
 import { FoodLogService } from '../../core/services/food-log.service';
 import { ProductService } from '../../core/services/product.service';
-import { PackageCalorieCalculatorService, PieceCalorieInfo } from '../../core/services/package-calorie-calculator.service';
+import { ShoppingListService } from '../../core/services/shopping-list.service';
+import { RetailerService } from '../../core/services/retailer.service';
 import { ProductItem } from '../../core/models/product.model';
 import { UserProfile } from '../../core/models/user-profile.model';
 import { CalorieCalculationResult } from '../../core/models/calorie-calculation.model';
 
-export interface FeaturedProductView {
+export interface DashboardProductCard {
+  id: string;
+  name: string;
+  portionText: string;
+  caloriesText: string;
+  imageUrl: string;
   product: ProductItem;
-  pieceInfo: PieceCalorieInfo | null;
-  servingCalories: number | null;
-  packageCalories: number | null;
-  priceFormatted: string;
 }
 
 @Component({
@@ -28,9 +28,7 @@ export interface FeaturedProductView {
   imports: [
     CommonModule,
     FormsModule,
-    BottomNavComponent,
-    HamburgerButtonComponent,
-    TranslatePipe
+    BottomNavComponent
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
@@ -40,35 +38,28 @@ export class DashboardComponent implements OnInit {
   private storageService = inject(StorageService);
   private calorieService = inject(CalorieCalculatorService);
   private productService = inject(ProductService);
-  private packageCalcService = inject(PackageCalorieCalculatorService);
+  private shoppingListService = inject(ShoppingListService);
+  private retailerService = inject(RetailerService);
   readonly foodLogService = inject(FoodLogService);
 
   readonly profile = signal<UserProfile | null>(null);
   readonly calculation = signal<CalorieCalculationResult | null>(null);
   readonly searchQuery = signal<string>('');
-
-  // Target curated product IDs to feature on Dashboard Bereich B
-  private readonly targetFeaturedIds = [
-    'netto-toast-500',
-    'netto-eggs-10stk',
-    'netto-bananas-1kg',
-    'netto-skyr-500',
-    'netto-kidney-beans-400',
-    'netto-oats-500'
-  ];
+  readonly marketLocation = signal<string>('10115 Berlin – Mitte');
+  readonly toastMessage = signal<string | null>(null);
 
   async ngOnInit(): Promise<void> {
     let p = await this.storageService.loadProfile();
     if (!p) {
       p = {
         id: 'guest_profile',
-        name: 'Lisa Müller',
-        birthDate: '1990-05-14',
+        name: 'Lisa',
+        birthDate: '1992-06-15',
         gender: 'female',
-        currentWeight: 78,
+        currentWeight: 75,
         height: 168,
-        targetWeight: 70,
-        activityLevel: 'sedentary',
+        targetWeight: 65,
+        activityLevel: 'moderate',
         goal: 'lose_weight',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -78,6 +69,16 @@ export class DashboardComponent implements OnInit {
 
     const calc = this.calorieService.calculate(p);
     this.calculation.set(calc);
+
+    // Laden der Supermarkt-Präferenz
+    const pref = await this.retailerService.loadPreference();
+    if (pref) {
+      if (pref.branch?.street) {
+        this.marketLocation.set(`${pref.branch.postalCode} ${pref.branch.city}`);
+      } else if (pref.postalCode && pref.city) {
+        this.marketLocation.set(`${pref.postalCode} ${pref.city}`);
+      }
+    }
   }
 
   readonly userFirstName = computed(() => {
@@ -105,55 +106,91 @@ export class DashboardComponent implements OnInit {
   });
 
   readonly calorieDashOffset = computed(() => {
-    const circumference = 352; // 2 * PI * 56 ≈ 351.86
+    const circumference = 340; // 2 * PI * 54.11 ≈ 340
     return Math.round(circumference * (1 - this.calorieRatio()));
   });
 
-  readonly featuredProducts = computed<FeaturedProductView[]>(() => {
+  readonly featuredProducts = computed<DashboardProductCard[]>(() => {
     const all = this.productService.products();
     if (!all || all.length === 0) return [];
 
-    // Filter by the preferred curated IDs, or fallback to first 6 items
-    const selected = all.filter(p => this.targetFeaturedIds.includes(p.id));
-    const items = selected.length >= 4 ? selected : all.slice(0, 6);
+    const result: DashboardProductCard[] = [];
 
-    return items.map(product => {
-      const pieceInfo = this.packageCalcService.calculatePieceCalories(product);
-      const serving = this.packageCalcService.calculateServingCalories(product);
-      const packageCalories = this.packageCalcService.calculatePackageCalories(product);
-      const priceFormatted = product.price !== null && product.price !== undefined
-        ? `${product.price.toFixed(2).replace('.', ',')} €`
-        : 'Preis n.v.';
+    // 1. Banane
+    const banana = all.find(p => p.id === 'netto-bananas-1kg');
+    if (banana) {
+      result.push({
+        id: banana.id,
+        name: 'Banane',
+        portionText: '1 Banane',
+        caloriesText: '≈ 95 kcal',
+        imageUrl: banana.imageUrl,
+        product: banana
+      });
+    }
 
-      return {
-        product,
-        pieceInfo,
-        servingCalories: serving?.calories || null,
-        packageCalories,
-        priceFormatted
-      };
-    });
+    // 2. Eier
+    const eggs = all.find(p => p.id === 'netto-eggs-10stk');
+    if (eggs) {
+      result.push({
+        id: eggs.id,
+        name: 'Eier',
+        portionText: '1 Ei',
+        caloriesText: '≈ 78 kcal',
+        imageUrl: 'images/products/eggs.jpg',
+        product: eggs
+      });
+    }
+
+    // 3. Skyr Natur
+    const skyr = all.find(p => p.id === 'netto-skyr-500');
+    if (skyr) {
+      result.push({
+        id: skyr.id,
+        name: 'Skyr Natur',
+        portionText: '1 Becher',
+        caloriesText: '≈ 150 kcal',
+        imageUrl: skyr.imageUrl,
+        product: skyr
+      });
+    }
+
+    // 4. Toastbrot Vollkorn
+    const toast = all.find(p => p.id === 'netto-toast-500');
+    if (toast) {
+      result.push({
+        id: toast.id,
+        name: 'Toastbrot Vollkorn',
+        portionText: '1 Scheibe',
+        caloriesText: '≈ 65 kcal',
+        imageUrl: 'images/products/toast.jpg',
+        product: toast
+      });
+    }
+
+    // 5. Weitere Produkte für horizontales Scrollen
+    const beans = all.find(p => p.id === 'netto-kidney-beans-400');
+    if (beans) {
+      result.push({
+        id: beans.id,
+        name: 'Kidneybohnen',
+        portionText: '1/2 Dose',
+        caloriesText: '≈ 132 kcal',
+        imageUrl: beans.imageUrl,
+        product: beans
+      });
+    }
+
+    return result;
   });
 
-  readonly filteredFeaturedProducts = computed<FeaturedProductView[]>(() => {
-    const query = this.searchQuery().trim().toLowerCase();
-    const list = this.featuredProducts();
-    if (!query) return list;
-
-    return list.filter(item =>
-      item.product.name.toLowerCase().includes(query) ||
-      item.product.category.toLowerCase().includes(query) ||
-      (item.product.brand && item.product.brand.toLowerCase().includes(query))
-    );
-  });
-
-  todayDateFormatted(): string {
-    const today = new Date();
-    return today.toLocaleDateString('de-DE', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long'
-    });
+  addToCart(product: ProductItem, event: MouseEvent): void {
+    event.stopPropagation();
+    this.shoppingListService.addProductToShoppingList(product);
+    this.toastMessage.set(`✓ "${product.name}" zur Einkaufsliste hinzugefügt!`);
+    setTimeout(() => {
+      this.toastMessage.set(null);
+    }, 2500);
   }
 
   openProduct(product: ProductItem): void {
@@ -164,7 +201,28 @@ export class DashboardComponent implements OnInit {
     this.router.navigate(['/discover']);
   }
 
-  goToProfileEdit(): void {
+  goToShoppingList(): void {
+    this.router.navigate(['/shopping-list']);
+  }
+
+  goToRecipes(): void {
+    this.router.navigate(['/recipes']);
+  }
+
+  goToMarketSelection(): void {
+    this.router.navigate(['/retailers']);
+  }
+
+  goToSettings(): void {
     this.router.navigate(['/onboarding']);
+  }
+
+  onSearchSubmit(): void {
+    const q = this.searchQuery().trim();
+    if (q) {
+      this.router.navigate(['/discover'], { queryParams: { q } });
+    } else {
+      this.goToAllProducts();
+    }
   }
 }

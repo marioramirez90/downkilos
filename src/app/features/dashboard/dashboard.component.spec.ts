@@ -51,48 +51,88 @@ describe('DashboardComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should personalize the greeting with first name', () => {
+  it('1. should personalize the greeting with first name from profile (Hallo Lisa!)', () => {
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toContain('Hallo, Lisa!');
+    expect(el.textContent).toContain('Hallo Lisa!');
+    expect(component.userFirstName()).toBe('Lisa');
   });
 
-  it('should render Area A: Dein Kalorienziel für heute with eaten and remaining calories', () => {
+  it('2. should load daily calorie target from user profile calculation', () => {
+    expect(component.targetKcal()).toBeGreaterThan(1200);
+  });
+
+  it('3. should calculate calorie ring progress and dashoffset correctly', () => {
+    expect(component.calorieDashOffset()).toBeGreaterThanOrEqual(0);
+    expect(component.calorieDashOffset()).toBeLessThanOrEqual(340);
+  });
+
+  it('4. should render Bereites gegessen and calculate eaten calories correctly', () => {
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toContain('Dein Kalorienziel für heute');
     expect(el.textContent).toContain('Bereits gegessen');
-    expect(el.textContent).toContain('Noch verfügbar');
-    expect(component.targetKcal()).toBeGreaterThan(0);
+    expect(component.eatenKcal()).toBe(component.foodLogService.eatenCalories());
   });
 
-  it('should render Area B: Was möchtest du heute essen? with Netto products', () => {
+  it('5. should render Noch verfügbar and calculate remaining calories correctly', () => {
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toContain('Was möchtest du heute essen?');
-    expect(el.textContent).toContain('Entdecke Lebensmittel bei Netto');
-    expect(component.featuredProducts().length).toBeGreaterThan(0);
+    expect(el.textContent).toContain('Noch verfügbar');
+    expect(component.remainingKcal()).toBe(Math.max(0, component.targetKcal() - component.eatenKcal()));
   });
 
-  it('should filter featured products when searching', () => {
-    component.searchQuery.set('Toast');
-    fixture.detectChanges();
-    const filtered = component.filteredFeaturedProducts();
-    expect(filtered.some(f => f.product.name.toLowerCase().includes('toast'))).toBe(true);
+  it('6. should display Dein Markt with Netto Marken-Discount', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.textContent).toContain('Dein Markt');
+    expect(el.textContent).toContain('Netto');
+    expect(el.textContent).toContain('Marken-Discount');
   });
 
-  it('should navigate to /discover when clicking Alle Netto-Produkte entdecken', () => {
-    component.goToAllProducts();
-    expect(router.navigate).toHaveBeenCalledWith(['/discover']);
+  it('7. should render Bei Netto entdecken with real product cards (Banane, Eier, Skyr, Toast)', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.textContent).toContain('Bei Netto entdecken');
+    expect(el.textContent).toContain('Alle Produkte ›');
+    expect(component.featuredProducts().length).toBeGreaterThanOrEqual(4);
+    const names = component.featuredProducts().map(p => p.name);
+    expect(names).toContain('Banane');
+    expect(names).toContain('Eier');
+    expect(names).toContain('Skyr Natur');
+    expect(names).toContain('Toastbrot Vollkorn');
   });
 
-  // TEST H / Test 10: Dashboard & Trennung von Einkaufen vs. Essen
-  it('Test H – Dashboard: Hinzufügen zur Einkaufsliste darf die gegessenen Tageskalorien nicht verändern', () => {
-    const initialEatenCalories = component.foodLogService.dailySummary().eatenCalories;
+  it('8. should add product to shopping list on plus click without altering eaten calories', () => {
+    const initialEaten = component.eatenKcal();
     const shoppingService = TestBed.inject(ShoppingListService);
+    const firstProduct = component.featuredProducts()[0].product;
 
-    // Ein Produkt mit vielen Kalorien zur Einkaufsliste hinzufügen
-    shoppingService.addCustomItem('1 kg Toastbrot & Bananen', 3.99, 'grains', '1 kg', 2500);
+    const dummyEvent = new MouseEvent('click');
+    component.addToCart(firstProduct, dummyEvent);
 
-    // Gegessene Kalorien auf dem Dashboard / im Tageskonto dürfen sich NICHT verändert haben
-    const eatenAfterShopping = component.foodLogService.dailySummary().eatenCalories;
-    expect(eatenAfterShopping).toBe(initialEatenCalories);
+    expect(shoppingService.items().some(i => i.productId === firstProduct.id)).toBe(true);
+    expect(component.eatenKcal()).toBe(initialEaten);
+    expect(component.toastMessage()).toContain(firstProduct.name);
+  });
+
+  it('9. should handle search submit and navigate to /discover', () => {
+    component.searchQuery.set('Toast');
+    component.onSearchSubmit();
+    expect(router.navigate).toHaveBeenCalledWith(['/discover'], { queryParams: { q: 'Toast' } });
+  });
+
+  it('10. should navigate to /shopping-list when clicking Einkaufsliste öffnen', () => {
+    component.goToShoppingList();
+    expect(router.navigate).toHaveBeenCalledWith(['/shopping-list']);
+  });
+
+  it('11. should navigate to /recipes when clicking Rezepte entdecken', () => {
+    component.goToRecipes();
+    expect(router.navigate).toHaveBeenCalledWith(['/recipes']);
+  });
+
+  it('12. should navigate to /retailers when clicking market card or Ändern', () => {
+    component.goToMarketSelection();
+    expect(router.navigate).toHaveBeenCalledWith(['/retailers']);
+  });
+
+  it('13. should navigate to /onboarding when clicking settings gear', () => {
+    component.goToSettings();
+    expect(router.navigate).toHaveBeenCalledWith(['/onboarding']);
   });
 });

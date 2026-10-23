@@ -1,12 +1,12 @@
 <div class="flex flex-col h-full bg-[#FFFFFF] overflow-hidden">
-  <!-- Fixed Header -->
+  <!-- Bereich A: Fester Header -->
   <header class="flex-shrink-0 px-5 pt-4 pb-2 border-b border-[#F0F4F1] bg-white z-10">
     <div class="flex items-center justify-between pb-1">
       <div class="flex items-center gap-3">
         <button
           type="button"
           (click)="goBack()"
-          class="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-[#103A2A] hover:bg-[#F1F5F2] active:scale-95 transition-transform"
+          class="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-[#103A2A] hover:bg-[#F1F5F2] active:scale-95 transition-transform cursor-pointer"
           aria-label="Zurück"
         >
           <svg class="w-6 h-6 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -17,183 +17,379 @@
           Dein Markt
         </h1>
       </div>
-      <app-hamburger-button></app-hamburger-button>
+      <div class="flex items-center gap-1.5">
+        <button
+          type="button"
+          (click)="showApiKeySettings.set(!showApiKeySettings())"
+          class="p-2 rounded-full text-[#627264] hover:bg-[#F1F5F2] text-xs font-bold"
+          title="Google Maps API-Schlüssel einstellen"
+        >
+          ⚙️
+        </button>
+        <app-hamburger-button></app-hamburger-button>
+      </div>
     </div>
 
     <p class="text-xs text-[#55695C] leading-relaxed mt-0.5">
-      Wähle deinen bevorzugten Markt, damit wir dir passende Produkte und Preise anzeigen können.
+      Finde echte Supermärkte in deiner direkten Umgebung für deinen wöchentlichen Ernährungsplan.
     </p>
   </header>
 
-  <!-- Scrollable Retailer & Budget Content Area -->
+  <!-- Bereich B: Scrollbarer Inhaltsbereich -->
   <div class="flex-1 min-h-0 overflow-y-auto px-5 py-4 space-y-4">
 
-  <!-- Active Netto Card (Matching Screen 4) -->
-  <div class="space-y-3">
-    <div
-      class="p-4 rounded-2xl border-2 border-[#278F39] bg-[#FFFFFF] shadow-soft-sm flex items-center justify-between cursor-pointer select-none"
-    >
-      <!-- Netto Brand Visual Card -->
-      <div class="flex items-center gap-3.5">
-        <div class="w-24 h-12 rounded-xl bg-[#FFF200] flex flex-col items-center justify-center px-2 py-1 shadow-sm border border-[#E6DB00]">
-          <span class="text-[#ED1C24] font-black text-xl italic tracking-tighter leading-none">
-            Netto
+    <!-- Optional: Google Maps API Configuration Modal / Dropdown -->
+    @if (showApiKeySettings()) {
+      <div class="p-3.5 rounded-2xl bg-[#EBF3EC] border border-[#CDE9D2] space-y-2 text-xs text-[#103A2A] animate-fade-in">
+        <div class="flex justify-between items-center">
+          <span class="font-bold flex items-center gap-1.5">
+            <span>🗺️</span>
+            <span>Google Maps API-Schlüssel</span>
           </span>
-          <span class="text-[#ED1C24] font-bold text-[8px] uppercase tracking-tight -mt-0.5">
-            Marken-Discount
-          </span>
+          <button (click)="showApiKeySettings.set(false)" class="text-xs font-bold text-[#627264]">✕</button>
         </div>
-        <div class="flex flex-col">
-          <span class="text-xs font-bold text-[#103A2A]">
-            Netto Marken-Discount
-          </span>
-          <span class="text-[11px] text-[#278F39] font-semibold flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-[#278F39]"></span>
-            Aktiv ausgewählt
-          </span>
-        </div>
-      </div>
-
-      <!-- Green Checkmark Circle -->
-      <div class="w-6 h-6 rounded-full bg-[#278F39] text-white flex items-center justify-center shadow-sm">
-        <svg class="w-4 h-4 stroke-[3]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-        </svg>
-      </div>
-    </div>
-
-    <!-- Location row with inline search -->
-    <div class="p-3.5 rounded-2xl bg-[#F6F8F6] border border-[#E3EBE4] space-y-2">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="text-base text-[#278F39]">📍</span>
-          <div class="flex flex-col">
-            <span class="text-[10px] uppercase font-bold text-[#627264] tracking-wider">
-              Dein Standort
-            </span>
-            <span class="text-xs font-bold text-[#103A2A]">
-              {{ currentBranch().postalCode }} {{ currentBranch().city }}
-            </span>
-          </div>
-        </div>
-        <button
-          type="button"
-          (click)="isEditingLocation.set(!isEditingLocation())"
-          class="text-xs font-bold text-[#278F39] hover:underline cursor-pointer"
-        >
-          {{ isEditingLocation() ? 'Schließen' : 'Ändern' }}
-        </button>
-      </div>
-
-      <!-- Inline Location Search Form -->
-      @if (isEditingLocation()) {
-        <div class="pt-2 border-t border-[#E3EBE4] flex gap-2 animate-fade-in">
+        <p class="text-[11px] text-[#55695C] leading-relaxed">
+          Benötigte Google Cloud APIs: <strong>Maps JavaScript API</strong>, <strong>Places API (New)</strong> und <strong>Geocoding API</strong>.
+        </p>
+        <div class="flex gap-2">
           <input
             type="text"
-            [(ngModel)]="searchLocationQuery"
-            placeholder="PLZ oder Ort (z.B. 10115 oder Berlin)"
-            class="flex-1 px-3 py-2 text-xs rounded-xl bg-white border border-[#DCE4DE] text-[#17241D] focus:outline-none focus:border-[#278F39]"
-            (keyup.enter)="applyLocationSearch()"
+            [(ngModel)]="apiKeyInput"
+            placeholder="AIzaSy..."
+            class="flex-1 px-3 py-2 bg-white rounded-xl border border-[#CCD8CF] text-xs focus:outline-none focus:border-[#278F39]"
           />
           <button
             type="button"
-            (click)="applyLocationSearch()"
-            class="px-3 py-2 text-xs font-bold rounded-xl bg-[#278F39] text-white hover:bg-[#217A30] cursor-pointer"
+            (click)="saveApiKey()"
+            class="px-3.5 py-2 rounded-xl bg-[#278F39] text-white font-bold text-xs hover:bg-[#20752E] cursor-pointer"
+          >
+            Speichern
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- 1. Bereich: Wo möchtest du einkaufen? -->
+    <section class="space-y-3">
+      <h2 class="text-xs font-black uppercase tracking-wider text-[#627264]">
+        Wo möchtest du einkaufen?
+      </h2>
+
+      <!-- Option A: Aktuellen Standort ermitteln (GPS) -->
+      <button
+        type="button"
+        (click)="locateMe()"
+        [disabled]="locationService.isLocating()"
+        class="w-full p-3.5 rounded-2xl bg-[#E5F5E8] hover:bg-[#D4EED8] active:scale-[0.98] border border-[#CDE9D2] text-[#278F39] font-bold text-xs flex items-center justify-center gap-2.5 transition-all cursor-pointer shadow-xs disabled:opacity-60"
+      >
+        @if (locationService.isLocating()) {
+          <div class="w-4 h-4 border-2 border-[#278F39] border-t-transparent rounded-full animate-spin"></div>
+          <span>Standort wird ermittelt...</span>
+        } @else {
+          <svg class="w-4 h-4 stroke-[2.3]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="3" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 2v3m0 14v3M2 12h3m14 0h3" />
+          </svg>
+          <span>Aktuellen Standort ermitteln</span>
+        }
+      </button>
+
+      <!-- Option B: Adresse manuell eingeben -->
+      <div class="space-y-1.5">
+        <label class="block text-[11px] font-semibold text-[#17241D]">
+          Oder Adresse manuell eingeben:
+        </label>
+        <div class="flex gap-2">
+          <div class="relative flex-1">
+            <input
+              type="text"
+              [formControl]="addressControl"
+              placeholder="Straße, Hausnummer, PLZ oder Stadt..."
+              (keyup.enter)="submitManualAddress()"
+              class="w-full pl-9 pr-3 py-2.5 text-xs rounded-xl bg-white border border-[#DCE4DE] text-[#17241D] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#278F39]"
+            />
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[#627264]">
+              📍
+            </span>
+          </div>
+          <button
+            type="button"
+            (click)="submitManualAddress()"
+            [disabled]="locationService.isLocating() || !addressControl.value"
+            class="px-4 py-2.5 text-xs font-bold rounded-xl bg-[#278F39] text-white hover:bg-[#217A30] active:scale-95 disabled:opacity-50 transition-all cursor-pointer flex-shrink-0"
           >
             Suchen
           </button>
         </div>
-      }
-    </div>
-  </div>
+      </div>
 
-  <!-- Coming Soon Notification Banner -->
-  @if (comingSoonNotice()) {
-    <div class="my-3 p-3 rounded-2xl bg-[#FEF9C3] border border-[#FDE047] text-xs font-semibold text-[#854D0E] animate-fade-in flex items-center justify-between">
-      <span>{{ comingSoonNotice() }}</span>
-      <button
-        type="button"
-        (click)="comingSoonNotice.set(null)"
-        class="text-sm font-bold text-[#854D0E] ml-2"
-      >
-        ✕
-      </button>
-    </div>
-  }
-
-  <!-- Section: Weitere Märkte (Disabled with Coming Soon) -->
-  <div class="space-y-2 pt-3">
-    <h3 class="text-xs font-bold text-[#103A2A] tracking-tight">
-      Weitere Märkte
-    </h3>
-
-    <div class="space-y-2">
-      @for (retailer of otherRetailers; track retailer.id) {
-        <div
-          (click)="onSelectOtherRetailer(retailer)"
-          class="flex items-center justify-between p-3 rounded-2xl border border-[#E3EBE4] bg-[#FFFFFF] hover:bg-[#F9FAF9] cursor-pointer transition-all select-none opacity-85 hover:opacity-100"
-        >
-          <!-- Retailer badge & name -->
-          <div class="flex items-center gap-3">
-            <span
-              class="w-16 h-8 rounded-lg flex items-center justify-center font-extrabold text-[11px] shadow-2xs"
-              [style.backgroundColor]="retailer.badgeBg"
-              [style.color]="retailer.badgeColor"
-            >
-              {{ retailer.shortName }}
-            </span>
-            <span class="text-xs font-semibold text-[#17241D]">
-              {{ retailer.name }}
-            </span>
+      <!-- Error Notification -->
+      @if (locationService.errorMessage()) {
+        <div class="p-3 rounded-2xl bg-amber-50 border border-amber-200 text-xs font-semibold text-amber-800 animate-fade-in flex items-start gap-2">
+          <span>⚠️</span>
+          <div class="flex-1">
+            <p>{{ locationService.errorMessage() }}</p>
           </div>
-
-          <!-- Empty radio circle -->
-          <div class="w-5 h-5 rounded-full border-2 border-[#CBD5E1] bg-white flex items-center justify-center"></div>
+          <button (click)="locationService.errorMessage.set(null)" class="text-xs font-bold text-amber-700">✕</button>
         </div>
       }
-    </div>
-  </div>
 
-  <!-- Section: Dein Wochenbudget (Matching Screen 4) -->
-  <div class="space-y-3 pt-5">
-    <div class="flex items-center justify-between">
-      <label for="budgetSlider" class="text-xs font-bold text-[#103A2A]">
-        Dein Wochenbudget
-      </label>
-      <div class="flex items-center gap-1 bg-[#F6F8F6] border border-[#E3EBE4] px-3 py-1 rounded-xl">
+      <!-- Confirmed Location Badge -->
+      @if (confirmedLocation(); as loc) {
+        <div class="p-3 rounded-2xl bg-[#F6F8F6] border border-[#E3EBE4] flex items-center justify-between animate-fade-in">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <span class="text-base">✅</span>
+            <div class="min-w-0">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-[#278F39] block">
+                Bestätigter Standort
+              </span>
+              <p class="text-xs font-bold text-[#103A2A] truncate">
+                {{ loc.formattedAddress }}
+              </p>
+            </div>
+          </div>
+          <span class="text-[10px] text-[#627264] font-semibold flex-shrink-0 ml-2">
+            {{ loc.isGps ? 'GPS-Ortung' : 'Adresse' }}
+          </span>
+        </div>
+      }
+    </section>
+
+    <!-- 2. Interaktive Google-Karte & Marker -->
+    @if (confirmedLocation()) {
+      <section class="space-y-2">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xs font-black uppercase tracking-wider text-[#627264]">
+            Supermärkte auf der Karte
+          </h2>
+          <span class="text-[10px] font-bold text-[#278F39]">
+            {{ nearbyStoresService.stores().length }} Filialen gefunden
+          </span>
+        </div>
+
+        <app-store-map
+          [userLocation]="confirmedLocation()"
+          [stores]="nearbyStoresService.stores()"
+          [selectedStore]="selectedStore()"
+          (storeSelected)="onSelectStore($event)"
+          (routeRequested)="openRoute($event)"
+        ></app-store-map>
+      </section>
+    }
+
+    <!-- Coming Soon Banner -->
+    @if (comingSoonNotice()) {
+      <div class="p-3 rounded-2xl bg-[#FEF9C3] border border-[#FDE047] text-xs font-semibold text-[#854D0E] animate-fade-in flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span>ℹ️</span>
+          <span>{{ comingSoonNotice() }}</span>
+        </div>
+        <button
+          type="button"
+          (click)="comingSoonNotice.set(null)"
+          class="text-sm font-bold text-[#854D0E] ml-2"
+        >
+          ✕
+        </button>
+      </div>
+    }
+
+    <!-- 3. Gefundene Supermärkte -->
+    @if (confirmedLocation()) {
+      <section class="space-y-3 pt-1">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xs font-black uppercase tracking-wider text-[#627264]">
+            Märkte in deiner Nähe ({{ nearbyStoresService.searchRadiusKm() }} km)
+          </h2>
+          <!-- Radius expansion buttons -->
+          <div class="flex gap-1">
+            <button
+              type="button"
+              (click)="expandRadius(5)"
+              class="px-2 py-0.5 rounded-full text-[10px] font-bold cursor-pointer transition-colors"
+              [ngClass]="nearbyStoresService.searchRadiusKm() === 5 ? 'bg-[#278F39] text-white' : 'bg-[#F1F5F2] text-[#627264]'"
+            >
+              5 km
+            </button>
+            <button
+              type="button"
+              (click)="expandRadius(10)"
+              class="px-2 py-0.5 rounded-full text-[10px] font-bold cursor-pointer transition-colors"
+              [ngClass]="nearbyStoresService.searchRadiusKm() === 10 ? 'bg-[#278F39] text-white' : 'bg-[#F1F5F2] text-[#627264]'"
+            >
+              10 km
+            </button>
+            <button
+              type="button"
+              (click)="expandRadius(20)"
+              class="px-2 py-0.5 rounded-full text-[10px] font-bold cursor-pointer transition-colors"
+              [ngClass]="nearbyStoresService.searchRadiusKm() === 20 ? 'bg-[#278F39] text-white' : 'bg-[#F1F5F2] text-[#627264]'"
+            >
+              20 km
+            </button>
+          </div>
+        </div>
+
+        @if (nearbyStoresService.isSearching()) {
+          <div class="py-8 text-center space-y-2">
+            <div class="w-6 h-6 border-2 border-[#278F39] border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <p class="text-xs font-semibold text-[#627264]">Suche echte Filialen im Umkreis...</p>
+          </div>
+        } @else {
+          <div class="space-y-2.5">
+            @for (store of nearbyStoresService.stores(); track store.id) {
+              <div
+                class="p-3.5 rounded-2xl border transition-all flex flex-col gap-2.5 select-none"
+                [ngClass]="store.isAvailable && selectedStore()?.id === store.id
+                  ? 'border-2 border-[#278F39] bg-white shadow-soft-sm'
+                  : 'border-[#E3EBE4] bg-[#FFFFFF] hover:border-[#278F39]/50'"
+              >
+                <!-- Upper Row: Brand Badge, Name, Distance & Selection Checkmark -->
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <!-- Brand Badge -->
+                    @if (store.isAvailable) {
+                      <div class="w-16 h-8 rounded-xl bg-[#FFF200] flex flex-col items-center justify-center px-1 shadow-2xs border border-[#E6DB00] flex-shrink-0">
+                        <span class="text-[#ED1C24] font-black text-sm italic tracking-tighter leading-none">Netto</span>
+                        <span class="text-[#ED1C24] font-bold text-[6px] uppercase tracking-tight">Marken-Discount</span>
+                      </div>
+                    } @else {
+                      <div class="w-16 h-8 rounded-xl bg-[#F1F5F2] flex items-center justify-center px-1 border border-[#E3EBE4] flex-shrink-0">
+                        <span class="text-xs font-extrabold text-[#475569]">{{ store.brand }}</span>
+                      </div>
+                    }
+
+                    <!-- Store Details -->
+                    <div class="min-w-0">
+                      <div class="flex items-center gap-2">
+                        <h3 class="text-xs font-bold text-[#103A2A] truncate">
+                          {{ store.brand }}
+                        </h3>
+                        @if (!store.isAvailable) {
+                          <span class="text-[9px] font-bold text-[#64748B] bg-[#F1F5F9] px-1.5 py-0.5 rounded-md">
+                            Coming soon
+                          </span>
+                        }
+                      </div>
+                      <p class="text-[11px] text-[#627264] truncate">
+                        {{ store.street || store.name }}
+                      </p>
+                      @if (store.city) {
+                        <p class="text-[10px] text-[#94A3B8]">
+                          {{ store.postalCode }} {{ store.city }}
+                        </p>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Distance Label -->
+                  <div class="flex flex-col items-end flex-shrink-0">
+                    <span class="text-xs font-extrabold text-[#103A2A]">
+                      {{ store.distanceKm }} km
+                    </span>
+                    <span class="text-[9px] text-[#94A3B8]">Luftlinie</span>
+                  </div>
+                </div>
+
+                <!-- Lower Row: Actions -->
+                <div class="flex items-center justify-between pt-1 border-t border-[#F0F4F1] text-xs">
+                  <!-- Route Button -->
+                  <button
+                    type="button"
+                    (click)="openRoute(store)"
+                    class="text-[11px] font-semibold text-[#278F39] hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>🗺️</span>
+                    <span>Route anzeigen</span>
+                  </button>
+
+                  <!-- Select Button -->
+                  @if (store.isAvailable) {
+                    <button
+                      type="button"
+                      (click)="onSelectStore(store)"
+                      class="px-3 py-1.5 rounded-xl font-bold text-xs transition-all cursor-pointer"
+                      [ngClass]="selectedStore()?.id === store.id
+                        ? 'bg-[#278F39] text-white shadow-2xs'
+                        : 'bg-[#E5F5E8] text-[#278F39] hover:bg-[#D4EED8]'"
+                    >
+                      {{ selectedStore()?.id === store.id ? '✓ Ausgewählt' : 'Diesen Netto auswählen' }}
+                    </button>
+                  } @else {
+                    <span class="text-[11px] text-[#94A3B8] font-medium italic">
+                      Bald verfügbar
+                    </span>
+                  }
+                </div>
+              </div>
+            } @empty {
+              <div class="text-center py-6 p-4 rounded-2xl bg-[#F8FAF8] border border-dashed border-[#CCD8CF] space-y-2">
+                <span class="text-2xl">🔍</span>
+                <p class="text-xs font-bold text-[#103A2A]">
+                  Keine Netto-Filiale im Umkreis von {{ nearbyStoresService.searchRadiusKm() }} km gefunden.
+                </p>
+                <div class="flex justify-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    (click)="expandRadius(10)"
+                    class="px-3 py-1.5 rounded-xl bg-[#278F39] text-white text-xs font-bold cursor-pointer"
+                  >
+                    Radius auf 10 km erweitern
+                  </button>
+                  <button
+                    type="button"
+                    (click)="expandRadius(20)"
+                    class="px-3 py-1.5 rounded-xl bg-[#E5F5E8] text-[#278F39] text-xs font-bold cursor-pointer"
+                  >
+                    Auf 20 km erweitern
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </section>
+    }
+
+    <!-- 4. Wochenbudget Slider -->
+    <section class="space-y-3 pt-3">
+      <div class="flex items-center justify-between">
+        <label for="budgetSlider" class="text-xs font-bold text-[#103A2A]">
+          Dein Wochenbudget für Lebensmittel
+        </label>
+        <div class="flex items-center gap-1 bg-[#F6F8F6] border border-[#E3EBE4] px-3 py-1 rounded-xl">
+          <input
+            type="number"
+            min="20"
+            max="150"
+            step="5"
+            [(ngModel)]="weeklyBudget"
+            class="w-10 text-right bg-transparent text-xs font-bold text-[#103A2A] focus:outline-none"
+          />
+          <span class="text-xs font-bold text-[#103A2A]">€</span>
+        </div>
+      </div>
+
+      <div class="space-y-1">
         <input
-          type="number"
+          id="budgetSlider"
+          type="range"
           min="20"
-          max="150"
+          max="100"
           step="5"
           [(ngModel)]="weeklyBudget"
-          class="w-10 text-right bg-transparent text-xs font-bold text-[#103A2A] focus:outline-none"
+          class="w-full accent-[#278F39] cursor-pointer h-2 bg-[#E3EBE4] rounded-lg"
         />
-        <span class="text-xs font-bold text-[#103A2A]">€</span>
+        <div class="flex justify-between text-[11px] font-semibold text-[#7A8E80]">
+          <span>20 €</span>
+          <span>100 €</span>
+        </div>
       </div>
-    </div>
-
-    <!-- Slider -->
-    <div class="space-y-1">
-      <input
-        id="budgetSlider"
-        type="range"
-        min="20"
-        max="100"
-        step="5"
-        [(ngModel)]="weeklyBudget"
-        class="w-full accent-[#278F39] cursor-pointer h-2 bg-[#E3EBE4] rounded-lg"
-      />
-      <div class="flex justify-between text-[11px] font-semibold text-[#7A8E80]">
-        <span>20 €</span>
-        <span>100 €</span>
-      </div>
-    </div>
-  </div>
+    </section>
 
   </div>
 
-  <!-- Static Bottom Action Footer: Always visible at bottom -->
+  <!-- Bereich C: Fester unterer Aktionsbereich (Always visible) -->
   <footer class="flex-shrink-0 bg-white/95 backdrop-blur-md border-t border-[#E3EBE4] px-5 py-3.5 z-20 shadow-[0_-4px_16px_rgba(0,0,0,0.04)] safe-area-bottom">
     <button
       type="button"

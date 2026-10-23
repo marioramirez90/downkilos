@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { RetailerService } from './retailer.service';
-import { StorageService } from './storage.service';
+import { LocationService } from './location.service';
+import { NearbyStoresService } from './nearby-stores.service';
 
 describe('RetailerService', () => {
   let service: RetailerService;
@@ -24,15 +25,7 @@ describe('RetailerService', () => {
     const available = retailers.filter(r => r.isAvailable);
     expect(available.length).toBe(1);
     expect(available[0].id).toBe('netto');
-  });
-
-  it('should find verified Netto branch by postal code or city', () => {
-    const branchBerlin = service.findNettoBranch('10115');
-    expect(branchBerlin.city).toContain('Berlin');
-    expect(branchBerlin.postalCode).toBe('10115');
-
-    const branchHamburg = service.findNettoBranch('Hamburg');
-    expect(branchHamburg.city).toContain('Hamburg');
+    expect(available[0].name).toBe('Netto Marken-Discount');
   });
 
   it('should save and load retailer preferences', async () => {
@@ -40,11 +33,12 @@ describe('RetailerService', () => {
       retailerId: 'netto',
       retailerName: 'Netto Marken-Discount',
       postalCode: '10115',
-      city: 'Berlin – Mitte',
+      city: 'Berlin',
       weeklyBudget: 50
     });
 
     const loaded = await service.loadPreference();
     expect(loaded?.weeklyBudget).toBe(50);
+    expect(loaded?.postalCode).toBe('10115');
   });
 });

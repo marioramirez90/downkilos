@@ -1,83 +1,192 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { Retailer, RetailerPreference, StoreBranch } from '../../core/models/retailer.model';
+import { FormsModule, ReactiveFormsModule, FormControl, Validators } from '@angular/forms';
+import { Retailer, RetailerPreference, StoreBranch, UserLocation } from '../../core/models/retailer.model';
 import { RetailerService } from '../../core/services/retailer.service';
-
+import { LocationService } from '../../core/services/location.service';
+import { NearbyStoresService } from '../../core/services/nearby-stores.service';
+import { GoogleMapsLoaderService } from '../../core/services/google-maps-loader.service';
 import { HamburgerButtonComponent } from '../../shared/components/hamburger-button/hamburger-button.component';
+import { StoreMapComponent } from '../../shared/components/store-map/store-map.component';
 
 @Component({
   selector: 'app-retailers',
   standalone: true,
-  imports: [CommonModule, FormsModule, HamburgerButtonComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    HamburgerButtonComponent,
+    StoreMapComponent
+  ],
   templateUrl: './retailers.component.html',
   styleUrl: './retailers.component.scss'
 })
 export class RetailersComponent implements OnInit {
   private router = inject(Router);
   private retailerService = inject(RetailerService);
+  locationService = inject(LocationService);
+  nearbyStoresService = inject(NearbyStoresService);
+  mapsLoader = inject(GoogleMapsLoaderService);
 
   readonly allRetailers = this.retailerService.getRetailers();
-  readonly otherRetailers = this.allRetailers.filter(r => !r.isAvailable);
 
-  currentBranch = signal<StoreBranch>({
-    id: 'netto-10115',
-    name: 'Netto Marken-Discount',
-    street: 'Invalidenstraße 158',
-    postalCode: '10115',
-    city: 'Berlin – Mitte'
-  });
+  // Reactive address input control
+  addressControl = new FormControl('', [Validators.required, Validators.minLength(3)]);
 
-  isEditingLocation = signal<boolean>(false);
-  searchLocationQuery = '';
+  // Selected store and user location
+  selectedStore = signal<StoreBranch | null>(null);
+  confirmedLocation = signal<UserLocation | null>(null);
+
   weeklyBudget = 40;
   comingSoonNotice = signal<string | null>(null);
+  showApiKeySettings = signal<boolean>(false);
+  apiKeyInput = '';
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     const saved = await this.retailerService.loadPreference();
     if (saved) {
       this.weeklyBudget = saved.weeklyBudget || 40;
-      if (saved.postalCode && saved.city) {
-        this.currentBranch.set({
-          id: 'saved-branch',
-          name: 'Netto Marken-Discount',
-          street: saved.branch?.street || 'Filiale im Einzugsgebiet',
-          postalCode: saved.postalCode,
-          city: saved.city
-        });
+      if (saved.branch) {
+        this.selectedStore.set(saved.branch);
+      }
+      if (saved.userLocation) {
+        this.confirmedLocation.set(saved.userLocation);
+        this.addressControl.setValue(saved.userLocation.formattedAddress);
+        // Automatically search nearby stores around the saved location
+        await this.nearbyStoresService.searchStores(saved.userLocation, 5);
+      } else if (saved.postalCode && saved.city) {
+        // Resolve saved postal code / city
+        try {
+          const loc = await this.locationService.geocodeAddress(`${saved.postalCode} ${saved.city}`);
+          this.confirmedLocation.set(loc);
+          await this.nearbyStoresService.searchStores(loc, 5);
+        } catch {
+          // Keep clean without inventing data
+        }
       }
     }
   }
 
-  applyLocationSearch() {
-    if (!this.searchLocationQuery.trim()) return;
-    const branch = this.retailerService.findNettoBranch(this.searchLocationQuery);
-    this.currentBranch.set(branch);
-    this.isEditingLocation.set(false);
-    this.searchLocationQuery = '';
-  }
-
-  onSelectOtherRetailer(retailer: Retailer) {
-    this.comingSoonNotice.set(`Coming soon – ${retailer.name} wird bald unterstützt.`);
-    setTimeout(() => {
+  /**
+   * Option A: Use current device GPS location via browser Geolocation API
+   */
+  async locateMe(): Promise<void> {
+    try {
       this.comingSoonNotice.set(null);
-    }, 4000);
+      const loc = await this.locationService.getCurrentPosition();
+      this.confirmedLocation.set(loc);
+      this.addressControl.setValue(loc.formattedAddress);
+
+      // Search real supermarkets around coordinates
+      const stores = await this.nearbyStoresService.searchStores(loc, 5);
+      const nearestNetto = stores.find(s => s.isAvailable);
+      if (nearestNetto) {
+        this.selectedStore.set(nearestNetto);
+      }
+    } catch {
+      // Error is set inside locationService
+    }
   }
 
-  goBack() {
+  /**
+   * Option B: Geocode manually entered address
+   */
+  async submitManualAddress(): Promise<void> {
+    const query = this.addressControl.value?.trim();
+    if (!query) {
+      this.addressControl.markAsTouched();
+      return;
+    }
+
+    try {
+      this.comingSoonNotice.set(null);
+      const loc = await this.locationService.geocodeAddress(query);
+      this.confirmedLocation.set(loc);
+
+      // Search real supermarkets around coordinates
+      const stores = await this.nearbyStoresService.searchStores(loc, 5);
+      const nearestNetto = stores.find(s => s.isAvailable);
+      if (nearestNetto) {
+        this.selectedStore.set(nearestNetto);
+      }
+    } catch {
+      // Error handled inside locationService
+    }
+  }
+
+  /**
+   * Expand search radius (e.g. from 5 km to 10 km or 20 km)
+   */
+  async expandRadius(radiusKm: number): Promise<void> {
+    const loc = this.confirmedLocation();
+    if (!loc) return;
+    await this.nearbyStoresService.searchStores(loc, radiusKm);
+  }
+
+  /**
+   * Store selection handler
+   */
+  onSelectStore(store: StoreBranch): void {
+    if (store.isAvailable) {
+      // Netto Marken-Discount is active in V1
+      this.selectedStore.set(store);
+      this.comingSoonNotice.set(null);
+    } else {
+      // Other retailers (EDEKA, REWE, Lidl, etc.) receive a clear Coming Soon badge
+      this.comingSoonNotice.set(
+        `${store.brand} (${store.street || store.city}): Dieser Händler wird demnächst für den automatischen Einkauf unterstützt.`
+      );
+    }
+  }
+
+  /**
+   * Open route in Google Maps
+   */
+  openRoute(store: StoreBranch): void {
+    const url = this.nearbyStoresService.getDirectionsUrl(store);
+    if (typeof window !== 'undefined') {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  }
+
+  /**
+   * Save custom Google Maps API key
+   */
+  async saveApiKey(): Promise<void> {
+    await this.mapsLoader.setApiKey(this.apiKeyInput);
+    this.showApiKeySettings.set(false);
+    // Reload search if location exists
+    const loc = this.confirmedLocation();
+    if (loc) {
+      await this.nearbyStoresService.searchStores(loc, this.nearbyStoresService.searchRadiusKm());
+    }
+  }
+
+  goBack(): void {
     this.router.navigate(['/calculator']);
   }
 
-  async confirmSelection() {
-    const branch = this.currentBranch();
+  /**
+   * Confirm market & budget selection and navigate to Dashboard
+   */
+  async confirmSelection(): Promise<void> {
+    const branch = this.selectedStore();
+    const loc = this.confirmedLocation();
+
+    // Fallback if user confirms without clicking search
+    const postalCode = branch?.postalCode || loc?.postalCode || '10115';
+    const city = branch?.city || loc?.city || 'Deutschland';
+
     const pref: RetailerPreference = {
       retailerId: 'netto',
       retailerName: 'Netto Marken-Discount',
-      branch,
-      postalCode: branch.postalCode,
-      city: branch.city,
-      weeklyBudget: Number(this.weeklyBudget)
+      branch: branch || undefined,
+      postalCode,
+      city,
+      weeklyBudget: Number(this.weeklyBudget),
+      userLocation: loc || undefined
     };
 
     await this.retailerService.savePreference(pref);

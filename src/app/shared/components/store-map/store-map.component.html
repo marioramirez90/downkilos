@@ -1,0 +1,104 @@
+<div class="relative w-full h-56 rounded-2xl overflow-hidden border border-[#E3EBE4] shadow-inner bg-[#F1F5F2]">
+  <!-- Real Google Maps Canvas -->
+  <div #mapCanvas class="w-full h-full" [class.hidden]="!isGoogleMapActive()"></div>
+
+  <!-- Fallback Visual Interactive SVG Map Canvas when Google Maps script is not loaded -->
+  @if (!isGoogleMapActive()) {
+    <div class="w-full h-full relative flex flex-col justify-between p-3 bg-gradient-to-br from-[#EBF3EC] to-[#DEECE0]">
+      <!-- Map watermark & Notice -->
+      <div class="flex items-center justify-between z-10">
+        <span class="text-[10px] font-bold text-[#278F39] bg-white/90 backdrop-blur-xs px-2 py-0.5 rounded-full shadow-2xs border border-[#CDE9D2]">
+          🗺️ Live-Umgebungskarte
+        </span>
+        @if (stores().length > 0) {
+          <span class="text-[10px] font-semibold text-[#103A2A] bg-white/90 px-2 py-0.5 rounded-full shadow-2xs">
+            {{ stores().length }} Märkte im Umkreis
+          </span>
+        }
+      </div>
+
+      <!-- SVG Map Visualization of Real Coordinates -->
+      <svg class="absolute inset-0 w-full h-full pointer-events-auto" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <!-- Subtle road grid lines -->
+        <line x1="0" y1="30" x2="100" y2="35" stroke="#CBDDD0" stroke-width="1.5" stroke-dasharray="2,3" />
+        <line x1="0" y1="70" x2="100" y2="65" stroke="#CBDDD0" stroke-width="1.5" stroke-dasharray="2,3" />
+        <line x1="35" y1="0" x2="40" y2="100" stroke="#CBDDD0" stroke-width="1.5" stroke-dasharray="2,3" />
+        <line x1="75" y1="0" x2="70" y2="100" stroke="#CBDDD0" stroke-width="1.5" stroke-dasharray="2,3" />
+
+        <!-- User Pin (Center) -->
+        @if (userLocation()) {
+          <circle cx="50" cy="50" r="14" fill="#278F39" fill-opacity="0.18" class="animate-ping" />
+          <circle cx="50" cy="50" r="5" fill="#278F39" stroke="#FFFFFF" stroke-width="2" />
+        }
+
+        <!-- Store Pins plotted relative to user center -->
+        @for (pt of svgStorePoints(); track pt.store.id) {
+          <g
+            (click)="onSelectStore(pt.store)"
+            class="cursor-pointer transition-transform hover:scale-125"
+            [attr.transform]="'translate(' + pt.x + ',' + pt.y + ')'"
+          >
+            <!-- Pin Outer -->
+            <circle
+              cx="0"
+              cy="0"
+              [attr.r]="selectedStore()?.id === pt.store.id ? 7 : 5"
+              [attr.fill]="pt.store.isAvailable ? '#FFF200' : '#E2E8F0'"
+              [attr.stroke]="pt.store.isAvailable ? '#ED1C24' : '#64748B'"
+              stroke-width="1.8"
+            />
+            <!-- Pin Inner Indicator -->
+            @if (pt.store.isAvailable) {
+              <text x="0" y="2.5" font-size="4.5" font-weight="black" fill="#ED1C24" text-anchor="middle">N</text>
+            } @else {
+              <circle cx="0" cy="0" r="2" fill="#64748B" />
+            }
+          </g>
+        }
+      </svg>
+
+      <!-- Bottom Hint -->
+      <div class="z-10 flex items-center justify-between text-[10px] text-[#627264] bg-white/80 backdrop-blur-xs px-2.5 py-1 rounded-xl border border-[#E3EBE4]">
+        <span>🟢 Du bist hier</span>
+        <span>🟡 Netto Filiale</span>
+        <span>⚪ Weitere Märkte</span>
+      </div>
+    </div>
+  }
+
+  <!-- Floating Active Info Card Overlay on Map -->
+  @if (selectedStore(); as store) {
+    <div class="absolute bottom-2 left-2 right-2 bg-white/95 backdrop-blur-md p-2.5 rounded-xl border border-[#E3EBE4] shadow-md z-20 flex items-center justify-between gap-2 animate-fade-in">
+      <div class="min-w-0 flex-1">
+        <div class="flex items-center gap-1.5">
+          <span
+            class="text-[9px] font-black px-1.5 py-0.5 rounded-md"
+            [ngClass]="store.isAvailable ? 'bg-[#FFF200] text-[#ED1C24] border border-[#E6DB00]' : 'bg-[#E2E8F0] text-[#475569]'"
+          >
+            {{ store.brand }}
+          </span>
+          <span class="text-[11px] font-black text-[#103A2A] truncate">
+            {{ store.street || store.name }}
+          </span>
+        </div>
+        <div class="text-[10px] text-[#627264] flex items-center gap-2 mt-0.5">
+          <span>📍 {{ store.distanceKm }} km (Luftlinie)</span>
+          @if (store.city) {
+            <span class="truncate">{{ store.postalCode }} {{ store.city }}</span>
+          }
+        </div>
+      </div>
+
+      <!-- Action: Route anzeigen -->
+      <button
+        type="button"
+        (click)="openRoute(store)"
+        class="px-2.5 py-1.5 bg-[#F1F5F2] hover:bg-[#E5F5E8] text-[#278F39] text-xs font-bold rounded-lg transition-colors flex items-center gap-1 flex-shrink-0 cursor-pointer"
+        title="In Google Maps navigieren"
+      >
+        <span>🗺️</span>
+        <span>Route</span>
+      </button>
+    </div>
+  }
+</div>

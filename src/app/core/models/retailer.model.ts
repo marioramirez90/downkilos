@@ -4,15 +4,36 @@ export interface Retailer {
   shortName: string;
   badgeBg: string;
   badgeColor: string;
-  isAvailable: boolean; // only Netto is true in V1
+  isAvailable: boolean; // only Netto Marken-Discount is true in V1
+}
+
+export interface UserLocation {
+  lat: number;
+  lng: number;
+  formattedAddress: string;
+  street?: string;
+  postalCode?: string;
+  city?: string;
+  isGps?: boolean;
 }
 
 export interface StoreBranch {
   id: string;
+  placeId?: string;
+  retailerId: string;
+  retailerName: string;
+  brand: string;
   name: string;
   street: string;
   postalCode: string;
   city: string;
+  formattedAddress: string;
+  lat: number;
+  lng: number;
+  distanceKm?: number;
+  isOpenNow?: boolean;
+  openingHoursText?: string[];
+  isAvailable: boolean; // true for Netto Marken-Discount, false for others
 }
 
 export interface RetailerPreference {
@@ -22,6 +43,7 @@ export interface RetailerPreference {
   postalCode: string;
   city: string;
   weeklyBudget: number;
+  userLocation?: UserLocation;
 }
 
 export const SUPPORTED_RETAILERS: Retailer[] = [

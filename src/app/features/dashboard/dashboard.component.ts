@@ -123,8 +123,16 @@ export class DashboardComponent implements OnInit {
 
   retailerLocation(): string {
     const pref = this.retailerPref();
-    if (!pref) return 'Netto Berlin – Mitte';
-    return `${pref.city || 'Berlin'}`;
+    if (!pref) return 'Standort wählen';
+    if (pref.branch?.street) {
+      return `${pref.branch.street}, ${pref.branch.city}`;
+    }
+    return `${pref.postalCode} ${pref.city}`.trim() || 'Netto Filiale';
+  }
+
+  retailerBranchName(): string {
+    const pref = this.retailerPref();
+    return pref?.branch?.brand || pref?.retailerName || 'Netto Marken-Discount';
   }
 
   weeklyBudget(): number {

@@ -5,28 +5,33 @@ import { FormsModule } from '@angular/forms';
 import { Retailer, RetailerPreference, StoreBranch } from '../../core/models/retailer.model';
 import { RetailerService } from '../../core/services/retailer.service';
 
+import { HamburgerButtonComponent } from '../../shared/components/hamburger-button/hamburger-button.component';
+
 @Component({
   selector: 'app-retailers',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, HamburgerButtonComponent],
   template: `
     <div class="flex flex-col h-full bg-[#FFFFFF] overflow-hidden">
       <!-- Fixed Header -->
       <header class="flex-shrink-0 px-5 pt-4 pb-2 border-b border-[#F0F4F1] bg-white z-10">
-        <div class="flex items-center gap-3 pb-1">
-          <button
-            type="button"
-            (click)="goBack()"
-            class="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-[#103A2A] hover:bg-[#F1F5F2] active:scale-95 transition-transform"
-            aria-label="Zurück"
-          >
-            <svg class="w-6 h-6 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-            </svg>
-          </button>
-          <h1 class="text-xl sm:text-2xl font-extrabold text-[#103A2A] tracking-tight">
-            Dein Markt
-          </h1>
+        <div class="flex items-center justify-between pb-1">
+          <div class="flex items-center gap-3">
+            <button
+              type="button"
+              (click)="goBack()"
+              class="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-[#103A2A] hover:bg-[#F1F5F2] active:scale-95 transition-transform"
+              aria-label="Zurück"
+            >
+              <svg class="w-6 h-6 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+              </svg>
+            </button>
+            <h1 class="text-xl sm:text-2xl font-extrabold text-[#103A2A] tracking-tight">
+              Dein Markt
+            </h1>
+          </div>
+          <app-hamburger-button></app-hamburger-button>
         </div>
 
         <p class="text-xs text-[#55695C] leading-relaxed mt-0.5">

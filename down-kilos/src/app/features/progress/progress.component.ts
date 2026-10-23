@@ -7,10 +7,12 @@ import { CalorieCalculatorService } from '../../core/services/calorie-calculator
 import { WeightEntry } from '../../core/models/weight-log.model';
 import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-nav.component';
 
+import { HamburgerButtonComponent } from '../../shared/components/hamburger-button/hamburger-button.component';
+
 @Component({
   selector: 'app-progress',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, BottomNavComponent],
+  imports: [CommonModule, FormsModule, RouterLink, BottomNavComponent, HamburgerButtonComponent],
   template: `
     <div class="flex flex-col h-full bg-[#F4F6F4] overflow-hidden">
       <!-- Fixed Mobile Header -->
@@ -25,17 +27,20 @@ import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-na
               Mein Fortschritt
             </h1>
           </div>
-          <button
-            (click)="openAddWeightModal()"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#278F39] hover:bg-[#20752E] text-white text-xs font-bold rounded-xl shadow-sm transition-all active:scale-95"
-            aria-label="Gewicht wiegen"
-          >
-            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-            <span>Wiegen</span>
-          </button>
+          <div class="flex items-center gap-1.5">
+            <app-hamburger-button></app-hamburger-button>
+            <button
+              (click)="openAddWeightModal()"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#278F39] hover:bg-[#20752E] text-white text-xs font-bold rounded-xl shadow-sm transition-all active:scale-95"
+              aria-label="Gewicht wiegen"
+            >
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              <span>Wiegen</span>
+            </button>
+          </div>
         </div>
       </header>
 

@@ -3,18 +3,20 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { LogoComponent } from '../../shared/components/logo/logo.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
+import { HamburgerButtonComponent } from '../../shared/components/hamburger-button/hamburger-button.component';
 
 @Component({
   selector: 'app-welcome',
   standalone: true,
-  imports: [CommonModule, LogoComponent, ButtonComponent],
+  imports: [CommonModule, LogoComponent, ButtonComponent, HamburgerButtonComponent],
   template: `
     <div class="flex flex-col h-full px-6 pt-6 pb-6 justify-between overflow-y-auto">
       <!-- Top Section: Logo & Headline -->
       <div class="space-y-4">
-        <!-- Logo -->
-        <div class="flex items-center">
+        <!-- Logo & Hamburger Menu -->
+        <div class="flex items-center justify-between">
           <app-logo size="md"></app-logo>
+          <app-hamburger-button></app-hamburger-button>
         </div>
 
         <!-- Headline -->

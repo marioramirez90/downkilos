@@ -6,11 +6,12 @@ import { ShoppingListService } from '../../core/services/shopping-list.service';
 import { PriceService } from '../../core/services/price.service';
 import { ProductCategory } from '../../core/models/product.model';
 import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-nav.component';
+import { HamburgerButtonComponent } from '../../shared/components/hamburger-button/hamburger-button.component';
 
 @Component({
   selector: 'app-shopping-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, BottomNavComponent],
+  imports: [CommonModule, FormsModule, BottomNavComponent, HamburgerButtonComponent],
   template: `
     <div class="flex flex-col h-full bg-[#FFFFFF] overflow-hidden">
       <!-- Main Scrollable Content Area -->
@@ -35,6 +36,7 @@ import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-na
 
           <!-- Info & Add Action -->
           <div class="flex items-center gap-1.5">
+            <app-hamburger-button></app-hamburger-button>
             <button
               type="button"
               (click)="showAddModal.set(true)"

@@ -8,10 +8,12 @@ import { UserProfile } from '../../core/models/user-profile.model';
 import { RetailerPreference } from '../../core/models/retailer.model';
 import { CalorieCalculationResult } from '../../core/models/calorie-calculation.model';
 
+import { HamburgerButtonComponent } from '../../shared/components/hamburger-button/hamburger-button.component';
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, BottomNavComponent],
+  imports: [CommonModule, BottomNavComponent, HamburgerButtonComponent],
   template: `
     <div class="flex flex-col h-full bg-[#FFFFFF] overflow-hidden">
       <!-- Main Scrollable Dashboard Content -->
@@ -26,18 +28,21 @@ import { CalorieCalculationResult } from '../../core/models/calorie-calculation.
               Heute • {{ todayDateFormatted() }}
             </p>
           </div>
-          <!-- Profile / Settings Quick Action -->
-          <button
-            type="button"
-            (click)="goToProfileEdit()"
-            class="w-10 h-10 rounded-full bg-[#F1F5F2] hover:bg-[#E5F5E8] flex items-center justify-center text-[#103A2A] transition-colors"
-            title="Profil bearbeiten"
-          >
-            <svg class="w-5 h-5 text-[#278F39]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="3" />
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-            </svg>
-          </button>
+          <!-- Top Right Actions: Hamburger Menu + Profile -->
+          <div class="flex items-center gap-1.5">
+            <app-hamburger-button></app-hamburger-button>
+            <button
+              type="button"
+              (click)="goToProfileEdit()"
+              class="w-10 h-10 rounded-full bg-[#F1F5F2] hover:bg-[#E5F5E8] flex items-center justify-center text-[#103A2A] transition-colors"
+              title="Profil bearbeiten"
+            >
+              <svg class="w-5 h-5 text-[#278F39]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <!-- Calorie Ring & Macros Card (Matching Screen 7) -->

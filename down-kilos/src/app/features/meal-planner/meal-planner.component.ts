@@ -4,11 +4,12 @@ import { Router } from '@angular/router';
 import { MealPlannerService } from '../../core/services/meal-planner.service';
 import { MealType, Recipe } from '../../core/models/recipe.model';
 import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-nav.component';
+import { HamburgerButtonComponent } from '../../shared/components/hamburger-button/hamburger-button.component';
 
 @Component({
   selector: 'app-meal-planner',
   standalone: true,
-  imports: [CommonModule, BottomNavComponent],
+  imports: [CommonModule, BottomNavComponent, HamburgerButtonComponent],
   template: `
     <div class="flex flex-col h-full bg-[#FFFFFF] overflow-hidden">
       <!-- Main Scrollable Area -->
@@ -30,15 +31,18 @@ import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-na
               Dein Mahlzeitenplan
             </h1>
           </div>
-          <!-- Info Icon button -->
-          <button
-            type="button"
-            (click)="showPlanInfo.set(!showPlanInfo())"
-            class="w-9 h-9 rounded-full bg-[#F1F5F2] hover:bg-[#E5F5E8] flex items-center justify-center text-[#278F39] transition-colors"
-            title="Info zum Plan"
-          >
-            <span class="text-sm font-bold">ℹ️</span>
-          </button>
+          <!-- Top Right Actions: Hamburger + Info -->
+          <div class="flex items-center gap-1">
+            <app-hamburger-button></app-hamburger-button>
+            <button
+              type="button"
+              (click)="showPlanInfo.set(!showPlanInfo())"
+              class="w-9 h-9 rounded-full bg-[#F1F5F2] hover:bg-[#E5F5E8] flex items-center justify-center text-[#278F39] transition-colors"
+              title="Info zum Plan"
+            >
+              <span class="text-sm font-bold">ℹ️</span>
+            </button>
+          </div>
         </div>
 
         <!-- Plan Info Box -->

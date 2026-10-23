@@ -2,13 +2,14 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-nav.component';
 import { ProductCatalogComponent } from '../../shared/components/product-catalog/product-catalog.component';
+import { HamburgerButtonComponent } from '../../shared/components/hamburger-button/hamburger-button.component';
 import { RECIPES_DATA } from '../../core/models/recipes.data';
 import { Recipe } from '../../core/models/recipe.model';
 
 @Component({
   selector: 'app-recipes',
   standalone: true,
-  imports: [CommonModule, BottomNavComponent, ProductCatalogComponent],
+  imports: [CommonModule, BottomNavComponent, ProductCatalogComponent, HamburgerButtonComponent],
   template: `
     <div class="flex flex-col h-full bg-[#FFFFFF] overflow-hidden">
       <!-- Fixed Header -->
@@ -17,9 +18,12 @@ import { Recipe } from '../../core/models/recipe.model';
           <h1 class="text-xl sm:text-2xl font-extrabold text-[#103A2A] tracking-tight">
             Rezepte & Produkte
           </h1>
-          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FFF200] text-[#ED1C24] border border-[#E6DB00]">
-            Netto
-          </span>
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FFF200] text-[#ED1C24] border border-[#E6DB00]">
+              Netto
+            </span>
+            <app-hamburger-button></app-hamburger-button>
+          </div>
         </div>
 
         <!-- Segmented Tab: Rezepte vs Netto-Sortiment -->

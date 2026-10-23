@@ -186,12 +186,12 @@
         </div>
 
         <p class="text-[11px] text-[#103A2A] leading-relaxed">
-          <strong>Reste-Tipp:</strong> Du hast noch {{ pantryService.items()[0].name }} ({{ pantryService.items()[0].currentAmountGrams }} {{ pantryService.items()[0].unit }}) übrig!
+          <strong>Reste-Tipp:</strong> Du hast noch {{ pantryService.items()[0].name }} ({{ pantryService.items()[0].remainingQuantityGrams }} {{ pantryService.items()[0].unit }}) übrig!
         </p>
 
         <div class="flex items-center justify-between pt-1">
           <span class="text-[10px] text-[#278F39] font-medium">
-            Haltbarkeit: {{ pantryService.items()[0].daysShelfLife }} Tage
+            Haltbarkeit: {{ pantryService.items()[0].maxStorageDays }} Tage
           </span>
           <button
             type="button"

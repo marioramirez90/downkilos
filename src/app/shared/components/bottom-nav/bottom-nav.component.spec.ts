@@ -21,15 +21,15 @@ describe('BottomNavComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should render all 5 navigation links (Home, Entdecken, Plan, Einkaufsliste, Mehr)', () => {
+  it('should render all 5 navigation links (Home, Lebensmittel, Rezepte, Einkaufsliste, Mehr)', () => {
     const el = fixture.nativeElement as HTMLElement;
     const links = el.querySelectorAll('a');
     expect(links.length).toBe(5);
 
     const text = el.textContent || '';
     expect(text).toContain('Home');
-    expect(text).toContain('Entdecken');
-    expect(text).toContain('Plan');
+    expect(text).toContain('Lebensmittel');
+    expect(text).toContain('Rezepte');
     expect(text).toContain('Einkaufsliste');
     expect(text).toContain('Mehr');
   });

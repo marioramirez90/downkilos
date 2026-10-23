@@ -79,4 +79,28 @@ describe('ShoppingListService', () => {
     const removed = service.items().find(i => i.name === 'Mineralwasser');
     expect(removed).toBeUndefined();
   });
+
+  it('should calculate total calories of all purchased packages and update when package count changes', () => {
+    const summary = service.summary();
+    expect(summary.totalCalories).toBeGreaterThan(1000);
+
+    const toast = service.items().find(i => i.productId === 'netto-toast-500');
+    expect(toast).toBeDefined();
+    expect(toast?.packageCalories).toBe(1250);
+    expect(toast?.totalCalories).toBe(1250);
+    const initialTotalCals = summary.totalCalories!;
+    const initialCost = summary.totalCost;
+
+    // Packungsanzahl um 1 erhöhen (+1 Toastbrot)
+    service.updatePackageCount(toast!.id, 1);
+
+    const updatedToast = service.items().find(i => i.id === toast!.id)!;
+    expect(updatedToast.packageCount).toBe(2);
+    expect(updatedToast.totalCalories).toBe(2500);
+    expect(updatedToast.totalCost).toBe(2.98);
+
+    const updatedSummary = service.summary();
+    expect(updatedSummary.totalCalories).toBe(initialTotalCals + 1250);
+    expect(updatedSummary.totalCost).toBe(Math.round((initialCost + 1.49) * 100) / 100);
+  });
 });

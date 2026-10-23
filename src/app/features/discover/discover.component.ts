@@ -6,6 +6,7 @@ import { ProductService } from '../../core/services/product.service';
 import { PriceService } from '../../core/services/price.service';
 import { FoodLogService } from '../../core/services/food-log.service';
 import { ShoppingListService } from '../../core/services/shopping-list.service';
+import { PackageCalorieCalculatorService, PieceCalorieInfo } from '../../core/services/package-calorie-calculator.service';
 import { ProductItem, CalorieFilterType, ProductSortType } from '../../core/models/product.model';
 import { MealType } from '../../core/models/recipe.model';
 import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-nav.component';
@@ -25,6 +26,7 @@ export class DiscoverComponent {
   priceService = inject(PriceService);
   foodLogService = inject(FoodLogService);
   shoppingListService = inject(ShoppingListService);
+  calorieCalc = inject(PackageCalorieCalculatorService);
 
   readonly Math = Math;
 
@@ -43,23 +45,28 @@ export class DiscoverComponent {
     return Math.round((amountGrams * yieldFactor * caloriesPer100g) / 100);
   }
 
-  // Portions- & Tagesplan-Modal
-  selectedProductForLog = signal<ProductItem | null>(null);
-  customAmountGrams: number = 150;
+  // Detail-Modal & interaktive Mengenauswahl
+  selectedProductDetail = signal<ProductItem | null>(null);
+  detailMode = signal<'pieces' | 'grams' | 'packages'>('pieces');
+  detailAmount = signal<number>(1);
   selectedMealType: MealType = 'snack';
-  selectedLogStatus: 'planned' | 'eaten' = 'planned';
+
+  // Barcode-Scanner Modal
+  showBarcodeScanner = signal<boolean>(false);
+  barcodeInput = '';
+  barcodeScanError = signal<string | null>(null);
 
   toastMessage = signal<string | null>(null);
 
   readonly categoryPills = [
     { id: 'all', label: 'Alle' },
-    { id: 'fruits_veg', label: 'Obst & Gemüse' },
-    { id: 'meat_fish', label: 'Fleisch & Fisch' },
-    { id: 'dairy', label: 'Milch & Skyr' },
-    { id: 'grains', label: 'Getreide & Reis' },
-    { id: 'ready_meal', label: 'Fertiggerichte' },
+    { id: 'grains', label: '🍞 Brot & Getreide' },
+    { id: 'dairy', label: '🥚 Eier & Milch' },
+    { id: 'pantry', label: '🥫 Vorrat & Dosen' },
+    { id: 'fruits_veg', label: '🍏 Obst & Gemüse' },
+    { id: 'meat_fish', label: '🥩 Fleisch & Fisch' },
+    { id: 'ready_meal', label: '🍲 Fertiggerichte' },
     { id: 'low_cal', label: '🌱 Kalorienarm (<40 kcal)' },
-    { id: 'under_100', label: '⚡ < 100 kcal / Portion' },
     { id: 'high_protein', label: '💪 Proteinreich (>10g)' },
     { id: 'budget', label: '🏷️ Günstig (< 1,50 €)' },
     { id: 'offers', label: '🔥 Netto-Angebote' }
@@ -74,27 +81,21 @@ export class DiscoverComponent {
     const calFilter = this.activeCalorieFilter();
     const remainingLimit = this.filterByRemainingKcal() ? this.remainingCalories() : null;
 
-    // 1. Textsuche
+    // 1. Textsuche nach Name, Marke oder Barcode
     if (query) {
       list = list.filter(p =>
         p.name.toLowerCase().includes(query) ||
         p.brand.toLowerCase().includes(query) ||
-        (p.ean && p.ean.includes(query))
+        (p.ean && p.ean.includes(query)) ||
+        (p.category && p.category.toLowerCase().includes(query))
       );
     }
 
-    // 2. Kategorie- & Smart-Filter
-    if (cat === 'fruits_veg' || cat === 'meat_fish' || cat === 'dairy' || cat === 'grains' || cat === 'ready_meal') {
+    // 2. Kategorie-Filter
+    if (cat === 'fruits_veg' || cat === 'meat_fish' || cat === 'dairy' || cat === 'grains' || cat === 'pantry' || cat === 'ready_meal') {
       list = list.filter(p => p.category === cat);
     } else if (cat === 'low_cal') {
       list = list.filter(p => p.nutrition.caloriesPer100g < 40);
-    } else if (cat === 'under_100') {
-      list = list.filter(p => {
-        const portionGrams = p.servingSizeGrams || 100;
-        const edibleGrams = Math.round(portionGrams * (p.edibleYieldPercent || 1.0));
-        const cal = (p.nutrition.caloriesPer100g / 100) * edibleGrams;
-        return cal <= 100;
-      });
     } else if (cat === 'high_protein') {
       list = list.filter(p => p.nutrition.proteinPer100g >= 10);
     } else if (cat === 'budget') {
@@ -106,22 +107,9 @@ export class DiscoverComponent {
     // 3. Kalorienfilter
     if (calFilter === 'low_cal') {
       list = list.filter(p => p.nutrition.caloriesPer100g < 40);
-    } else if (calFilter === 'under_100_serving') {
-      list = list.filter(p => (p.nutrition.caloriesPer100g / 100) * ((p.servingSizeGrams || 100) * (p.edibleYieldPercent || 1.0)) <= 100);
-    } else if (calFilter === 'under_200_serving') {
-      list = list.filter(p => (p.nutrition.caloriesPer100g / 100) * ((p.servingSizeGrams || 100) * (p.edibleYieldPercent || 1.0)) <= 200);
     }
 
-    // 4. Verbleibendes Kalorienbudget
-    if (remainingLimit !== null) {
-      list = list.filter(p => {
-        const portionGrams = p.servingSizeGrams || 100;
-        const cal = (p.nutrition.caloriesPer100g / 100) * (portionGrams * (p.edibleYieldPercent || 1.0));
-        return cal <= remainingLimit;
-      });
-    }
-
-    // 5. Sortierung
+    // 4. Sortierung
     const sort = this.activeSortBy();
     const sorted = [...list];
     if (sort === 'price_asc') {
@@ -139,57 +127,85 @@ export class DiscoverComponent {
     return sorted;
   });
 
-  /**
-   * Berechnet Kalorien für die übliche Standardportion
-   */
-  getServingCalories(product: ProductItem): number {
-    const servingGrams = product.servingSizeGrams || 100;
-    const edibleGrams = Math.round(servingGrams * (product.edibleYieldPercent || 1.0));
-    return Math.round((product.nutrition.caloriesPer100g / 100) * edibleGrams);
+  // Dynamische Kalorienberechnung für die geöffnete Produktdetail-Ansicht
+  readonly calculatedDetailCalories = computed<number | null>(() => {
+    const prod = this.selectedProductDetail();
+    if (!prod) return null;
+    const mode = this.detailMode();
+    const amount = this.detailAmount();
+    return this.calorieCalc.calculateCustomAmountCalories(prod, amount, mode);
+  });
+
+  getPackageCalories(product: ProductItem): number | null {
+    return this.calorieCalc.calculatePackageCalories(product);
   }
 
-  /**
-   * Berechnet Kalorien der gesamten essbaren Packung
-   */
-  getTotalPackageEdibleCalories(product: ProductItem): number {
-    const totalGrams = product.packageWeightGrams || 500;
-    const edibleGrams = Math.round(totalGrams * (product.edibleYieldPercent || 1.0));
-    return Math.round((product.nutrition.caloriesPer100g / 100) * edibleGrams);
+  getPieceInfo(product: ProductItem): PieceCalorieInfo | null {
+    return this.calorieCalc.calculatePieceCalories(product);
   }
 
-  openLogModal(product: ProductItem): void {
-    this.selectedProductForLog.set(product);
-    this.customAmountGrams = product.servingSizeGrams || 150;
-    this.selectedMealType = 'snack';
-    this.selectedLogStatus = 'planned';
+  openProductDetail(product: ProductItem): void {
+    this.selectedProductDetail.set(product);
+    const pieceInfo = this.calorieCalc.calculatePieceCalories(product);
+    if (pieceInfo) {
+      this.detailMode.set('pieces');
+      this.detailAmount.set(1);
+    } else {
+      this.detailMode.set('grams');
+      this.detailAmount.set(product.servingSizeGrams || 100);
+    }
   }
 
-  closeLogModal(): void {
-    this.selectedProductForLog.set(null);
+  closeProductDetail(): void {
+    this.selectedProductDetail.set(null);
   }
 
-  setPredefinedAmount(grams: number): void {
-    this.customAmountGrams = grams;
-  }
-
-  confirmAddToDay(): void {
-    const product = this.selectedProductForLog();
-    if (!product || this.customAmountGrams <= 0) return;
-
-    this.foodLogService.addProductToDay(
-      product,
-      this.customAmountGrams,
-      this.selectedMealType,
-      this.selectedLogStatus
-    );
-
-    this.showToast(`"${product.name}" (${this.customAmountGrams}g) zum Tagesplan hinzugefügt!`);
-    this.closeLogModal();
+  setDetailSelection(amount: number, mode: 'pieces' | 'grams' | 'packages'): void {
+    this.detailAmount.set(amount);
+    this.detailMode.set(mode);
   }
 
   addToShoppingList(product: ProductItem): void {
     this.shoppingListService.addProductToShoppingList(product);
-    this.showToast(`"${product.name}" auf Einkaufsliste gesetzt!`);
+    this.showToast(`1 Packung "${product.name}" zur Einkaufsliste hinzugefügt!`);
+  }
+
+  logAsEatenFromDetail(): void {
+    const prod = this.selectedProductDetail();
+    if (!prod) return;
+
+    let grams = 100;
+    const mode = this.detailMode();
+    const amount = this.detailAmount();
+
+    if (mode === 'pieces') {
+      const pieceInfo = this.calorieCalc.calculatePieceCalories(prod);
+      grams = (pieceInfo?.pieceWeightGrams || 50) * amount;
+    } else if (mode === 'packages') {
+      grams = (prod.packageWeightGrams || 500) * amount;
+    } else {
+      grams = amount;
+    }
+
+    this.foodLogService.addProductToDay(prod, Math.round(grams), this.selectedMealType, 'eaten');
+    this.showToast(`"${prod.name}" (${Math.round(grams)}g) als gegessen verbucht!`);
+    this.closeProductDetail();
+  }
+
+  // Barcode-Suche
+  searchByBarcode(): void {
+    const code = this.barcodeInput.trim();
+    if (!code) return;
+
+    const matched = this.productService.products().find(p => p.ean === code);
+    if (matched) {
+      this.barcodeScanError.set(null);
+      this.showBarcodeScanner.set(false);
+      this.barcodeInput = '';
+      this.openProductDetail(matched);
+    } else {
+      this.barcodeScanError.set(`Kein verifiziertes Netto-Produkt mit EAN "${code}" gefunden.`);
+    }
   }
 
   goToShoppingList(): void {

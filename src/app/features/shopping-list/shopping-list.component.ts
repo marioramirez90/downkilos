@@ -36,12 +36,20 @@ export class ShoppingListComponent {
     this.showAddModal.set(false);
   }
 
+  updateCount(id: string, delta: number): void {
+    this.shoppingService.updatePackageCount(id, delta);
+  }
+
+  removeItem(id: string): void {
+    this.shoppingService.removeItem(id);
+  }
+
   openListInStore() {
     // Mode for shopping directly at Netto
     alert('Einkaufsmodus aktiviert! Hake deine Artikel beim Einkauf im Netto-Markt einfach ab.');
   }
 
   goBack() {
-    this.router.navigate(['/meal-planner']);
+    this.router.navigate(['/discover']);
   }
 }

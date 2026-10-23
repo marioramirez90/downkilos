@@ -1,6 +1,6 @@
 <div class="flex flex-col h-full bg-[#FFFFFF] overflow-hidden">
   <!-- Bereich A: Fester Header mit Kategoriefilter -->
-  <header class="flex-shrink-0 px-5 pt-4 pb-2 bg-white border-b border-[#F0F4F1] z-10 space-y-2">
+  <header class="flex-shrink-0 px-5 pt-4 pb-2 bg-white border-b border-[#F0F4F1] z-10 space-y-2.5">
     <div class="flex items-center justify-between pb-1">
       <div class="flex items-center gap-3">
         <button
@@ -13,9 +13,14 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
           </svg>
         </button>
-        <h1 class="text-xl sm:text-2xl font-extrabold text-[#103A2A] tracking-tight">
-          Einkaufsliste
-        </h1>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-extrabold text-[#103A2A] tracking-tight">
+            Meine Einkaufsliste
+          </h1>
+          <span class="text-[10px] text-[#627264] block">
+            Echte Netto-Packungen, Gesamtkosten & Packungskalorien
+          </span>
+        </div>
       </div>
 
       <!-- Info & Add Action -->
@@ -23,7 +28,6 @@
         <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FFF200] text-[#ED1C24] border border-[#E6DB00]">
           Netto
         </span>
-        <app-hamburger-button></app-hamburger-button>
         <button
           type="button"
           (click)="showAddModal.set(true)"
@@ -31,36 +35,74 @@
         >
           + Artikel
         </button>
-        <button
-          type="button"
-          (click)="showInfo.set(!showInfo())"
-          class="w-8 h-8 rounded-full bg-[#F1F5F2] hover:bg-[#E5F5E8] flex items-center justify-center text-[#278F39] transition-colors text-xs font-bold cursor-pointer"
-          title="Info"
-        >
-          ℹ️
-        </button>
+        <app-hamburger-button></app-hamburger-button>
       </div>
     </div>
 
-    <!-- Info Notice -->
-    @if (showInfo()) {
-      <div class="p-3.5 rounded-2xl bg-[#E5F5E8] border border-[#CDE9D2] text-xs text-[#103A2A] leading-relaxed animate-fade-in flex justify-between items-start">
-        <div class="space-y-1">
-          <p class="font-bold">Echte Netto Marken-Discount Produkte</p>
-          <p>
-            Mengen basieren auf ganzen Netto-Packungsgrößen. Preise werden als aktuelle Angebote oder zuletzt bekannte Filialpreise geführt. Keine Fantasiepreise.
-          </p>
-        </div>
-        <button (click)="showInfo.set(false)" class="text-xs font-bold text-[#278F39] ml-2 cursor-pointer">✕</button>
+    <!-- ZENTRALE KENNZAHLEN DER EINKAUFSLISTE (Kosten & Kalorien) -->
+    <div class="p-3.5 rounded-3xl bg-gradient-to-br from-[#EBF3EC] to-[#DEECE0] border border-[#CDE9D2] shadow-soft-sm space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="text-[11px] font-extrabold text-[#103A2A] uppercase tracking-wider flex items-center gap-1.5">
+          <span>🛒</span>
+          <span>Netto Einkaufskosten & Gesamtsumme</span>
+        </span>
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white text-[#278F39] border border-[#CDE9D2]">
+          {{ shoppingService.summary().checkedItems }} von {{ shoppingService.summary().totalItems }} gekauft
+        </span>
       </div>
-    }
 
-    <!-- Category Filter Pills (Matching Screen 6) -->
+      <div class="grid grid-cols-2 gap-2">
+        <!-- Karte 1: Gesamtkosten in Euro -->
+        <div class="p-2.5 rounded-2xl bg-white border border-[#CDE9D2] shadow-2xs">
+          <span class="text-[9px] font-bold text-[#627264] uppercase block">Gesamtkosten</span>
+          <span class="text-lg font-black text-[#103A2A] block mt-0.5">
+            {{ priceService.formatPrice(shoppingService.summary().totalCost) }}
+          </span>
+          <span class="text-[9px] text-[#278F39] font-medium block">
+            exakt in Cent berechnet
+          </span>
+        </div>
+
+        <!-- Karte 2: Gesamtkalorien aller gekauften Lebensmittelpackungen -->
+        <div class="p-2.5 rounded-2xl bg-[#103A2A] text-white shadow-2xs">
+          <span class="text-[9px] font-bold text-[#A3E5B1] uppercase block flex items-center gap-1">
+            <span>🔥</span>
+            <span>Gesamtkalorien</span>
+          </span>
+          <span class="text-lg font-black text-white block mt-0.5">
+            @if (shoppingService.summary().totalCalories !== null) {
+              {{ shoppingService.summary().totalCalories | number:'1.0-0' }} kcal
+            } @else {
+              <span class="text-xs font-semibold text-[#FED7AA]">Teilsumme</span>
+            }
+          </span>
+          <span class="text-[9px] text-[#A3E5B1]/80 block">
+            aller essbaren Packungen
+          </span>
+        </div>
+      </div>
+
+      <!-- Hinweis bei unvollständigen Daten (niemals erfundene Zahlen!) -->
+      @if (shoppingService.summary().estimateNotice; as priceNotice) {
+        <div class="p-1.5 rounded-xl bg-white/70 text-[10px] text-[#D97706] font-semibold flex items-center gap-1.5">
+          <span>⚠️</span>
+          <span>{{ priceNotice }}</span>
+        </div>
+      }
+      @if (shoppingService.summary().caloriesNotice; as calNotice) {
+        <div class="p-1.5 rounded-xl bg-white/70 text-[10px] text-[#B45309] font-semibold flex items-center gap-1.5">
+          <span>ℹ️</span>
+          <span>{{ calNotice }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Category Filter Pills -->
     <div class="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar select-none text-xs">
       <button
         type="button"
         (click)="setCategory('all')"
-        class="py-1.5 px-3.5 rounded-full font-bold transition-all whitespace-nowrap cursor-pointer"
+        class="py-1 px-3 rounded-full font-bold transition-all whitespace-nowrap cursor-pointer text-[11px]"
         [ngClass]="shoppingService.selectedCategory() === 'all'
           ? 'bg-[#278F39] text-white shadow-soft-sm'
           : 'bg-[#F1F5F2] text-[#627264] hover:bg-[#E2EDE5]'"
@@ -69,69 +111,68 @@
       </button>
       <button
         type="button"
+        (click)="setCategory('grains')"
+        class="py-1 px-3 rounded-full font-bold transition-all whitespace-nowrap cursor-pointer text-[11px]"
+        [ngClass]="shoppingService.selectedCategory() === 'grains'
+          ? 'bg-[#278F39] text-white shadow-soft-sm'
+          : 'bg-[#F1F5F2] text-[#627264] hover:bg-[#E2EDE5]'"
+      >
+        Brot & Getreide
+      </button>
+      <button
+        type="button"
+        (click)="setCategory('dairy')"
+        class="py-1 px-3 rounded-full font-bold transition-all whitespace-nowrap cursor-pointer text-[11px]"
+        [ngClass]="shoppingService.selectedCategory() === 'dairy'
+          ? 'bg-[#278F39] text-white shadow-soft-sm'
+          : 'bg-[#F1F5F2] text-[#627264] hover:bg-[#E2EDE5]'"
+      >
+        Eier & Milch
+      </button>
+      <button
+        type="button"
+        (click)="setCategory('pantry')"
+        class="py-1 px-3 rounded-full font-bold transition-all whitespace-nowrap cursor-pointer text-[11px]"
+        [ngClass]="shoppingService.selectedCategory() === 'pantry'
+          ? 'bg-[#278F39] text-white shadow-soft-sm'
+          : 'bg-[#F1F5F2] text-[#627264] hover:bg-[#E2EDE5]'"
+      >
+        Vorrat & Dosen
+      </button>
+      <button
+        type="button"
         (click)="setCategory('fruits_veg')"
-        class="py-1.5 px-3.5 rounded-full font-bold transition-all whitespace-nowrap cursor-pointer"
+        class="py-1 px-3 rounded-full font-bold transition-all whitespace-nowrap cursor-pointer text-[11px]"
         [ngClass]="shoppingService.selectedCategory() === 'fruits_veg'
           ? 'bg-[#278F39] text-white shadow-soft-sm'
           : 'bg-[#F1F5F2] text-[#627264] hover:bg-[#E2EDE5]'"
       >
         Obst & Gemüse
       </button>
-      <button
-        type="button"
-        (click)="setCategory('dairy')"
-        class="py-1.5 px-3.5 rounded-full font-bold transition-all whitespace-nowrap cursor-pointer"
-        [ngClass]="shoppingService.selectedCategory() === 'dairy'
-          ? 'bg-[#278F39] text-white shadow-soft-sm'
-          : 'bg-[#F1F5F2] text-[#627264] hover:bg-[#E2EDE5]'"
-      >
-        Milchprodukte
-      </button>
-      <button
-        type="button"
-        (click)="setCategory('meat_fish')"
-        class="py-1.5 px-3.5 rounded-full font-bold transition-all whitespace-nowrap cursor-pointer"
-        [ngClass]="shoppingService.selectedCategory() === 'meat_fish'
-          ? 'bg-[#278F39] text-white shadow-soft-sm'
-          : 'bg-[#F1F5F2] text-[#627264] hover:bg-[#E2EDE5]'"
-      >
-        Fleisch & Fisch
-      </button>
-      <button
-        type="button"
-        (click)="setCategory('grains')"
-        class="py-1.5 px-3.5 rounded-full font-bold transition-all whitespace-nowrap cursor-pointer"
-        [ngClass]="shoppingService.selectedCategory() === 'grains'
-          ? 'bg-[#278F39] text-white shadow-soft-sm'
-          : 'bg-[#F1F5F2] text-[#627264] hover:bg-[#E2EDE5]'"
-      >
-        Getreide
-      </button>
     </div>
   </header>
 
-  <!-- Bereich B: Scrollbarer Inhalt -->
+  <!-- Bereich B: Scrollbarer Inhalt der Einkaufsliste -->
   <main class="flex-1 px-5 py-4 space-y-3 min-h-0 overflow-y-auto">
-    <!-- Items List (Matching Screen 6) -->
-    <div class="space-y-2">
+    <div class="space-y-3">
       @for (item of shoppingService.filteredItems(); track item.id) {
         <div
-          class="p-2.5 sm:p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 select-none"
+          class="p-3.5 rounded-3xl border transition-all flex flex-col gap-2.5 select-none"
           [ngClass]="item.isChecked || item.inPantry
             ? 'bg-[#F8FAF9] border-[#E3EBE4] opacity-80'
-            : 'bg-white border-[#E3EBE4] shadow-soft-sm hover:border-[#278F39]/50'"
+            : 'bg-white border-[#E3EBE4] shadow-soft-sm hover:border-[#278F39]'"
         >
-          <!-- Left: Checkbox & Product Image -->
-          <div class="flex items-center gap-3 min-w-0 flex-1">
-            <!-- Checkbox -->
+          <!-- Top Row: Checkbox, Bild, Name, Marke, Entfernen -->
+          <div class="flex items-start gap-3 min-w-0">
+            <!-- Checkbox "Gekauft" -->
             <button
               type="button"
               (click)="shoppingService.toggleItemChecked(item.id)"
-              class="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 transition-all cursor-pointer"
+              class="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 transition-all cursor-pointer mt-0.5"
               [ngClass]="item.isChecked
                 ? 'bg-[#278F39] text-white shadow-2xs'
                 : 'border-2 border-[#CBD5E1] bg-white hover:border-[#278F39]'"
-              [attr.aria-label]="item.name + ' abhaken'"
+              [attr.aria-label]="item.name + ' als gekauft markieren'"
             >
               @if (item.isChecked) {
                 <svg class="w-4 h-4 stroke-[3]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -141,170 +182,121 @@
             </button>
 
             <!-- Thumbnail -->
-            <div class="w-12 h-12 rounded-xl overflow-hidden bg-[#F6F8F6] border border-[#E3EBE4] flex-shrink-0">
+            <div class="w-14 h-14 rounded-2xl overflow-hidden bg-[#F6F8F6] border border-[#E3EBE4] flex-shrink-0">
               <img [src]="item.imageUrl" [alt]="item.name" class="w-full h-full object-cover" loading="lazy" />
             </div>
 
-            <!-- Text labels -->
+            <!-- Produkt-Titel & Packungsgröße -->
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-1.5 flex-wrap">
-                <h4
-                  class="text-xs sm:text-sm font-bold text-[#103A2A] truncate"
-                  [class.line-through]="item.isChecked"
-                  [class.text-[#627264]]="item.isChecked"
-                >
-                  {{ item.name }}
-                </h4>
-                @if (item.brand) {
-                  <span class="text-[9px] font-semibold text-[#627264] px-1 bg-[#F1F5F2] rounded">
-                    {{ item.brand }}
+                <span class="text-[9px] font-bold text-[#627264] uppercase tracking-wider">
+                  {{ item.brand || 'Netto' }}
+                </span>
+                @if (item.inPantry) {
+                  <span class="text-[9px] font-bold text-[#278F39] bg-[#E5F5E8] px-1.5 py-0.2 rounded">
+                    Im Vorrat (kostet 0 €)
                   </span>
                 }
               </div>
+
+              <h4
+                class="text-xs sm:text-sm font-extrabold text-[#103A2A] leading-snug line-clamp-2 mt-0.5"
+                [class.line-through]="item.isChecked"
+                [class.text-[#627264]]="item.isChecked"
+              >
+                {{ item.name }}
+              </h4>
+
               <div class="flex items-center gap-2 mt-0.5 text-[11px] text-[#627264] flex-wrap">
-                <span>{{ item.packageCount }}x {{ item.packageSize }}</span>
-                @if (item.priceStatus) {
-                  <span
-                    class="text-[9px] font-bold px-1.5 py-0.2 rounded"
-                    [ngClass]="priceService.getStatusBadge(item.priceStatus).bgClass + ' ' + priceService.getStatusBadge(item.priceStatus).textClass"
-                  >
-                    {{ priceService.getStatusBadge(item.priceStatus).badgeText }}
-                  </span>
-                }
-                @if (item.observationDate) {
-                  <span class="text-[9px] text-[#94A3B8]">
-                    {{ priceService.formatObservationDate(item.observationDate) }}
+                <span class="font-bold text-[#103A2A]">{{ item.packageSize }}</span>
+                @if (item.packageCalories !== null && item.packageCalories !== undefined) {
+                  <span class="text-[10px] text-[#278F39] font-bold">
+                    {{ item.packageCalories }} kcal / Pck.
                   </span>
                 }
               </div>
             </div>
+
+            <!-- Entfernen-Button -->
+            <button
+              type="button"
+              (click)="removeItem(item.id)"
+              class="w-7 h-7 rounded-full bg-[#F6F8F6] hover:bg-[#FEE2E2] text-[#94A3B8] hover:text-[#EF4444] flex items-center justify-center transition-colors cursor-pointer text-xs flex-shrink-0"
+              title="Artikel entfernen"
+            >
+              🗑️
+            </button>
           </div>
 
-          <!-- Right: Price & Pantry Action -->
-          <div class="flex flex-col items-end justify-between flex-shrink-0 gap-1">
-            <span
-              class="text-xs sm:text-sm font-black"
-              [ngClass]="item.inPantry ? 'text-[#94A3B8] line-through' : (item.totalCost !== null ? 'text-[#103A2A]' : 'text-[#D97706] text-xs font-semibold')"
-            >
-              {{ item.inPantry ? 'Im Vorrat' : priceService.formatPrice(item.totalCost) }}
-            </span>
-            
-            <div class="flex items-center gap-1.5">
+          <!-- Bottom Row: Stepper für Packungsanzahl & Zeilen-Gesamtsummen -->
+          <div class="pt-2 border-t border-[#F0F4F1] flex items-center justify-between gap-2 flex-wrap">
+            <!-- Stepper für Packungen mit Plus & Minus -->
+            <div class="flex items-center gap-1 bg-[#F6F8F6] p-1 rounded-xl border border-[#E3EBE4]">
               <button
                 type="button"
-                (click)="shoppingService.toggleInPantry(item.id)"
-                class="text-[10px] font-semibold px-1.5 py-0.5 rounded cursor-pointer transition-colors"
-                [ngClass]="item.inPantry
-                  ? 'bg-[#E5F5E8] text-[#278F39] font-bold'
-                  : 'bg-[#F1F5F2] text-[#627264] hover:bg-[#E2EDE5]'"
-                [title]="item.inPantry ? 'Aus Vorrat entfernen' : 'Bereits im Vorrat vorhanden (kostet 0 €)'"
+                (click)="updateCount(item.id, -1)"
+                [disabled]="item.packageCount <= 1"
+                class="w-7 h-7 rounded-lg bg-white border border-[#DCE4DE] hover:bg-[#E5F5E8] active:scale-95 text-[#103A2A] font-extrabold text-sm flex items-center justify-center cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                title="1 Packung weniger"
               >
-                {{ item.inPantry ? '✓ Vorrat' : 'Vorrat?' }}
+                −
               </button>
 
-              @if (item.isCustom) {
-                <button
-                  type="button"
-                  (click)="shoppingService.removeCustomItem(item.id)"
-                  class="text-xs text-red-400 hover:text-red-600 p-0.5 cursor-pointer"
-                  title="Löschen"
+              <span class="px-2 text-xs font-black text-[#103A2A] min-w-[3.5rem] text-center">
+                {{ item.packageCount }} {{ item.packageCount === 1 ? 'Packung' : 'Packungen' }}
+              </span>
+
+              <button
+                type="button"
+                (click)="updateCount(item.id, 1)"
+                class="w-7 h-7 rounded-lg bg-white border border-[#DCE4DE] hover:bg-[#E5F5E8] active:scale-95 text-[#103A2A] font-extrabold text-sm flex items-center justify-center cursor-pointer"
+                title="1 Packung mehr"
+              >
+                +
+              </button>
+            </div>
+
+            <!-- Zeilensumme für diese Position (Preis & Kalorien) -->
+            <div class="flex items-center gap-3 text-right">
+              <!-- Kalorien dieser Position -->
+              <div>
+                <span class="text-[9px] text-[#627264] block font-semibold">Position Kalorien</span>
+                <span class="text-xs font-black text-[#278F39]">
+                  @if (item.totalCalories !== null && item.totalCalories !== undefined) {
+                    {{ item.totalCalories | number:'1.0-0' }} kcal
+                  } @else {
+                    <span class="text-[10px] text-[#D97706]">unbekannt</span>
+                  }
+                </span>
+              </div>
+
+              <!-- Preis dieser Position -->
+              <div>
+                <span class="text-[9px] text-[#627264] block font-semibold">Position Preis</span>
+                <span
+                  class="text-xs sm:text-sm font-black"
+                  [ngClass]="item.inPantry ? 'text-[#94A3B8] line-through' : (item.totalCost !== null ? 'text-[#103A2A]' : 'text-[#D97706] text-xs font-semibold')"
                 >
-                  ✕
-                </button>
-              }
+                  {{ item.inPantry ? '0,00 €' : priceService.formatPrice(item.totalCost) }}
+                </span>
+              </div>
             </div>
           </div>
         </div>
       } @empty {
-        <div class="text-center py-8 text-xs text-[#627264]">
-          Keine Artikel in dieser Kategorie vorhanden.
-        </div>
-      }
-    </div>
-
-    <!-- Optional Budget Buffer Selector -->
-    <div class="p-3 rounded-2xl bg-[#F6F8F6] border border-[#E3EBE4] space-y-2 mt-2">
-      <div class="flex items-center justify-between text-xs">
-        <span class="font-semibold text-[#17241D]">Budget-Sicherheitspuffer:</span>
-        <div class="flex gap-1">
-          <button
-            type="button"
-            (click)="shoppingService.setBudgetBuffer(0)"
-            class="px-2 py-0.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer"
-            [ngClass]="shoppingService.budgetBufferPercent() === 0 ? 'bg-[#278F39] text-white' : 'bg-white text-[#627264] border border-[#E3EBE4]'"
-          >
-            0%
-          </button>
-          <button
-            type="button"
-            (click)="shoppingService.setBudgetBuffer(5)"
-            class="px-2 py-0.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer"
-            [ngClass]="shoppingService.budgetBufferPercent() === 5 ? 'bg-[#278F39] text-white' : 'bg-white text-[#627264] border border-[#E3EBE4]'"
-          >
-            +5%
-          </button>
-          <button
-            type="button"
-            (click)="shoppingService.setBudgetBuffer(10)"
-            class="px-2 py-0.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer"
-            [ngClass]="shoppingService.budgetBufferPercent() === 10 ? 'bg-[#278F39] text-white' : 'bg-white text-[#627264] border border-[#E3EBE4]'"
-          >
-            +10%
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bottom Summary Row: Dual Cost Breakdown (Tatsächlicher Einkauf vs Rechnerische Portionskosten) -->
-    <div class="p-3.5 rounded-2xl bg-[#F6F8F6] border-2 border-[#278F39]/20 space-y-2.5 mt-2">
-      <div class="flex items-center justify-between">
-        <span class="text-[11px] font-extrabold uppercase tracking-wider text-[#278F39]">
-          Netto Einkaufskosten
-        </span>
-        <span class="text-[10px] text-[#627264]">
-          {{ shoppingService.summary().checkedItems }} von {{ shoppingService.summary().totalItems }} Artikeln erledigt
-        </span>
-      </div>
-
-      <div class="grid grid-cols-2 gap-2">
-        <div class="p-2.5 rounded-xl bg-white border border-[#E3EBE4]">
-          <span class="text-[9px] font-bold text-[#627264] uppercase block">Rechnerische Portionskosten</span>
-          <span class="text-base font-extrabold text-[#278F39] block mt-0.5">
-            {{ priceService.formatPrice(shoppingService.summary().totalPortionCost) }}
-          </span>
-          <span class="text-[8px] text-[#627264] block leading-tight">Effektiv verzehrter Anteil</span>
-        </div>
-
-        <div class="p-2.5 rounded-xl bg-[#FFF9E6] border border-[#FFE082]">
-          <span class="text-[9px] font-bold text-[#B45309] uppercase block">Tatsächlicher Kassenbon</span>
-          <span class="text-base font-extrabold text-[#B45309] block mt-0.5">
-            {{ priceService.formatPrice(shoppingService.summary().totalCostWithBuffer) }}
-          </span>
-          <span class="text-[8px] text-[#B45309]/80 block leading-tight">Alle ganzen Packungen</span>
-        </div>
-      </div>
-
-      @if (shoppingService.summary().budgetBufferPercent > 0) {
-        <span class="text-[10px] text-[#627264] block">
-          Inkl. {{ shoppingService.summary().budgetBufferPercent }}% Puffer (+{{ priceService.formatPrice(shoppingService.summary().budgetBufferAmount) }})
-        </span>
-      }
-
-      <!-- Schätzungs- oder Unvollständigkeits-Hinweis -->
-      @if (shoppingService.summary().estimateNotice; as notice) {
-        <div class="pt-1.5 border-t border-[#E3EBE4] flex items-center gap-1.5 text-[10px]"
-             [ngClass]="shoppingService.summary().hasMissingPrices ? 'text-[#D97706]' : 'text-[#2563EB]'">
-          <span>ℹ️</span>
-          <span class="font-semibold">{{ notice }}</span>
+        <div class="text-center py-12 bg-[#F6F8F6] rounded-3xl border border-[#E3EBE4] space-y-2">
+          <span class="text-3xl">🛒</span>
+          <p class="text-xs font-bold text-[#103A2A]">Deine Einkaufsliste ist leer.</p>
+          <p class="text-[11px] text-[#627264]">Entdecke Netto-Lebensmittel und füge sie mit einem Klick hinzu!</p>
         </div>
       }
     </div>
   </main>
 
-  <!-- Bereich C: Fester unterer Bereich mit Hauptbutton und Navigationsleiste -->
+  <!-- Bereich C: Fester Footer mit Hauptbutton und Navigationsleiste -->
   <footer class="flex-shrink-0 bg-white border-t border-[#E3EBE4] z-20">
-    <!-- Hauptbutton "Liste im Markt öffnen" unmittelbar über der Navigationsleiste -->
-    <div class="px-5 py-2.5 bg-white border-b border-[#F0F4F1]">
+    <!-- Hauptbutton "Liste im Markt öffnen" -->
+    <div class="px-5 py-2.5 bg-white border-b border-[#F0F4F1] flex gap-2">
       <button
         type="button"
         (click)="openListInStore()"
@@ -324,7 +316,7 @@
     <div class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fade-in">
       <div class="bg-white rounded-3xl p-5 w-full max-w-sm space-y-4 shadow-xl border border-[#E3EBE4]">
         <div class="flex justify-between items-center">
-          <h3 class="text-sm font-extrabold text-[#103A2A]">Artikel hinzufügen</h3>
+          <h3 class="text-sm font-extrabold text-[#103A2A]">Eigenen Artikel hinzufügen</h3>
           <button (click)="showAddModal.set(false)" class="text-[#627264] hover:text-[#103A2A] font-bold cursor-pointer">✕</button>
         </div>
 

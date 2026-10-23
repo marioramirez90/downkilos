@@ -2,6 +2,7 @@ import { Injectable, inject, signal, computed } from '@angular/core';
 import { ShoppingListItem, ShoppingListSummary } from '../models/shopping-list.model';
 import { ProductService } from './product.service';
 import { PantryService } from './pantry.service';
+import { PackageCalorieCalculatorService } from './package-calorie-calculator.service';
 import { ProductCategory, ProductItem } from '../models/product.model';
 import { Recipe } from '../models/recipe.model';
 
@@ -15,6 +16,7 @@ const STORAGE_CUSTOM_ITEMS_KEY = 'down_kilos_shopping_custom';
 export class ShoppingListService {
   private productService = inject(ProductService);
   private pantryService = inject(PantryService);
+  private calorieCalc = inject(PackageCalorieCalculatorService);
 
   readonly items = signal<ShoppingListItem[]>([]);
   readonly selectedCategory = signal<ProductCategory>('all');
@@ -25,32 +27,43 @@ export class ShoppingListService {
     const totalItems = all.length;
     const checkedItems = all.filter(i => i.isChecked).length;
 
-    let totalFullPackageCost = 0;
-    let totalPortionCost = 0;
+    let totalFullPackageCostCents = 0;
+    let totalPortionCostCents = 0;
+    let totalCaloriesSum = 0;
     let hasMissingPrices = false;
     let hasOlderPrices = false;
+    let hasMissingCalories = false;
 
     for (const item of all) {
-      // Wenn bereits im Vorrat vorhanden, entfällt der Kaufpreis
+      // Wenn bereits im Vorrat vorhanden, entfällt der Kaufpreis & Zukauf-Kalorien
       if (item.inPantry) {
         continue;
       }
 
+      // 1. Euro-Kosten (Berechnung intern in Cent zur Vermeidung von Rundungsfehlern)
       if (item.totalCost !== null && item.totalCost !== undefined) {
-        totalFullPackageCost += item.totalCost;
-        totalPortionCost += (item.portionCost ?? item.totalCost);
+        totalFullPackageCostCents += Math.round(item.totalCost * 100);
+        const portion = item.portionCost !== null && item.portionCost !== undefined ? item.portionCost : item.totalCost;
+        totalPortionCostCents += Math.round(portion * 100);
         if (item.isOlderPrice) {
           hasOlderPrices = true;
         }
       } else {
         hasMissingPrices = true;
       }
+
+      // 2. Gesamtkalorien aller gekauften Packungen
+      if (item.totalCalories !== null && item.totalCalories !== undefined) {
+        totalCaloriesSum += item.totalCalories;
+      } else {
+        hasMissingCalories = true;
+      }
     }
 
-    const roundedBase = Math.round(totalFullPackageCost * 100) / 100;
-    const roundedPortionBase = Math.round(totalPortionCost * 100) / 100;
+    const roundedBase = totalFullPackageCostCents / 100;
+    const roundedPortionBase = totalPortionCostCents / 100;
     const bufferPct = this.budgetBufferPercent();
-    const bufferAmount = Math.round((roundedBase * (bufferPct / 100)) * 100) / 100;
+    const bufferAmount = Math.round(totalFullPackageCostCents * (bufferPct / 100)) / 100;
     const totalCostWithBuffer = Math.round((roundedBase + bufferAmount) * 100) / 100;
 
     let estimateNotice: string | undefined = undefined;
@@ -60,18 +73,26 @@ export class ShoppingListService {
       estimateNotice = 'Geschätzter Einkaufswert (basiert teilweise auf zuletzt beobachteten Preisen)';
     }
 
+    let caloriesNotice: string | undefined = undefined;
+    if (hasMissingCalories) {
+      caloriesNotice = 'Kaloriensumme unvollständig (Nährwertdaten für einzelne Artikel fehlen)';
+    }
+
     return {
       totalItems,
       checkedItems,
       totalCost: roundedBase,
       totalPortionCost: roundedPortionBase,
-      isComplete: !hasMissingPrices,
+      totalCalories: hasMissingCalories ? (totalCaloriesSum > 0 ? totalCaloriesSum : null) : totalCaloriesSum,
+      isComplete: !hasMissingPrices && !hasMissingCalories,
       hasOlderPrices,
       hasMissingPrices,
+      hasMissingCalories,
       budgetBufferPercent: bufferPct,
       budgetBufferAmount: bufferAmount,
       totalCostWithBuffer,
-      estimateNotice
+      estimateNotice,
+      caloriesNotice
     };
   });
 
@@ -97,16 +118,15 @@ export class ShoppingListService {
 
     // Basis-Bedarf der Mahlzeiten
     const planProductIds: Array<{ id: string; neededAmount: number; unit: string; defaultPackageCount?: number }> = [
+      { id: 'netto-toast-500', neededAmount: 500, unit: 'g' },
+      { id: 'netto-eggs-10stk', neededAmount: 10, unit: 'Stück' },
+      { id: 'netto-kidney-beans-400', neededAmount: 400, unit: 'g' },
       { id: 'netto-chicken-400', neededAmount: 400, unit: 'g' },
       { id: 'netto-brown-rice-500', neededAmount: 500, unit: 'g' },
       { id: 'netto-broccoli-1stk', neededAmount: 1, unit: 'Stück' },
-      { id: 'netto-paprika-red-2stk', neededAmount: 500, unit: 'g' },
-      { id: 'netto-carrots-1kg', neededAmount: 1, unit: 'kg' },
       { id: 'netto-oats-500', neededAmount: 500, unit: 'g' },
       { id: 'netto-skyr-500', neededAmount: 500, unit: 'g' },
-      { id: 'netto-bananas-1kg', neededAmount: 1, unit: 'kg' },
-      { id: 'netto-red-lentils-500', neededAmount: 500, unit: 'g' },
-      { id: 'netto-eggs-10stk', neededAmount: 10, unit: 'Stück' }
+      { id: 'netto-bananas-1kg', neededAmount: 1, unit: 'kg' }
     ];
 
     const baseItems: ShoppingListItem[] = planProductIds.map(def => {
@@ -114,7 +134,10 @@ export class ShoppingListService {
       const isOlder = prod ? (prod.priceStatus === 'last_observed' || prod.priceStatus === 'user_reported') : false;
       const price = prod?.price ?? null;
       const packageCount = def.defaultPackageCount || 1;
-      const totalCost = price !== null ? Math.round((price * packageCount) * 100) / 100 : null;
+
+      const packCalories = prod ? this.calorieCalc.calculatePackageCalories(prod) : null;
+      const pieceInfo = prod ? this.calorieCalc.calculatePieceCalories(prod) : null;
+      const itemTotals = this.calorieCalc.calculateItemTotals(price, packageCount, packCalories);
 
       return {
         id: `item-${def.id}`,
@@ -130,8 +153,13 @@ export class ShoppingListService {
         packageWeightGrams: prod?.packageWeightGrams || 500,
         packageCount,
         packagePrice: price,
-        portionCost: totalCost,
-        totalCost,
+        portionCost: itemTotals.totalCostEuro,
+        totalCost: itemTotals.totalCostEuro,
+        packageCalories: packCalories,
+        totalCalories: itemTotals.totalCalories,
+        caloriesPer100g: prod?.nutrition?.caloriesPer100g ?? null,
+        caloriesPerPiece: pieceInfo?.calories ?? null,
+        pieceUnitName: pieceInfo?.unitName ?? prod?.pieceUnitName,
         isChecked: checkedMap[`item-${def.id}`] ?? false,
         priceStatus: prod?.priceStatus || 'unknown',
         priceSource: prod?.priceSource || 'Netto Katalog',
@@ -140,14 +168,6 @@ export class ShoppingListService {
         inPantry: pantryMap[`item-${def.id}`] ?? false
       };
     });
-
-    // Mark reference items from Screen 6 as checked if not user-toggled yet
-    if (checkedMap['item-netto-chicken-400'] === undefined && checkedMap['item-netto-brown-rice-500'] === undefined) {
-      const chicken = baseItems.find(i => i.productId === 'netto-chicken-400');
-      const rice = baseItems.find(i => i.productId === 'netto-brown-rice-500');
-      if (chicken) chicken.isChecked = true;
-      if (rice) rice.isChecked = true;
-    }
 
     const combined = [...baseItems, ...customItems];
     this.items.set(combined);
@@ -170,6 +190,7 @@ export class ShoppingListService {
       const neededGrams = ing.amount * (servings / (recipe.defaultServings || 1));
       const packageGrams = prod.packageWeightGrams || 500;
       const packagePrice = prod.price;
+      const packCalories = this.calorieCalc.calculatePackageCalories(prod);
 
       // Existiert bereits ein Eintrag für dieses Produkt auf der Einkaufsliste?
       const existingIdx = currentItems.findIndex(i => i.productId === ing.productId);
@@ -178,21 +199,28 @@ export class ShoppingListService {
         const existing = currentItems[existingIdx];
         const newTotalNeeded = existing.neededAmount + neededGrams;
         const newPackageCount = Math.max(1, Math.ceil(newTotalNeeded / packageGrams));
-        const newTotalCost = packagePrice !== null ? Math.round((packagePrice * newPackageCount) * 100) / 100 : null;
-        const newPortionCost = packagePrice !== null ? Math.round(((packagePrice / packageGrams) * newTotalNeeded) * 100) / 100 : null;
+        const itemTotals = this.calorieCalc.calculateItemTotals(packagePrice, newPackageCount, packCalories);
+        const newPortionCost = packagePrice !== null 
+          ? Math.round(((packagePrice / packageGrams) * newTotalNeeded) * 100) / 100 
+          : null;
 
         currentItems[existingIdx] = {
           ...existing,
           neededAmount: Math.round(newTotalNeeded),
           packageCount: newPackageCount,
-          totalCost: newTotalCost,
-          portionCost: newPortionCost
+          totalCost: itemTotals.totalCostEuro,
+          portionCost: newPortionCost,
+          packageCalories: packCalories,
+          totalCalories: itemTotals.totalCalories
         };
       } else {
         const packageCount = Math.max(1, Math.ceil(neededGrams / packageGrams));
-        const totalCost = packagePrice !== null ? Math.round((packagePrice * packageCount) * 100) / 100 : null;
-        const portionCost = packagePrice !== null ? Math.round(((packagePrice / packageGrams) * neededGrams) * 100) / 100 : null;
+        const itemTotals = this.calorieCalc.calculateItemTotals(packagePrice, packageCount, packCalories);
+        const portionCost = packagePrice !== null 
+          ? Math.round(((packagePrice / packageGrams) * neededGrams) * 100) / 100 
+          : null;
         const isOlder = prod.priceStatus === 'last_observed' || prod.priceStatus === 'user_reported';
+        const pieceInfo = this.calorieCalc.calculatePieceCalories(prod);
 
         const newItem: ShoppingListItem = {
           id: `item-${prod.id}`,
@@ -209,7 +237,12 @@ export class ShoppingListService {
           packageCount,
           packagePrice,
           portionCost,
-          totalCost,
+          totalCost: itemTotals.totalCostEuro,
+          packageCalories: packCalories,
+          totalCalories: itemTotals.totalCalories,
+          caloriesPer100g: prod.nutrition?.caloriesPer100g ?? null,
+          caloriesPerPiece: pieceInfo?.calories ?? null,
+          pieceUnitName: pieceInfo?.unitName ?? prod.pieceUnitName,
           isChecked: false,
           priceStatus: prod.priceStatus,
           priceSource: prod.priceSource,
@@ -249,23 +282,55 @@ export class ShoppingListService {
     this.savePantryState(list);
   }
 
+  /**
+   * Ändert die Packungsanzahl (+/-) und aktualisiert sofort Preis in Cent und Gesamtkalorien
+   */
+  updatePackageCount(id: string, delta: number): void {
+    const list = this.items().map(i => {
+      if (i.id === id) {
+        const newCount = Math.max(1, i.packageCount + delta);
+        const itemTotals = this.calorieCalc.calculateItemTotals(i.packagePrice, newCount, i.packageCalories);
+        return {
+          ...i,
+          packageCount: newCount,
+          totalCost: itemTotals.totalCostEuro,
+          totalCalories: itemTotals.totalCalories
+        };
+      }
+      return i;
+    });
+
+    this.items.set(list);
+  }
+
+  /**
+   * Entfernt einen Artikel aus der Einkaufsliste
+   */
+  removeItem(id: string): void {
+    const remaining = this.items().filter(i => i.id !== id);
+    this.items.set(remaining);
+
+    if (id.startsWith('custom-')) {
+      this.removeCustomItem(id);
+    }
+  }
+
+  /**
+   * Fügt ein Netto-Produkt aus dem Entdecken-Katalog oder der Produktdetailseite hinzu
+   */
   addProductToShoppingList(product: ProductItem): void {
     const existing = this.items().find(i => i.productId === product.id);
     if (existing) {
-      // Wenn bereits vorhanden, Stückzahl erhöhen
-      const updated = this.items().map(i => {
-        if (i.productId === product.id) {
-          const newCount = i.packageCount + 1;
-          const newTotal = i.packagePrice !== null ? Math.round((i.packagePrice * newCount) * 100) / 100 : null;
-          return { ...i, packageCount: newCount, totalCost: newTotal };
-        }
-        return i;
-      });
-      this.items.set(updated);
+      // Wenn bereits vorhanden, Packungsanzahl um 1 erhöhen
+      this.updatePackageCount(existing.id, 1);
       return;
     }
 
     const isOlder = product.priceStatus === 'last_observed' || product.priceStatus === 'user_reported';
+    const packCalories = this.calorieCalc.calculatePackageCalories(product);
+    const pieceInfo = this.calorieCalc.calculatePieceCalories(product);
+    const itemTotals = this.calorieCalc.calculateItemTotals(product.price, 1, packCalories);
+
     const newItem: ShoppingListItem = {
       id: `item-${product.id}`,
       productId: product.id,
@@ -280,8 +345,13 @@ export class ShoppingListService {
       packageWeightGrams: product.packageWeightGrams,
       packageCount: 1,
       packagePrice: product.price,
-      portionCost: product.price,
-      totalCost: product.price,
+      portionCost: itemTotals.totalCostEuro,
+      totalCost: itemTotals.totalCostEuro,
+      packageCalories: packCalories,
+      totalCalories: itemTotals.totalCalories,
+      caloriesPer100g: product.nutrition?.caloriesPer100g ?? null,
+      caloriesPerPiece: pieceInfo?.calories ?? null,
+      pieceUnitName: pieceInfo?.unitName ?? product.pieceUnitName,
       isChecked: false,
       priceStatus: product.priceStatus,
       priceSource: product.priceSource,
@@ -293,7 +363,9 @@ export class ShoppingListService {
     this.items.set([newItem, ...this.items()]);
   }
 
-  addCustomItem(name: string, price: number | null, category: ProductCategory = 'pantry', packageSize = '1 Packung'): void {
+  addCustomItem(name: string, price: number | null, category: ProductCategory = 'pantry', packageSize = '1 Packung', packageCalories: number | null = null): void {
+    const itemTotals = this.calorieCalc.calculateItemTotals(price, 1, packageCalories);
+
     const newItem: ShoppingListItem = {
       id: `custom-${Date.now()}`,
       name: name.trim(),
@@ -305,8 +377,12 @@ export class ShoppingListService {
       packageWeightGrams: 500,
       packageCount: 1,
       packagePrice: price,
-      portionCost: price,
-      totalCost: price,
+      portionCost: itemTotals.totalCostEuro,
+      totalCost: itemTotals.totalCostEuro,
+      packageCalories: packageCalories,
+      totalCalories: itemTotals.totalCalories,
+      caloriesPer100g: null,
+      caloriesPerPiece: null,
       isChecked: false,
       isCustom: true,
       priceStatus: price !== null ? 'user_reported' : 'unknown',
@@ -327,8 +403,7 @@ export class ShoppingListService {
     let currentCustom = this.getSavedCustomItems();
     currentCustom = currentCustom.filter(i => i.id !== id);
     this.saveCustomItems(currentCustom);
-
-    this.generateListFromPlan();
+    this.items.set(this.items().filter(i => i.id !== id));
   }
 
   private saveCheckedState(list: ShoppingListItem[]): void {

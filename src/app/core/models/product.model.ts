@@ -74,6 +74,11 @@ export interface ProductItem {
   servingSizeGrams?: number;      // Übliche Portion (z.B. 150g Banane, 150g Skyr, 50g Haferflocken)
   servingUnit?: string;          // z.B. '1 Stück', '1 Portion', '1 Schale'
   edibleYieldPercent?: number;    // Essbarer Anteil (z.B. 0.68 bei Bananen wg. Schale, 1.0 bei Reis/Skyr)
+  drainedWeightGrams?: number;    // Abtropfgewicht bei Dosen/Gläsern (z.B. 240g bei 400g Kidneybohnen)
+  piecesPerPackage?: number;      // Stückanzahl (z.B. 20 Toastscheiben, 10 Eier)
+  pieceWeightGrams?: number;      // Einzelgewicht (z.B. 25g pro Toastscheibe, 53g pro Ei)
+  pieceUnitName?: string;         // Name der Einheit (z.B. 'Scheibe', 'Ei', 'Stück')
+  nutritionBasis?: 'edible_raw' | 'drained_weight' | 'as_sold' | 'prepared';
   
   price: number | null;          // null wenn unbekannt (niemals erfundene Werte)
   priceUnit: string;

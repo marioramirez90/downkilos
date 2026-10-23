@@ -3,6 +3,7 @@ import { provideRouter, Router } from '@angular/router';
 import { DashboardComponent } from './dashboard.component';
 import { StorageService } from '../../core/services/storage.service';
 import { CalorieCalculatorService } from '../../core/services/calorie-calculator.service';
+import { ShoppingListService } from '../../core/services/shopping-list.service';
 import { UserProfile } from '../../core/models/user-profile.model';
 
 describe('DashboardComponent', () => {
@@ -78,5 +79,18 @@ describe('DashboardComponent', () => {
   it('should navigate to shopping list when clicking Einkaufsliste öffnen', () => {
     component.goToShoppingList();
     expect(router.navigate).toHaveBeenCalledWith(['/shopping-list']);
+  });
+
+  // TEST 10: Dashboard & Trennung von Einkaufen vs. Essen
+  it('Test 10 – Dashboard: Hinzufügen zur Einkaufsliste darf die gegessenen Tageskalorien nicht verändern', () => {
+    const initialEatenCalories = component.foodLogService.dailySummary().eatenCalories;
+    const shoppingService = TestBed.inject(ShoppingListService);
+
+    // Ein Produkt mit vielen Kalorien zur Einkaufsliste hinzufügen
+    shoppingService.addCustomItem('1 kg Toastbrot & Bananen', 3.99, 'grains', '1 kg', 2500);
+
+    // Gegessene Kalorien auf dem Dashboard / im Tageskonto dürfen sich NICHT verändert haben
+    const eatenAfterShopping = component.foodLogService.dailySummary().eatenCalories;
+    expect(eatenAfterShopping).toBe(initialEatenCalories);
   });
 });

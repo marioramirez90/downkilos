@@ -16,6 +16,11 @@ export interface ShoppingListItem {
   packagePrice: number | null; // Preis je voller Packung bei Netto
   portionCost: number | null;  // Anteilige Kosten der tatsächlich verbrauchten Menge
   totalCost: number | null;    // Tatsächlicher Einkaufspreis = packagePrice * packageCount
+  packageCalories: number | null; // Kalorien einer vollen essbaren Packung
+  totalCalories: number | null;   // packageCalories * packageCount
+  caloriesPer100g?: number | null;
+  caloriesPerPiece?: number | null;
+  pieceUnitName?: string;
   isChecked: boolean;
   isCustom?: boolean;
   priceStatus?: PriceStatus;
@@ -30,11 +35,14 @@ export interface ShoppingListSummary {
   checkedItems: number;
   totalCost: number;        // Tatsächlicher voller Einkaufspreis (B)
   totalPortionCost: number; // Rechnerischer Portionspreis der Zutaten (A)
+  totalCalories: number | null; // Gesamtkalorien aller gekauften Lebensmittelpackungen
   isComplete: boolean;
   hasOlderPrices: boolean;
   hasMissingPrices: boolean;
+  hasMissingCalories: boolean;
   budgetBufferPercent: number;
   budgetBufferAmount: number;
   totalCostWithBuffer: number;
   estimateNotice?: string;
+  caloriesNotice?: string;
 }

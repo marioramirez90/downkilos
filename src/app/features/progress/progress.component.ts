@@ -10,6 +10,17 @@ import { WeightEntry } from '../../core/models/weight-log.model';
 import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-nav.component';
 import { HamburgerButtonComponent } from '../../shared/components/hamburger-button/hamburger-button.component';
 
+export interface DisplayWeightEntry {
+  id: string;
+  date: string;
+  formattedDate: string;
+  weight: number;
+  note?: string;
+  weekLabel: string;
+  diffFromPrev?: number;
+  diffFormatted?: string;
+}
+
 @Component({
   selector: 'app-progress',
   standalone: true,
@@ -31,18 +42,14 @@ export class ProgressComponent implements OnInit {
 
   showAddModal = false;
   showResetConfirm = false;
+  editingEntryId: string | null = null;
 
   newWeightVal: number | null = null;
   newWeightDate: string = new Date().toISOString().split('T')[0];
   newWeightNote = '';
 
   readonly weightEntries = computed(() => this.storageService.weightHistory());
-  readonly reversedWeightEntries = computed(() => [...this.storageService.weightHistory()].reverse());
   readonly profile = computed(() => this.storageService.profile());
-
-  // Screen 7: Streaks & Stat metrics
-  readonly streakDays = signal<number>(12);
-  readonly weightLossWeeks = signal<string>('-2,3');
 
   // Weights
   readonly currentWeight = computed(() => {
@@ -50,7 +57,7 @@ export class ProgressComponent implements OnInit {
     if (list.length > 0) {
       return list[list.length - 1].weight;
     }
-    return this.profile()?.currentWeight ?? 78;
+    return this.profile()?.currentWeight ?? 75;
   });
 
   readonly startWeight = computed(() => {
@@ -58,7 +65,7 @@ export class ProgressComponent implements OnInit {
     if (list.length > 0) {
       return list[0].weight;
     }
-    return (this.profile()?.currentWeight ?? 78) + 2.3;
+    return this.profile()?.currentWeight ?? 75;
   });
 
   readonly targetWeight = computed(() => {
@@ -69,10 +76,28 @@ export class ProgressComponent implements OnInit {
     return Number((this.currentWeight() - this.startWeight()).toFixed(1));
   });
 
+  readonly weightDiffFormatted = computed(() => {
+    const diff = this.changeFromStart();
+    if (Math.abs(diff) < 0.05) return '0,0 kg';
+    const sign = diff > 0 ? '+' : '';
+    return `${sign}${diff.toFixed(1).replace('.', ',')} kg`;
+  });
+
+  readonly weightDiffSub = computed(() => {
+    return this.weightEntries().length > 1 ? 'Veränderung seit Start' : 'Ausgangswert';
+  });
+
   readonly progressPercent = computed(() => {
-    const totalToLose = this.startWeight() - this.targetWeight();
-    if (totalToLose <= 0) return 100;
-    const lostSoFar = this.startWeight() - this.currentWeight();
+    const start = this.startWeight();
+    const target = this.targetWeight();
+    const current = this.currentWeight();
+
+    if (start <= target) {
+      return current <= target ? 100 : 0;
+    }
+
+    const totalToLose = start - target;
+    const lostSoFar = start - current;
     const pct = Math.round((lostSoFar / totalToLose) * 100);
     return Math.max(0, Math.min(100, pct));
   });
@@ -80,6 +105,45 @@ export class ProgressComponent implements OnInit {
   readonly remainingKg = computed(() => {
     const rem = this.currentWeight() - this.targetWeight();
     return Math.max(0, Number(rem.toFixed(1)));
+  });
+
+  // Enriched week-by-week entries
+  readonly enrichedWeightEntries = computed<DisplayWeightEntry[]>(() => {
+    const raw = this.weightEntries();
+    if (raw.length === 0) return [];
+
+    const sorted = [...raw].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    const startDate = new Date(sorted[0].date).getTime();
+
+    return sorted.map((entry, index) => {
+      const entryTime = new Date(entry.date).getTime();
+      const diffDays = Math.floor((entryTime - startDate) / (1000 * 60 * 60 * 24));
+      const weekIndex = Math.max(1, Math.floor(diffDays / 7) + 1);
+
+      let diffFromPrev: number | undefined;
+      let diffFormatted: string | undefined;
+
+      if (index > 0) {
+        diffFromPrev = Number((entry.weight - sorted[index - 1].weight).toFixed(1));
+        const sign = diffFromPrev > 0 ? '+' : '';
+        diffFormatted = `${sign}${diffFromPrev.toFixed(1).replace('.', ',')} kg`;
+      }
+
+      return {
+        id: entry.id,
+        date: entry.date,
+        formattedDate: this.formatDisplayDate(entry.date),
+        weight: entry.weight,
+        note: entry.note,
+        weekLabel: `Woche ${weekIndex}`,
+        diffFromPrev,
+        diffFormatted
+      };
+    });
+  });
+
+  readonly reversedEnrichedEntries = computed<DisplayWeightEntry[]>(() => {
+    return [...this.enrichedWeightEntries()].reverse();
   });
 
   // Daily calorie and macro recommendations
@@ -112,10 +176,9 @@ export class ProgressComponent implements OnInit {
   readonly targetCarbs = computed(() => this.carbsGrams());
   readonly targetFat = computed(() => this.fatGrams());
 
-  // Screen 7 Calorie & Macro status:
   readonly eatenCalories = computed(() => {
     const eaten = this.foodLogService.eatenCalories();
-    return eaten > 0 ? eaten : 1250;
+    return eaten > 0 ? eaten : 0;
   });
 
   readonly targetKcal = computed(() => this.dailyCalories());
@@ -131,18 +194,15 @@ export class ProgressComponent implements OnInit {
   });
 
   readonly eatenProtein = computed(() => {
-    const ep = this.foodLogService.dailySummary().eatenProtein;
-    return ep > 0 ? ep : 78;
+    return this.foodLogService.dailySummary().eatenProtein;
   });
 
   readonly eatenCarbs = computed(() => {
-    const ec = this.foodLogService.dailySummary().eatenCarbs;
-    return ec > 0 ? ec : 120;
+    return this.foodLogService.dailySummary().eatenCarbs;
   });
 
   readonly eatenFat = computed(() => {
-    const ef = this.foodLogService.dailySummary().eatenFat;
-    return ef > 0 ? ef : 42;
+    return this.foodLogService.dailySummary().eatenFat;
   });
 
   macroRatio(eaten: number, target: number): number {
@@ -150,7 +210,11 @@ export class ProgressComponent implements OnInit {
     return Math.min(100, Math.round((eaten / target) * 100));
   }
 
-  // Navigation actions (Screen 7 buttons)
+  // Navigation actions
+  goToSettings(): void {
+    this.router.navigate(['/settings']);
+  }
+
   goToMealPlanner(): void {
     this.router.navigate(['/meal-planner']);
   }
@@ -167,9 +231,14 @@ export class ProgressComponent implements OnInit {
     this.router.navigate(['/how-it-works']);
   }
 
+  goToCaloriePlan(): void {
+    this.router.navigate(['/calculator']);
+  }
+
   goBack(): void {
     this.router.navigate(['/dashboard']);
   }
+
   readonly chartPoints = computed(() => {
     const entries = this.weightEntries();
     if (entries.length < 2) return [];
@@ -254,25 +323,47 @@ export class ProgressComponent implements OnInit {
   }
 
   openAddWeightModal(): void {
+    this.editingEntryId = null;
     this.newWeightVal = this.currentWeight();
     this.newWeightDate = new Date().toISOString().split('T')[0];
     this.newWeightNote = '';
     this.showAddModal = true;
   }
 
+  openEditWeightModal(entry: DisplayWeightEntry): void {
+    this.editingEntryId = entry.id;
+    this.newWeightVal = entry.weight;
+    this.newWeightDate = entry.date;
+    this.newWeightNote = entry.note || '';
+    this.showAddModal = true;
+  }
+
   async saveNewWeight(): Promise<void> {
     if (this.newWeightVal && this.newWeightVal > 30 && this.newWeightVal < 300) {
-      await this.storageService.addWeightEntry(
-        Number(this.newWeightVal.toFixed(1)),
-        this.newWeightDate,
-        this.newWeightNote.trim() || undefined
-      );
+      const roundedWeight = Number(this.newWeightVal.toFixed(1));
+      const trimmedNote = this.newWeightNote.trim() || undefined;
+
+      if (this.editingEntryId) {
+        await this.storageService.updateWeightEntry(
+          this.editingEntryId,
+          roundedWeight,
+          this.newWeightDate,
+          trimmedNote
+        );
+      } else {
+        await this.storageService.addWeightEntry(
+          roundedWeight,
+          this.newWeightDate,
+          trimmedNote
+        );
+      }
       this.showAddModal = false;
+      this.editingEntryId = null;
     }
   }
 
-  deleteEntry(id: string): void {
-    this.storageService.deleteWeightEntry(id);
+  async deleteEntry(id: string): Promise<void> {
+    await this.storageService.deleteWeightEntry(id);
   }
 
   exportBackup(): void {
@@ -284,10 +375,6 @@ export class ProgressComponent implements OnInit {
     a.download = `down-kilos-backup-${new Date().toISOString().split('T')[0]}.json`;
     a.click();
     window.URL.revokeObjectURL(url);
-  }
-
-  goToCaloriePlan(): void {
-    this.router.navigate(['/calculator']);
   }
 
   async executeReset(): Promise<void> {

@@ -13,15 +13,16 @@
         </svg>
       </button>
 
-      <h1>{{ 'PROGRESS.HEADER_TITLE' | translate }}</h1>
+      <h1>Mehr & Fortschritt</h1>
 
       <div class="header-actions">
         <button
           type="button"
-          (click)="goToProfileEdit()"
+          (click)="goToSettings()"
           class="settings-btn"
-          title="Profil bearbeiten"
+          title="Einstellungen"
           aria-label="Einstellungen"
+          id="btn-progress-settings"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <circle cx="12" cy="12" r="3" />
@@ -100,23 +101,23 @@
       </div>
     </section>
 
-    <!-- 2. Two Metric Stat Cards (Screen 7: -2,3 kg & 12 Tage in Folge) -->
+    <!-- 2. Two Metric Stat Cards (Veränderung & Aktuelles Gewicht) -->
     <div class="stats-grid">
-      <!-- Card 1: Gewichtsänderung -->
-      <div class="stat-card">
+      <!-- Card 1: Gewichtsveränderung -->
+      <div class="stat-card" id="stat-card-change">
         <div class="stat-icon-badge">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
           </svg>
         </div>
         <div class="stat-text-box">
-          <strong>{{ weightLossWeeks() }} kg</strong>
-          <span>{{ 'PROGRESS.STAT_WEEKS_SUB' | translate }}</span>
+          <strong>{{ weightDiffFormatted() }}</strong>
+          <span>{{ weightDiffSub() }}</span>
         </div>
       </div>
 
-      <!-- Card 2: Streak in Folge -->
-      <div class="stat-card">
+      <!-- Card 2: Aktuelles Gewicht & Zielabstand -->
+      <div class="stat-card" id="stat-card-current">
         <div class="stat-icon-badge">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-width="2" />
@@ -127,18 +128,25 @@
           </svg>
         </div>
         <div class="stat-text-box">
-          <strong>{{ streakDays() }} {{ 'PROGRESS.STAT_STREAK_UNIT' | translate }}</strong>
-          <span>{{ 'PROGRESS.STAT_STREAK_SUB' | translate }}</span>
+          <strong>{{ currentWeightFormatted() }} kg</strong>
+          <span>
+            @if (remainingKg() > 0) {
+              noch {{ remainingKgFormatted() }} kg bis zum Ziel
+            } @else {
+              Zielgewicht erreicht! 🎉
+            }
+          </span>
         </div>
       </div>
     </div>
 
-    <!-- 3. Two Action Buttons (Screen 7: Mahlzeiten planen & Einkaufsliste öffnen) -->
+    <!-- 3. Two Action Buttons (Mahlzeiten planen & Einkaufsliste öffnen) -->
     <div class="action-buttons-group">
       <button
         type="button"
         (click)="goToMealPlanner()"
         class="primary-action-btn"
+        id="btn-progress-meal-planner"
       >
         <span>{{ 'PROGRESS.PLAN_MEALS_BTN' | translate }}</span>
         <span class="btn-arrow">→</span>
@@ -148,6 +156,7 @@
         type="button"
         (click)="goToShoppingList()"
         class="secondary-action-btn"
+        id="btn-progress-shopping-list"
       >
         <span class="btn-cart-icon">🛒</span>
         <span>{{ 'PROGRESS.OPEN_SHOPPING_LIST_BTN' | translate }}</span>
@@ -162,6 +171,7 @@
           type="button"
           (click)="goToProfileEdit()"
           class="goal-change-btn"
+          id="btn-change-goal"
         >
           {{ 'PROGRESS.GOAL_CHANGE' | translate }}
         </button>
@@ -200,6 +210,7 @@
           type="button"
           (click)="openAddWeightModal()"
           class="weigh-quick-btn"
+          id="btn-open-weigh-modal"
         >
           + {{ 'PROGRESS.WEIGH_BTN' | translate }}
         </button>
@@ -230,6 +241,14 @@
               </text>
             }
           </svg>
+        } @else if (weightEntries().length === 1) {
+          <div class="single-entry-chart-box">
+            <span class="single-chart-icon">⚖️</span>
+            <div class="single-chart-info">
+              <strong>Startgewicht erfasst: {{ currentWeightFormatted() }} kg</strong>
+              <p>Trage deine nächste Messung ein, um deinen Gewichtsverlauf im Diagramm zu sehen.</p>
+            </div>
+          </div>
         } @else {
           <div class="empty-chart-box">
             <span>📊</span>
@@ -239,43 +258,100 @@
       </div>
     </section>
 
-    <!-- 6. History Card -->
+    <!-- 6. Wöchentlicher Verlauf & Historie -->
     <section class="history-section-card">
       <div class="history-title-row">
-        <h3>{{ 'PROGRESS.HISTORY_TITLE' | translate }}</h3>
-        <button type="button" (click)="openAddWeightModal()" class="history-add-btn">
+        <div>
+          <h3>{{ 'PROGRESS.HISTORY_TITLE' | translate }}</h3>
+          <span class="history-sub-text">Wöchentliche Messungen & Veränderungen</span>
+        </div>
+        <button
+          type="button"
+          (click)="openAddWeightModal()"
+          class="history-add-btn"
+          id="btn-add-weight-history"
+        >
           + Neu hinzufügen
         </button>
       </div>
 
       <div class="history-entries-list">
-        @for (entry of reversedWeightEntries(); track entry.id) {
-          <div class="entry-row">
-            <div class="entry-info">
-              <span class="entry-date">{{ formatDisplayDate(entry.date) }}</span>
-              @if (entry.note) {
-                <span class="entry-note-tag">{{ entry.note }}</span>
-              }
-            </div>
+        @if (reversedEnrichedEntries().length > 0) {
+          @for (entry of reversedEnrichedEntries(); track entry.id) {
+            <div class="entry-row">
+              <div class="entry-info">
+                <div class="entry-week-badge">{{ entry.weekLabel }}</div>
+                <div class="entry-details">
+                  <span class="entry-date">{{ entry.formattedDate }}</span>
+                  @if (entry.note) {
+                    <span class="entry-note-tag">{{ entry.note }}</span>
+                  }
+                </div>
+              </div>
 
-            <div class="entry-val-box">
-              <strong>{{ entry.weight.toFixed(1) }} kg</strong>
-              <button
-                type="button"
-                (click)="deleteEntry(entry.id)"
-                class="entry-delete-btn"
-                title="Eintrag entfernen"
-                aria-label="Eintrag entfernen"
-              >
-                ✕
-              </button>
+              <div class="entry-val-box">
+                <div class="entry-weights">
+                  <strong class="entry-kg">{{ entry.weight.toFixed(1) }} kg</strong>
+                  @if (entry.diffFormatted) {
+                    <span
+                      class="entry-diff-badge"
+                      [class.negative]="entry.diffFromPrev && entry.diffFromPrev < 0"
+                      [class.positive]="entry.diffFromPrev && entry.diffFromPrev > 0"
+                    >
+                      {{ entry.diffFormatted }}
+                    </span>
+                  }
+                </div>
+                
+                <div class="entry-actions">
+                  <button
+                    type="button"
+                    (click)="openEditWeightModal(entry)"
+                    class="entry-edit-btn"
+                    title="Eintrag bearbeiten"
+                    aria-label="Eintrag bearbeiten"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    type="button"
+                    (click)="deleteEntry(entry.id)"
+                    class="entry-delete-btn"
+                    title="Eintrag entfernen"
+                    aria-label="Eintrag entfernen"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
             </div>
+          }
+        } @else {
+          <div class="empty-history-box">
+            <p>Noch keine Wiegungen vorhanden. Trage dein aktuelles Gewicht ein!</p>
           </div>
         }
       </div>
     </section>
 
-    <!-- 6. Mein Kalorienziel & Abnehmplan (Erneut aufrufen) -->
+    <!-- 7. Schnellzugriff: Einstellungen, Kalorienplan, So funktioniert Down Kilos -->
+    <h3 class="quick-links-title">Weitere Optionen & Einstellungen</h3>
+
+    <!-- Link: Einstellungen -->
+    <section class="how-it-works-link-card settings-card">
+      <div class="intro-link-content">
+        <span class="intro-link-icon">⚙️</span>
+        <div class="intro-link-text">
+          <strong>Einstellungen & Profil</strong>
+          <small>Profil bearbeiten, Kalorienziel prüfen oder App-Daten zurücksetzen</small>
+        </div>
+      </div>
+      <button type="button" (click)="goToSettings()" class="intro-link-btn" id="btn-open-settings-card">
+        Öffnen →
+      </button>
+    </section>
+
+    <!-- Link: Mein Kalorienziel & Abnehmplan -->
     <section class="how-it-works-link-card">
       <div class="intro-link-content">
         <span class="intro-link-icon">🎯</span>
@@ -289,7 +365,7 @@
       </button>
     </section>
 
-    <!-- 7. So funktioniert Down Kilos (Einführung erneut ansehen) -->
+    <!-- Link: So funktioniert Down Kilos -->
     <section class="how-it-works-link-card">
       <div class="intro-link-content">
         <span class="intro-link-icon">🎬</span>
@@ -298,7 +374,7 @@
           <small>Einführung & Nährwert-Erklärung erneut ansehen</small>
         </div>
       </div>
-      <button type="button" (click)="goToHowItWorks()" class="intro-link-btn">
+      <button type="button" (click)="goToHowItWorks()" class="intro-link-btn" id="btn-open-how-it-works">
         Ansehen →
       </button>
     </section>
@@ -309,12 +385,12 @@
     <app-bottom-nav></app-bottom-nav>
   </footer>
 
-  <!-- Modal: Gewicht eintragen -->
+  <!-- Modal: Gewicht eintragen / bearbeiten -->
   @if (showAddModal) {
     <div class="weigh-modal-backdrop">
       <div class="weigh-modal-dialog">
         <div class="modal-top">
-          <h3>{{ 'PROGRESS.ADD_WEIGHT_TITLE' | translate }}</h3>
+          <h3>{{ editingEntryId ? 'Gewichtseintrag bearbeiten' : ('PROGRESS.ADD_WEIGHT_TITLE' | translate) }}</h3>
           <button type="button" (click)="showAddModal = false" class="modal-close-btn">✕</button>
         </div>
 
@@ -325,19 +401,22 @@
             step="0.1"
             [(ngModel)]="newWeightVal"
             placeholder="z.B. 77.5"
+            id="input-weight-val"
           />
 
           <label>Datum</label>
           <input
             type="date"
             [(ngModel)]="newWeightDate"
+            id="input-weight-date"
           />
 
           <label>Notiz (optional)</label>
           <input
             type="text"
             [(ngModel)]="newWeightNote"
-            placeholder="z.B. Nach dem Sport"
+            placeholder="z.B. Nach dem Sport / Nüchtern"
+            id="input-weight-note"
           />
         </div>
 
@@ -353,6 +432,7 @@
             type="button"
             (click)="saveNewWeight()"
             class="modal-save-btn"
+            id="btn-save-weight"
           >
             {{ 'COMMON.SAVE' | translate }}
           </button>

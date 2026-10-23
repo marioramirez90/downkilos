@@ -256,7 +256,7 @@ export class StorageService {
       updated = current.map((e, idx) => idx === existingIndex ? { ...e, weight, note: note ?? e.note } : e);
     } else {
       const newEntry: WeightEntry = {
-        id: 'w_' + Date.now(),
+        id: 'w_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
         date: entryDate,
         weight,
         note
@@ -279,9 +279,37 @@ export class StorageService {
     }
   }
 
-  deleteWeightEntry(id: string): void {
+  async updateWeightEntry(id: string, weight: number, date: string, note?: string): Promise<void> {
+    const current = this.weightHistory();
+    const updated = current.map(e => e.id === id ? { ...e, weight, date, note } : e);
+    this.saveWeightHistory(updated);
+
+    const profile = this.profile();
+    if (profile) {
+      const latest = [...updated].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+      if (latest && latest.weight !== profile.currentWeight) {
+        await this.saveProfile({
+          ...profile,
+          currentWeight: latest.weight
+        });
+      }
+    }
+  }
+
+  async deleteWeightEntry(id: string): Promise<void> {
     const filtered = this.weightHistory().filter(e => e.id !== id);
     this.saveWeightHistory(filtered);
+
+    const profile = this.profile();
+    if (profile && filtered.length > 0) {
+      const latest = [...filtered].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+      if (latest && latest.weight !== profile.currentWeight) {
+        await this.saveProfile({
+          ...profile,
+          currentWeight: latest.weight
+        });
+      }
+    }
   }
 
   exportDataJson(): string {

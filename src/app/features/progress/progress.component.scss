@@ -505,6 +505,37 @@
           }
         }
 
+        .single-entry-chart-box {
+          height: 100%;
+          border: 1px solid $border-color-green;
+          border-radius: $radius-md;
+          background: linear-gradient(135deg, $primary-light 0%, #FFFFFF 100%);
+          @include flexbox(row, flex-start, center, 14px);
+          padding: 16px;
+
+          .single-chart-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+          }
+
+          .single-chart-info {
+            @include flexbox(column, flex-start, flex-start, 4px);
+
+            strong {
+              font-size: 13px;
+              font-weight: 800;
+              color: $secondary-color;
+            }
+
+            p {
+              margin: 0;
+              font-size: 11px;
+              color: $text-muted;
+              line-height: 1.4;
+            }
+          }
+        }
+
         .empty-chart-box {
           height: 100%;
           border: 1px dashed $border-color;
@@ -546,6 +577,14 @@
           color: $secondary-color;
         }
 
+        .history-sub-text {
+          font-size: 11px;
+          color: $text-muted;
+          font-weight: 500;
+          display: block;
+          margin-top: 2px;
+        }
+
         .history-add-btn {
           border: none;
           background: transparent;
@@ -564,52 +603,117 @@
         @include flexbox(column, flex-start, stretch);
         border-top: 1px solid $border-color-light;
 
+        .empty-history-box {
+          padding: 16px 0;
+          text-align: center;
+          font-size: 12px;
+          color: $text-muted;
+        }
+
         .entry-row {
-          padding: 10px 0;
+          padding: 12px 0;
           border-bottom: 1px solid $border-color-light;
           @include flexbox(row, space-between, center);
 
           .entry-info {
-            @include flexbox(row, flex-start, center, 8px);
+            @include flexbox(row, flex-start, center, 10px);
 
-            .entry-date {
-              font-size: 12px;
-              font-weight: 700;
-              color: $secondary-color;
+            .entry-week-badge {
+              padding: 3px 8px;
+              border-radius: $radius-full;
+              background-color: $primary-light;
+              color: $primary-color;
+              font-size: 11px;
+              font-weight: 800;
+              white-space: nowrap;
             }
 
-            .entry-note-tag {
-              font-size: 10px;
-              padding: 2px 6px;
-              border-radius: $radius-sm;
-              background-color: $bg-light;
-              color: $text-muted;
+            .entry-details {
+              @include flexbox(column, center, flex-start, 2px);
+
+              .entry-date {
+                font-size: 12px;
+                font-weight: 700;
+                color: $secondary-color;
+              }
+
+              .entry-note-tag {
+                font-size: 10px;
+                padding: 1px 6px;
+                border-radius: $radius-sm;
+                background-color: $bg-light;
+                color: $text-muted;
+              }
             }
           }
 
           .entry-val-box {
-            @include flexbox(row, flex-end, center, 10px);
+            @include flexbox(row, flex-end, center, 12px);
 
-            strong {
-              font-size: 13px;
-              font-weight: 800;
-              color: $secondary-color;
+            .entry-weights {
+              @include flexbox(column, center, flex-end, 2px);
+
+              .entry-kg {
+                font-size: 13px;
+                font-weight: 800;
+                color: $secondary-color;
+              }
+
+              .entry-diff-badge {
+                font-size: 10px;
+                font-weight: 700;
+                padding: 1px 5px;
+                border-radius: $radius-sm;
+                background-color: $bg-light;
+                color: $text-muted;
+
+                &.negative {
+                  background-color: rgba($primary-color, 0.12);
+                  color: $primary-color;
+                }
+
+                &.positive {
+                  background-color: #FEF3C7;
+                  color: #D97706;
+                }
+              }
             }
 
-            .entry-delete-btn {
-              width: 22px;
-              height: 22px;
-              border-radius: $radius-full;
-              border: none;
-              background: transparent;
-              color: $text-muted;
-              font-size: 11px;
-              cursor: pointer;
-              @include inline-flexbox(row, center, center);
+            .entry-actions {
+              @include flexbox(row, flex-end, center, 4px);
 
-              &:hover {
-                background-color: #FEE2E2;
-                color: $danger-color;
+              .entry-edit-btn {
+                width: 26px;
+                height: 26px;
+                border-radius: $radius-full;
+                border: none;
+                background: transparent;
+                color: $text-muted;
+                font-size: 12px;
+                cursor: pointer;
+                @include inline-flexbox(row, center, center);
+
+                &:hover {
+                  background-color: $bg-light;
+                  color: $primary-color;
+                }
+              }
+
+              .entry-delete-btn {
+                width: 26px;
+                height: 26px;
+                border-radius: $radius-full;
+                border: none;
+                background: transparent;
+                color: $text-muted;
+                font-size: 11px;
+                cursor: pointer;
+                @include inline-flexbox(row, center, center);
+
+                &:hover {
+                  background-color: #FEE2E2;
+                  color: $danger-color;
+                }
               }
             }
           }
@@ -617,7 +721,14 @@
       }
     }
 
-    // 6. How It Works Link Card
+    .quick-links-title {
+      margin: 16px 0 4px;
+      font-size: 14px;
+      font-weight: 800;
+      color: $secondary-color;
+    }
+
+    // 7. How It Works & Settings Link Card
     .how-it-works-link-card {
       padding: 14px 18px;
       border-radius: $radius-lg;
@@ -625,6 +736,11 @@
       border: 1px solid $border-color-green;
       box-shadow: $shadow-sm;
       @include flexbox(row, space-between, center, 12px);
+
+      &.settings-card {
+        border-color: rgba($primary-color, 0.4);
+        background: linear-gradient(135deg, rgba($primary-color, 0.05) 0%, #FFFFFF 100%);
+      }
 
       .intro-link-content {
         @include flexbox(row, flex-start, center, 12px);

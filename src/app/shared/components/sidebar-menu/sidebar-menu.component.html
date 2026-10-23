@@ -1,23 +1,14 @@
 @if (menuService.isOpen()) {
   <!-- Backdrop Overlay -->
-  <div
-    (click)="closeMenu()"
-    class="absolute inset-0 bg-black/50 backdrop-blur-xs z-50 animate-fade-in transition-opacity"
-  ></div>
+  <div (click)="closeMenu()" class="menu-backdrop"></div>
 
   <!-- Slide-over Drawer Menu -->
-  <aside
-    class="absolute top-0 left-0 bottom-0 w-[82%] max-w-[320px] bg-white z-50 shadow-2xl flex flex-col justify-between overflow-hidden animate-slide-in"
-  >
+  <aside class="sidebar-drawer">
     <!-- Drawer Header -->
-    <div class="px-5 pt-5 pb-4 border-b border-[#E3EBE4] bg-[#F8FAF8] flex items-center justify-between">
+    <div class="drawer-header">
       <app-logo size="sm"></app-logo>
-      <button
-        (click)="closeMenu()"
-        class="w-8 h-8 rounded-full flex items-center justify-center text-[#627264] hover:text-[#103A2A] hover:bg-[#E3EBE4] transition-colors"
-        aria-label="Menü schließen"
-      >
-        <svg class="w-5 h-5 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <button (click)="closeMenu()" class="close-button" aria-label="Menü schließen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <line x1="18" y1="6" x2="6" y2="18" />
           <line x1="6" y1="6" x2="18" y2="18" />
         </svg>
@@ -25,151 +16,91 @@
     </div>
 
     <!-- Profile Quick Banner -->
-    <div class="px-5 py-3.5 bg-[#E5F5E8] border-b border-[#D2ECD6] flex items-center gap-3">
-      <div class="w-10 h-10 rounded-full bg-[#278F39] text-white flex items-center justify-center font-bold text-sm shadow-sm flex-shrink-0">
+    <div class="profile-banner">
+      <div class="avatar-circle">
         {{ userInitial() }}
       </div>
-      <div class="min-w-0 flex-1">
-        <h4 class="text-xs font-bold text-[#103A2A] truncate">
-          {{ userName() }}
-        </h4>
-        <p class="text-[11px] text-[#278F39] font-semibold">
-          {{ userWeightInfo() }}
-        </p>
+      <div class="profile-details">
+        <h4>{{ userName() }}</h4>
+        <p>{{ userWeightInfo() }}</p>
       </div>
     </div>
 
     <!-- Navigation Links -->
-    <nav class="flex-1 overflow-y-auto px-3 py-3 space-y-1">
+    <nav class="drawer-nav">
       <!-- 1. Dashboard -->
-      <a
-        routerLink="/dashboard"
-        (click)="closeMenu()"
-        routerLinkActive="bg-[#E5F5E8] text-[#278F39] font-bold"
-        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-[#103A2A] hover:bg-[#F6F8F6] transition-colors"
-      >
-        <span class="text-base">🏠</span>
-        <span>Dashboard (Mein Tag)</span>
+      <a routerLink="/dashboard" (click)="closeMenu()" routerLinkActive="active" class="nav-item">
+        <span>🏠</span>
+        <span>{{ 'SIDEBAR.DASHBOARD' | translate }}</span>
       </a>
 
       <!-- 2. Mahlzeitenplan -->
-      <a
-        routerLink="/meal-planner"
-        (click)="closeMenu()"
-        routerLinkActive="bg-[#E5F5E8] text-[#278F39] font-bold"
-        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-[#103A2A] hover:bg-[#F6F8F6] transition-colors"
-      >
-        <span class="text-base">📅</span>
-        <span>Mahlzeitenplan</span>
+      <a routerLink="/meal-planner" (click)="closeMenu()" routerLinkActive="active" class="nav-item">
+        <span>📅</span>
+        <span>{{ 'SIDEBAR.MEAL_PLAN' | translate }}</span>
       </a>
 
       <!-- 3. Einkaufsliste -->
-      <a
-        routerLink="/shopping-list"
-        (click)="closeMenu()"
-        routerLinkActive="bg-[#E5F5E8] text-[#278F39] font-bold"
-        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-[#103A2A] hover:bg-[#F6F8F6] transition-colors"
-      >
-        <span class="text-base">🛒</span>
-        <span>Einkaufsliste (Netto)</span>
+      <a routerLink="/shopping-list" (click)="closeMenu()" routerLinkActive="active" class="nav-item">
+        <span>🛒</span>
+        <span>{{ 'SIDEBAR.SHOPPING_LIST' | translate }}</span>
       </a>
 
-      <!-- 4. Netto-Produkte (Neuer eigener Bildschirm) -->
-      <a
-        routerLink="/netto-products"
-        (click)="closeMenu()"
-        routerLinkActive="bg-[#E5F5E8] text-[#278F39] font-bold"
-        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-[#103A2A] hover:bg-[#F6F8F6] transition-colors"
-      >
-        <span class="text-base">🏷️</span>
-        <span>Netto-Produkte</span>
+      <!-- 4. Netto-Produkte -->
+      <a routerLink="/netto-products" (click)="closeMenu()" routerLinkActive="active" class="nav-item">
+        <span>🏷️</span>
+        <span>{{ 'SIDEBAR.PRODUCTS' | translate }}</span>
       </a>
 
       <!-- 5. Rezepte & Produkte -->
-      <a
-        routerLink="/recipes"
-        (click)="closeMenu()"
-        routerLinkActive="bg-[#E5F5E8] text-[#278F39] font-bold"
-        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-[#103A2A] hover:bg-[#F6F8F6] transition-colors"
-      >
-        <span class="text-base">🍲</span>
-        <span>Rezepte & Netto-Sortiment</span>
+      <a routerLink="/recipes" (click)="closeMenu()" routerLinkActive="active" class="nav-item">
+        <span>🍲</span>
+        <span>{{ 'SIDEBAR.RECIPES' | translate }}</span>
       </a>
 
       <!-- 6. Mein Fortschritt -->
-      <a
-        routerLink="/progress"
-        (click)="closeMenu()"
-        routerLinkActive="bg-[#E5F5E8] text-[#278F39] font-bold"
-        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-[#103A2A] hover:bg-[#F6F8F6] transition-colors"
-      >
-        <span class="text-base">📈</span>
-        <span>Mein Fortschritt & Vitalwerte</span>
+      <a routerLink="/progress" (click)="closeMenu()" routerLinkActive="active" class="nav-item">
+        <span>📈</span>
+        <span>{{ 'SIDEBAR.PROGRESS' | translate }}</span>
       </a>
 
-      <div class="pt-2 pb-1 border-t border-[#F0F4F1] my-1">
-        <span class="px-3.5 text-[10px] font-bold uppercase tracking-wider text-[#7A8E80]">
-          Verwaltung
-        </span>
+      <div class="nav-divider">
+        <span>{{ 'SIDEBAR.SECTION_ADMIN' | translate }}</span>
       </div>
 
       <!-- Admin-Konsole -->
-      <a
-        routerLink="/admin"
-        (click)="closeMenu()"
-        routerLinkActive="bg-[#E5F5E8] text-[#278F39] font-bold"
-        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-[#103A2A] hover:bg-[#F6F8F6] transition-colors"
-      >
-        <span class="text-base">🔐</span>
-        <span>Netto Admin-Konsole</span>
+      <a routerLink="/admin" (click)="closeMenu()" routerLinkActive="active" class="nav-item">
+        <span>🔐</span>
+        <span>{{ 'SIDEBAR.ADMIN' | translate }}</span>
       </a>
 
-      <div class="pt-2 pb-1 border-t border-[#F0F4F1] my-1">
-        <span class="px-3.5 text-[10px] font-bold uppercase tracking-wider text-[#7A8E80]">
-          Einstellungen
-        </span>
+      <div class="nav-divider">
+        <span>{{ 'SIDEBAR.SECTION_SETTINGS' | translate }}</span>
       </div>
 
-      <!-- 6. Kalorienrechner -->
-      <a
-        routerLink="/calculator"
-        (click)="closeMenu()"
-        routerLinkActive="bg-[#E5F5E8] text-[#278F39] font-bold"
-        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-[#103A2A] hover:bg-[#F6F8F6] transition-colors"
-      >
-        <span class="text-base">🧮</span>
-        <span>Kalorienbedarf berechnen</span>
+      <!-- Kalorienrechner -->
+      <a routerLink="/calculator" (click)="closeMenu()" routerLinkActive="active" class="nav-item">
+        <span>🧮</span>
+        <span>{{ 'SIDEBAR.CALCULATOR' | translate }}</span>
       </a>
 
-      <!-- 7. Marktauswahl -->
-      <a
-        routerLink="/retailers"
-        (click)="closeMenu()"
-        routerLinkActive="bg-[#E5F5E8] text-[#278F39] font-bold"
-        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-[#103A2A] hover:bg-[#F6F8F6] transition-colors"
-      >
-        <span class="text-base">🏪</span>
-        <span>Netto Filiale & Budget</span>
+      <!-- Marktauswahl -->
+      <a routerLink="/retailers" (click)="closeMenu()" routerLinkActive="active" class="nav-item">
+        <span>🏪</span>
+        <span>{{ 'SIDEBAR.RETAILERS' | translate }}</span>
       </a>
 
-      <!-- 8. Profil anpassen -->
-      <a
-        routerLink="/onboarding"
-        (click)="closeMenu()"
-        routerLinkActive="bg-[#E5F5E8] text-[#278F39] font-bold"
-        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-[#103A2A] hover:bg-[#F6F8F6] transition-colors"
-      >
-        <span class="text-base">👤</span>
-        <span>Profil bearbeiten</span>
+      <!-- Profil anpassen -->
+      <a routerLink="/onboarding" (click)="closeMenu()" routerLinkActive="active" class="nav-item">
+        <span>👤</span>
+        <span>{{ 'SIDEBAR.PROFILE' | translate }}</span>
       </a>
     </nav>
 
     <!-- Drawer Footer -->
-    <div class="px-5 py-3 border-t border-[#E3EBE4] bg-[#F8FAF8] flex items-center justify-between text-[11px] text-[#627264]">
-      <span class="font-medium">Down Kilos v1.0.0</span>
-      <span class="px-2 py-0.5 rounded-full bg-[#FFF200] text-[#ED1C24] font-bold text-[9px] border border-[#E6DB00]">
-        Netto Partner
-      </span>
+    <div class="drawer-footer">
+      <span>Down Kilos v3.0</span>
+      <span class="partner-badge">{{ 'SIDEBAR.PARTNER' | translate }}</span>
     </div>
   </aside>
 }

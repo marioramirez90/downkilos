@@ -2,10 +2,18 @@
   [type]="type()"
   [disabled]="disabled()"
   (click)="clicked.emit($event)"
-  [class]="buttonClasses()"
+  class="custom-button"
+  [class.full-width]="fullWidth()"
+  [class.btn-primary]="variant() === 'primary'"
+  [class.btn-secondary]="variant() === 'secondary'"
+  [class.btn-outline]="variant() === 'outline'"
+  [class.btn-ghost]="variant() === 'ghost'"
+  [class.size-sm]="size() === 'sm'"
+  [class.size-md]="size() === 'md'"
+  [class.size-lg]="size() === 'lg'"
 >
   <ng-content></ng-content>
   @if (iconRight()) {
-    <span class="inline-block transition-transform duration-200 group-hover:translate-x-1">→</span>
+    <span>→</span>
   }
 </button>

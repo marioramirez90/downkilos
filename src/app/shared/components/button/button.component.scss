@@ -1,1 +1,59 @@
-// Styles for ButtonComponent
+@use '../../../../styles/abstracts/variables' as *;
+@use '../../../../styles/abstracts/mixins' as *;
+@use '../../../../styles/components/buttons' as *;
+
+.custom-button {
+  @include button-base;
+
+  &.full-width {
+    width: 100%;
+  }
+
+  // Variants
+  &.btn-primary {
+    @include button-primary;
+  }
+
+  &.btn-secondary {
+    @include button-secondary;
+  }
+
+  &.btn-outline {
+    @include button-outline;
+  }
+
+  &.btn-ghost {
+    @include button-ghost;
+  }
+
+  // Sizes
+  &.size-sm {
+    padding: 10px 16px;
+    font-size: 14px;
+    gap: 6px;
+    border-radius: $radius-md;
+  }
+
+  &.size-md {
+    padding: 12px 20px;
+    font-size: 15px;
+    gap: 8px;
+    border-radius: $radius-lg;
+  }
+
+  &.size-lg {
+    padding: 16px 24px;
+    font-size: 16px;
+    gap: 10px;
+    border-radius: $radius-lg;
+  }
+
+  span {
+    font-size: 1.1em;
+    transition: transform 0.2s ease;
+  }
+
+  &:hover span {
+    transform: translateX(3px);
+  }
+}

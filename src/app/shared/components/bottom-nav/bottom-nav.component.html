@@ -1,70 +1,70 @@
-<nav class="flex-shrink-0 w-full bg-[#FFFFFF] border-t border-[#E3EBE4] px-2 py-2 flex items-center justify-around select-none z-30 safe-area-bottom">
+<nav class="bottom-navigation">
   <!-- 1. Home -->
   <a
     routerLink="/dashboard"
-    routerLinkActive="text-[#278F39] font-bold"
+    routerLinkActive="active"
     [routerLinkActiveOptions]="{ exact: true }"
-    class="flex flex-col items-center justify-center flex-1 py-1 text-[#627264] hover:text-[#278F39] transition-colors"
+    class="nav-tab"
   >
-    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
       <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
       <polyline points="9 22 9 12 15 12 15 22" />
     </svg>
-    <span class="text-[10px] mt-0.5">Home</span>
+    <span>{{ 'NAV.HOME' | translate }}</span>
   </a>
 
   <!-- 2. Lebensmittel (Entdecken) -->
   <a
     routerLink="/discover"
-    routerLinkActive="text-[#278F39] font-bold"
-    class="flex flex-col items-center justify-center flex-1 py-1 text-[#627264] hover:text-[#278F39] transition-colors"
+    routerLinkActive="active"
+    class="nav-tab"
   >
-    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
       <path d="M12 2a9 9 0 0 1 9 9c0 4.97-4.03 9-9 9s-9-4.03-9-9a9 9 0 0 1 9-9z" />
       <path d="M12 2v4" />
       <path d="M15 6c1.5 0 2.5 1 2.5 2.5" />
     </svg>
-    <span class="text-[10px] mt-0.5">Lebensmittel</span>
+    <span>{{ 'NAV.DISCOVER' | translate }}</span>
   </a>
 
   <!-- 3. Rezepte -->
   <a
     routerLink="/recipes"
-    routerLinkActive="text-[#278F39] font-bold"
-    class="flex flex-col items-center justify-center flex-1 py-1 text-[#627264] hover:text-[#278F39] transition-colors"
+    routerLinkActive="active"
+    class="nav-tab"
   >
-    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
       <path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z" />
       <line x1="6" y1="17" x2="18" y2="17" />
     </svg>
-    <span class="text-[10px] mt-0.5">Rezepte</span>
+    <span>{{ 'NAV.RECIPES' | translate }}</span>
   </a>
 
   <!-- 4. Einkaufsliste -->
   <a
     routerLink="/shopping-list"
-    routerLinkActive="text-[#278F39] font-bold"
-    class="flex flex-col items-center justify-center flex-1 py-1 text-[#627264] hover:text-[#278F39] transition-colors"
+    routerLinkActive="active"
+    class="nav-tab"
   >
-    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="9" cy="21" r="1" />
       <circle cx="20" cy="21" r="1" />
       <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
     </svg>
-    <span class="text-[10px] mt-0.5">Einkaufsliste</span>
+    <span>{{ 'NAV.SHOPPING_LIST' | translate }}</span>
   </a>
 
   <!-- 5. Mehr / Fortschritt -->
   <a
     routerLink="/progress"
-    routerLinkActive="text-[#278F39] font-bold"
-    class="flex flex-col items-center justify-center flex-1 py-1 text-[#627264] hover:text-[#278F39] transition-colors"
+    routerLinkActive="active"
+    class="nav-tab"
   >
-    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="1" />
       <circle cx="19" cy="12" r="1" />
       <circle cx="5" cy="12" r="1" />
     </svg>
-    <span class="text-[10px] mt-0.5">Mehr</span>
+    <span>{{ 'NAV.MORE' | translate }}</span>
   </a>
 </nav>

@@ -1,0 +1,28 @@
+// Flexbox layout mixin strictly following Mario Ramirez standards
+@mixin flexbox($direction: row, $justify: flex-start, $align: stretch, $gap: 0) {
+  display: flex;
+  flex-direction: $direction;
+  justify-content: $justify;
+  align-items: $align;
+  @if $gap != 0 {
+    gap: $gap;
+  }
+}
+
+// Inline flexbox helper
+@mixin inline-flexbox($direction: row, $justify: center, $align: center, $gap: 0) {
+  display: inline-flex;
+  flex-direction: $direction;
+  justify-content: $justify;
+  align-items: $align;
+  @if $gap != 0 {
+    gap: $gap;
+  }
+}
+
+// Media Query Mixins matching Mario's standard breakpoints: 1200px / 980px / 480px / 390px
+@mixin respond-to($breakpoint) {
+  @media screen and (max-width: $breakpoint) {
+    @content;
+  }
+}

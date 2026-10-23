@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { MenuService } from '../../../core/services/menu.service';
 import { StorageService } from '../../../core/services/storage.service';
 import { LogoComponent } from '../logo/logo.component';
@@ -8,7 +9,7 @@ import { LogoComponent } from '../logo/logo.component';
 @Component({
   selector: 'app-sidebar-menu',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, LogoComponent],
+  imports: [CommonModule, RouterLink, RouterLinkActive, LogoComponent, TranslatePipe],
   templateUrl: './sidebar-menu.component.html',
   styleUrl: './sidebar-menu.component.scss'
 })

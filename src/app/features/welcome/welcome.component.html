@@ -1,44 +1,38 @@
-<div class="flex flex-col h-full bg-[#FFFFFF] overflow-hidden">
+<div class="welcome-container">
   <!-- Bereich A: Header mit Logo und Hamburger-Menü -->
-  <header class="flex-shrink-0 px-6 pt-5 pb-2 bg-white border-b border-[#F0F4F1] z-10 flex items-center justify-between">
+  <header class="welcome-header">
     <app-logo size="md"></app-logo>
     <app-hamburger-button></app-hamburger-button>
   </header>
 
   <!-- Bereich B: Scrollbarer Inhalt (Headline & Hero-Bereich) -->
-  <main class="flex-1 px-6 py-3 space-y-4 min-h-0 overflow-y-auto">
-    <!-- Headline -->
-    <div class="pt-1">
-      <h1 class="text-3xl sm:text-[34px] font-extrabold leading-[1.15] text-[#103A2A] tracking-tight">
-        Gesünder essen.<br />
-        Einfacher abnehmen.
+  <main class="welcome-content">
+    <div class="headline-section">
+      <h1>
+        {{ 'WELCOME.HEADLINE_1' | translate }}<br />
+        {{ 'WELCOME.HEADLINE_2' | translate }}
       </h1>
-      <p class="text-[14px] sm:text-[15px] text-[#55695C] mt-2 leading-relaxed max-w-[340px]">
-        Individuelle Mahlzeitenpläne, passend zu deinem Alltag und deinem Lieblingsmarkt.
-      </p>
+      <p>{{ 'WELCOME.SUBTITLE' | translate }}</p>
     </div>
 
     <!-- Center Hero Image Section -->
-    <div class="relative my-3 flex justify-center items-center">
-      <!-- Main Hero Photo -->
-      <div class="w-full relative aspect-[4/3] rounded-[28px] overflow-hidden shadow-soft-lg border-2 border-white/60">
+    <div class="hero-section">
+      <div class="hero-photo-wrapper">
         <img
           src="images/welcome-hero.jpg"
           alt="Gesunde Mahlzeit genießen"
-          class="w-full h-full object-cover object-center"
           loading="eager"
         />
-        <!-- Subtle lighting vignette -->
-        <div class="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none"></div>
+        <div class="hero-overlay"></div>
       </div>
 
-      <!-- Handwritten Badge "Kleine Schritte. Große Ergebnisse." -->
-      <div class="absolute -right-2 top-1/2 -translate-y-1/2 bg-white/95 backdrop-blur-sm px-3.5 py-2.5 rounded-2xl shadow-soft border border-[#E5F5E8] flex flex-col items-start z-10 max-w-[130px] transform rotate-1 hover:rotate-0 transition-transform">
-        <span class="font-handwriting text-lg leading-tight text-[#103A2A] font-bold">
-          Kleine<br />Schritte.<br />Große<br />Ergebnisse.
+      <!-- Badge "Kleine Schritte. Große Ergebnisse." -->
+      <div class="hero-badge">
+        <span>
+          {{ 'WELCOME.BADGE_LINE1' | translate }}<br />
+          {{ 'WELCOME.BADGE_LINE2' | translate }}
         </span>
-        <!-- Curved cute arrow -->
-        <svg class="w-6 h-6 text-[#278F39] -mt-1 self-end" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <path d="M4 14c4 4 11 3 14-4" />
           <path d="M14 6l4 4-4 4" />
         </svg>
@@ -47,8 +41,7 @@
   </main>
 
   <!-- Bereich C: Fester unterer Bereich mit Buttons -->
-  <footer class="flex-shrink-0 px-6 py-3 bg-white border-t border-[#F0F4F1] space-y-2 safe-area-bottom z-20">
-    <!-- Primary Button -->
+  <footer class="welcome-footer">
     <app-button
       variant="primary"
       size="lg"
@@ -56,35 +49,30 @@
       [iconRight]="true"
       (clicked)="startOnboarding()"
     >
-      Kostenlos starten
+      {{ 'WELCOME.START_FREE' | translate }}
     </app-button>
 
-    <!-- Secondary Button -->
     <app-button
       variant="secondary"
       size="md"
       [fullWidth]="true"
       (clicked)="startOnboarding()"
     >
-      Ohne Login fortfahren
+      {{ 'WELCOME.CONTINUE_GUEST' | translate }}
     </app-button>
 
-    <!-- Login placeholder notice -->
-    <div class="text-center pt-1">
-      <p class="text-xs text-[#627264]">
-        Bereits ein Konto?
-        <button
-          type="button"
-          (click)="showLoginNotice()"
-          class="font-semibold text-[#278F39] hover:underline ml-1 cursor-pointer"
-        >
-          Jetzt anmelden
+    <!-- Login notice -->
+    <div class="login-row">
+      <p>
+        {{ 'WELCOME.HAVE_ACCOUNT' | translate }}
+        <button type="button" (click)="showLoginNotice()">
+          {{ 'WELCOME.LOGIN_ACTION' | translate }}
         </button>
       </p>
       @if (showLoginInfo) {
-        <p class="text-[11px] text-[#278F39] bg-[#E5F5E8] py-1 px-2.5 rounded-full mt-1.5 inline-block animate-fade-in font-medium">
-          Coming soon – du kannst Down Kilos direkt ohne Registrierung nutzen!
-        </p>
+        <div class="login-info-bubble">
+          {{ 'WELCOME.LOGIN_NOTICE' | translate }}
+        </div>
       }
     </div>
   </footer>

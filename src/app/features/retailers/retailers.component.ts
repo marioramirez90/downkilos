@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormControl, Validators } from '@angular/forms';
+import { TranslatePipe } from '../../core/i18n/translate.pipe';
 import { Retailer, RetailerPreference, StoreBranch, UserLocation } from '../../core/models/retailer.model';
 import { RetailerService } from '../../core/services/retailer.service';
 import { LocationService } from '../../core/services/location.service';
@@ -18,7 +19,8 @@ import { StoreMapComponent } from '../../shared/components/store-map/store-map.c
     FormsModule,
     ReactiveFormsModule,
     HamburgerButtonComponent,
-    StoreMapComponent
+    StoreMapComponent,
+    TranslatePipe
   ],
   templateUrl: './retailers.component.html',
   styleUrl: './retailers.component.scss'

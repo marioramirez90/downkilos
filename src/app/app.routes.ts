@@ -54,6 +54,12 @@ export const routes: Routes = [
     title: 'Down Kilos – Dashboard',
   },
   {
+    path: 'settings',
+    loadComponent: () =>
+      import('./features/settings/settings.component').then((m) => m.SettingsComponent),
+    title: 'Down Kilos – Einstellungen',
+  },
+  {
     path: 'discover',
     loadComponent: () =>
       import('./features/discover/discover.component').then((m) => m.DiscoverComponent),

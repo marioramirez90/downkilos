@@ -131,9 +131,9 @@ describe('DashboardComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/retailers']);
   });
 
-  it('13. should navigate to /onboarding when clicking settings gear', () => {
+  it('13. should navigate to /settings when clicking settings gear', () => {
     component.goToSettings();
-    expect(router.navigate).toHaveBeenCalledWith(['/onboarding']);
+    expect(router.navigate).toHaveBeenCalledWith(['/settings']);
   });
 
   it('14. should open food diary when clicking Bereits gegessen or calorie ring', () => {

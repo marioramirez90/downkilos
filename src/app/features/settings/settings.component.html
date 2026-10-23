@@ -1,0 +1,178 @@
+<div class="settings-screen">
+  <!-- Header -->
+  <header class="settings-header">
+    <div class="header-main-row">
+      <button
+        type="button"
+        (click)="goBack()"
+        class="back-arrow-btn"
+        aria-label="Zurück zum Dashboard"
+        title="Zurück zum Dashboard"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18l-6-6 6-6" />
+        </svg>
+      </button>
+
+      <h1 class="screen-title">Einstellungen</h1>
+
+      <div class="header-placeholder-box"></div>
+    </div>
+  </header>
+
+  <!-- Scrollbarer Inhaltsbereich -->
+  <main class="settings-scroll-area">
+    <!-- Bereich 1: Mein Profil und Ziel (Section 17) -->
+    <section class="settings-section profile-goal-section">
+      <div class="section-badge-header">
+        <span class="badge-icon">👤</span>
+        <h2 class="section-title">Mein Profil und Ziel</h2>
+      </div>
+
+      <div class="profile-data-card">
+        <!-- Steckbrief -->
+        <div class="data-rows-grid">
+          <div class="data-row">
+            <span class="data-label">Vorname</span>
+            <strong class="data-value">{{ userFirstName() }}</strong>
+          </div>
+
+          <div class="data-row">
+            <span class="data-label">Geburtsdatum</span>
+            <span class="data-value">{{ formattedBirthDate() }}</span>
+          </div>
+
+          <div class="data-row">
+            <span class="data-label">Aktuelles Gewicht</span>
+            <strong class="data-value">{{ profile()?.currentWeight ? profile()?.currentWeight + ' kg' : '–' }}</strong>
+          </div>
+
+          <div class="data-row">
+            <span class="data-label">Körpergröße</span>
+            <span class="data-value">{{ profile()?.height ? profile()?.height + ' cm' : '–' }}</span>
+          </div>
+
+          <div class="data-row">
+            <span class="data-label">Aktivitätslevel</span>
+            <span class="data-value text-wrap">{{ activityLabel() }}</span>
+          </div>
+
+          <div class="data-row">
+            <span class="data-label">Persönliches Ziel</span>
+            <strong class="data-value text-wrap">{{ goalLabel() }}</strong>
+          </div>
+        </div>
+
+        <!-- Kalorien-Kennzahlen -->
+        <div class="calorie-metrics-subcard">
+          <div class="metric-item highlight-target">
+            <span class="metric-sublabel">Tages-Kalorienziel</span>
+            <strong class="metric-number">{{ targetCalories() }} kcal</strong>
+          </div>
+
+          <div class="metric-divider"></div>
+
+          <div class="metric-item">
+            <span class="metric-sublabel">Erhaltungsbedarf</span>
+            <span class="metric-number">{{ maintenanceCalories() }} kcal</span>
+          </div>
+
+          <div class="metric-divider"></div>
+
+          <div class="metric-item">
+            <span class="metric-sublabel">Kaloriendefizit</span>
+            <span class="metric-number deficit-value">-{{ calorieDeficit() }} kcal</span>
+          </div>
+        </div>
+
+        <!-- Aktionsbuttons Profil & Ziel -->
+        <div class="profile-action-buttons">
+          <button
+            type="button"
+            (click)="openEditProfile()"
+            class="edit-profile-btn"
+          >
+            ✏️ Profil bearbeiten
+          </button>
+
+          <button
+            type="button"
+            (click)="openEditGoal()"
+            class="edit-goal-btn"
+          >
+            🎯 Kalorienziel ansehen / bearbeiten
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bereich 2: Alle Daten zurücksetzen (Section 18) -->
+    <section class="settings-section danger-zone-section">
+      <div class="section-badge-header danger-header">
+        <span class="badge-icon">⚠️</span>
+        <h2 class="section-title">Alle Daten zurücksetzen</h2>
+      </div>
+
+      <div class="danger-card">
+        <p class="danger-desc">
+          Möchtest du von vorne beginnen? Alle lokalen App-Daten werden dabei vollständig und unwiderruflich gelöscht.
+        </p>
+
+        <button
+          type="button"
+          (click)="confirmResetModal()"
+          class="reset-trigger-btn"
+        >
+          🗑️ Alle meine Daten zurücksetzen
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Feste untere Navigation -->
+  <footer class="settings-footer-nav">
+    <app-bottom-nav></app-bottom-nav>
+  </footer>
+
+  <!-- Bestätigungsdialog: Down Kilos zurücksetzen? (Section 18) -->
+  @if (showResetDialog()) {
+    <div class="reset-modal-backdrop" (click)="cancelReset()"></div>
+    <div class="reset-confirm-modal" role="alertdialog" aria-modal="true" aria-labelledby="resetTitle" aria-describedby="resetDesc">
+      <div class="modal-alert-icon">⚠️</div>
+      <h3 id="resetTitle" class="reset-modal-title">Down Kilos zurücksetzen?</h3>
+      <p id="resetDesc" class="reset-modal-text">
+        Dabei werden dein Gastprofil, dein Kalorienziel, deine Ernährungseinträge, deine Einkaufsliste und dein Gewichtsverlauf dauerhaft gelöscht.
+      </p>
+
+      @if (resetErrorMessage(); as err) {
+        <div class="reset-error-box">
+          <span>{{ err }}</span>
+        </div>
+      }
+
+      <div class="modal-buttons-row">
+        <button
+          type="button"
+          (click)="cancelReset()"
+          class="btn-cancel-reset"
+          [disabled]="isResetting()"
+        >
+          Abbrechen
+        </button>
+
+        <button
+          type="button"
+          (click)="executeReset()"
+          class="btn-confirm-delete"
+          [disabled]="isResetting()"
+        >
+          @if (isResetting()) {
+            Löschen...
+          } @else {
+            Alle Daten löschen
+          }
+        </button>
+      </div>
+    </div>
+  }
+</div>

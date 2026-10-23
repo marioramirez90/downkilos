@@ -309,18 +309,46 @@ export class StorageService {
     }
   }
 
-  async resetAllData(): Promise<void> {
-    localStorage.removeItem(LOCAL_FALLBACK_KEY);
-    localStorage.removeItem(LOCAL_RETAILER_KEY);
-    localStorage.removeItem(LOCAL_WEIGHT_KEY);
-    localStorage.removeItem(LOCAL_ONBOARDING_KEY);
-    localStorage.removeItem('down_kilos_shopping_list_checked');
-    localStorage.removeItem('down_kilos_swapped_meals');
-    localStorage.removeItem('down_kilos_user_custom_prices');
+  async resetAllData(): Promise<boolean> {
+    try {
+      // 1. Lokale Benutzerspeicher entfernen (nur App-spezifische Nutzerdaten)
+      const keysToRemove = [
+        LOCAL_FALLBACK_KEY,
+        LOCAL_RETAILER_KEY,
+        LOCAL_WEIGHT_KEY,
+        LOCAL_ONBOARDING_KEY,
+        'down_kilos_today_food_log',
+        'down_kilos_shopping_checked',
+        'down_kilos_shopping_pantry',
+        'down_kilos_shopping_custom',
+        'down_kilos_shopping_items',
+        'down_kilos_shopping_list_checked',
+        'down_kilos_swapped_meals',
+        'down_kilos_user_custom_prices',
+        'down_kilos_user_prices'
+      ];
 
-    await this.deleteProfile();
-    this.weightHistory.set([]);
-    this.retailerPref.set(null);
+      for (const key of keysToRemove) {
+        try {
+          localStorage.removeItem(key);
+        } catch {
+          // ignore
+        }
+      }
+
+      // 2. IndexedDB Profil leeren
+      await this.deleteProfile();
+
+      // 3. Reaktive Signale zurücksetzen
+      this.profile.set(null);
+      this.weightHistory.set([]);
+      this.retailerPref.set(null);
+
+      return true;
+    } catch (err) {
+      console.error('Fehler beim Zurücksetzen der Benutzerdaten:', err);
+      return false;
+    }
   }
 }
 

@@ -372,7 +372,7 @@ export class DashboardComponent implements OnInit {
   }
 
   goToSettings(): void {
-    this.router.navigate(['/onboarding']);
+    this.router.navigate(['/settings']);
   }
 
   onSearchSubmit(): void {

@@ -1,97 +1,213 @@
-<div class="flex flex-col h-full bg-[#F4F6F4] overflow-hidden">
-  <!-- Fixed Mobile Header -->
-  <header class="flex-shrink-0 bg-[#FFFFFF] border-b border-[#E3EBE4] px-4 py-3 z-10">
-    <div class="max-w-md mx-auto flex items-center justify-between">
-      <div>
-        <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#E5F5E8] text-[#278F39] text-[10px] font-bold tracking-wide">
-          <span>📉</span>
-          <span>GEWICHTSVERLAUF</span>
-        </div>
-        <h1 class="text-xl font-black text-[#103A2A] tracking-tight mt-0.5">
-          Mein Fortschritt
-        </h1>
-      </div>
-      <div class="flex items-center gap-1.5">
-        <app-hamburger-button></app-hamburger-button>
+<div class="progress-container">
+  <!-- Fixed Header: Back, Title, Settings & Hamburger -->
+  <header class="progress-header">
+    <div class="header-inner">
+      <button
+        type="button"
+        (click)="goBack()"
+        class="back-nav-btn"
+        aria-label="Zurück zum Dashboard"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
+      </button>
+
+      <h1>{{ 'PROGRESS.HEADER_TITLE' | translate }}</h1>
+
+      <div class="header-actions">
         <button
-          (click)="openAddWeightModal()"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#278F39] hover:bg-[#20752E] text-white text-xs font-bold rounded-xl shadow-sm transition-all active:scale-95"
-          aria-label="Gewicht wiegen"
+          type="button"
+          (click)="goToProfileEdit()"
+          class="settings-btn"
+          title="Profil bearbeiten"
+          aria-label="Einstellungen"
         >
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
           </svg>
-          <span>Wiegen</span>
         </button>
+        <app-hamburger-button></app-hamburger-button>
       </div>
     </div>
   </header>
 
-  <main class="flex-1 min-h-0 overflow-y-auto max-w-md w-full mx-auto px-4 pt-4 pb-6 space-y-4">
-    <!-- 1. Hero Weight Progress Card -->
-    <section class="bg-[#FFFFFF] rounded-3xl p-5 border border-[#E3EBE4] shadow-sm relative overflow-hidden">
-      <div class="absolute -top-12 -right-12 w-32 h-32 bg-[#E5F5E8] rounded-full blur-2xl pointer-events-none"></div>
+  <!-- Scrollable Content -->
+  <main class="progress-content">
+    <!-- Subtitle: Heute -->
+    <h2 class="section-headline">{{ 'PROGRESS.TODAY' | translate }}</h2>
 
-      <div class="flex items-start justify-between">
-        <div>
-          <span class="text-xs font-semibold text-[#627264] uppercase tracking-wider">Aktuelles Gewicht</span>
-          <div class="flex items-baseline gap-1.5 mt-1">
-            <span class="text-4xl font-black text-[#103A2A] tracking-tight">
-              {{ currentWeightFormatted() }}
+    <!-- 1. Hero Calorie Ring & Macro Card (Screen 7 Mockup) -->
+    <section class="hero-calorie-card">
+      <div class="card-inner-row">
+        <!-- Circular Ring -->
+        <div class="ring-container">
+          <svg viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="50" class="ring-bg" />
+            <circle
+              cx="60"
+              cy="60"
+              r="50"
+              class="ring-progress"
+              [attr.stroke-dasharray]="314"
+              [attr.stroke-dashoffset]="calorieDashOffset()"
+            />
+          </svg>
+          <div class="ring-labels-box">
+            <strong class="ring-number">{{ eatenCalories() | number }}</strong>
+            <span class="ring-target-text">
+              {{ 'PROGRESS.CALORIE_OF_TARGET' | translate:{ target: targetKcal() | number } }}
             </span>
-            <span class="text-base font-bold text-[#627264]">kg</span>
           </div>
         </div>
 
-        <!-- Difference pill -->
-        <div
-          [ngClass]="changeFromStart() <= 0 ? 'bg-[#E5F5E8] text-[#278F39]' : 'bg-amber-50 text-amber-700'"
-          class="px-3 py-1.5 rounded-2xl flex items-center gap-1 text-xs font-black shadow-sm"
-        >
-          <span>{{ changeFromStart() <= 0 ? '↓' : '↑' }}</span>
-          <span>{{ changeFromStartFormatted() }} kg</span>
-        </div>
-      </div>
+        <!-- Macro Progress Rows -->
+        <div class="macros-group">
+          <!-- Eiweiß -->
+          <div class="macro-bar-item">
+            <div class="macro-header-row">
+              <span class="macro-title">Eiweiß</span>
+              <strong class="macro-value">{{ eatenProtein() }} / {{ targetProtein() }} g</strong>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill protein" [style.width.%]="macroRatio(eatenProtein(), targetProtein())"></div>
+            </div>
+          </div>
 
-      <!-- Progress Bar & Target Calculation -->
-      <div class="mt-5 pt-4 border-t border-[#F0F4F1] space-y-2">
-        <div class="flex items-center justify-between text-xs font-bold">
-          <span class="text-[#627264]">Start: {{ startWeightFormatted() }} kg</span>
-          <span class="text-[#278F39]">{{ progressPercent() }}% geschafft</span>
-          <span class="text-[#103A2A]">Ziel: {{ targetWeightFormatted() }} kg</span>
-        </div>
+          <!-- Kohlenhydrate -->
+          <div class="macro-bar-item">
+            <div class="macro-header-row">
+              <span class="macro-title">Kohlenhydrate</span>
+              <strong class="macro-value">{{ eatenCarbs() }} / {{ targetCarbs() }} g</strong>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill carbs" [style.width.%]="macroRatio(eatenCarbs(), targetCarbs())"></div>
+            </div>
+          </div>
 
-        <!-- Progress Track -->
-        <div class="w-full bg-[#EBF0EC] rounded-full h-3 overflow-hidden p-0.5">
-          <div
-            class="bg-gradient-to-r from-[#278F39] to-[#34B34C] h-full rounded-full transition-all duration-700"
-            [style.width.%]="progressPercent()"
-          ></div>
+          <!-- Fett -->
+          <div class="macro-bar-item">
+            <div class="macro-header-row">
+              <span class="macro-title">Fett</span>
+              <strong class="macro-value">{{ eatenFat() }} / {{ targetFat() }} g</strong>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill fat" [style.width.%]="macroRatio(eatenFat(), targetFat())"></div>
+            </div>
+          </div>
         </div>
-
-        <p class="text-[11px] text-[#627264] text-center pt-1">
-          Noch <strong class="text-[#103A2A]">{{ remainingKgFormatted() }} kg</strong> bis zu deinem Wohlfühlgewicht!
-        </p>
       </div>
     </section>
 
-    <!-- 2. Visual SVG Chart (Gewichtsverlauf) -->
-    <section class="bg-[#FFFFFF] rounded-3xl p-5 border border-[#E3EBE4] shadow-sm space-y-3">
-      <div class="flex items-center justify-between">
-        <div>
-          <h2 class="text-sm font-black text-[#103A2A] tracking-tight">Gewichtsverlauf</h2>
-          <p class="text-[11px] text-[#627264]">Entwicklung über die letzten Wiegungen</p>
+    <!-- 2. Two Metric Stat Cards (Screen 7: -2,3 kg & 12 Tage in Folge) -->
+    <div class="stats-grid">
+      <!-- Card 1: Gewichtsänderung -->
+      <div class="stat-card">
+        <div class="stat-icon-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
         </div>
-        <span class="text-xs font-bold text-[#278F39] bg-[#E5F5E8] px-2.5 py-0.5 rounded-full">
-          {{ weightEntries().length }} Messungen
-        </span>
+        <div class="stat-text-box">
+          <strong>{{ weightLossWeeks() }} kg</strong>
+          <span>{{ 'PROGRESS.STAT_WEEKS_SUB' | translate }}</span>
+        </div>
       </div>
 
-      <!-- SVG Chart Container -->
-      <div class="w-full h-44 pt-2">
+      <!-- Card 2: Streak in Folge -->
+      <div class="stat-card">
+        <div class="stat-icon-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-width="2" />
+            <line x1="16" y1="2" x2="16" y2="6" stroke-width="2" />
+            <line x1="8" y1="2" x2="8" y2="6" stroke-width="2" />
+            <line x1="3" y1="10" x2="21" y2="10" stroke-width="2" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 16l2 2 4-4" />
+          </svg>
+        </div>
+        <div class="stat-text-box">
+          <strong>{{ streakDays() }} {{ 'PROGRESS.STAT_STREAK_UNIT' | translate }}</strong>
+          <span>{{ 'PROGRESS.STAT_STREAK_SUB' | translate }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Two Action Buttons (Screen 7: Mahlzeiten planen & Einkaufsliste öffnen) -->
+    <div class="action-buttons-group">
+      <button
+        type="button"
+        (click)="goToMealPlanner()"
+        class="primary-action-btn"
+      >
+        <span>{{ 'PROGRESS.PLAN_MEALS_BTN' | translate }}</span>
+        <span class="btn-arrow">→</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="goToShoppingList()"
+        class="secondary-action-btn"
+      >
+        <span class="btn-cart-icon">🛒</span>
+        <span>{{ 'PROGRESS.OPEN_SHOPPING_LIST_BTN' | translate }}</span>
+      </button>
+    </div>
+
+    <!-- 4. Goal Card ("Mein Ziel") -->
+    <section class="target-goal-card">
+      <div class="goal-top-row">
+        <h3>{{ 'PROGRESS.GOAL_TITLE' | translate }}</h3>
+        <button
+          type="button"
+          (click)="goToProfileEdit()"
+          class="goal-change-btn"
+        >
+          {{ 'PROGRESS.GOAL_CHANGE' | translate }}
+        </button>
+      </div>
+
+      <span class="goal-sub-label">{{ 'PROGRESS.GOAL_REDUCE_WEIGHT' | translate }}</span>
+
+      <div class="goal-values-row">
+        <div class="weight-col">
+          <strong>{{ currentWeight() | number:'1.0-1' }} kg</strong>
+          <small>{{ 'PROGRESS.CURRENT_LABEL' | translate }}</small>
+        </div>
+
+        <div class="progress-bar-box">
+          <div class="goal-track">
+            <div class="goal-fill" [style.width.%]="progressPercent()"></div>
+          </div>
+          <span class="pct-text">{{ progressPercent() }}%</span>
+        </div>
+
+        <div class="weight-col align-right">
+          <strong>{{ targetWeight() | number:'1.0-1' }} kg</strong>
+          <small>{{ 'PROGRESS.TARGET_LABEL' | translate }}</small>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Gewichtsverlauf Chart -->
+    <section class="chart-section-card">
+      <div class="section-title-row">
+        <div>
+          <h3>{{ 'PROGRESS.CHART_TITLE' | translate }}</h3>
+          <span>{{ weightEntries().length }} {{ 'PROGRESS.MEASUREMENTS_UNIT' | translate }}</span>
+        </div>
+        <button
+          type="button"
+          (click)="openAddWeightModal()"
+          class="weigh-quick-btn"
+        >
+          + {{ 'PROGRESS.WEIGH_BTN' | translate }}
+        </button>
+      </div>
+
+      <div class="svg-chart-container">
         @if (weightEntries().length >= 2) {
-          <svg class="w-full h-full overflow-visible" viewBox="0 0 320 130" preserveAspectRatio="none">
+          <svg viewBox="0 0 320 130" preserveAspectRatio="none">
             <defs>
               <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="#278F39" stop-opacity="0.25" />
@@ -99,321 +215,118 @@
               </linearGradient>
             </defs>
 
-            <!-- Horizontal guide lines -->
-            <line x1="0" y1="20" x2="320" y2="20" stroke="#E3EBE4" stroke-dasharray="3,3" stroke-width="1" />
-            <line x1="0" y1="65" x2="320" y2="65" stroke="#E3EBE4" stroke-dasharray="3,3" stroke-width="1" />
-            <line x1="0" y1="110" x2="320" y2="110" stroke="#E3EBE4" stroke-dasharray="3,3" stroke-width="1" />
+            <!-- Guide Lines -->
+            <line x1="0" y1="20" x2="320" y2="20" class="guide-line" />
+            <line x1="0" y1="65" x2="320" y2="65" class="guide-line" />
+            <line x1="0" y1="110" x2="320" y2="110" class="guide-line" />
 
-            <!-- Filled Area -->
             <polygon [attr.points]="chartAreaPoints()" fill="url(#chartGradient)" />
+            <polyline [attr.points]="chartLinePoints()" class="chart-poly-line" />
 
-            <!-- Trend Line -->
-            <polyline
-              [attr.points]="chartLinePoints()"
-              fill="none"
-              stroke="#278F39"
-              stroke-width="3"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-
-            <!-- Data Points -->
             @for (pt of chartPoints(); track pt.id) {
-              <circle
-                [attr.cx]="pt.x"
-                [attr.cy]="pt.y"
-                r="4.5"
-                fill="#FFFFFF"
-                stroke="#278F39"
-                stroke-width="2.5"
-              />
-              <!-- Weight label on point -->
-              <text
-                [attr.x]="pt.x"
-                [attr.y]="pt.y - 8"
-                font-size="9"
-                font-weight="bold"
-                fill="#103A2A"
-                text-anchor="middle"
-              >
+              <circle [attr.cx]="pt.x" [attr.cy]="pt.y" r="4.5" class="chart-point" />
+              <text [attr.x]="pt.x" [attr.y]="pt.y - 8" class="chart-point-label">
                 {{ pt.weight.toFixed(1) }}
               </text>
             }
           </svg>
         } @else {
-          <div class="h-full flex flex-col items-center justify-center text-center p-4 bg-[#F8FAF8] rounded-2xl border border-dashed border-[#CCD8CF]">
-            <span class="text-2xl mb-1">📊</span>
-            <p class="text-xs font-bold text-[#103A2A]">Noch nicht genügend Datenpunkte</p>
-            <p class="text-[11px] text-[#627264] mt-0.5">Trage mindestens 2 Wiegungen ein, um den Verlauf zu sehen.</p>
+          <div class="empty-chart-box">
+            <span>📊</span>
+            <p>Trage mindestens 2 Wiegungen ein, um den Verlauf zu sehen.</p>
           </div>
         }
       </div>
-
-      <!-- Date labels below chart -->
-      @if (weightEntries().length >= 2) {
-        <div class="flex justify-between items-center text-[10px] text-[#627264] font-medium px-1">
-          <span>{{ formatDisplayDate(weightEntries()[0].date) }}</span>
-          <span>{{ formatDisplayDate(weightEntries()[weightEntries().length - 1].date) }}</span>
-        </div>
-      }
     </section>
 
-    <!-- 3. Daily Calorie & Macronutrient Targets -->
-    <section class="bg-[#FFFFFF] rounded-3xl p-5 border border-[#E3EBE4] shadow-sm space-y-4">
-      <div class="flex items-center justify-between">
-        <div>
-          <h2 class="text-sm font-black text-[#103A2A] tracking-tight">Tages-Ernährungsziel</h2>
-          <p class="text-[11px] text-[#627264]">Berechnet nach Mifflin-St. Jeor & PAL</p>
-        </div>
-        <a
-          routerLink="/calculator"
-          class="text-xs font-bold text-[#278F39] hover:underline flex items-center gap-0.5"
-        >
-          <span>Neu berechnen</span>
-          <span>→</span>
-        </a>
-      </div>
-
-      <!-- Calorie Target Badge -->
-      <div class="p-4 bg-[#E5F5E8] rounded-2xl flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-[#278F39] text-white flex items-center justify-center font-bold text-lg">
-            🔥
-          </div>
-          <div>
-            <span class="text-xs font-medium text-[#278F39] uppercase tracking-wider">Tägliches Kalorienziel</span>
-            <div class="text-xl font-black text-[#103A2A]">
-              {{ dailyCalories() }} <span class="text-sm font-semibold text-[#627264]">kcal / Tag</span>
-            </div>
-          </div>
-        </div>
-        <span class="text-[11px] font-bold text-[#278F39] bg-white px-2 py-1 rounded-xl shadow-xs">
-          -500 kcal Defizit
-        </span>
-      </div>
-
-      <!-- Macronutrient Split Cards -->
-      <div class="grid grid-cols-3 gap-2.5">
-        <!-- Protein -->
-        <div class="p-3 bg-[#F8FAF8] rounded-2xl border border-[#E3EBE4] text-center">
-          <span class="text-[10px] font-bold text-[#627264] uppercase block">Eiweiß</span>
-          <span class="text-base font-black text-[#103A2A] block mt-0.5">{{ proteinGrams() }}g</span>
-          <span class="text-[9px] font-semibold text-[#278F39]">25% Energie</span>
-        </div>
-
-        <!-- Carbs -->
-        <div class="p-3 bg-[#F8FAF8] rounded-2xl border border-[#E3EBE4] text-center">
-          <span class="text-[10px] font-bold text-[#627264] uppercase block">Kohlenhydrate</span>
-          <span class="text-base font-black text-[#103A2A] block mt-0.5">{{ carbsGrams() }}g</span>
-          <span class="text-[9px] font-semibold text-[#627264]">45% Energie</span>
-        </div>
-
-        <!-- Fat -->
-        <div class="p-3 bg-[#F8FAF8] rounded-2xl border border-[#E3EBE4] text-center">
-          <span class="text-[10px] font-bold text-[#627264] uppercase block">Fett</span>
-          <span class="text-base font-black text-[#103A2A] block mt-0.5">{{ fatGrams() }}g</span>
-          <span class="text-[9px] font-semibold text-[#627264]">30% Energie</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- 4. Weight History Table -->
-    <section class="bg-[#FFFFFF] rounded-3xl p-5 border border-[#E3EBE4] shadow-sm space-y-3">
-      <div class="flex items-center justify-between">
-        <h2 class="text-sm font-black text-[#103A2A] tracking-tight">Messungen-Historie</h2>
-        <button
-          (click)="openAddWeightModal()"
-          class="text-xs font-bold text-[#278F39] hover:underline"
-        >
+    <!-- 6. History Card -->
+    <section class="history-section-card">
+      <div class="history-title-row">
+        <h3>{{ 'PROGRESS.HISTORY_TITLE' | translate }}</h3>
+        <button type="button" (click)="openAddWeightModal()" class="history-add-btn">
           + Neu hinzufügen
         </button>
       </div>
 
-      <div class="divide-y divide-[#F0F4F1] -mx-2">
+      <div class="history-entries-list">
         @for (entry of reversedWeightEntries(); track entry.id) {
-          <div class="py-2.5 px-2 flex items-center justify-between hover:bg-[#F8FAF8] rounded-xl transition-colors">
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="text-xs font-bold text-[#103A2A]">{{ formatDisplayDate(entry.date) }}</span>
-                @if (entry.note) {
-                  <span class="text-[10px] font-medium text-[#627264] bg-[#F0F4F1] px-1.5 py-0.5 rounded-md">
-                    {{ entry.note }}
-                  </span>
-                }
-              </div>
+          <div class="entry-row">
+            <div class="entry-info">
+              <span class="entry-date">{{ formatDisplayDate(entry.date) }}</span>
+              @if (entry.note) {
+                <span class="entry-note-tag">{{ entry.note }}</span>
+              }
             </div>
 
-            <div class="flex items-center gap-3">
-              <span class="text-sm font-black text-[#103A2A]">
-                {{ entry.weight.toFixed(1) }} kg
-              </span>
+            <div class="entry-val-box">
+              <strong>{{ entry.weight.toFixed(1) }} kg</strong>
               <button
+                type="button"
                 (click)="deleteEntry(entry.id)"
-                class="p-1 text-[#9BA89F] hover:text-red-500 rounded-lg transition-colors"
+                class="entry-delete-btn"
                 title="Eintrag entfernen"
                 aria-label="Eintrag entfernen"
               >
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
+                ✕
               </button>
             </div>
           </div>
         }
       </div>
     </section>
-
-    <!-- 5. Profile & Data Management Actions -->
-    <section class="bg-[#FFFFFF] rounded-3xl p-5 border border-[#E3EBE4] shadow-sm space-y-3">
-      <h2 class="text-sm font-black text-[#103A2A] tracking-tight">Einstellungen & Lokale Daten</h2>
-
-      <div class="space-y-2 text-xs">
-        <!-- Edit Profile -->
-        <a
-          routerLink="/onboarding"
-          class="flex items-center justify-between p-3 rounded-2xl bg-[#F8FAF8] hover:bg-[#E5F5E8] border border-[#E3EBE4] font-bold text-[#103A2A] transition-colors"
-        >
-          <div class="flex items-center gap-2.5">
-            <span>👤</span>
-            <span>Gastprofil anpassen (Größe, Alter, Ziel)</span>
-          </div>
-          <span class="text-[#278F39]">→</span>
-        </a>
-
-        <!-- Change Retailer -->
-        <a
-          routerLink="/retailers"
-          class="flex items-center justify-between p-3 rounded-2xl bg-[#F8FAF8] hover:bg-[#E5F5E8] border border-[#E3EBE4] font-bold text-[#103A2A] transition-colors"
-        >
-          <div class="flex items-center gap-2.5">
-            <span>🛒</span>
-            <span>Netto Filiale & Budget anpassen</span>
-          </div>
-          <span class="text-[#278F39]">→</span>
-        </a>
-
-        <!-- Export JSON -->
-        <button
-          (click)="exportBackup()"
-          class="w-full flex items-center justify-between p-3 rounded-2xl bg-[#F8FAF8] hover:bg-[#F0F4F1] border border-[#E3EBE4] font-bold text-[#103A2A] transition-colors text-left"
-        >
-          <div class="flex items-center gap-2.5">
-            <span>💾</span>
-            <span>Meine Daten als JSON-Backup exportieren</span>
-          </div>
-          <span class="text-[#627264]">Download</span>
-        </button>
-
-        <!-- Reset App -->
-        <button
-          (click)="showResetConfirm = true"
-          class="w-full flex items-center justify-between p-3 rounded-2xl bg-red-50 hover:bg-red-100 border border-red-100 font-bold text-red-600 transition-colors text-left"
-        >
-          <div class="flex items-center gap-2.5">
-            <span>🗑️</span>
-            <span>Alle lokalen Daten zurücksetzen</span>
-          </div>
-          <span>Reset</span>
-        </button>
-      </div>
-    </section>
   </main>
 
-  <!-- Sticky Bottom Navigation Bar -->
-  <app-bottom-nav></app-bottom-nav>
+  <!-- Sticky Bottom Navigation -->
+  <footer class="progress-footer">
+    <app-bottom-nav></app-bottom-nav>
+  </footer>
 
   <!-- Modal: Gewicht eintragen -->
   @if (showAddModal) {
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
-      <div class="w-full max-w-sm bg-white rounded-3xl p-6 shadow-2xl border border-[#E3EBE4] space-y-4">
-        <div class="flex items-center justify-between">
-          <h3 class="text-base font-extrabold text-[#103A2A]">Neues Gewicht erfassen</h3>
-          <button
-            (click)="showAddModal = false"
-            class="p-1 rounded-full text-gray-400 hover:text-gray-700"
-            aria-label="Schließen"
-          >
-            ✕
-          </button>
+    <div class="weigh-modal-backdrop">
+      <div class="weigh-modal-dialog">
+        <div class="modal-top">
+          <h3>{{ 'PROGRESS.ADD_WEIGHT_TITLE' | translate }}</h3>
+          <button type="button" (click)="showAddModal = false" class="modal-close-btn">✕</button>
         </div>
 
-        <div class="space-y-3">
-          <div>
-            <label class="block text-xs font-bold text-[#103A2A] mb-1">Gewicht (in kg)</label>
-            <div class="relative">
-              <input
-                type="number"
-                step="0.1"
-                [(ngModel)]="newWeightVal"
-                class="w-full px-4 py-2.5 rounded-xl border border-[#CCD8CF] focus:outline-none focus:ring-2 focus:ring-[#278F39] text-base font-bold text-[#103A2A]"
-                placeholder="z.B. 68.2"
-              />
-              <span class="absolute right-3.5 top-3 text-xs font-bold text-[#627264]">kg</span>
-            </div>
-          </div>
+        <div class="modal-inputs-col">
+          <label>{{ 'PROGRESS.WEIGHT_INPUT_LABEL' | translate }}</label>
+          <input
+            type="number"
+            step="0.1"
+            [(ngModel)]="newWeightVal"
+            placeholder="z.B. 77.5"
+          />
 
-          <div>
-            <label class="block text-xs font-bold text-[#103A2A] mb-1">Datum</label>
-            <input
-              type="date"
-              [(ngModel)]="newWeightDate"
-              class="w-full px-4 py-2 rounded-xl border border-[#CCD8CF] focus:outline-none focus:ring-2 focus:ring-[#278F39] text-xs font-semibold text-[#103A2A]"
-            />
-          </div>
+          <label>Datum</label>
+          <input
+            type="date"
+            [(ngModel)]="newWeightDate"
+          />
 
-          <div>
-            <label class="block text-xs font-bold text-[#103A2A] mb-1">Optionale Notiz</label>
-            <input
-              type="text"
-              [(ngModel)]="newWeightNote"
-              placeholder="z.B. Morgens nüchtern"
-              class="w-full px-4 py-2 rounded-xl border border-[#CCD8CF] focus:outline-none focus:ring-2 focus:ring-[#278F39] text-xs font-medium text-[#103A2A]"
-            />
-          </div>
+          <label>Notiz (optional)</label>
+          <input
+            type="text"
+            [(ngModel)]="newWeightNote"
+            placeholder="z.B. Nach dem Sport"
+          />
         </div>
 
-        <div class="flex items-center gap-2 pt-2">
+        <div class="modal-actions-row">
           <button
+            type="button"
             (click)="showAddModal = false"
-            class="flex-1 py-2.5 rounded-xl border border-[#CCD8CF] text-xs font-bold text-[#627264] hover:bg-[#F8FAF8]"
+            class="modal-cancel-btn"
           >
-            Abbrechen
+            {{ 'COMMON.CANCEL' | translate }}
           </button>
           <button
+            type="button"
             (click)="saveNewWeight()"
-            [disabled]="!newWeightVal || newWeightVal <= 30 || newWeightVal >= 300"
-            class="flex-1 py-2.5 rounded-xl bg-[#278F39] hover:bg-[#20752E] disabled:opacity-50 text-white text-xs font-bold shadow-sm transition-all"
+            class="modal-save-btn"
           >
-            Speichern
-          </button>
-        </div>
-      </div>
-    </div>
-  }
-
-  <!-- Modal: Reset Confirmation -->
-  @if (showResetConfirm) {
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
-      <div class="w-full max-w-sm bg-white rounded-3xl p-6 shadow-2xl border border-[#E3EBE4] space-y-4 text-center">
-        <span class="text-4xl">⚠️</span>
-        <h3 class="text-base font-extrabold text-[#103A2A]">Wirklich alle Daten löschen?</h3>
-        <p class="text-xs text-[#627264] leading-relaxed">
-          Dein Profil, alle gespeicherten Rezepte, Einkaufslisten und dein Gewichtsverlauf werden unwiderruflich von diesem Gerät gelöscht.
-        </p>
-
-        <div class="flex items-center gap-2 pt-2">
-          <button
-            (click)="showResetConfirm = false"
-            class="flex-1 py-2.5 rounded-xl border border-[#CCD8CF] text-xs font-bold text-[#627264] hover:bg-[#F8FAF8]"
-          >
-            Abbrechen
-          </button>
-          <button
-            (click)="executeReset()"
-            class="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-sm transition-all"
-          >
-            Ja, alles löschen
+            {{ 'COMMON.SAVE' | translate }}
           </button>
         </div>
       </div>

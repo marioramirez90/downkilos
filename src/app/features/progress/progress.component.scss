@@ -1,1 +1,723 @@
-// Styles for ProgressComponent
+@use 'sass:color';
+@use '../../../styles/abstracts/variables' as *;
+@use '../../../styles/abstracts/mixins' as *;
+@use '../../../styles/components/buttons' as *;
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+:host {
+  display: block;
+  height: 100%;
+}
+
+.progress-container {
+  @include flexbox(column, space-between, stretch);
+  height: 100%;
+  background-color: $bg-white;
+  overflow: hidden;
+
+  .progress-header {
+    flex-shrink: 0;
+    padding: 16px 20px 12px;
+    background-color: $bg-white;
+    border-bottom: 1px solid $border-color-light;
+    z-index: 10;
+
+    .header-inner {
+      @include flexbox(row, space-between, center);
+
+      .back-nav-btn {
+        @include inline-flexbox(row, center, center);
+        width: 36px;
+        height: 36px;
+        border-radius: $radius-full;
+        border: none;
+        background: transparent;
+        color: $secondary-color;
+        cursor: pointer;
+        transition: background-color 0.2s ease, transform 0.1s ease;
+
+        &:hover {
+          background-color: $bg-light;
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+
+        svg {
+          width: 22px;
+          height: 22px;
+          stroke-width: 2.5;
+        }
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 800;
+        color: $secondary-color;
+        letter-spacing: -0.02em;
+      }
+
+      .header-actions {
+        @include flexbox(row, flex-end, center, 8px);
+
+        .settings-btn {
+          @include inline-flexbox(row, center, center);
+          width: 36px;
+          height: 36px;
+          border-radius: $radius-full;
+          border: none;
+          background: transparent;
+          color: $primary-color;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+
+          &:hover {
+            background-color: $bg-light;
+          }
+
+          svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2;
+          }
+        }
+      }
+    }
+  }
+
+  .progress-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px 24px;
+    background-color: $bg-light;
+    @include flexbox(column, flex-start, stretch, 14px);
+
+    .section-headline {
+      margin: 0 0 2px;
+      font-size: 18px;
+      font-weight: 800;
+      color: $secondary-color;
+    }
+
+    // 1. Hero Calorie Ring & Macro Card (Screen 7)
+    .hero-calorie-card {
+      padding: 18px;
+      border-radius: $radius-xl;
+      background-color: $bg-white;
+      border: 1px solid $border-color-green;
+      box-shadow: $shadow-sm;
+
+      .card-inner-row {
+        @include flexbox(row, space-between, center, 16px);
+
+        @media screen and (max-width: 360px) {
+          @include flexbox(column, center, center, 14px);
+        }
+
+        .ring-container {
+          position: relative;
+          width: 120px;
+          height: 120px;
+          flex-shrink: 0;
+
+          svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+
+            .ring-bg {
+              fill: none;
+              stroke: #E8F5E9;
+              stroke-width: 10;
+            }
+
+            .ring-progress {
+              fill: none;
+              stroke: $primary-color;
+              stroke-width: 10;
+              stroke-linecap: round;
+              transition: stroke-dashoffset 0.6s ease;
+            }
+          }
+
+          .ring-labels-box {
+            position: absolute;
+            inset: 0;
+            @include flexbox(column, center, center);
+            text-align: center;
+            pointer-events: none;
+
+            .ring-number {
+              font-size: 24px;
+              font-weight: 900;
+              color: $secondary-color;
+              line-height: 1;
+            }
+
+            .ring-target-text {
+              font-size: 10px;
+              font-weight: 600;
+              color: $text-muted;
+              margin-top: 4px;
+            }
+          }
+        }
+
+        .macros-group {
+          flex: 1;
+          width: 100%;
+          @include flexbox(column, center, stretch, 10px);
+
+          .macro-bar-item {
+            @include flexbox(column, flex-start, stretch, 4px);
+
+            .macro-header-row {
+              @include flexbox(row, space-between, center);
+
+              .macro-title {
+                font-size: 12px;
+                font-weight: 700;
+                color: $secondary-color;
+              }
+
+              .macro-value {
+                font-size: 11px;
+                font-weight: 700;
+                color: $text-muted;
+              }
+            }
+
+            .bar-track {
+              height: 6px;
+              border-radius: $radius-full;
+              background-color: #EBF0EC;
+              overflow: hidden;
+
+              .bar-fill {
+                height: 100%;
+                border-radius: $radius-full;
+                transition: width 0.5s ease;
+
+                &.protein {
+                  background-color: $primary-color;
+                }
+
+                &.carbs {
+                  background-color: #84CC16;
+                }
+
+                &.fat {
+                  background-color: #F59E0B;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // 2. Stats Grid (Screen 7: -2,3 kg & 12 Tage in Folge)
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+
+      .stat-card {
+        padding: 14px;
+        border-radius: $radius-lg;
+        background-color: $bg-white;
+        border: 1px solid $border-color;
+        box-shadow: $shadow-sm;
+        @include flexbox(row, flex-start, center, 12px);
+
+        .stat-icon-badge {
+          width: 38px;
+          height: 38px;
+          border-radius: $radius-md;
+          background-color: #E5F5E8;
+          color: $primary-color;
+          @include inline-flexbox(row, center, center);
+          flex-shrink: 0;
+
+          svg {
+            width: 20px;
+            height: 20px;
+          }
+        }
+
+        .stat-text-box {
+          @include flexbox(column, center, flex-start);
+
+          strong {
+            font-size: 17px;
+            font-weight: 900;
+            color: $secondary-color;
+            line-height: 1.1;
+          }
+
+          span {
+            font-size: 11px;
+            font-weight: 600;
+            color: $text-muted;
+            margin-top: 2px;
+          }
+        }
+      }
+    }
+
+    // 3. Action Buttons Group (Screen 7)
+    .action-buttons-group {
+      @include flexbox(column, flex-start, stretch, 10px);
+
+      .primary-action-btn {
+        width: 100%;
+        padding: 14px 20px;
+        border-radius: $radius-full;
+        border: none;
+        background-color: $primary-color;
+        color: $bg-white;
+        font-size: 14px;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: $shadow-button;
+        @include flexbox(row, center, center, 8px);
+        transition: background-color 0.15s ease, transform 0.1s ease;
+
+        &:hover {
+          background-color: $primary-dark;
+        }
+
+        &:active {
+          transform: scale(0.98);
+        }
+
+        .btn-arrow {
+          font-size: 16px;
+        }
+      }
+
+      .secondary-action-btn {
+        width: 100%;
+        padding: 13px 20px;
+        border-radius: $radius-full;
+        border: 1.5px solid $border-color-green;
+        background-color: $bg-white;
+        color: $secondary-color;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: $shadow-sm;
+        @include flexbox(row, center, center, 8px);
+        transition: background-color 0.15s ease, border-color 0.15s ease;
+
+        &:hover {
+          background-color: #F0FDF4;
+          border-color: $primary-color;
+        }
+
+        &:active {
+          transform: scale(0.98);
+        }
+
+        .btn-cart-icon {
+          font-size: 16px;
+        }
+      }
+    }
+
+    // 4. Goal Card ("Mein Ziel")
+    .target-goal-card {
+      padding: 16px 18px;
+      border-radius: $radius-xl;
+      background-color: $bg-white;
+      border: 1px solid $border-color;
+      box-shadow: $shadow-sm;
+      @include flexbox(column, flex-start, stretch, 8px);
+
+      .goal-top-row {
+        @include flexbox(row, space-between, center);
+
+        h3 {
+          margin: 0;
+          font-size: 14px;
+          font-weight: 800;
+          color: $secondary-color;
+        }
+
+        .goal-change-btn {
+          border: none;
+          background: transparent;
+          color: $primary-color;
+          font-size: 12px;
+          font-weight: 700;
+          cursor: pointer;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+
+      .goal-sub-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: $text-muted;
+      }
+
+      .goal-values-row {
+        @include flexbox(row, space-between, center, 12px);
+        padding-top: 4px;
+
+        .weight-col {
+          @include flexbox(column, center, flex-start);
+
+          strong {
+            font-size: 16px;
+            font-weight: 900;
+            color: $secondary-color;
+          }
+
+          small {
+            font-size: 10px;
+            font-weight: 600;
+            color: $text-muted;
+          }
+
+          &.align-right {
+            align-items: flex-end;
+          }
+        }
+
+        .progress-bar-box {
+          flex: 1;
+          @include flexbox(column, center, center, 4px);
+
+          .goal-track {
+            width: 100%;
+            height: 6px;
+            border-radius: $radius-full;
+            background-color: #EBF0EC;
+            overflow: hidden;
+
+            .goal-fill {
+              height: 100%;
+              border-radius: $radius-full;
+              background-color: $primary-color;
+              transition: width 0.5s ease;
+            }
+          }
+
+          .pct-text {
+            font-size: 10px;
+            font-weight: 700;
+            color: $primary-color;
+          }
+        }
+      }
+    }
+
+    // 5. Chart Section
+    .chart-section-card {
+      padding: 16px 18px;
+      border-radius: $radius-xl;
+      background-color: $bg-white;
+      border: 1px solid $border-color;
+      box-shadow: $shadow-sm;
+      @include flexbox(column, flex-start, stretch, 10px);
+
+      .section-title-row {
+        @include flexbox(row, space-between, center);
+
+        h3 {
+          margin: 0;
+          font-size: 14px;
+          font-weight: 800;
+          color: $secondary-color;
+        }
+
+        span {
+          font-size: 11px;
+          color: $text-muted;
+        }
+
+        .weigh-quick-btn {
+          padding: 6px 14px;
+          border-radius: $radius-full;
+          border: none;
+          background-color: #E5F5E8;
+          color: $primary-color;
+          font-size: 11px;
+          font-weight: 700;
+          cursor: pointer;
+
+          &:hover {
+            background-color: $secondary-light;
+          }
+        }
+      }
+
+      .svg-chart-container {
+        width: 100%;
+        height: 130px;
+
+        svg {
+          width: 100%;
+          height: 100%;
+          overflow: visible;
+
+          .guide-line {
+            stroke: $border-color;
+            stroke-dasharray: 3, 3;
+            stroke-width: 1;
+          }
+
+          .chart-poly-line {
+            fill: none;
+            stroke: $primary-color;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+          }
+
+          .chart-point {
+            fill: $bg-white;
+            stroke: $primary-color;
+            stroke-width: 2.5;
+          }
+
+          .chart-point-label {
+            font-size: 9px;
+            font-weight: 700;
+            fill: $secondary-color;
+            text-anchor: middle;
+          }
+        }
+
+        .empty-chart-box {
+          height: 100%;
+          border: 1px dashed $border-color;
+          border-radius: $radius-md;
+          background-color: $bg-light;
+          @include flexbox(column, center, center, 4px);
+          padding: 16px;
+          text-align: center;
+
+          span {
+            font-size: 20px;
+          }
+
+          p {
+            margin: 0;
+            font-size: 11px;
+            color: $text-muted;
+          }
+        }
+      }
+    }
+
+    // 6. History Section
+    .history-section-card {
+      padding: 16px 18px;
+      border-radius: $radius-xl;
+      background-color: $bg-white;
+      border: 1px solid $border-color;
+      box-shadow: $shadow-sm;
+      @include flexbox(column, flex-start, stretch, 10px);
+
+      .history-title-row {
+        @include flexbox(row, space-between, center);
+
+        h3 {
+          margin: 0;
+          font-size: 14px;
+          font-weight: 800;
+          color: $secondary-color;
+        }
+
+        .history-add-btn {
+          border: none;
+          background: transparent;
+          color: $primary-color;
+          font-size: 12px;
+          font-weight: 700;
+          cursor: pointer;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+
+      .history-entries-list {
+        @include flexbox(column, flex-start, stretch);
+        border-top: 1px solid $border-color-light;
+
+        .entry-row {
+          padding: 10px 0;
+          border-bottom: 1px solid $border-color-light;
+          @include flexbox(row, space-between, center);
+
+          .entry-info {
+            @include flexbox(row, flex-start, center, 8px);
+
+            .entry-date {
+              font-size: 12px;
+              font-weight: 700;
+              color: $secondary-color;
+            }
+
+            .entry-note-tag {
+              font-size: 10px;
+              padding: 2px 6px;
+              border-radius: $radius-sm;
+              background-color: $bg-light;
+              color: $text-muted;
+            }
+          }
+
+          .entry-val-box {
+            @include flexbox(row, flex-end, center, 10px);
+
+            strong {
+              font-size: 13px;
+              font-weight: 800;
+              color: $secondary-color;
+            }
+
+            .entry-delete-btn {
+              width: 22px;
+              height: 22px;
+              border-radius: $radius-full;
+              border: none;
+              background: transparent;
+              color: $text-muted;
+              font-size: 11px;
+              cursor: pointer;
+              @include inline-flexbox(row, center, center);
+
+              &:hover {
+                background-color: #FEE2E2;
+                color: $danger-color;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .progress-footer {
+    flex-shrink: 0;
+    z-index: 10;
+  }
+
+  // Modal
+  .weigh-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background-color: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+    @include flexbox(row, center, center);
+    padding: 16px;
+
+    .weigh-modal-dialog {
+      width: 100%;
+      max-width: 400px;
+      background-color: $bg-white;
+      border-radius: $radius-xl;
+      box-shadow: $shadow-md;
+      border: 1px solid $border-color-light;
+      padding: 20px;
+      @include flexbox(column, flex-start, stretch, 14px);
+      animation: fadeIn 0.2s ease-out;
+
+      .modal-top {
+        @include flexbox(row, space-between, center);
+
+        h3 {
+          margin: 0;
+          font-size: 15px;
+          font-weight: 800;
+          color: $secondary-color;
+        }
+
+        .modal-close-btn {
+          border: none;
+          background: transparent;
+          color: $text-muted;
+          font-size: 16px;
+          cursor: pointer;
+        }
+      }
+
+      .modal-inputs-col {
+        @include flexbox(column, flex-start, stretch, 8px);
+
+        label {
+          font-size: 11px;
+          font-weight: 700;
+          color: $text-color;
+          text-transform: uppercase;
+        }
+
+        input {
+          padding: 10px 14px;
+          border-radius: $radius-md;
+          border: 1px solid $border-color;
+          font-size: 13px;
+
+          &:focus {
+            outline: none;
+            border-color: $primary-color;
+          }
+        }
+      }
+
+      .modal-actions-row {
+        @include flexbox(row, flex-end, center, 8px);
+        padding-top: 6px;
+
+        .modal-cancel-btn {
+          flex: 1;
+          padding: 10px;
+          border-radius: $radius-md;
+          border: none;
+          background-color: $bg-light;
+          color: $text-muted;
+          font-weight: 600;
+          font-size: 12px;
+          cursor: pointer;
+        }
+
+        .modal-save-btn {
+          flex: 1;
+          padding: 10px;
+          border-radius: $radius-md;
+          border: none;
+          background-color: $primary-color;
+          color: $bg-white;
+          font-weight: 700;
+          font-size: 12px;
+          cursor: pointer;
+
+          &:hover {
+            background-color: $primary-dark;
+          }
+        }
+      }
+    }
+  }
+}

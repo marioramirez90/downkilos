@@ -28,7 +28,7 @@ describe('BottomNavComponent', () => {
 
     const text = el.textContent || '';
     expect(text).toContain('Home');
-    expect(text).toContain('Lebensmittel');
+    expect(text).toContain('Plan');
     expect(text).toContain('Rezepte');
     expect(text).toContain('Einkaufsliste');
     expect(text).toContain('Mehr');

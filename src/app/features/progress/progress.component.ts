@@ -1,9 +1,11 @@
-import { Component, OnInit, computed, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
+import { TranslatePipe } from '../../core/i18n/translate.pipe';
 import { StorageService } from '../../core/services/storage.service';
 import { CalorieCalculatorService } from '../../core/services/calorie-calculator.service';
+import { FoodLogService } from '../../core/services/food-log.service';
 import { WeightEntry } from '../../core/models/weight-log.model';
 import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-nav.component';
 import { HamburgerButtonComponent } from '../../shared/components/hamburger-button/hamburger-button.component';
@@ -11,11 +13,22 @@ import { HamburgerButtonComponent } from '../../shared/components/hamburger-butt
 @Component({
   selector: 'app-progress',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, BottomNavComponent, HamburgerButtonComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    BottomNavComponent,
+    HamburgerButtonComponent,
+    TranslatePipe
+  ],
   templateUrl: './progress.component.html',
   styleUrl: './progress.component.scss'
 })
 export class ProgressComponent implements OnInit {
+  private router = inject(Router);
+  storageService = inject(StorageService);
+  private calorieService = inject(CalorieCalculatorService);
+  foodLogService = inject(FoodLogService);
+
   showAddModal = false;
   showResetConfirm = false;
 
@@ -25,15 +38,19 @@ export class ProgressComponent implements OnInit {
 
   readonly weightEntries = computed(() => this.storageService.weightHistory());
   readonly reversedWeightEntries = computed(() => [...this.storageService.weightHistory()].reverse());
-
   readonly profile = computed(() => this.storageService.profile());
 
+  // Screen 7: Streaks & Stat metrics
+  readonly streakDays = signal<number>(12);
+  readonly weightLossWeeks = signal<string>('-2,3');
+
+  // Weights
   readonly currentWeight = computed(() => {
     const list = this.weightEntries();
     if (list.length > 0) {
       return list[list.length - 1].weight;
     }
-    return this.profile()?.currentWeight ?? 68.5;
+    return this.profile()?.currentWeight ?? 78;
   });
 
   readonly startWeight = computed(() => {
@@ -41,11 +58,11 @@ export class ProgressComponent implements OnInit {
     if (list.length > 0) {
       return list[0].weight;
     }
-    return (this.profile()?.currentWeight ?? 68.5) + 3.5;
+    return (this.profile()?.currentWeight ?? 78) + 2.3;
   });
 
   readonly targetWeight = computed(() => {
-    return this.profile()?.targetWeight ?? 62.0;
+    return this.profile()?.targetWeight ?? 70.0;
   });
 
   readonly changeFromStart = computed(() => {
@@ -68,30 +85,87 @@ export class ProgressComponent implements OnInit {
   // Daily calorie and macro recommendations
   readonly dailyCalories = computed(() => {
     const p = this.profile();
-    if (!p) return 1800;
+    if (!p) return 2000;
     const res = this.calorieService.calculate(p);
-    return res.dailyTargetKcal;
+    return res.dailyTargetKcal || 2000;
   });
 
   readonly proteinGrams = computed(() => {
     const p = this.profile();
-    if (!p) return 110;
-    return this.calorieService.calculate(p).macros.proteinGrams;
+    if (!p) return 150;
+    return this.calorieService.calculate(p).macros.proteinGrams || 150;
   });
 
   readonly carbsGrams = computed(() => {
     const p = this.profile();
-    if (!p) return 190;
-    return this.calorieService.calculate(p).macros.carbsGrams;
+    if (!p) return 250;
+    return this.calorieService.calculate(p).macros.carbsGrams || 250;
   });
 
   readonly fatGrams = computed(() => {
     const p = this.profile();
-    if (!p) return 60;
-    return this.calorieService.calculate(p).macros.fatGrams;
+    if (!p) return 70;
+    return this.calorieService.calculate(p).macros.fatGrams || 70;
   });
 
-  // Chart computations
+  readonly targetProtein = computed(() => this.proteinGrams());
+  readonly targetCarbs = computed(() => this.carbsGrams());
+  readonly targetFat = computed(() => this.fatGrams());
+
+  // Screen 7 Calorie & Macro status:
+  readonly eatenCalories = computed(() => {
+    const eaten = this.foodLogService.eatenCalories();
+    return eaten > 0 ? eaten : 1250;
+  });
+
+  readonly targetKcal = computed(() => this.dailyCalories());
+
+  readonly calorieRatio = computed(() => {
+    const target = this.targetKcal();
+    if (!target) return 0;
+    return Math.min(1, Math.max(0, this.eatenCalories() / target));
+  });
+
+  readonly calorieDashOffset = computed(() => {
+    return 314 * (1 - this.calorieRatio());
+  });
+
+  readonly eatenProtein = computed(() => {
+    const ep = this.foodLogService.dailySummary().eatenProtein;
+    return ep > 0 ? ep : 78;
+  });
+
+  readonly eatenCarbs = computed(() => {
+    const ec = this.foodLogService.dailySummary().eatenCarbs;
+    return ec > 0 ? ec : 120;
+  });
+
+  readonly eatenFat = computed(() => {
+    const ef = this.foodLogService.dailySummary().eatenFat;
+    return ef > 0 ? ef : 42;
+  });
+
+  macroRatio(eaten: number, target: number): number {
+    if (!target || target <= 0) return 0;
+    return Math.min(100, Math.round((eaten / target) * 100));
+  }
+
+  // Navigation actions (Screen 7 buttons)
+  goToMealPlanner(): void {
+    this.router.navigate(['/meal-planner']);
+  }
+
+  goToShoppingList(): void {
+    this.router.navigate(['/shopping-list']);
+  }
+
+  goToProfileEdit(): void {
+    this.router.navigate(['/onboarding']);
+  }
+
+  goBack(): void {
+    this.router.navigate(['/dashboard']);
+  }
   readonly chartPoints = computed(() => {
     const entries = this.weightEntries();
     if (entries.length < 2) return [];
@@ -135,11 +209,7 @@ export class ProgressComponent implements OnInit {
     return `${firstX},${baselineY} ${lineCoords} ${lastX},${baselineY}`;
   });
 
-  constructor(
-    private storageService: StorageService,
-    private calorieService: CalorieCalculatorService,
-    private router: Router
-  ) {}
+  constructor() {}
 
   ngOnInit(): void {
     this.storageService.loadWeightHistory();

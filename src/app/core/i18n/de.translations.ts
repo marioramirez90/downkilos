@@ -5,6 +5,7 @@ export const DE_TRANSLATIONS = {
   },
   NAV: {
     HOME: 'Home',
+    PLAN: 'Plan',
     DISCOVER: 'Lebensmittel',
     RECIPES: 'Rezepte',
     SHOPPING_LIST: 'Einkaufsliste',
@@ -174,6 +175,27 @@ export const DE_TRANSLATIONS = {
     EXPAND_20: 'Auf 20 km erweitern',
     BUDGET_LABEL: 'Dein Wochenbudget für Lebensmittel',
     CONFIRM_SELECTION: 'Auswahl bestätigen'
+  },
+  PROGRESS: {
+    HEADER_TITLE: 'Mein Fortschritt',
+    TODAY: 'Heute',
+    CALORIE_OF_TARGET: 'von {{target}} kcal',
+    PLAN_MEALS_BTN: 'Mahlzeiten planen',
+    OPEN_SHOPPING_LIST_BTN: 'Einkaufsliste öffnen',
+    STAT_WEEKS_SUB: 'seit 4 Wochen',
+    STAT_STREAK_SUB: 'in Folge',
+    STAT_STREAK_UNIT: 'Tage',
+    GOAL_TITLE: 'Mein Ziel',
+    GOAL_CHANGE: 'Ändern',
+    GOAL_REDUCE_WEIGHT: 'Gewicht reduzieren',
+    CURRENT_LABEL: 'aktuell',
+    TARGET_LABEL: 'Zielgewicht',
+    CHART_TITLE: 'Gewichtsverlauf',
+    MEASUREMENTS_UNIT: 'Messungen',
+    WEIGH_BTN: 'Wiegen',
+    HISTORY_TITLE: 'Messungen-Historie',
+    ADD_WEIGHT_TITLE: 'Neues Gewicht wiegen',
+    WEIGHT_INPUT_LABEL: 'Gewicht in kg'
   },
   SIDEBAR: {
     TITLE: 'Menü',

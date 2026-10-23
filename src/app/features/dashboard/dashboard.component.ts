@@ -114,6 +114,18 @@ export class DashboardComponent implements OnInit {
     return Math.round(circumference * (1 - this.calorieRatio()));
   });
 
+  readonly formattedTargetKcal = computed(() => {
+    return Math.round(this.targetKcal()).toLocaleString('de-DE');
+  });
+
+  readonly formattedEatenKcal = computed(() => {
+    return Math.round(this.eatenKcal()).toLocaleString('de-DE');
+  });
+
+  readonly formattedRemainingKcal = computed(() => {
+    return Math.round(this.remainingKcal()).toLocaleString('de-DE');
+  });
+
   readonly featuredProducts = computed<DashboardProductCard[]>(() => {
     const all = this.productService.products();
     if (!all || all.length === 0) return [];

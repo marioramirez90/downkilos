@@ -32,30 +32,30 @@
 
     <!-- 2. Hero-Bereich: Kalorienring (Links) & Dein Markt (Rechts) -->
     <div class="hero-widgets-row">
-      <!-- Links: Großer Kalorienring -->
+      <!-- Links: Großer freistehender Kalorienring ohne Rahmen -->
       <div class="calorie-ring-widget">
         <div class="ring-svg-container">
-          <svg viewBox="0 0 130 130" class="ring-svg">
+          <svg viewBox="0 0 140 140" class="ring-svg">
             <defs>
               <linearGradient id="dashboardRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#34D399" />
-                <stop offset="50%" stop-color="#278F39" />
+                <stop offset="0%" stop-color="#37C847" />
+                <stop offset="60%" stop-color="#278F39" />
                 <stop offset="100%" stop-color="#103A2A" />
               </linearGradient>
             </defs>
 
             <!-- Hellgrüne Spur -->
             <circle
-              cx="65"
-              cy="65"
+              cx="70"
+              cy="70"
               r="54"
               class="ring-bg-track"
             />
 
             <!-- Aktiver Bogen mit Farbverlauf -->
             <circle
-              cx="65"
-              cy="65"
+              cx="70"
+              cy="70"
               r="54"
               class="ring-active-track"
               stroke="url(#dashboardRingGrad)"
@@ -66,7 +66,7 @@
 
           <!-- Zentrumstext -->
           <div class="ring-center-text">
-            <strong class="ring-number">{{ targetKcal() | number:'1.0-0' }}</strong>
+            <strong class="ring-number">{{ formattedTargetKcal() }}</strong>
             <span class="ring-unit">kcal</span>
             <small class="ring-sub">Tagesziel</small>
           </div>
@@ -77,9 +77,8 @@
       <div class="market-card-widget">
         <div class="market-top-row">
           <span class="market-heading">Dein Markt</span>
-          <svg class="market-pin-icon" viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-            <circle cx="12" cy="10" r="3"></circle>
+          <svg class="market-pin-icon" viewBox="0 0 24 24" fill="#278F39" stroke="none">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/>
           </svg>
         </div>
 
@@ -95,7 +94,7 @@
         <!-- Markt-Standortzeile mit Ändern-Link -->
         <div class="market-bottom-row">
           <div class="location-group">
-            <svg class="small-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg class="small-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
               <circle cx="12" cy="10" r="3"></circle>
             </svg>
@@ -111,7 +110,7 @@
       <!-- Links: Bereits gegessen mit Besteck-Icon -->
       <div class="status-col eaten-col">
         <div class="icon-circle cutlery-circle">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
             <path d="M18 2v6a3 3 0 0 1-3 3 3 3 0 0 1-3-3V2"></path>
             <path d="M15 11v11"></path>
             <path d="M6 2v7a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V2"></path>
@@ -120,20 +119,23 @@
         </div>
         <div class="status-info">
           <span class="status-label">Bereits gegessen</span>
-          <strong class="status-value">{{ eatenKcal() | number:'1.0-0' }} kcal</strong>
+          <strong class="status-value">{{ formattedEatenKcal() }} kcal</strong>
         </div>
       </div>
+
+      <!-- Vertikaler Teiler -->
+      <div class="status-divider"></div>
 
       <!-- Rechts: Noch verfügbar mit Flammen-Icon -->
       <div class="status-col remaining-col">
         <div class="icon-circle flame-circle">
           <svg viewBox="0 0 24 24" fill="#278F39">
-            <path d="M12 2C9.5 6 6 8.5 6 13a6 6 0 0 0 12 0c0-4.5-3.5-7-6-11zm0 15a3 3 0 0 1-3-3c0-1.8 1.2-3.2 3-5 1.8 1.8 3 3.2 3 5a3 3 0 0 1-3 3z" />
+            <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
           </svg>
         </div>
         <div class="status-info">
           <span class="status-label">Noch verfügbar</span>
-          <strong class="status-value">{{ remainingKcal() | number:'1.0-0' }} kcal</strong>
+          <strong class="status-value">{{ formattedRemainingKcal() }} kcal</strong>
         </div>
       </div>
     </div>
@@ -173,9 +175,12 @@
       </div>
     </section>
 
-    <!-- 5. Produktsuchleiste -->
+    <!-- 5. Produktsuchleiste mit Lupe -->
     <div class="search-bar-box">
-      <span class="search-icon-symbol">🔍</span>
+      <svg class="search-icon-svg" viewBox="0 0 24 24" fill="none" stroke="#66716D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
       <input
         type="text"
         [(ngModel)]="searchQuery"

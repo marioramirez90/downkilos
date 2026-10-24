@@ -54,6 +54,28 @@ export const routes: Routes = [
     title: 'Down Kilos – Dashboard',
   },
   {
+    path: 'gewicht',
+    loadComponent: () =>
+      import('./features/weight/weight.component').then((m) => m.WeightComponent),
+    title: 'Down Kilos – Mein Gewicht',
+  },
+  {
+    path: 'weight',
+    redirectTo: 'gewicht',
+    pathMatch: 'full',
+  },
+  {
+    path: 'was-hast-du-gegessen',
+    loadComponent: () =>
+      import('./features/food-diary/food-diary.component').then((m) => m.FoodDiaryComponent),
+    title: 'Down Kilos – Was hast du heute gegessen?',
+  },
+  {
+    path: 'food-log',
+    redirectTo: 'was-hast-du-gegessen',
+    pathMatch: 'full',
+  },
+  {
     path: 'settings',
     loadComponent: () =>
       import('./features/settings/settings.component').then((m) => m.SettingsComponent),

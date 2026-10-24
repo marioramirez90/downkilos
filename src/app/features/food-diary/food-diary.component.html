@@ -1,0 +1,343 @@
+<div class="food-diary-screen">
+  <!-- Header: Back button, Title, Subtitle -->
+  <header class="diary-header">
+    <div class="header-top-line">
+      <button
+        type="button"
+        (click)="goBack()"
+        class="back-btn"
+        aria-label="Zurück zum Dashboard"
+        title="Zurück zum Dashboard"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18l-6-6 6-6" />
+        </svg>
+      </button>
+
+      <div class="title-column">
+        <h1 class="screen-title">Was hast du heute gegessen?</h1>
+      </div>
+
+      <div class="spacer-box"></div>
+    </div>
+    <p class="screen-subtitle">Trage deine Lebensmittel ein. Wir berechnen deine Kalorien automatisch.</p>
+
+    <!-- Calorie Balance Mini Summary Bar -->
+    <div class="calorie-summary-strip">
+      <div class="summary-col">
+        <span class="col-label">Gegessen</span>
+        <strong class="col-val text-green">{{ eatenKcal() }} kcal</strong>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-col">
+        <span class="col-label">Tagesziel</span>
+        <strong class="col-val">{{ targetKcal() }} kcal</strong>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-col">
+        <span class="col-label">Noch verfügbar</span>
+        <strong class="col-val">{{ remainingKcal() }} kcal</strong>
+      </div>
+    </div>
+  </header>
+
+  <!-- Scrollable Content Area -->
+  <main class="diary-scrollable-content">
+    <!-- 1. Mahlzeit wählen (Frühstück, Mittag, Abend, Snack) -->
+    <section class="meal-type-selector">
+      <span class="selector-heading">Mahlzeit auswählen:</span>
+      <div class="meal-tabs-row">
+        <button
+          type="button"
+          class="meal-chip"
+          [class.active]="selectedMealType() === 'breakfast'"
+          (click)="selectedMealType.set('breakfast')"
+        >
+          🌅 Frühstück
+        </button>
+        <button
+          type="button"
+          class="meal-chip"
+          [class.active]="selectedMealType() === 'lunch'"
+          (click)="selectedMealType.set('lunch')"
+        >
+          ☀️ Mittagessen
+        </button>
+        <button
+          type="button"
+          class="meal-chip"
+          [class.active]="selectedMealType() === 'dinner'"
+          (click)="selectedMealType.set('dinner')"
+        >
+          🌙 Abendessen
+        </button>
+        <button
+          type="button"
+          class="meal-chip"
+          [class.active]="selectedMealType() === 'snack'"
+          (click)="selectedMealType.set('snack')"
+        >
+          🍎 Snack
+        </button>
+      </div>
+    </section>
+
+    <!-- 2. Lebensmittel suchen -->
+    <section class="search-section">
+      <div class="search-input-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="#66716D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          placeholder="Eier, Toast, Banane, Skyr, Joghurt..."
+          class="product-search-input"
+          aria-label="Lebensmittel suchen"
+        />
+        @if (searchQuery()) {
+          <button type="button" (click)="searchQuery.set('')" class="clear-search-btn">✕</button>
+        }
+      </div>
+
+      <!-- Quick Filter Chips -->
+      <div class="filter-chips-row">
+        @for (chip of filterChips; track chip.query) {
+          <button
+            type="button"
+            class="filter-chip-btn"
+            [class.active]="searchQuery().toLowerCase() === chip.query.toLowerCase()"
+            (click)="setChipQuery(chip.query)"
+          >
+            {{ chip.label }}
+          </button>
+        }
+      </div>
+    </section>
+
+    <!-- 3. Ausgewähltes Produkt & Portionswahl (Wenn ausgewählt) -->
+    @if (selectedProduct(); as prod) {
+      <section class="selected-product-card">
+        <div class="product-top-row">
+          <img [src]="prod.imageUrl" [alt]="prod.name" class="product-thumb" />
+          <div class="prod-details">
+            <span class="prod-brand">{{ prod.brand || 'Netto Marken-Discount' }}</span>
+            <h3 class="prod-title">{{ prod.name }}</h3>
+            <span class="prod-base-cals">{{ prod.nutrition.caloriesPer100g }} kcal / 100 g</span>
+          </div>
+          <button type="button" (click)="clearSelectedProduct()" class="close-card-btn" aria-label="Auswahl aufheben">✕</button>
+        </div>
+
+        <!-- Portionen wählen -->
+        <div class="portions-box">
+          <span class="portions-label">Portion wählen:</span>
+          <div class="portion-options-grid">
+            @for (opt of currentPortionOptions(); track opt.label) {
+              <button
+                type="button"
+                class="portion-pill"
+                [class.active]="selectedPortionOption()?.label === opt.label"
+                (click)="choosePortionOption(opt)"
+              >
+                {{ opt.label }}
+              </button>
+            }
+          </div>
+
+          <!-- Eigene Menge Eingabe falls Custom gewählt -->
+          @if (selectedPortionOption()?.isCustom) {
+            <div class="custom-grams-row">
+              <label for="customGramsInput">Eigene Menge:</label>
+              <div class="custom-input-with-unit">
+                <input
+                  id="customGramsInput"
+                  type="number"
+                  min="1"
+                  max="2000"
+                  [(ngModel)]="customGrams"
+                  class="custom-number-input"
+                />
+                <span class="unit-label">Gramm (g)</span>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Berechnung der Nährwerte -->
+        @if (calculatedNutrition(); as calc) {
+          <div class="calculated-summary-panel">
+            <div class="calc-calories-display">
+              <span class="calc-amount-label">Ergibt für {{ calc.grams }} g:</span>
+              <strong class="calc-calories-number">{{ calc.calories }} kcal</strong>
+            </div>
+
+            <div class="calc-macros-row">
+              <div class="macro-cell">
+                <span class="m-val">{{ calc.protein }} g</span>
+                <span class="m-lbl">Protein</span>
+              </div>
+              <div class="macro-cell">
+                <span class="m-val">{{ calc.carbs }} g</span>
+                <span class="m-lbl">Kohlenhydrate</span>
+              </div>
+              <div class="macro-cell">
+                <span class="m-val">{{ calc.fat }} g</span>
+                <span class="m-lbl">Fett</span>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Grüner Button: Als gegessen eintragen (Section 7) -->
+        <button
+          type="button"
+          (click)="logAsEaten()"
+          class="submit-eaten-btn"
+          id="btn-log-as-eaten"
+        >
+          <span>Als gegessen eintragen</span>
+          <span class="btn-arrow">✓</span>
+        </button>
+      </section>
+    } @else {
+      <!-- Produktkatalog-Suchergebnisse -->
+      <section class="search-results-list">
+        <div class="results-header-row">
+          <span class="results-count">{{ searchResults().length }} Produkte gefunden</span>
+          <button type="button" (click)="openManualEntry()" class="manual-entry-link">
+            + Manuell eintragen
+          </button>
+        </div>
+
+        <div class="products-grid-list">
+          @for (prod of searchResults(); track prod.id) {
+            <div class="product-item-card" (click)="selectProduct(prod)" role="button" tabindex="0">
+              <img [src]="prod.imageUrl" [alt]="prod.name" class="item-img" loading="lazy" />
+              <div class="item-info">
+                <strong class="item-title">{{ prod.name }}</strong>
+                <span class="item-serving">{{ prod.servingUnit || prod.packageSize || '100 g' }}</span>
+                <div class="item-nutrition-tag">
+                  <span class="cals-highlight">{{ prod.nutrition.caloriesPer100g }} kcal</span>
+                  <span class="cals-sub">/ 100g</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                class="select-action-btn"
+                aria-label="Produkt auswählen"
+              >
+                Wählen ›
+              </button>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- 4. Tagesprotokoll (Bereits gespeicherte Lebensmittel des aktuellen Tages) -->
+    <section class="daily-log-section">
+      <div class="section-title-line">
+        <h2 class="log-title">Heute gegessen</h2>
+        <span class="log-cals-total">{{ eatenKcal() }} kcal gesamt</span>
+      </div>
+
+      @if (todayItems().length > 0) {
+        <div class="logged-items-stack">
+          @for (item of todayItems(); track item.id) {
+            <div class="logged-item-row">
+              <div class="item-leading-info">
+                <span class="meal-badge">{{ item.mealType }}</span>
+                <div class="item-text">
+                  <strong class="name">{{ item.name }}</strong>
+                  <span class="portion-details">{{ item.displayQuantity }}</span>
+                </div>
+              </div>
+
+              <div class="item-trailing-box">
+                <strong class="item-cals-number">{{ item.calories }} kcal</strong>
+                <button
+                  type="button"
+                  (click)="deleteFoodItem(item.id)"
+                  class="item-delete-btn"
+                  title="Aus Tagesprotokoll entfernen"
+                  aria-label="Aus Tagesprotokoll entfernen"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <!-- Zero Dummy Data Initial State -->
+        <div class="empty-log-box">
+          <div class="empty-icon">🍽️</div>
+          <strong class="empty-title">Noch keine Lebensmittel eingetragen</strong>
+          <p class="empty-desc">Wähle oben ein Lebensmittel aus, um deinen Verzehr für heute festzuhalten. Bereits gegessen: 0 kcal.</p>
+        </div>
+      }
+    </section>
+  </main>
+
+  <!-- Toast Notification -->
+  @if (toastMessage(); as msg) {
+    <div class="diary-toast">
+      <span>{{ msg }}</span>
+    </div>
+  }
+
+  <!-- Manuelle Lebensmitteleingabe Modal -->
+  @if (showManualModal()) {
+    <div class="manual-modal-backdrop" (click)="closeManualEntry()"></div>
+    <div class="manual-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="manualTitle">
+      <div class="modal-top">
+        <h3 id="manualTitle" class="modal-title">Lebensmittel manuell eintragen</h3>
+        <button type="button" (click)="closeManualEntry()" class="modal-close-btn">✕</button>
+      </div>
+
+      <div class="modal-inputs-stack">
+        <div class="input-group">
+          <label for="manName">Name des Lebensmittels</label>
+          <input
+            id="manName"
+            type="text"
+            [(ngModel)]="manualName"
+            placeholder="z.B. Apfel oder Nudeln mit Pesto"
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="manCals">Kalorien (kcal)</label>
+          <input
+            id="manCals"
+            type="number"
+            min="0"
+            [(ngModel)]="manualCalories"
+            placeholder="z.B. 250"
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="manPortion">Portion / Menge</label>
+          <input
+            id="manPortion"
+            type="text"
+            [(ngModel)]="manualPortion"
+            placeholder="z.B. 1 Apfel oder 1 Teller"
+          />
+        </div>
+      </div>
+
+      <div class="modal-actions-row">
+        <button type="button" (click)="closeManualEntry()" class="btn-cancel">Abbrechen</button>
+        <button type="button" (click)="submitManualFood()" class="btn-submit">Als gegessen eintragen</button>
+      </div>
+    </div>
+  }
+
+  <!-- Sticky Bottom Navigation -->
+  <footer class="diary-footer-nav">
+    <app-bottom-nav></app-bottom-nav>
+  </footer>
+</div>

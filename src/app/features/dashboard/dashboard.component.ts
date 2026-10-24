@@ -47,22 +47,20 @@ export class DashboardComponent implements OnInit {
   readonly profile = signal<UserProfile | null>(null);
   readonly calculation = signal<CalorieCalculationResult | null>(null);
   readonly searchQuery = signal<string>('');
-  readonly marketLocation = signal<string>('10115 Berlin – Mitte');
+  readonly marketLocation = signal<string>('Netto Marken-Discount');
   readonly toastMessage = signal<string | null>(null);
 
-  // Ernährungstagebuch State (Section 11.4 & Section 12)
+  // Ernährungstagebuch State & Quick-Add Compatibility
   readonly isDiaryOpen = signal<boolean>(false);
   readonly selectedMealForAdd = signal<MealType | null>(null);
   readonly addFoodMode = signal<'netto' | 'manual'>('netto');
   readonly quickProductForAdd = signal<ProductItem | null>(null);
   readonly nettoFilterQuery = signal<string>('');
 
-  // Manuelle Lebensmitteleingabe
   readonly manualName = signal<string>('');
   readonly manualCalories = signal<number | null>(null);
   readonly manualPortion = signal<string>('1 Portion');
 
-  // Datum im Tagebuch
   readonly diaryDate = signal<Date>(new Date());
   readonly Math = Math;
 
@@ -89,15 +87,8 @@ export class DashboardComponent implements OnInit {
       const calc = this.calorieService.calculate(p);
       this.calculation.set(calc);
 
-      // Laden der Supermarkt-Präferenz
-      const pref = await this.retailerService.loadPreference();
-      if (pref) {
-        const pc = pref.branch?.postalCode || pref.postalCode || '';
-        const city = pref.branch?.city || pref.city || '';
-        if (pc || city) {
-          this.marketLocation.set(`${pc} ${city}`.trim());
-        }
-      }
+      // Marktpräferenz laden
+      await this.retailerService.loadPreference();
     } catch (err) {
       console.warn('Dashboard init non-fatal error:', err);
     }
@@ -128,7 +119,12 @@ export class DashboardComponent implements OnInit {
   });
 
   readonly calorieDashOffset = computed(() => {
-    const circumference = 340; // 2 * PI * 54.11 ≈ 340
+    const circumference = 340;
+    return Math.round(circumference * (1 - this.calorieRatio()));
+  });
+
+  readonly dashboardRingDashOffset = computed(() => {
+    const circumference = 552.92;
     return Math.round(circumference * (1 - this.calorieRatio()));
   });
 
@@ -142,6 +138,14 @@ export class DashboardComponent implements OnInit {
 
   readonly formattedRemainingKcal = computed(() => {
     return Math.round(this.remainingKcal()).toLocaleString('de-DE');
+  });
+
+  readonly discoverTitle = computed(() => {
+    const pref = this.storageService.retailerPref();
+    if (pref && pref.retailerName && pref.retailerId !== 'netto') {
+      return `Bei ${pref.retailerName} entdecken`;
+    }
+    return 'Bei Netto entdecken';
   });
 
   readonly featuredProducts = computed<DashboardProductCard[]>(() => {
@@ -202,27 +206,7 @@ export class DashboardComponent implements OnInit {
       });
     }
 
-    // 5. Weitere Produkte für horizontales Scrollen
-    const beans = all.find(p => p.id === 'netto-kidney-beans-400');
-    if (beans) {
-      result.push({
-        id: beans.id,
-        name: 'Kidneybohnen',
-        portionText: '1/2 Dose',
-        caloriesText: '≈ 132 kcal',
-        imageUrl: beans.imageUrl,
-        product: beans
-      });
-    }
-
     return result;
-  });
-
-  readonly availableNettoProducts = computed<ProductItem[]>(() => {
-    const all = this.productService.products();
-    const query = this.nettoFilterQuery().trim().toLowerCase();
-    if (!query) return all.slice(0, 16);
-    return all.filter(p => p.name.toLowerCase().includes(query) || (p.brand && p.brand.toLowerCase().includes(query))).slice(0, 16);
   });
 
   readonly formattedDiaryDate = computed(() => {
@@ -234,8 +218,23 @@ export class DashboardComponent implements OnInit {
     return isToday ? `Heute, ${dateStr}` : dateStr;
   });
 
+  /**
+   * Navigiert zur separaten Lebensmittel-Erfassungsseite (Section 7).
+   */
+  goToFoodDiary(): void {
+    this.router.navigate(['/was-hast-du-gegessen']);
+  }
+
+  /**
+   * Navigiert zur neuen Gewichtsseite (Section 11).
+   */
+  goToWeight(): void {
+    this.router.navigate(['/gewicht']);
+  }
+
   openDiary(): void {
     this.isDiaryOpen.set(true);
+    this.goToFoodDiary();
   }
 
   closeDiary(): void {
@@ -269,9 +268,13 @@ export class DashboardComponent implements OnInit {
     this.selectedMealForAdd.set(null);
   }
 
+  /**
+   * Plus-Button auf der Produktkarte:
+   * Fügt das jeweilige Produkt zur Einkaufsliste hinzu (Section 8).
+   */
   onProductPlusClick(product: ProductItem, event: MouseEvent): void {
     event.stopPropagation();
-    this.quickProductForAdd.set(product);
+    this.addToCart(product, event);
   }
 
   closeQuickAddModal(): void {
@@ -285,14 +288,6 @@ export class DashboardComponent implements OnInit {
     this.foodLogService.logProduct(p, mealType, undefined, 'eaten');
     this.quickProductForAdd.set(null);
     this.toastMessage.set(`✓ "${p.name}" zu ${this.getMealLabel(mealType)} hinzugefügt!`);
-    setTimeout(() => this.toastMessage.set(null), 2500);
-  }
-
-  addProductToMeal(product: ProductItem): void {
-    const meal = this.selectedMealForAdd() || 'snack';
-    this.foodLogService.logProduct(product, meal, undefined, 'eaten');
-    this.closeAddModal();
-    this.toastMessage.set(`✓ "${product.name}" zu ${this.getMealLabel(meal)} hinzugefügt!`);
     setTimeout(() => this.toastMessage.set(null), 2500);
   }
 
@@ -329,16 +324,6 @@ export class DashboardComponent implements OnInit {
       case 'dinner': return 'Abendessen';
       case 'snack': return 'Snacks & Getränke';
       default: return mealType;
-    }
-  }
-
-  getMealIcon(mealType: MealType): string {
-    switch (mealType) {
-      case 'breakfast': return '🌅';
-      case 'lunch': return '☀️';
-      case 'dinner': return '🌙';
-      case 'snack': return '🍎';
-      default: return '🍽️';
     }
   }
 

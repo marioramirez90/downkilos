@@ -121,9 +121,9 @@ describe('DashboardComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/shopping-list']);
   });
 
-  it('11. should navigate to /recipes when clicking Rezepte entdecken', () => {
-    component.goToRecipes();
-    expect(router.navigate).toHaveBeenCalledWith(['/recipes']);
+  it('11. should navigate to /gewicht when clicking Mein aktuelles Gewicht', () => {
+    component.goToWeight();
+    expect(router.navigate).toHaveBeenCalledWith(['/gewicht']);
   });
 
   it('12. should navigate to /retailers when clicking market card or Ändern', () => {
@@ -136,63 +136,48 @@ describe('DashboardComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/settings']);
   });
 
-  it('14. should open food diary when clicking Bereits gegessen or calorie ring', () => {
-    expect(component.isDiaryOpen()).toBe(false);
-
-    component.openDiary();
-    expect(component.isDiaryOpen()).toBe(true);
-
-    fixture.detectChanges();
-    const el = fixture.nativeElement as HTMLElement;
-    expect(el.querySelector('.diary-drawer')).toBeTruthy();
-
-    component.closeDiary();
-    expect(component.isDiaryOpen()).toBe(false);
+  it('14. should navigate to /was-hast-du-gegessen when clicking Bereits gegessen', () => {
+    component.goToFoodDiary();
+    expect(router.navigate).toHaveBeenCalledWith(['/was-hast-du-gegessen']);
   });
 
-  it('15. should open quick-add modal when clicking product plus button', () => {
+  it('15. should add product to shopping list on plus click and show toast', () => {
+    const shoppingService = TestBed.inject(ShoppingListService);
     const firstProduct = component.featuredProducts()[0].product;
     const dummyEvent = new MouseEvent('click');
 
     component.onProductPlusClick(firstProduct, dummyEvent);
-    expect(component.quickProductForAdd()).toBe(firstProduct);
-
-    fixture.detectChanges();
-    const el = fixture.nativeElement as HTMLElement;
-    expect(el.querySelector('.quick-add-modal')).toBeTruthy();
+    expect(shoppingService.items().some(i => i.productId === firstProduct.id)).toBe(true);
+    expect(component.toastMessage()).toContain(firstProduct.name);
   });
 
   it('16. should log a Netto product into breakfast and update eaten calories reactively', () => {
     const initialEaten = component.eatenKcal();
     const firstProduct = component.featuredProducts()[0].product;
 
-    component.quickProductForAdd.set(firstProduct);
-    component.confirmQuickAddProduct('breakfast');
+    component.foodLogService.logProduct(firstProduct, 'breakfast', undefined, 'eaten');
 
     expect(component.eatenKcal()).toBeGreaterThan(initialEaten);
     expect(component.foodLogService.getItemsForMeal('breakfast').length).toBe(1);
-    expect(component.toastMessage()).toContain(firstProduct.name);
   });
 
   it('17. should log a manual food item and update eaten calories', () => {
     const initialEaten = component.eatenKcal();
 
-    component.openAddModal('lunch');
-    component.manualName.set('Vollkornnudeln mit Tomatensauce');
-    component.manualCalories.set(450);
-    component.manualPortion.set('1 Teller');
-    component.submitManualFood();
+    component.foodLogService.addManualItem(
+      'Vollkornnudeln mit Tomatensauce',
+      450,
+      '1 Teller',
+      'lunch',
+      'eaten'
+    );
 
     expect(component.eatenKcal()).toBe(initialEaten + 450);
     expect(component.foodLogService.getItemsForMeal('lunch').length).toBe(1);
-    expect(component.selectedMealForAdd()).toBeNull();
   });
 
   it('18. should remove a logged food item and recalculate calories', () => {
-    component.openAddModal('snack');
-    component.manualName.set('Apfel');
-    component.manualCalories.set(60);
-    component.submitManualFood();
+    component.foodLogService.addManualItem('Apfel', 60, '1 Stück', 'snack', 'eaten');
 
     const items = component.foodLogService.getItemsForMeal('snack');
     expect(items.length).toBeGreaterThan(0);

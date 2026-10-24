@@ -334,8 +334,22 @@
       </div>
     </section>
 
-    <!-- 7. Schnellzugriff: Einstellungen, Kalorienplan, So funktioniert Down Kilos -->
-    <h3 class="quick-links-title">Weitere Optionen & Einstellungen</h3>
+    <!-- 7. Schnellzugriff: Rezepte, Einstellungen, Kalorienplan, So funktioniert Down Kilos -->
+    <h3 class="quick-links-title">Weitere Optionen & Rezepte</h3>
+
+    <!-- Link: Rezepte entdecken (verschoben aus Hauptnavigation) -->
+    <section class="how-it-works-link-card recipes-card">
+      <div class="intro-link-content">
+        <span class="intro-link-icon">🍳</span>
+        <div class="intro-link-text">
+          <strong>Rezepte entdecken</strong>
+          <small>Kalorienarme Rezepte mit Zutaten aus dem Netto-Sortiment</small>
+        </div>
+      </div>
+      <button type="button" (click)="goToRecipes()" class="intro-link-btn" id="btn-open-recipes-card">
+        Öffnen →
+      </button>
+    </section>
 
     <!-- Link: Einstellungen -->
     <section class="how-it-works-link-card settings-card">

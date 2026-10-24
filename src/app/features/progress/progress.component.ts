@@ -219,6 +219,10 @@ export class ProgressComponent implements OnInit {
     this.router.navigate(['/meal-planner']);
   }
 
+  goToRecipes(): void {
+    this.router.navigate(['/recipes']);
+  }
+
   goToShoppingList(): void {
     this.router.navigate(['/shopping-list']);
   }

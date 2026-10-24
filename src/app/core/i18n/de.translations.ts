@@ -10,6 +10,7 @@ export const DE_TRANSLATIONS = {
     DISCOVER: 'Produkte',
     RECIPES: 'Rezepte',
     SHOPPING_LIST: 'Einkaufsliste',
+    WEIGHT: 'Gewicht',
     MORE: 'Mehr'
   },
   COMMON: {

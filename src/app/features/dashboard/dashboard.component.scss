@@ -1,6 +1,3 @@
-@use '../../../styles/abstracts/variables' as vars;
-@use '../../../styles/abstracts/mixins' as mixins;
-
 :host {
   display: block;
   height: 100%;
@@ -9,12 +6,15 @@
 // 1. App-Container (100dvh, kein Window-Scroll)
 .dashboard-screen {
   height: 100dvh;
-  background-color: vars.$bg-white;
+  background-color: #FFFFFF;
   overflow: hidden;
-  @include mixins.flexbox(column, flex-start, stretch);
+  display: flex;
+  flex-direction: column;
   position: relative;
   max-width: 480px;
   margin: 0 auto;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #102521;
 }
 
 // 2. Scrollbarer Hauptbereich
@@ -22,8 +22,10 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 8px 16px 8px;
-  @include mixins.flexbox(column, flex-start, stretch, 7px);
+  padding: 10px 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   -webkit-overflow-scrolling: touch;
 
   &::-webkit-scrollbar {
@@ -33,13 +35,18 @@
 
 // 3. Header: Logo, Zahnrad, Begrüßung
 .dashboard-header {
-  @include mixins.flexbox(column, flex-start, stretch);
+  display: flex;
+  flex-direction: column;
 
   .header-top-row {
-    @include mixins.flexbox(row, space-between, center);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
     .logo-group {
-      @include mixins.flexbox(row, flex-start, center, 7px);
+      display: flex;
+      align-items: center;
+      gap: 7px;
 
       .leaf-logo-icon {
         width: 26px;
@@ -49,27 +56,29 @@
       }
 
       .app-brand-name {
-        font-size: 1.3rem;
-        font-weight: 800;
-        color: vars.$secondary-color;
+        font-size: 1.25rem;
+        font-weight: 900;
+        color: #102521;
         letter-spacing: -0.02em;
       }
     }
 
     .settings-btn {
-      width: 30px;
-      height: 30px;
-      border-radius: vars.$radius-full;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
       background: transparent;
       border: none;
-      color: vars.$secondary-color;
+      color: #102521;
       cursor: pointer;
-      @include mixins.flexbox(row, center, center);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       transition: opacity 0.2s ease;
 
       svg {
-        width: 19px;
-        height: 19px;
+        width: 20px;
+        height: 20px;
       }
 
       &:hover {
@@ -79,18 +88,18 @@
   }
 
   .user-greeting-title {
-    margin: 4px 0 1px;
-    font-size: 1.85rem;
-    font-weight: 800;
-    color: vars.$secondary-color;
+    margin: 6px 0 1px;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #102521;
     letter-spacing: -0.03em;
     line-height: 1.15;
   }
 
   .calorie-target-subtitle {
     margin: 0;
-    font-size: 0.82rem;
-    color: vars.$text-muted;
+    font-size: 0.85rem;
+    color: #66716D;
     font-weight: 400;
   }
 }
@@ -98,13 +107,18 @@
 // 4. Hero Widgets: Kalorienring (Links) & Dein Markt (Rechts)
 .hero-widgets-row {
   display: grid;
-  grid-template-columns: 1.15fr 1fr;
-  gap: 10px;
-  align-items: center;
+  grid-template-columns: 165px 1fr;
+  gap: 12px;
+  align-items: stretch;
 
-  @include mixins.respond-to(360px) {
-    grid-template-columns: 1.1fr 1fr;
-    gap: 6px;
+  @media (max-width: 375px) {
+    grid-template-columns: 155px 1fr;
+    gap: 10px;
+  }
+
+  @media (max-width: 350px) {
+    grid-template-columns: 140px 1fr;
+    gap: 8px;
   }
 
   // Kalorienring Widget: freistehend, kein Card-Rahmen
@@ -112,7 +126,10 @@
     background: transparent;
     border: none;
     padding: 0;
-    @include mixins.flexbox(column, center, center);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
     &.clickable-widget {
       cursor: pointer;
@@ -129,290 +146,312 @@
 
     .ring-svg-container {
       position: relative;
-      width: 152px;
-      height: 152px;
+      width: 160px;
+      height: 160px;
       max-width: 100%;
-      @include mixins.flexbox(row, center, center);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      @media (max-width: 375px) {
+        width: 150px;
+        height: 150px;
+      }
+
+      @media (max-width: 350px) {
+        width: 136px;
+        height: 136px;
+      }
 
       .ring-svg {
         width: 100%;
         height: 100%;
-        transform: rotate(-90deg);
+        overflow: visible;
 
+        // 1. Hellgrüner Grundkreis
         .ring-bg-track {
           fill: none;
-          stroke: vars.$primary-light;
-          stroke-width: 14;
+          stroke: #E2EBE3;
+          stroke-width: 24;
         }
 
-        .ring-active-track {
+        // 2. Heller, kräftig grüner Bogen
+        .ring-arc-bright {
           fill: none;
-          stroke-width: 14;
+          stroke: #39CD50;
+          stroke-width: 24;
           stroke-linecap: round;
-          transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        // 3. Dunkelgrüner Bogen
+        .ring-arc-dark {
+          fill: none;
+          stroke: #005333;
+          stroke-width: 24;
+          stroke-linecap: round;
+        }
+
+        // 4. Dezent getrennter Fortschrittsbogen bei Verzehr
+        .ring-eaten-progress {
+          fill: none;
+          stroke: #1B6A2A;
+          stroke-width: 4;
+          stroke-linecap: round;
+          transition: stroke-dashoffset 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
       }
 
       .ring-center-text {
         position: absolute;
         inset: 0;
-        @include mixins.flexbox(column, center, center);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
         text-align: center;
         pointer-events: none;
+        transform: translateY(-2px);
 
         .ring-number {
-          font-size: 1.8rem;
-          font-weight: 800;
-          color: vars.$text-color;
+          font-size: 2.1rem;
+          font-weight: 900;
+          color: #102521;
           line-height: 1;
-          letter-spacing: -0.02em;
+          letter-spacing: -0.03em;
         }
 
         .ring-unit {
-          font-size: 0.88rem;
-          font-weight: 700;
-          color: vars.$text-color;
+          font-size: 0.95rem;
+          font-weight: 800;
+          color: #102521;
           margin-top: 1px;
         }
 
         .ring-sub {
-          font-size: 0.7rem;
-          font-weight: 400;
-          color: vars.$text-muted;
-          margin-top: 1px;
+          font-size: 0.76rem;
+          font-weight: 500;
+          color: #66716D;
+          margin-top: 2px;
         }
       }
     }
   }
 
-  // Dein Markt Widget
+  // Dein Markt Widget (Exakt wie im Bild)
   .market-card-widget {
-    background-color: vars.$bg-light;
-    border: 1px solid vars.$border-color;
-    border-radius: 16px;
-    padding: 9px 11px;
-    @include mixins.flexbox(column, space-between, stretch);
-    min-height: 138px;
+    background-color: #F0F8F2;
+    border: 1.5px solid #D6EFE0;
+    border-radius: 18px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 140px;
 
     .market-top-row {
-      @include mixins.flexbox(row, space-between, center);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
 
       .market-heading {
-        font-size: 0.82rem;
+        font-size: 0.88rem;
         font-weight: 700;
-        color: vars.$text-color;
+        color: #102521;
       }
 
       .market-pin-icon {
-        width: 14px;
-        height: 14px;
+        width: 17px;
+        height: 17px;
       }
     }
 
     .netto-banner-box {
-      background-color: vars.$netto-yellow;
-      border-radius: 8px;
+      background-color: #FFE600;
+      border-radius: 9px;
       padding: 6px 9px;
-      margin: 4px 0;
+      margin: 6px 0;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       transition: transform 0.15s ease, box-shadow 0.15s ease;
-      @include mixins.flexbox(row, space-between, center);
 
       &:hover {
         transform: translateY(-1px);
-        box-shadow: vars.$shadow-sm;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
       }
 
       .netto-badge-visual {
-        @include mixins.flexbox(column, center, flex-start);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
 
         .netto-main-text {
-          font-size: 1.2rem;
+          font-size: 1.25rem;
           font-weight: 900;
           font-style: italic;
-          color: vars.$netto-red;
+          color: #E30613;
           line-height: 1;
           letter-spacing: -0.03em;
         }
 
         .netto-sub-text {
-          font-size: 0.55rem;
+          font-size: 0.54rem;
           font-weight: 800;
-          color: vars.$netto-red;
+          color: #E30613;
           margin-top: 1px;
           letter-spacing: -0.01em;
         }
       }
 
       .netto-chevron {
-        font-size: 1.1rem;
+        font-size: 1.15rem;
         font-weight: 700;
-        color: rgba(16, 37, 33, 0.4);
+        color: rgba(16, 37, 33, 0.45);
       }
     }
 
     .market-bottom-row {
-      @include mixins.flexbox(row, space-between, center, 4px);
-      font-size: 0.63rem;
-
-      .location-group {
-        @include mixins.flexbox(row, flex-start, center, 3px);
-        min-width: 0;
-        flex: 1;
-
-        .small-pin {
-          width: 11px;
-          height: 11px;
-          color: vars.$text-color;
-          flex-shrink: 0;
-        }
-
-        .location-text {
-          color: vars.$text-color;
-          font-weight: 500;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-      }
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
 
       .change-link {
-        border: none;
-        background: transparent;
-        color: vars.$primary-color;
+        color: #278F39;
+        font-size: 0.8rem;
         font-weight: 600;
-        font-size: 0.66rem;
-        cursor: pointer;
+        background: none;
+        border: none;
         padding: 0;
+        cursor: pointer;
         text-decoration: underline;
-        flex-shrink: 0;
 
         &:hover {
-          color: vars.$primary-dark;
+          color: #1B6A2A;
         }
       }
     }
   }
 }
 
-// 5. Status Card: Bereits gegessen / Noch verfügbar
+// 5. Bereits gegessen und Noch verfügbar Karte
 .status-summary-card {
-  background-color: vars.$bg-light;
-  border: 1px solid vars.$border-color;
-  border-radius: 16px;
-  padding: 7px 12px;
-  @include mixins.flexbox(row, space-between, center);
+  background-color: #F4FAF5;
+  border: 1px solid #D8EFE0;
+  border-radius: 18px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
 
   .status-col {
     flex: 1;
-    @include mixins.flexbox(row, flex-start, center, 8px);
+    display: flex;
+    align-items: center;
+    gap: 10px;
 
     &.clickable-col {
       cursor: pointer;
-      border-radius: 12px;
-      padding: 4px 6px;
+      border-radius: 10px;
+      padding: 3px 5px;
+      margin: -3px -5px;
       transition: background-color 0.15s ease;
 
       &:hover {
-        background-color: rgba(39, 143, 57, 0.08);
+        background-color: rgba(39, 143, 57, 0.06);
+      }
+
+      &:focus-visible {
+        outline: 2px solid #278F39;
+        outline-offset: 2px;
       }
     }
 
     .icon-circle {
-      width: 32px;
-      height: 32px;
-      border-radius: vars.$radius-full;
-      background-color: vars.$primary-light;
-      @include mixins.flexbox(row, center, center);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: #E5F5E8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
 
       svg {
-        width: 16px;
-        height: 16px;
+        width: 20px;
+        height: 20px;
       }
     }
 
     .status-info {
-      @include mixins.flexbox(column, center, flex-start, 0px);
-
-      .status-label-row {
-        @include mixins.flexbox(row, flex-start, center, 6px);
-      }
+      display: flex;
+      flex-direction: column;
 
       .status-label {
-        font-size: 0.68rem;
-        color: vars.$text-muted;
-        font-weight: 400;
-      }
-
-      .tap-hint-badge {
-        font-size: 0.6rem;
-        font-weight: 700;
-        color: vars.$primary-color;
-        background-color: vars.$primary-light;
-        padding: 1px 5px;
-        border-radius: vars.$radius-full;
+        font-size: 0.74rem;
+        color: #66716D;
+        font-weight: 500;
       }
 
       .status-value {
         font-size: 1.05rem;
         font-weight: 800;
-        color: vars.$text-color;
-        letter-spacing: -0.02em;
+        color: #102521;
+        line-height: 1.15;
+        letter-spacing: -0.01em;
       }
     }
   }
 
   .status-divider {
     width: 1px;
-    height: 28px;
-    background-color: vars.$border-color;
-    margin: 0 6px;
-    flex-shrink: 0;
+    height: 32px;
+    background-color: #D3E7D8;
+    margin: 0 10px;
   }
 }
 
-// 6. Section "Bei Netto entdecken"
+// 6. "Bei Netto entdecken" Horizontale Produktkarten
 .discover-products-section {
-  @include mixins.flexbox(column, flex-start, stretch);
+  display: flex;
+  flex-direction: column;
+  margin-top: 2px;
 
   .section-title-row {
-    @include mixins.flexbox(row, space-between, center);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
 
     .section-heading {
-      margin: 0;
-      font-size: 1.1rem;
+      font-size: 1.18rem;
       font-weight: 800;
-      color: vars.$text-color;
+      color: #102521;
+      margin: 0;
       letter-spacing: -0.02em;
     }
 
     .see-all-link {
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: vars.$primary-color;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #278F39;
       cursor: pointer;
-      text-decoration: none;
-      transition: color 0.15s ease;
 
       &:hover {
-        color: vars.$primary-dark;
+        text-decoration: underline;
       }
     }
   }
 
   .section-desc {
-    margin: 1px 0 6px;
-    font-size: 0.7rem;
-    color: vars.$text-muted;
+    margin: 1px 0 8px;
+    font-size: 0.8rem;
+    color: #66716D;
   }
 
-  // Horizontale Produkt-Scrollleiste
   .horizontal-cards-track {
-    @include mixins.flexbox(row, flex-start, stretch, 8px);
+    display: flex;
+    gap: 8px;
     overflow-x: auto;
-    padding: 1px 1px 4px;
-    scroll-snap-type: x mandatory;
+    padding-bottom: 4px;
     -webkit-overflow-scrolling: touch;
 
     &::-webkit-scrollbar {
@@ -420,30 +459,30 @@
     }
 
     .product-tile-card {
-      width: 104px;
-      flex-shrink: 0;
-      scroll-snap-align: start;
-      background-color: vars.$bg-white;
-      border: 1px solid vars.$border-color;
-      border-radius: 14px;
-      padding: 6px 6px 6px;
+      flex: 0 0 110px;
+      background-color: #FFFFFF;
+      border: 1px solid #EBF1EC;
+      border-radius: 16px;
+      padding: 8px 6px 8px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
       cursor: pointer;
-      transition: transform 0.15s ease, border-color 0.15s ease;
-      @include mixins.flexbox(column, space-between, stretch);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
 
       &:hover {
-        border-color: vars.$primary-color;
         transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+        border-color: #D2EBD7;
       }
 
       .product-thumb-box {
-        width: 72px;
-        height: 56px;
-        margin: 0 auto 2px;
-        border-radius: 8px;
-        overflow: hidden;
-        background-color: #FFFFFF;
-        @include mixins.flexbox(row, center, center);
+        width: 100%;
+        height: 65px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 4px;
 
         img {
           max-width: 100%;
@@ -453,840 +492,151 @@
       }
 
       .tile-title {
-        margin: 0;
-        font-size: 0.73rem;
+        font-size: 0.78rem;
         font-weight: 700;
-        color: vars.$text-color;
-        line-height: 1.15;
-        height: 1.7rem;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
+        color: #102521;
+        margin: 0;
+        line-height: 1.2;
         overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
       .tile-portion {
-        font-size: 0.62rem;
-        color: vars.$text-muted;
+        font-size: 0.68rem;
+        color: #66716D;
         margin-top: 1px;
       }
 
       .tile-bottom-line {
-        margin-top: 3px;
-        @include mixins.flexbox(row, space-between, center);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 4px;
 
         .tile-cals {
-          font-size: 0.68rem;
+          font-size: 0.74rem;
           font-weight: 700;
-          color: vars.$text-color;
+          color: #102521;
         }
 
         .tile-add-btn {
-          width: 20px;
-          height: 20px;
-          border-radius: vars.$radius-full;
-          background-color: vars.$primary-light;
-          color: vars.$primary-color;
-          border: none;
-          font-size: 13px;
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background-color: #E5F5E8;
+          color: #278F39;
+          font-size: 1.05rem;
           font-weight: 700;
-          cursor: pointer;
-          @include mixins.flexbox(row, center, center);
-          transition: all 0.15s ease;
-
-          &:hover {
-            background-color: vars.$primary-color;
-            color: vars.$bg-white;
-          }
-        }
-      }
-    }
-  }
-}
-
-// 7. Produktsuchleiste
-.search-bar-box {
-  background-color: #F2F5F2;
-  border: 1px solid transparent;
-  border-radius: vars.$radius-full;
-  height: 40px;
-  padding: 0 14px;
-  @include mixins.flexbox(row, flex-start, center, 8px);
-  transition: border-color 0.2s ease, background-color 0.2s ease;
-
-  &:focus-within {
-    border-color: vars.$primary-color;
-    background-color: vars.$bg-white;
-  }
-
-  .search-icon-svg {
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
-  }
-
-  input {
-    flex: 1;
-    border: none;
-    background: transparent;
-    font-size: 0.78rem;
-    color: vars.$text-color;
-    outline: none;
-
-    &::placeholder {
-      color: #839189;
-    }
-  }
-}
-
-// 8. Große Aktionsbuttons
-.action-buttons-stack {
-  @include mixins.flexbox(column, flex-start, stretch, 6px);
-
-  .open-cart-button {
-    width: 100%;
-    height: 44px;
-    background-color: vars.$primary-color;
-    color: vars.$bg-white;
-    border: none;
-    border-radius: vars.$radius-full;
-    font-size: 0.86rem;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 3px 10px rgba(39, 143, 57, 0.22);
-    @include mixins.flexbox(row, center, center, 8px);
-    transition: transform 0.15s ease, background-color 0.15s ease;
-
-    .btn-icon-cart {
-      width: 17px;
-      height: 17px;
-    }
-
-    &:hover {
-      background-color: vars.$primary-dark;
-      transform: translateY(-1px);
-    }
-
-    &:active {
-      transform: translateY(0);
-    }
-  }
-
-  .open-recipes-button {
-    width: 100%;
-    height: 44px;
-    background-color: vars.$primary-light;
-    border: none;
-    border-radius: vars.$radius-full;
-    color: vars.$secondary-color;
-    font-size: 0.86rem;
-    font-weight: 700;
-    cursor: pointer;
-    @include mixins.flexbox(row, center, center, 8px);
-    transition: transform 0.15s ease, background-color 0.15s ease;
-
-    .btn-icon-chef {
-      width: 17px;
-      height: 17px;
-    }
-
-    &:hover {
-      background-color: #D8EEDC;
-      transform: translateY(-1px);
-    }
-
-    &:active {
-      transform: translateY(0);
-    }
-  }
-}
-
-// 9. Toast Notification
-.dashboard-toast-popup {
-  position: fixed;
-  top: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: vars.$secondary-color;
-  color: vars.$bg-white;
-  padding: 8px 16px;
-  border-radius: vars.$radius-full;
-  font-size: 0.75rem;
-  font-weight: 700;
-  box-shadow: vars.$shadow-md;
-  z-index: 100;
-  animation: toastFade 0.2s ease-out;
-}
-
-// 10. Feste Bottom Navigation
-.dashboard-footer-nav {
-  flex-shrink: 0;
-  background-color: vars.$bg-white;
-  border-top: 1px solid vars.$border-color;
-  z-index: 20;
-}
-
-@keyframes toastFade {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -8px);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-}
-
-// ==========================================
-// 11. Ernährungstagebuch Drawer & Modals
-// ==========================================
-.diary-backdrop,
-.add-food-backdrop {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(16, 58, 42, 0.45);
-  backdrop-filter: blur(3px);
-  z-index: 90;
-  animation: backdropFade 0.2s ease-out;
-}
-
-.diary-drawer {
-  position: fixed;
-  inset-x: 0;
-  bottom: 0;
-  max-width: 540px;
-  margin: 0 auto;
-  height: 86dvh;
-  background-color: vars.$bg-white;
-  border-top-left-radius: 24px;
-  border-top-right-radius: 24px;
-  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.16);
-  z-index: 95;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  animation: slideUpDrawer 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-
-  .diary-header {
-    padding: 16px 20px 12px;
-    background-color: #FAFCF9;
-    border-bottom: 1px solid vars.$border-color;
-    flex-shrink: 0;
-
-    .diary-header-title-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-
-      .diary-title-group {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-
-        .diary-badge-icon {
-          font-size: 1.25rem;
-        }
-
-        .diary-title {
-          margin: 0;
-          font-size: 1.25rem;
-          font-weight: 800;
-          color: vars.$secondary-color;
-          letter-spacing: -0.02em;
-        }
-      }
-
-      .diary-close-btn {
-        background: vars.$primary-light;
-        color: vars.$primary-color;
-        border: none;
-        border-radius: vars.$radius-full;
-        padding: 6px 14px;
-        font-size: 0.82rem;
-        font-weight: 700;
-        cursor: pointer;
-        transition: background-color 0.15s ease;
-
-        &:hover {
-          background-color: vars.$primary-color;
-          color: vars.$bg-white;
-        }
-      }
-    }
-
-    .diary-date-nav {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-
-      .date-arrow-btn {
-        background: transparent;
-        border: 1px solid vars.$border-color;
-        border-radius: vars.$radius-full;
-        width: 28px;
-        height: 28px;
-        font-size: 1.1rem;
-        color: vars.$secondary-color;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.15s ease;
-
-        &:hover {
-          background-color: vars.$primary-light;
-          border-color: vars.$primary-color;
-        }
-      }
-
-      .date-display-label {
-        font-size: 0.88rem;
-        font-weight: 700;
-        color: vars.$text-color;
-        min-width: 140px;
-        text-align: center;
-      }
-    }
-  }
-
-  .diary-scrollable-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-
-    .diary-summary-box {
-      background: linear-gradient(135deg, #F3FBF5 0%, #E9F7EC 100%);
-      border: 1px solid #D1EEDB;
-      border-radius: 16px;
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-
-      .summary-stat-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 2px;
-
-        .stat-caption {
-          font-size: 0.68rem;
-          color: vars.$text-muted;
-          font-weight: 500;
-        }
-
-        .stat-number {
-          font-size: 0.95rem;
-          font-weight: 800;
-          color: vars.$secondary-color;
-
-          &.stat-highlight-green {
-            color: vars.$primary-color;
-          }
-        }
-      }
-
-      .summary-divider {
-        width: 1px;
-        height: 28px;
-        background-color: #D1EEDB;
-      }
-    }
-
-    .meals-list-container {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-
-      .meal-card-section {
-        background-color: #FAFDFB;
-        border: 1px solid vars.$border-color;
-        border-radius: 16px;
-        padding: 12px 14px;
-
-        .meal-header-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 8px;
-
-          .meal-title-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-
-            .meal-symbol {
-              font-size: 1.2rem;
-            }
-
-            .meal-meta {
-              display: flex;
-              flex-direction: column;
-
-              .meal-name {
-                margin: 0;
-                font-size: 0.92rem;
-                font-weight: 800;
-                color: vars.$secondary-color;
-              }
-
-              .meal-cals-count {
-                font-size: 0.72rem;
-                font-weight: 600;
-                color: vars.$primary-color;
-              }
-            }
-          }
-
-          .add-meal-entry-btn {
-            background-color: vars.$primary-light;
-            color: vars.$primary-color;
-            border: none;
-            border-radius: vars.$radius-full;
-            padding: 5px 12px;
-            font-size: 0.76rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.15s ease;
-
-            &:hover {
-              background-color: vars.$primary-color;
-              color: vars.$bg-white;
-            }
-          }
-        }
-
-        .meal-items-stack {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-
-          .logged-food-row {
-            background-color: vars.$bg-white;
-            border: 1px solid #EBF1ED;
-            border-radius: 10px;
-            padding: 8px 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            .food-info-col {
-              display: flex;
-              flex-direction: column;
-              min-width: 0;
-              flex: 1;
-
-              .food-name {
-                font-size: 0.82rem;
-                font-weight: 700;
-                color: vars.$text-color;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-              }
-
-              .food-portion {
-                font-size: 0.68rem;
-                color: vars.$text-muted;
-              }
-            }
-
-            .food-actions-col {
-              display: flex;
-              align-items: center;
-              gap: 8px;
-
-              .food-kcal-badge {
-                font-size: 0.75rem;
-                font-weight: 700;
-                color: vars.$secondary-color;
-                background-color: #F2F7F4;
-                padding: 3px 7px;
-                border-radius: 6px;
-              }
-
-              .food-del-btn {
-                background: transparent;
-                border: none;
-                cursor: pointer;
-                font-size: 0.85rem;
-                opacity: 0.65;
-                padding: 2px;
-                transition: opacity 0.15s ease;
-
-                &:hover {
-                  opacity: 1;
-                }
-              }
-            }
-          }
-
-          .empty-meal-hint {
-            padding: 10px;
-            text-align: center;
-            font-size: 0.74rem;
-            color: vars.$text-muted;
-            font-style: italic;
-          }
-        }
-      }
-    }
-  }
-}
-
-// 12. Modal: Lebensmitteleingabe (+ Hinzufügen)
-.add-food-modal,
-.quick-add-modal {
-  position: fixed;
-  inset-x: 16px;
-  bottom: 24px;
-  max-width: 460px;
-  margin: 0 auto;
-  max-height: 82dvh;
-  background-color: vars.$bg-white;
-  border-radius: 20px;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.22);
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
-  padding: 18px 20px;
-  animation: modalScaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  overflow-y: auto;
-
-  .modal-top-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-
-    .modal-title {
-      margin: 0;
-      font-size: 1.15rem;
-      font-weight: 800;
-      color: vars.$secondary-color;
-    }
-
-    .modal-x-btn {
-      background: transparent;
-      border: none;
-      font-size: 1.15rem;
-      color: vars.$text-muted;
-      cursor: pointer;
-      padding: 2px 6px;
-
-      &:hover {
-        color: vars.$text-color;
-      }
-    }
-  }
-
-  .modal-tab-row {
-    display: flex;
-    gap: 8px;
-    background-color: #F0F4F1;
-    padding: 3px;
-    border-radius: vars.$radius-full;
-    margin-bottom: 14px;
-
-    .modal-tab-btn {
-      flex: 1;
-      border: none;
-      background: transparent;
-      padding: 7px 12px;
-      border-radius: vars.$radius-full;
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: vars.$text-muted;
-      cursor: pointer;
-      transition: all 0.15s ease;
-
-      &.active {
-        background-color: vars.$bg-white;
-        color: vars.$secondary-color;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-      }
-    }
-  }
-
-  .netto-tab-content {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-
-    .netto-search-field input {
-      width: 100%;
-      height: 38px;
-      padding: 0 14px;
-      border: 1px solid vars.$border-color;
-      border-radius: vars.$radius-full;
-      font-size: 0.82rem;
-      outline: none;
-
-      &:focus {
-        border-color: vars.$primary-color;
-      }
-    }
-
-    .netto-modal-products-list {
-      max-height: 280px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-
-      .netto-modal-item-row {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 6px 10px;
-        border: 1px solid #EBF1ED;
-        border-radius: 12px;
-        cursor: pointer;
-        transition: background-color 0.15s ease;
-
-        &:hover {
-          background-color: #F5FAF6;
-        }
-
-        .netto-item-img {
-          width: 38px;
-          height: 38px;
-          object-fit: contain;
-          border-radius: 8px;
-          background-color: vars.$bg-white;
-        }
-
-        .netto-item-meta {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          min-width: 0;
-
-          .item-brand {
-            font-size: 0.62rem;
-            color: vars.$text-muted;
-            text-transform: uppercase;
-          }
-
-          .item-name {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: vars.$text-color;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-          }
-
-          .item-cals {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: vars.$primary-color;
-          }
-        }
-
-        .netto-item-plus-btn {
-          width: 26px;
-          height: 26px;
-          border-radius: vars.$radius-full;
-          background-color: vars.$primary-light;
-          color: vars.$primary-color;
           border: none;
-          font-weight: 800;
-          font-size: 14px;
           cursor: pointer;
           display: flex;
           align-items: center;
           justify-content: center;
+          transition: background-color 0.15s ease, transform 0.15s ease;
+
+          &:hover {
+            background-color: #278F39;
+            color: #FFFFFF;
+            transform: scale(1.08);
+          }
         }
       }
     }
   }
+}
 
-  .manual-tab-content {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+// 7. Große Aktionsbuttons
+.action-buttons-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 2px;
 
-    .form-group-field {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-
-      label {
-        font-size: 0.74rem;
-        font-weight: 700;
-        color: vars.$secondary-color;
-      }
-
-      input {
-        height: 40px;
-        padding: 0 12px;
-        border: 1px solid vars.$border-color;
-        border-radius: 10px;
-        font-size: 0.85rem;
-        outline: none;
-
-        &:focus {
-          border-color: vars.$primary-color;
-        }
-      }
-    }
-
-    .form-row-two-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .submit-manual-food-btn {
-      margin-top: 6px;
-      height: 42px;
-      background-color: vars.$primary-color;
-      color: vars.$bg-white;
-      border: none;
-      border-radius: vars.$radius-full;
-      font-size: 0.88rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background-color 0.15s ease;
-
-      &:hover:not(:disabled) {
-        background-color: vars.$primary-dark;
-      }
-
-      &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-    }
-  }
-
-  // Quick Add Product Card
-  .quick-product-hero {
+  .open-cart-button {
+    width: 100%;
+    height: 48px;
+    border-radius: 9999px;
+    background-color: #278F39;
+    color: #FFFFFF;
+    font-size: 0.94rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
-    background-color: #F5FAF6;
-    border-radius: 14px;
-    margin-bottom: 12px;
-
-    .quick-prod-img {
-      width: 48px;
-      height: 48px;
-      object-fit: contain;
-      border-radius: 10px;
-      background-color: vars.$bg-white;
-    }
-
-    .quick-prod-details {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-
-      .quick-prod-name {
-        font-size: 0.9rem;
-        font-weight: 800;
-        color: vars.$secondary-color;
-      }
-
-      .quick-prod-cals {
-        font-size: 0.78rem;
-        font-weight: 700;
-        color: vars.$primary-color;
-      }
-    }
-  }
-
-  .quick-choose-heading {
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: vars.$text-muted;
-    margin: 0 0 10px;
-  }
-
-  .meal-options-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-bottom: 14px;
-
-    .quick-meal-btn {
-      background-color: vars.$bg-white;
-      border: 1px solid vars.$border-color;
-      border-radius: 12px;
-      padding: 10px 8px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-
-      span {
-        font-size: 1.3rem;
-      }
-
-      strong {
-        font-size: 0.78rem;
-        color: vars.$secondary-color;
-      }
-
-      &:hover {
-        border-color: vars.$primary-color;
-        background-color: vars.$primary-light;
-      }
-    }
-  }
-
-  .quick-add-cart-btn {
-    background-color: #F2F5F2;
-    border: none;
-    border-radius: vars.$radius-full;
-    padding: 9px 14px;
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: vars.$text-color;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
+    justify-content: center;
+    gap: 9px;
+    box-shadow: 0 4px 14px rgba(39, 143, 57, 0.28);
+    transition: all 0.2s ease;
 
     &:hover {
-      background-color: #E2EBE3;
+      background-color: #217A30;
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    .btn-icon-cart {
+      width: 19px;
+      height: 19px;
+    }
+  }
+
+  .open-weight-button {
+    width: 100%;
+    height: 48px;
+    border-radius: 9999px;
+    background-color: #E5F5E8;
+    color: #005333;
+    font-size: 0.94rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #D8EFE0;
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    .btn-icon-scale {
+      width: 19px;
+      height: 19px;
     }
   }
 }
 
-@keyframes slideUpDrawer {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
+// 8. Feste untere Navigation
+.dashboard-footer-nav {
+  flex-shrink: 0;
+  background-color: #FFFFFF;
+  border-top: 1px solid #EBF1EC;
 }
 
-@keyframes modalScaleUp {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+// Toast Popup
+.dashboard-toast-popup {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #102521;
+  color: #FFFFFF;
+  padding: 10px 20px;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  z-index: 999;
+  white-space: nowrap;
 }
-
-@keyframes backdropFade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-

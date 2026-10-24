@@ -21,7 +21,7 @@ describe('BottomNavComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should render all 5 navigation links (Home, Lebensmittel, Rezepte, Einkaufsliste, Mehr)', () => {
+  it('should render all 5 navigation links (Home, Produkte, Einkaufsliste, Gewicht, Mehr)', () => {
     const el = fixture.nativeElement as HTMLElement;
     const links = el.querySelectorAll('a');
     expect(links.length).toBe(5);
@@ -29,8 +29,8 @@ describe('BottomNavComponent', () => {
     const text = el.textContent || '';
     expect(text).toContain('Home');
     expect(text).toContain('Produkte');
-    expect(text).toContain('Rezepte');
     expect(text).toContain('Einkaufsliste');
+    expect(text).toContain('Gewicht');
     expect(text).toContain('Mehr');
   });
 });

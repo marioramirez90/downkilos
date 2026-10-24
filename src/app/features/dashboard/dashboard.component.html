@@ -6,7 +6,7 @@
       <div class="header-top-row">
         <div class="logo-group">
           <!-- Offizielles grünes Blatt-Logo -->
-          <img src="images/down-kilos-leaf.png" alt="Down Kilos" class="leaf-logo-icon" />
+          <img src="images/down-kilos-leaf.png" alt="Down Kilos Logo" class="leaf-logo-icon" />
           <span class="app-brand-name">Down Kilos</span>
         </div>
 
@@ -17,6 +17,7 @@
           class="settings-btn"
           aria-label="Einstellungen"
           title="Profil & Einstellungen"
+          id="btn-dashboard-settings"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"></circle>
@@ -25,53 +26,67 @@
         </button>
       </div>
 
-      <!-- Große Begrüßung -->
+      <!-- Große Begrüßung (ohne Emoji, exakt wie im Bild) -->
       <h1 class="user-greeting-title">Hallo {{ userFirstName() }}!</h1>
       <p class="calorie-target-subtitle">Dein Kalorienziel für heute</p>
     </header>
 
-    <!-- 2. Hero-Bereich: Kalorienring (Links) & Dein Markt (Rechts) -->
+    <!-- 2. Hero-Bereich: Mehrfarbiger Kalorienring (Links) & Dein Markt (Rechts) -->
     <div class="hero-widgets-row">
-      <!-- Links: Großer freistehender Kalorienring ohne Rahmen (Klickbar -> Tagebuch) -->
+      <!-- Links: Großer freistehender Kalorienring (Klickbar -> /was-hast-du-gegessen) -->
       <div
         class="calorie-ring-widget clickable-widget"
-        (click)="openDiary()"
+        (click)="goToFoodDiary()"
         role="button"
         tabindex="0"
         aria-label="Tageskalorien und Ernährungstagebuch öffnen"
         title="Tippen für Ernährungstagebuch"
       >
         <div class="ring-svg-container">
-          <svg viewBox="0 0 140 140" class="ring-svg">
-            <defs>
-              <linearGradient id="dashboardRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#37C847" />
-                <stop offset="60%" stop-color="#278F39" />
-                <stop offset="100%" stop-color="#103A2A" />
-              </linearGradient>
-            </defs>
-
-            <!-- Hellgrüne Spur -->
+          <svg viewBox="0 0 240 240" class="ring-svg">
+            <!-- 1. Durchgehender sehr hellgrüner Grundkreis (#E2EBE3) -->
             <circle
-              cx="70"
-              cy="70"
-              r="54"
+              cx="120"
+              cy="120"
+              r="88"
               class="ring-bg-track"
             />
 
-            <!-- Aktiver Bogen mit Farbverlauf -->
+            <!-- 2. Heller, kräftig grüner Bogen (#39CD50) -->
             <circle
-              cx="70"
-              cy="70"
-              r="54"
-              class="ring-active-track"
-              stroke="url(#dashboardRingGrad)"
-              stroke-dasharray="340"
-              [attr.stroke-dashoffset]="calorieDashOffset()"
+              cx="120"
+              cy="120"
+              r="88"
+              class="ring-arc-bright"
+              stroke-dasharray="184.31 552.92"
+              transform="rotate(-75 120 120)"
             />
+
+            <!-- 3. Dunkelgrüner Bogen (#005333) -->
+            <circle
+              cx="120"
+              cy="120"
+              r="88"
+              class="ring-arc-dark"
+              stroke-dasharray="238.06 552.92"
+              transform="rotate(45 120 120)"
+            />
+
+            <!-- 4. Dezent getrennter Fortschrittsbogen nur wenn Kalorien gegessen wurden -->
+            @if (eatenKcal() > 0) {
+              <circle
+                cx="120"
+                cy="120"
+                r="88"
+                class="ring-eaten-progress"
+                stroke-dasharray="552.92"
+                [attr.stroke-dashoffset]="dashboardRingDashOffset()"
+                transform="rotate(-90 120 120)"
+              />
+            }
           </svg>
 
-          <!-- Zentrumstext -->
+          <!-- Zentrumstext: 2.000 / kcal / Tagesziel -->
           <div class="ring-center-text">
             <strong class="ring-number">{{ formattedTargetKcal() }}</strong>
             <span class="ring-unit">kcal</span>
@@ -80,17 +95,17 @@
         </div>
       </div>
 
-      <!-- Rechts: Dein Markt Karte -->
+      <!-- Rechts: Dein Markt Karte (Exakt wie im Bild: OHNE Adresse, OHNE PLZ) -->
       <div class="market-card-widget">
         <div class="market-top-row">
           <span class="market-heading">Dein Markt</span>
-          <svg class="market-pin-icon" viewBox="0 0 24 24" fill="#278F39" stroke="none">
+          <svg class="market-pin-icon" viewBox="0 0 24 24" fill="#278F39">
             <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/>
           </svg>
         </div>
 
         <!-- Netto Gelbes Logo-Banner -->
-        <div class="netto-banner-box" (click)="goToMarketSelection()" role="button" tabindex="0">
+        <div class="netto-banner-box" (click)="goToMarketSelection()" role="button" tabindex="0" title="Markt ändern">
           <div class="netto-badge-visual">
             <span class="netto-main-text">Netto</span>
             <span class="netto-sub-text">Marken-Discount</span>
@@ -98,15 +113,8 @@
           <span class="netto-chevron">›</span>
         </div>
 
-        <!-- Markt-Standortzeile mit Ändern-Link -->
+        <!-- Ändern Link (rechtsbündig, keine Adresse, keine PLZ) -->
         <div class="market-bottom-row">
-          <div class="location-group">
-            <svg class="small-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-              <circle cx="12" cy="10" r="3"></circle>
-            </svg>
-            <span class="location-text">{{ marketLocation() }}</span>
-          </div>
           <button type="button" (click)="goToMarketSelection()" class="change-link">Ändern</button>
         </div>
       </div>
@@ -114,14 +122,15 @@
 
     <!-- 3. Bereits gegessen und Noch verfügbar Karte -->
     <div class="status-summary-card">
-      <!-- Links: Bereits gegessen mit Besteck-Icon (Klickbar -> Tagebuch) -->
+      <!-- Links: Bereits gegessen mit Besteck-Icon (Vollständig klickbar -> /was-hast-du-gegessen) -->
       <div
         class="status-col eaten-col clickable-col"
-        (click)="openDiary()"
+        (click)="goToFoodDiary()"
+        (keyup.enter)="goToFoodDiary()"
         role="button"
         tabindex="0"
-        aria-label="Ernährungstagebuch öffnen"
-        title="Tippen für Ernährungstagebuch"
+        aria-label="Bereits gegessen: Was hast du heute gegessen?"
+        title="Tippen um Lebensmittel einzutragen"
       >
         <div class="icon-circle cutlery-circle">
           <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
@@ -132,10 +141,7 @@
           </svg>
         </div>
         <div class="status-info">
-          <div class="status-label-row">
-            <span class="status-label">Bereits gegessen</span>
-            <span class="tap-hint-badge">Tagebuch ›</span>
-          </div>
+          <span class="status-label">Bereits gegessen</span>
           <strong class="status-value">{{ formattedEatenKcal() }} kcal</strong>
         </div>
       </div>
@@ -143,7 +149,7 @@
       <!-- Vertikaler Teiler -->
       <div class="status-divider"></div>
 
-      <!-- Rechts: Noch verfügbar mit Flammen-Icon -->
+      <!-- Rechts: Noch verfügbar mit Flammen-Icon (NICHT klickbar, nur Info) -->
       <div class="status-col remaining-col">
         <div class="icon-circle flame-circle">
           <svg viewBox="0 0 24 24" fill="#278F39">
@@ -160,7 +166,7 @@
     <!-- 4. "Bei Netto entdecken" Horizontale Lebensmittelkarten -->
     <section class="discover-products-section">
       <div class="section-title-row">
-        <h2 class="section-heading">Bei Netto entdecken</h2>
+        <h2 class="section-heading">{{ discoverTitle() }}</h2>
         <a (click)="goToAllProducts()" class="see-all-link">Alle Produkte ›</a>
       </div>
       <p class="section-desc">Produkte mit wenig Kalorien, passend zu deinem Ziel.</p>
@@ -182,8 +188,8 @@
                 type="button"
                 (click)="onProductPlusClick(item.product, $event)"
                 class="tile-add-btn"
-                title="Zu Mahlzeit eintragen"
-                aria-label="Zu Mahlzeit eintragen"
+                title="Zur Einkaufsliste hinzufügen"
+                aria-label="Zur Einkaufsliste hinzufügen"
               >
                 +
               </button>
@@ -193,28 +199,14 @@
       </div>
     </section>
 
-    <!-- 5. Produktsuchleiste mit Lupe -->
-    <div class="search-bar-box">
-      <svg class="search-icon-svg" viewBox="0 0 24 24" fill="none" stroke="#66716D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="8"></circle>
-        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-      </svg>
-      <input
-        type="text"
-        [(ngModel)]="searchQuery"
-        (keyup.enter)="onSearchSubmit()"
-        placeholder="Eier, Toast, Bananen, Getränke ..."
-        aria-label="Lebensmittel bei Netto suchen"
-      />
-    </div>
-
-    <!-- 6. Große Aktionsbuttons -->
+    <!-- 5. Große Aktionsbuttons (Suchleiste entfernt!) -->
     <div class="action-buttons-stack">
       <!-- Großer grüner Einkaufslisten-Button -->
       <button
         type="button"
         (click)="goToShoppingList()"
         class="open-cart-button"
+        id="btn-open-shopping-list"
       >
         <svg class="btn-icon-cart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="9" cy="21" r="1"></circle>
@@ -224,17 +216,19 @@
         <span>Einkaufsliste öffnen →</span>
       </button>
 
-      <!-- Hellgrüner Rezepte-Button -->
+      <!-- Zweiter Button: Mein aktuelles Gewicht (ersetzt Rezepte entdecken) -->
       <button
         type="button"
-        (click)="goToRecipes()"
-        class="open-recipes-button"
+        (click)="goToWeight()"
+        class="open-weight-button"
+        id="btn-open-weight"
       >
-        <svg class="btn-icon-chef" viewBox="0 0 24 24" fill="none" stroke="#103A2A" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"></path>
-          <line x1="6" y1="17" x2="18" y2="17"></line>
+        <svg class="btn-icon-scale" viewBox="0 0 24 24" fill="none" stroke="#005333" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="5" ry="5"></rect>
+          <circle cx="12" cy="8" r="2.5"></circle>
+          <path d="M12 7v1.5"></path>
         </svg>
-        <span>Rezepte entdecken →</span>
+        <span>Mein aktuelles Gewicht →</span>
       </button>
     </div>
   </main>
@@ -246,364 +240,8 @@
     </div>
   }
 
-  <!-- 7. Dauerhaft sichtbare untere Navigation -->
+  <!-- 6. Dauerhaft sichtbare untere Navigation (5 Punkte) -->
   <footer class="dashboard-footer-nav">
     <app-bottom-nav></app-bottom-nav>
   </footer>
-
-  <!-- 8. Ernährungstagebuch (Slide-Up Drawer / Full Overlay, Section 11.4 & Section 12) -->
-  @if (isDiaryOpen()) {
-    <div class="diary-backdrop" (click)="closeDiary()"></div>
-    <div class="diary-drawer" role="dialog" aria-modal="true" aria-label="Ernährungstagebuch">
-      <!-- Drawer Header -->
-      <div class="diary-header">
-        <div class="diary-header-title-row">
-          <div class="diary-title-group">
-            <span class="diary-badge-icon">📖</span>
-            <h2 class="diary-title">Ernährungstagebuch</h2>
-          </div>
-          <button type="button" (click)="closeDiary()" class="diary-close-btn" aria-label="Tagebuch schließen">
-            Fertig
-          </button>
-        </div>
-
-        <!-- Datumsnavigator -->
-        <div class="diary-date-nav">
-          <button type="button" (click)="previousDiaryDay()" class="date-arrow-btn" aria-label="Vorheriger Tag">‹</button>
-          <span class="date-display-label">{{ formattedDiaryDate() }}</span>
-          <button type="button" (click)="nextDiaryDay()" class="date-arrow-btn" aria-label="Nächster Tag">›</button>
-        </div>
-      </div>
-
-      <!-- Scrollbarer Inhalt des Tagebuchs -->
-      <div class="diary-scrollable-body">
-        <!-- Kalorien-Zusammenfassungskarte -->
-        <div class="diary-summary-box">
-          <div class="summary-stat-item">
-            <span class="stat-caption">Tagesziel</span>
-            <strong class="stat-number">{{ formattedTargetKcal() }} kcal</strong>
-          </div>
-          <div class="summary-divider"></div>
-          <div class="summary-stat-item">
-            <span class="stat-caption">Gegessen</span>
-            <strong class="stat-number stat-highlight-green">{{ formattedEatenKcal() }} kcal</strong>
-          </div>
-          <div class="summary-divider"></div>
-          <div class="summary-stat-item">
-            <span class="stat-caption">Verfügbar</span>
-            <strong class="stat-number">{{ formattedRemainingKcal() }} kcal</strong>
-          </div>
-        </div>
-
-        <!-- 4 Mahlzeitenbereiche -->
-        <div class="meals-list-container">
-          <!-- 1. Frühstück -->
-          <div class="meal-card-section">
-            <div class="meal-header-row">
-              <div class="meal-title-group">
-                <span class="meal-symbol">🌅</span>
-                <div class="meal-meta">
-                  <h3 class="meal-name">Frühstück</h3>
-                  <span class="meal-cals-count">{{ getMealCalories('breakfast') }} kcal</span>
-                </div>
-              </div>
-              <button type="button" (click)="openAddModal('breakfast')" class="add-meal-entry-btn">
-                + Hinzufügen
-              </button>
-            </div>
-
-            <div class="meal-items-stack">
-              @for (item of getMealItems('breakfast'); track item.id) {
-                <div class="logged-food-row">
-                  <div class="food-info-col">
-                    <strong class="food-name">{{ item.name }}</strong>
-                    <span class="food-portion">{{ item.displayQuantity }}</span>
-                  </div>
-                  <div class="food-actions-col">
-                    <span class="food-kcal-badge">{{ item.calories }} kcal</span>
-                    <button type="button" (click)="deleteFoodItem(item.id)" class="food-del-btn" title="Löschen" aria-label="Eintrag löschen">
-                      🗑️
-                    </button>
-                  </div>
-                </div>
-              } @empty {
-                <div class="empty-meal-hint">
-                  <span>Noch kein Frühstück eingetragen</span>
-                </div>
-              }
-            </div>
-          </div>
-
-          <!-- 2. Mittagessen -->
-          <div class="meal-card-section">
-            <div class="meal-header-row">
-              <div class="meal-title-group">
-                <span class="meal-symbol">☀️</span>
-                <div class="meal-meta">
-                  <h3 class="meal-name">Mittagessen</h3>
-                  <span class="meal-cals-count">{{ getMealCalories('lunch') }} kcal</span>
-                </div>
-              </div>
-              <button type="button" (click)="openAddModal('lunch')" class="add-meal-entry-btn">
-                + Hinzufügen
-              </button>
-            </div>
-
-            <div class="meal-items-stack">
-              @for (item of getMealItems('lunch'); track item.id) {
-                <div class="logged-food-row">
-                  <div class="food-info-col">
-                    <strong class="food-name">{{ item.name }}</strong>
-                    <span class="food-portion">{{ item.displayQuantity }}</span>
-                  </div>
-                  <div class="food-actions-col">
-                    <span class="food-kcal-badge">{{ item.calories }} kcal</span>
-                    <button type="button" (click)="deleteFoodItem(item.id)" class="food-del-btn" title="Löschen" aria-label="Eintrag löschen">
-                      🗑️
-                    </button>
-                  </div>
-                </div>
-              } @empty {
-                <div class="empty-meal-hint">
-                  <span>Noch kein Mittagessen eingetragen</span>
-                </div>
-              }
-            </div>
-          </div>
-
-          <!-- 3. Abendessen -->
-          <div class="meal-card-section">
-            <div class="meal-header-row">
-              <div class="meal-title-group">
-                <span class="meal-symbol">🌙</span>
-                <div class="meal-meta">
-                  <h3 class="meal-name">Abendessen</h3>
-                  <span class="meal-cals-count">{{ getMealCalories('dinner') }} kcal</span>
-                </div>
-              </div>
-              <button type="button" (click)="openAddModal('dinner')" class="add-meal-entry-btn">
-                + Hinzufügen
-              </button>
-            </div>
-
-            <div class="meal-items-stack">
-              @for (item of getMealItems('dinner'); track item.id) {
-                <div class="logged-food-row">
-                  <div class="food-info-col">
-                    <strong class="food-name">{{ item.name }}</strong>
-                    <span class="food-portion">{{ item.displayQuantity }}</span>
-                  </div>
-                  <div class="food-actions-col">
-                    <span class="food-kcal-badge">{{ item.calories }} kcal</span>
-                    <button type="button" (click)="deleteFoodItem(item.id)" class="food-del-btn" title="Löschen" aria-label="Eintrag löschen">
-                      🗑️
-                    </button>
-                  </div>
-                </div>
-              } @empty {
-                <div class="empty-meal-hint">
-                  <span>Noch kein Abendessen eingetragen</span>
-                </div>
-              }
-            </div>
-          </div>
-
-          <!-- 4. Snacks & Getränke -->
-          <div class="meal-card-section">
-            <div class="meal-header-row">
-              <div class="meal-title-group">
-                <span class="meal-symbol">🍎</span>
-                <div class="meal-meta">
-                  <h3 class="meal-name">Snacks & Getränke</h3>
-                  <span class="meal-cals-count">{{ getMealCalories('snack') }} kcal</span>
-                </div>
-              </div>
-              <button type="button" (click)="openAddModal('snack')" class="add-meal-entry-btn">
-                + Hinzufügen
-              </button>
-            </div>
-
-            <div class="meal-items-stack">
-              @for (item of getMealItems('snack'); track item.id) {
-                <div class="logged-food-row">
-                  <div class="food-info-col">
-                    <strong class="food-name">{{ item.name }}</strong>
-                    <span class="food-portion">{{ item.displayQuantity }}</span>
-                  </div>
-                  <div class="food-actions-col">
-                    <span class="food-kcal-badge">{{ item.calories }} kcal</span>
-                    <button type="button" (click)="deleteFoodItem(item.id)" class="food-del-btn" title="Löschen" aria-label="Eintrag löschen">
-                      🗑️
-                    </button>
-                  </div>
-                </div>
-              } @empty {
-                <div class="empty-meal-hint">
-                  <span>Noch keine Snacks eingetragen</span>
-                </div>
-              }
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  }
-
-  <!-- 9. Modal für Lebensmitteleingabe (+ Hinzufügen zu Mahlzeit) -->
-  @if (selectedMealForAdd(); as activeMeal) {
-    <div class="add-food-backdrop" (click)="closeAddModal()"></div>
-    <div class="add-food-modal" role="dialog" aria-modal="true">
-      <div class="modal-top-row">
-        <h3 class="modal-title">Zu {{ getMealLabel(activeMeal) }} hinzufügen</h3>
-        <button type="button" (click)="closeAddModal()" class="modal-x-btn" aria-label="Schließen">✕</button>
-      </div>
-
-      <!-- Reiter: Netto-Produkte vs. Manuell eintragen -->
-      <div class="modal-tab-row">
-        <button
-          type="button"
-          (click)="addFoodMode.set('netto')"
-          class="modal-tab-btn"
-          [class.active]="addFoodMode() === 'netto'"
-        >
-          Bei Netto wählen
-        </button>
-        <button
-          type="button"
-          (click)="addFoodMode.set('manual')"
-          class="modal-tab-btn"
-          [class.active]="addFoodMode() === 'manual'"
-        >
-          Manuell eintragen
-        </button>
-      </div>
-
-      @if (addFoodMode() === 'netto') {
-        <!-- Netto-Produktsuche & Schnell-Auswahl -->
-        <div class="netto-tab-content">
-          <div class="netto-search-field">
-            <input
-              type="text"
-              [(ngModel)]="nettoFilterQuery"
-              placeholder="Netto-Produkt suchen..."
-              aria-label="Netto-Produkt suchen"
-            />
-          </div>
-
-          <div class="netto-modal-products-list">
-            @for (prod of availableNettoProducts(); track prod.id) {
-              <div class="netto-modal-item-row" (click)="addProductToMeal(prod)" role="button" tabindex="0">
-                <img [src]="prod.imageUrl" [alt]="prod.name" class="netto-item-img" />
-                <div class="netto-item-meta">
-                  <span class="item-brand">{{ prod.brand || 'Netto' }}</span>
-                  <strong class="item-name">{{ prod.name }}</strong>
-                  <span class="item-cals">
-                    ≈ {{ Math.round(prod.nutrition.caloriesPer100g * (prod.servingSizeGrams || 100) / 100) }} kcal
-                    ({{ prod.servingSizeGrams || 100 }} g)
-                  </span>
-                </div>
-                <button type="button" class="netto-item-plus-btn" aria-label="Hinzufügen">+</button>
-              </div>
-            }
-          </div>
-        </div>
-      } @else {
-        <!-- Manuelle Eingabe Formular -->
-        <div class="manual-tab-content">
-          <div class="form-group-field">
-            <label for="manualFoodName">Name des Lebensmittels *</label>
-            <input
-              id="manualFoodName"
-              type="text"
-              [(ngModel)]="manualName"
-              placeholder="z.B. Apfel, Haferflocken, Kaffee..."
-            />
-          </div>
-
-          <div class="form-row-two-col">
-            <div class="form-group-field">
-              <label for="manualFoodCals">Kalorien (kcal) *</label>
-              <input
-                id="manualFoodCals"
-                type="number"
-                [(ngModel)]="manualCalories"
-                placeholder="z.B. 150"
-                min="0"
-              />
-            </div>
-            <div class="form-group-field">
-              <label for="manualFoodPortion">Menge / Portion</label>
-              <input
-                id="manualFoodPortion"
-                type="text"
-                [(ngModel)]="manualPortion"
-                placeholder="z.B. 1 Portion (150 g)"
-              />
-            </div>
-          </div>
-
-          <button
-            type="button"
-            (click)="submitManualFood()"
-            class="submit-manual-food-btn"
-            [disabled]="!manualName().trim() || !manualCalories() || manualCalories()! <= 0"
-          >
-            Eintrag speichern
-          </button>
-        </div>
-      }
-    </div>
-  }
-
-  <!-- 10. Quick-Add Modal bei Klick auf das grüne Plus einer Netto-Produktkarte -->
-  @if (quickProductForAdd(); as qp) {
-    <div class="add-food-backdrop" (click)="closeQuickAddModal()"></div>
-    <div class="quick-add-modal" role="dialog" aria-modal="true">
-      <div class="modal-top-row">
-        <h3 class="modal-title">Eintragen</h3>
-        <button type="button" (click)="closeQuickAddModal()" class="modal-x-btn" aria-label="Schließen">✕</button>
-      </div>
-
-      <div class="quick-product-hero">
-        <img [src]="qp.imageUrl" [alt]="qp.name" class="quick-prod-img" />
-        <div class="quick-prod-details">
-          <strong class="quick-prod-name">{{ qp.name }}</strong>
-          <span class="quick-prod-cals">
-            ≈ {{ Math.round(qp.nutrition.caloriesPer100g * (qp.servingSizeGrams || 100) / 100) }} kcal
-            ({{ qp.servingSizeGrams || 100 }} g)
-          </span>
-        </div>
-      </div>
-
-      <p class="quick-choose-heading">Zu welcher Mahlzeit hinzufügen?</p>
-
-      <div class="meal-options-grid">
-        <button type="button" (click)="confirmQuickAddProduct('breakfast')" class="quick-meal-btn">
-          <span>🌅</span>
-          <strong>Frühstück</strong>
-        </button>
-        <button type="button" (click)="confirmQuickAddProduct('lunch')" class="quick-meal-btn">
-          <span>☀️</span>
-          <strong>Mittagessen</strong>
-        </button>
-        <button type="button" (click)="confirmQuickAddProduct('dinner')" class="quick-meal-btn">
-          <span>🌙</span>
-          <strong>Abendessen</strong>
-        </button>
-        <button type="button" (click)="confirmQuickAddProduct('snack')" class="quick-meal-btn">
-          <span>🍎</span>
-          <strong>Snack</strong>
-        </button>
-      </div>
-
-      <!-- Alternative Option: Zur Einkaufsliste -->
-      <button
-        type="button"
-        (click)="addToCart(qp, $event); closeQuickAddModal()"
-        class="quick-add-cart-btn"
-      >
-        🛒 Zur Einkaufsliste hinzufügen
-      </button>
-    </div>
-  }
 </div>

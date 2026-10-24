@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { StorageService } from '../../core/services/storage.service';
+import { FoodLogService } from '../../core/services/food-log.service';
+import { ShoppingListService } from '../../core/services/shopping-list.service';
 import {
   ACTIVITY_OPTIONS,
   ActivityLevel,
@@ -26,6 +28,8 @@ export class OnboardingComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private storageService = inject(StorageService);
+  private foodLogService = inject(FoodLogService);
+  private shoppingListService = inject(ShoppingListService);
 
   readonly activityOptions = ACTIVITY_OPTIONS;
   readonly goalOptions = GOAL_OPTIONS;
@@ -147,7 +151,9 @@ export class OnboardingComponent implements OnInit {
       };
 
       await this.storageService.saveProfile(profile);
-      this.router.navigate(['/calculator']);
+      this.foodLogService.clearTodayLog();
+      this.shoppingListService.clearAllItems();
+      this.router.navigate(['/loading'], { queryParams: { step: 'calculate' } });
     } finally {
       this.isSubmitting = false;
     }

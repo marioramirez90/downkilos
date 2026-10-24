@@ -3,35 +3,48 @@
     @if (!hasError()) {
       <!-- Großer animierter zweifarbiger Kalorienring mit Down-Kilos-Blatt -->
       <div class="ring-spinner-wrapper" role="status" aria-live="polite">
-        <svg viewBox="0 0 160 160" class="ring-spinner-svg" aria-hidden="true">
-          <!-- Hellgrüner Grundring -->
+        <svg viewBox="0 0 200 200" class="ring-spinner-svg" aria-hidden="true">
+          <!-- 1. Hellgrüner Grundkreis (#E2EBE3) -->
           <circle
-            cx="80"
-            cy="80"
-            r="66"
-            class="ring-bg"
+            cx="100"
+            cy="100"
+            r="72"
+            class="loader-ring-track"
           ></circle>
-          <!-- Kräftig grünes Kreissegment mit weicher Rotation -->
-          <circle
-            cx="80"
-            cy="80"
-            r="66"
-            class="ring-accent"
-          ></circle>
+
+          <!-- 2. Rotierende zweifarbige Segmente (Hellgrün #3ACC50 & Dunkelgrün #005333) -->
+          <g class="loader-arcs-spinning-group">
+            <circle
+              cx="100"
+              cy="100"
+              r="72"
+              class="loader-arc-bright"
+              stroke-dasharray="145 452.39"
+            ></circle>
+            <circle
+              cx="100"
+              cy="100"
+              r="72"
+              class="loader-arc-dark"
+              stroke-dasharray="190 452.39"
+              transform="rotate(155 100 100)"
+            ></circle>
+          </g>
         </svg>
 
         <!-- Down Kilos Blatt-Logo im Zentrum -->
         <div class="ring-logo-center">
-          <img src="images/down-kilos-leaf.png" alt="Down Kilos" class="leaf-icon" />
+          <img src="images/down-kilos-leaf.png" alt="Down Kilos Blatt" class="leaf-icon" />
         </div>
       </div>
 
-      <h1 class="loader-title">Down Kilos</h1>
-      <p class="loader-message">{{ loadingStep() }}</p>
+      <!-- Dynamischer Text passend zum Ladevorgang -->
+      <h1 class="loader-title">{{ title() }}</h1>
+      <p class="loader-subtitle">{{ subtitle() }}</p>
     } @else {
       <!-- Fehleranzeige mit Wiederholungs-Option -->
-      <div class="error-box">
-        <div class="error-icon">⚠️</div>
+      <div class="error-box" role="alert">
+        <div class="error-icon" aria-hidden="true">⚠️</div>
         <h2 class="error-title">Hinweis</h2>
         <p class="error-message">{{ errorMessage() }}</p>
         <button type="button" (click)="retry()" class="retry-btn">

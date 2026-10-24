@@ -96,7 +96,7 @@ describe('OnboardingComponent', () => {
         goal: 'lose_weight'
       })
     );
-    expect(router.navigate).toHaveBeenCalledWith(['/calculator']);
+    expect(router.navigate).toHaveBeenCalledWith(['/loading'], { queryParams: { step: 'calculate' } });
   });
 
   it('should update activityLevel when selectActivity is called', () => {

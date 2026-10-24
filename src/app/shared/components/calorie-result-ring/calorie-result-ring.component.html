@@ -1,0 +1,42 @@
+<div class="calorie-ring-wrapper" role="img" [attr.aria-label]="displayCalories() + ' ' + unit + ' ' + subtitle">
+  <svg
+    viewBox="0 0 240 240"
+    class="calorie-ring-svg"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <!-- 1. Durchgehender sehr hellgrüner Grundkreis (#E2EBE3) -->
+    <circle
+      cx="120"
+      cy="120"
+      r="88"
+      class="ring-track"
+    />
+
+    <!-- 2. Heller, kräftig grüner Bogen im oberen und rechten Bereich (#3ACC50) -->
+    <circle
+      cx="120"
+      cy="120"
+      r="88"
+      class="ring-arc-bright"
+      [attr.stroke-dasharray]="brightArcLength + ' ' + circumference"
+      transform="rotate(-75 120 120)"
+    />
+
+    <!-- 3. Dunkelgrüner Bogen im unteren und linken Bereich (#005333) -->
+    <circle
+      cx="120"
+      cy="120"
+      r="88"
+      class="ring-arc-dark"
+      [attr.stroke-dasharray]="darkArcLength + ' ' + circumference"
+      transform="rotate(45 120 120)"
+    />
+  </svg>
+
+  <!-- Zentrierter Textbereich: 2.000 / kcal / Tagesziel -->
+  <div class="ring-center-content">
+    <span class="ring-value">{{ displayCalories() }}</span>
+    <span class="ring-unit">{{ unit }}</span>
+    <span class="ring-label">{{ subtitle }}</span>
+  </div>
+</div>

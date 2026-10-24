@@ -1,15 +1,16 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { StorageService } from '../../core/services/storage.service';
 import { CalorieCalculatorService } from '../../core/services/calorie-calculator.service';
 import { CalorieCalculationResult } from '../../core/models/calorie-calculation.model';
 import { UserProfile } from '../../core/models/user-profile.model';
+import { CalorieResultRingComponent } from '../../shared/components/calorie-result-ring/calorie-result-ring.component';
 
 @Component({
   selector: 'app-calculator',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, CalorieResultRingComponent],
   templateUrl: './calculator.component.html',
   styleUrl: './calculator.component.scss'
 })
@@ -24,10 +25,24 @@ export class CalculatorComponent implements OnInit {
     this.activeTab.set(this.activeTab() === 'overview' ? 'details' : 'overview');
   }
 
-  // Reaktives Profil aus dem Storage (KEINE Dummy-Daten im Produktivcode)
-  readonly profile = computed<UserProfile | null>(() => {
-    return this.storageService.profile();
-  });
+  // Reaktives Profil
+  readonly profile = signal<UserProfile | null>(null);
+
+  constructor() {
+    // Synchronisiere initial mit dem Storage-Signal
+    const initialProf = this.storageService.profile();
+    if (initialProf) {
+      this.profile.set(initialProf);
+    }
+
+    // Höre auf Updates am Storage-Signal
+    effect(() => {
+      const p = this.storageService.profile();
+      if (p) {
+        this.profile.set(p);
+      }
+    });
+  }
 
   // Automatische Neuberechnung bei jeder Profiländerung
   readonly calc = computed<CalorieCalculationResult | null>(() => {
@@ -44,38 +59,33 @@ export class CalculatorComponent implements OnInit {
 
   readonly formattedTargetKcal = computed<string>(() => {
     const c = this.calc();
-    if (!c) return '0';
+    if (!c) return '2.000';
     return Math.round(c.dailyTargetKcal).toLocaleString('de-DE');
   });
 
   readonly formattedTdee = computed<string>(() => {
     const c = this.calc();
-    if (!c) return '0';
+    if (!c) return '2.300';
     return Math.round(c.tdee).toLocaleString('de-DE');
   });
 
   readonly formattedBmr = computed<string>(() => {
     const c = this.calc();
-    if (!c) return '0';
+    if (!c) return '1.500';
     return Math.round(c.bmr).toLocaleString('de-DE');
-  });
-
-  readonly deficitValue = computed<number>(() => {
-    const c = this.calc();
-    return c ? c.deficit : 0;
   });
 
   readonly deficitDisplay = computed<string>(() => {
     const p = this.profile();
     const c = this.calc();
-    if (!c) return '0';
+    if (!c) return '-300';
     if (p?.goal === 'gain_weight') {
       return `+${Math.abs(c.deficit)}`;
     }
     if (p?.goal === 'maintain_weight') {
       return '0';
     }
-    return `${c.deficit}`;
+    return `-${Math.abs(c.deficit)}`;
   });
 
   readonly deficitSubtitle = computed<string>(() => {
@@ -88,34 +98,23 @@ export class CalculatorComponent implements OnInit {
   readonly explanationHeadline = computed<string>(() => {
     const p = this.profile();
     if (p?.goal === 'maintain_weight') {
-      return 'Mit deinem täglichen Kalorienziel deckst du deinen Erhaltungsbedarf.';
+      return `Mit ${this.formattedTargetKcal()} kcal pro Tag deckst du deinen Erhaltungsbedarf.`;
     }
     if (p?.goal === 'gain_weight') {
-      return 'Mit deinem täglichen Kalorienziel planst du einen gesunden Kalorienüberschuss.';
+      return `Mit ${this.formattedTargetKcal()} kcal pro Tag planst du einen gesunden Kalorienüberschuss.`;
     }
-    return 'Mit deinem täglichen Kalorienziel planst du eine moderate Energieeinsparung.';
+    return `Mit ${this.formattedTargetKcal()} kcal pro Tag erreichst du ein moderates Kaloriendefizit.`;
   });
 
   readonly explanationBody = computed<string>(() => {
     const p = this.profile();
     if (p?.goal === 'maintain_weight') {
-      return 'Down Kilos unterstützt dich dabei, passende Lebensmittel zu entdecken und dein Gewicht stabil zu halten.';
+      return 'Das hilft dir dabei, auf gesunde Weise dein Gewicht stabil zu halten, ohne auf deine Lieblingslebensmittel verzichten zu müssen.';
     }
     if (p?.goal === 'gain_weight') {
-      return 'Down Kilos unterstützt dich dabei, proteinreiche und passende Lebensmittel für den gezielten Aufbau zu entdecken.';
+      return 'Das unterstützt dich dabei, gezielt Muskeln aufzubauen, ohne auf deine Lieblingslebensmittel verzichten zu müssen.';
     }
-    return 'Down Kilos unterstützt dich dabei, passende Lebensmittel zu entdecken.';
-  });
-
-  readonly calorieRatio = computed<number>(() => {
-    const res = this.calc();
-    if (!res || !res.tdee) return 0.75;
-    return Math.min(1, Math.max(0.1, res.dailyTargetKcal / res.tdee));
-  });
-
-  readonly calorieDashOffset = computed<number>(() => {
-    const circumference = 478; // 2 * PI * 76 ≈ 477.52
-    return Math.round(circumference * (1 - this.calorieRatio()));
+    return 'Das kann dir helfen, auf gesunde und nachhaltige Weise abzunehmen, ohne auf deine Lieblingslebensmittel verzichten zu müssen.';
   });
 
   readonly fourWeekRangeText = computed<string>(() => {
@@ -138,10 +137,18 @@ export class CalculatorComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     const p = await this.storageService.loadProfile();
-    if (!p) {
-      this.router.navigate(['/onboarding']);
-    } else {
+    if (p) {
+      this.profile.set(p);
       this.storageService.profile.set(p);
+      this.calorieService.calculate(p);
+    } else {
+      const current = this.storageService.profile();
+      if (current) {
+        this.profile.set(current);
+        this.calorieService.calculate(current);
+      } else {
+        this.router.navigate(['/onboarding']);
+      }
     }
   }
 

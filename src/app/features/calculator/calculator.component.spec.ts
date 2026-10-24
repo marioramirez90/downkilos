@@ -56,7 +56,7 @@ describe('CalculatorComponent', () => {
     expect(el.textContent).toContain('Hier ist dein persönlicher Kalorienbedarf');
     expect(el.textContent).toContain('Erhaltungsbedarf');
     expect(el.textContent).toContain('Tägliches Defizit');
-    expect(el.textContent).toContain('Dein Tagesziel');
+    expect(el.textContent).toContain('Tagesziel');
     expect(el.textContent).toContain('Deine mögliche Entwicklung');
     expect(el.textContent).toContain('in 4 Wochen');
     expect(el.textContent).toContain('in 3 Monaten');
@@ -75,7 +75,7 @@ describe('CalculatorComponent', () => {
 
     component.activeTab.set('overview');
     fixture.detectChanges();
-    expect(el.textContent).toContain('Dein Tagesziel');
+    expect(el.textContent).toContain('Tagesziel');
   });
 
   it('should navigate to /retailers on clicking CTA button', () => {

@@ -1,5 +1,5 @@
 <div class="calculator-screen">
-  <!-- 1. Header (Zurück, Titel: Mein Kalorienbedarf, Info-Icon, Tabs) -->
+  <!-- 1. Header (Zurück-Pfeil, Titel: Mein Kalorienbedarf, Info-Icon, Tabs) -->
   <header class="calculator-header">
     <div class="header-top-row">
       <button
@@ -32,7 +32,7 @@
     </div>
 
     <!-- Segmented Tabs: Übersicht / Details -->
-    <nav class="calculator-tabs-bar" role="tablist">
+    <nav class="calculator-tabs-bar" role="tablist" aria-label="Ansicht umschalten">
       <button
         type="button"
         role="tab"
@@ -59,7 +59,7 @@
     @if (activeTab() === 'overview') {
       <!-- Persönliche Begrüßung -->
       <section class="personal-greeting-section">
-        <h2 class="user-greeting-title">Hallo {{ userFirstName() }}!</h2>
+        <h2 class="user-greeting-title">Hallo {{ userFirstName() }}! 👋</h2>
         <p class="greeting-subtitle">
           Hier ist dein persönlicher Kalorienbedarf, berechnet aus deinen Angaben. So weißt du,
           wie viele Kalorien du täglich essen kannst, um dein Ziel zu erreichen.
@@ -68,35 +68,12 @@
 
       <!-- Großer zweifarbiger Kalorienring exakt wie im Referenzdesign -->
       <section class="gauge-ring-card">
-        <div class="ring-svg-container">
-          <svg viewBox="0 0 200 200" class="ring-svg">
-            <!-- Hellgrüner oberer Bogen (von ~12:20 bis ~4:30) -->
-            <path
-              d="M 118.6 30.5 A 72 72 0 0 1 159 141.3"
-              fill="none"
-              stroke="#22C55E"
-              stroke-width="14"
-              stroke-linecap="round"
-              class="ring-arc-bright"
-            />
-            <!-- Dunkelgrüner unterer Bogen (von ~4:30 rundherum bis ~9:30) -->
-            <path
-              d="M 159 141.3 A 72 72 0 0 1 28.3 93.7"
-              fill="none"
-              stroke="#0F5132"
-              stroke-width="14"
-              stroke-linecap="round"
-              class="ring-arc-dark"
-            />
-          </svg>
-
-          <!-- Zentrumstext -->
-          <div class="ring-center-text">
-            <span class="ring-number">{{ formattedTargetKcal() }}</span>
-            <span class="ring-unit">kcal</span>
-            <span class="ring-sub">Dein Tagesziel</span>
-          </div>
-        </div>
+        <app-calorie-result-ring
+          [targetCalories]="calc()?.dailyTargetKcal || 2000"
+          [formattedCalories]="formattedTargetKcal()"
+          [unit]="'kcal'"
+          [subtitle]="'Tagesziel'"
+        ></app-calorie-result-ring>
       </section>
 
       <!-- Erhaltungsbedarf & Defizit Karten (Nebeneinander im 2-Spalten-Grid) -->
@@ -104,18 +81,18 @@
         <!-- Karte 1: Erhaltungsbedarf -->
         <div class="metric-card">
           <div class="metric-top-row">
-            <span class="metric-val">{{ formattedTdee() }}</span>
+            <strong class="metric-val">{{ formattedTdee() }}</strong>
             <span class="metric-unit">kcal</span>
           </div>
           <div class="metric-title">Erhaltungsbedarf</div>
           <div class="metric-sub">(um dein aktuelles Gewicht zu halten)</div>
         </div>
 
-        <!-- Karte 2: Tägliches Defizit -->
+        <!-- Karte 2: Tägliches Defizit mit roter Flamme -->
         <div class="metric-card">
           <div class="metric-top-row">
-            <span class="flame-icon">🔥</span>
-            <span class="metric-val">{{ deficitDisplay() }}</span>
+            <span class="flame-badge" aria-hidden="true">🔥</span>
+            <strong class="metric-val">{{ deficitDisplay() }}</strong>
             <span class="metric-unit">kcal</span>
           </div>
           <div class="metric-title">Tägliches Defizit</div>
@@ -154,10 +131,10 @@
             <!-- 4 Wochen -->
             <div class="outlook-card">
               <div class="outlook-top-row">
-                <span class="outlook-val">{{ fourWeekRangeText() }}</span>
-                <svg class="trend-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="1 6 8.5 12 13.5 8 23 18"></polyline>
-                  <polyline points="17 18 23 18 23 12"></polyline>
+                <strong class="outlook-val">{{ fourWeekRangeText() }}</strong>
+                <svg class="trend-icon" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="2 6 9 13 14 9 22 17"></polyline>
+                  <polyline points="16 17 22 17 22 11"></polyline>
                 </svg>
               </div>
               <span class="outlook-sub">in 4 Wochen</span>
@@ -166,10 +143,10 @@
             <!-- 3 Monate -->
             <div class="outlook-card">
               <div class="outlook-top-row">
-                <span class="outlook-val">{{ threeMonthRangeText() }}</span>
-                <svg class="trend-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="1 6 8.5 12 13.5 8 23 18"></polyline>
-                  <polyline points="17 18 23 18 23 12"></polyline>
+                <strong class="outlook-val">{{ threeMonthRangeText() }}</strong>
+                <svg class="trend-icon" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="2 6 9 13 14 9 22 17"></polyline>
+                  <polyline points="16 17 22 17 22 11"></polyline>
                 </svg>
               </div>
               <span class="outlook-sub">in 3 Monaten</span>
@@ -185,6 +162,39 @@
       <!-- TAB 2: DETAILS (Makronährstoffe & Stoffwechselanalyse) -->
       @if (calc(); as c) {
         <div class="details-tab-content">
+          <!-- Wissenschaftliche Formel & Stoffwechselanalyse -->
+          <section class="metabolism-analysis-card">
+            <h2 class="details-section-title">Stoffwechselanalyse</h2>
+            <p class="details-section-subtitle">Wissenschaftlich fundierte Berechnung nach Mifflin-St. Jeor</p>
+
+            <div class="metabolism-detail-row">
+              <span class="detail-label">Ruheenergieverbrauch (BMR):</span>
+              <strong class="detail-value">{{ formattedBmr() }} kcal</strong>
+            </div>
+
+            <div class="metabolism-detail-row">
+              <span class="detail-label">Aktivitätsfaktor (PAL):</span>
+              <strong class="detail-value">
+                {{ profile()?.activityLevel === 'moderate' ? '1,55 (Moderat)' : (profile()?.activityLevel === 'light' ? '1,375 (Leicht)' : (profile()?.activityLevel === 'very_active' ? '1,725 (Sehr aktiv)' : '1,2 (Sitzend)')) }}
+              </strong>
+            </div>
+
+            <div class="metabolism-detail-row">
+              <span class="detail-label">Geschätzter Erhaltungsbedarf:</span>
+              <strong class="detail-value">{{ formattedTdee() }} kcal</strong>
+            </div>
+
+            <div class="metabolism-detail-row highlight-row">
+              <span class="detail-label">Gewähltes tägliches Defizit:</span>
+              <strong class="detail-value text-green">{{ deficitDisplay() }} kcal</strong>
+            </div>
+
+            <div class="metabolism-detail-row target-row">
+              <span class="detail-label">Berechnetes Tagesziel:</span>
+              <strong class="detail-value text-large">{{ formattedTargetKcal() }} kcal</strong>
+            </div>
+          </section>
+
           <!-- Makronährstoffe -->
           <section class="macros-breakdown-card">
             <h2 class="details-section-title">Optimale Nährstoffverteilung</h2>
@@ -224,32 +234,16 @@
             </div>
           </section>
 
-          <!-- Stoffwechselanalyse -->
-          <section class="metabolism-analysis-card">
-            <h2 class="details-section-title">Stoffwechselanalyse</h2>
-
-            <div class="metabolism-detail-row">
-              <span>Ruheenergieverbrauch (BMR):</span>
-              <strong>{{ formattedBmr() }} kcal</strong>
-            </div>
-
-            <div class="metabolism-detail-row">
-              <span>Erhaltungsbedarf (TDEE):</span>
-              <strong>{{ formattedTdee() }} kcal</strong>
-            </div>
-
-            <div class="metabolism-detail-row">
-              <span>Wissenschaftliche Formel:</span>
-              <strong>Mifflin-St. Jeor</strong>
-            </div>
-          </section>
-
           <!-- Medizinischer Sicherheitshinweis -->
           <div class="medical-safety-callout">
-            <strong>Gesundheitshinweis</strong>
+            <div class="callout-header">
+              <span class="shield-icon" aria-hidden="true">🛡️</span>
+              <strong>Gesundheitshinweis & Leitlinien</strong>
+            </div>
             <p>
-              Diese Werte sind wissenschaftlich begründete Richtwerte für Erwachsene.
-              Bei Schwangerschaft, Stillzeit oder Vorerkrankungen sollte die Ernährung individuell mit ärztlichen Fachkräften abgestimmt werden.
+              Diese Werte sind wissenschaftlich begründete Richtwerte für gesunde Erwachsene.
+              Bei Schwangerschaft, Stillzeit, bekannten Essstörungen oder medizinischen Vorerkrankungen
+              sollte die Ernährung stets individuell mit ärztlichen Fachkräften abgestimmt werden.
             </p>
           </div>
         </div>
@@ -257,7 +251,7 @@
     }
   </main>
 
-  <!-- 3. Fester Weiter-Button (bleibt immer sichtbar) -->
+  <!-- 3. Fester Weiter-Button (bleibt immer sichtbar am unteren Bildschirmrand) -->
   <footer class="calculator-fixed-footer">
     <button
       type="button"

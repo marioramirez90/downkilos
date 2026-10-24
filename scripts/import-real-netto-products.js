@@ -139,29 +139,93 @@ const REAL_IMAGE_MAP = {
   }
 };
 
-function detectCategory(name, categoriesTags, defaultCategory) {
+function detectCategory(name, categoriesTags, defaultCategory, id) {
   const n = (name || '').toLowerCase();
   const c = (categoriesTags || []).join(' ').toLowerCase();
+  const itemId = (id || '').toLowerCase();
 
-  if (n.includes('milch') || n.includes('joghurt') || n.includes('quark') || n.includes('käse') || n.includes('skyr') || n.includes('butter') || n.includes('sahne') || n.includes('pudding') || c.includes('dairies')) {
-    return 'dairy';
-  }
-  if (n.includes('hähnchen') || n.includes('pute') || n.includes('fleisch') || n.includes('hack') || n.includes('lachs') || n.includes('thunfisch') || n.includes('schinken') || n.includes('wurst') || n.includes('salami') || n.includes('forelle') || c.includes('meats') || c.includes('fishes')) {
-    return 'meat_fish';
-  }
-  if (n.includes('brot') || n.includes('toast') || n.includes('hafer') || n.includes('flocken') || n.includes('nudeln') || n.includes('reis') || n.includes('müsli') || n.includes('spaghetti') || n.includes('penne') || n.includes('tortilla') || n.includes('wrap') || c.includes('cereals') || c.includes('pastas')) {
-    return 'grains';
-  }
-  if (n.includes('apfel') || n.includes('äpfel') || n.includes('banane') || n.includes('beeren') || n.includes('tomate') || n.includes('salat') || n.includes('möhre') || n.includes('karotte') || n.includes('gemüse') || n.includes('obst') || n.includes('erdbeere') || n.includes('himbeere') || n.includes('bohnen') || n.includes('erbsen') || n.includes('mais') || c.includes('fruits') || c.includes('vegetables')) {
-    return 'fruits_veg';
-  }
-  if (n.includes('drink') || n.includes('saft') || n.includes('wasser') || n.includes('tee') || n.includes('kaffee') || n.includes('espresso') || c.includes('beverages')) {
-    return 'beverages';
-  }
-  if (n.includes('pizza') || n.includes('lasagne') || n.includes('eintopf') || n.includes('fertiggericht')) {
+  // 1. Fertiggerichte
+  if (n.includes('pizza') || n.includes('lasagne') || n.includes('fertiggericht') || n.includes('eintopf') || n.includes('ravioli') || n.includes('gnocchi')) {
     return 'ready_meal';
   }
-  return defaultCategory || 'pantry';
+
+  // 2. Pflanzliche Drinks
+  if (n.includes('haferdrink') || n.includes('sojadrink') || n.includes('mandeldrink') || n.includes('reisdrink') || n.includes('pflanzen drink') || n.includes('pflanzendrink') || n.includes('kokos-reisdrink') || (n.includes('barista') && n.includes('drink'))) {
+    return 'plant_drinks';
+  }
+
+  // 3. Eier
+  if ((/\b(eier|hühnereier|bio-eier|frischeier|wieseneier)\b/.test(n) || n.includes('10 frische eier') || n.includes('eier aus') || itemId.includes('egg')) && !n.includes('schoko') && !n.includes('käse') && !n.includes('fleisch') && !n.includes('salat')) {
+    return 'eggs';
+  }
+
+  // 4. Fisch & Meeresfrüchte
+  if (n.includes('lachs') || n.includes('thunfisch') || n.includes('forelle') || n.includes('fisch') || n.includes('garnelen') || n.includes('kabeljau') || n.includes('hering') || n.includes('seelachs') || n.includes('scholle') || n.includes('matjes') || n.includes('krabben') || n.includes('fish') || c.includes('fishes')) {
+    return 'fish';
+  }
+
+  // 5. Fleisch & Wurst
+  if (((n.includes('salami') || n.includes('schinken') || n.includes('wurst') || n.includes('fleisch') || n.includes('hähnchen') || n.includes('haehnchen') || n.includes('pute') || n.includes('hack') || n.includes('bacon') || n.includes('speck') || n.includes('leberkäse') || n.includes('cevapcici') || n.includes('steak') || n.includes('filet') || n.includes('gyros') || n.includes('wiener')) && !n.includes('kartoffel') && !n.includes('salat') && !n.includes('suppe') && !n.includes('aufstrich')) || c.includes('meats')) {
+    return 'meat_sausage';
+  }
+
+  // 6. Snacks & Süßigkeiten
+  if (n.includes('schokolade') || n.includes('schoko') || n.includes('chips') || n.includes('erdnüss') || n.includes('erdnuss') || n.includes('cashew') || n.includes('walnuss') || n.includes('mandel') || n.includes('keks') || n.includes('waffel') || n.includes('riegel') || n.includes('gummibär') || n.includes('bonbon') || n.includes('cracker') || n.includes('popcorn') || n.includes('salzstange') || n.includes('drops') || n.includes('praline') || c.includes('snacks') || c.includes('sweets')) {
+    return 'snacks_sweets';
+  }
+
+  // 7. Brot & Backwaren
+  if (n.includes('toast') || n.includes('brot') || n.includes('baguette') || n.includes('brötchen') || n.includes('croissant') || n.includes('fladenbrot') || n.includes('knäckebrot') || n.includes('sandwich') || n.includes('wrap') || n.includes('tortilla')) {
+    if (!n.includes('aufstrich') && !n.includes('salat') && !n.includes('suppe')) {
+      return 'bakery';
+    }
+  }
+
+  // 8. Frühstück & Müsli
+  if (n.includes('haferflocken') || (n.includes('hafer') && n.includes('flocken')) || n.includes('müsli') || n.includes('crunchy') || n.includes('cornflakes') || n.includes('flakes') || n.includes('porridge') || n.includes('cerealien')) {
+    return 'breakfast_cereals';
+  }
+
+  // 9. Nudeln & Reis
+  if (n.includes('nudel') || n.includes('pasta') || n.includes('spaghetti') || n.includes('penne') || n.includes('fusilli') || n.includes('rigatoni') || n.includes('tortellini') || n.includes('tagliatelle') || n.includes('makkaroni') || (n.includes('reis') && !n.includes('sirup')) || n.includes('naturreis') || n.includes('basmati') || n.includes('parboiled') || c.includes('pastas')) {
+    if (!n.includes('sauce') && !n.includes('suppe') && !n.includes('salat') && !n.includes('waffel')) {
+      return 'pasta_rice';
+    }
+  }
+
+  // 10. Öle & Fette
+  if (/\b(öl|rapsöl|olivenöl|sonnenblumenöl|leinöl|kokosöl|pflanzenöl|butter|margarine)\b/.test(n) && !n.includes('sardinen') && !n.includes('pesto')) {
+    return 'oils_fats';
+  }
+
+  // 11. Milchprodukte
+  if (/\b(milch|joghurt|quark|speisequark|frischkäse|skyr|käse|gouda|edamer|emmentaler|mozzarella|parmesan|grana padano|sahne|schmand|creme fraiche|pudding)\b/.test(n) || c.includes('dairies')) {
+    if (!n.includes('schoko')) {
+      return 'dairy';
+    }
+  }
+
+  // 12. Getränke
+  if (/\b(wasser|mineralwasser|saft|direktsaft|orangensaft|apfelsaft|cola|limonade|eistee|tee|kaffee|espresso|getränk|smoothie|drink)\b/.test(n) || c.includes('beverages')) {
+    return 'beverages';
+  }
+
+  // 13. Konserven
+  if (/\b(kidney|bohnen|kichererbsen|erbsen|linsen|mais|gewürzgurken|kapern|oliven|apfelmus|passata|passiert|tomatenmark)\b/.test(n) || c.includes('canned-foods')) {
+    return 'canned';
+  }
+
+  // 14. Soßen & Dressings
+  if (/\b(sauce|nudelsauce|pesto|ketchup|senf|mayonnaise|dressing|essig|balsamico)\b/.test(n) || c.includes('sauces')) {
+    return 'sauces';
+  }
+
+  // 15. Obst & Gemüse
+  if (/\b(apfel|äpfel|banane|bananen|birne|beeren|erdbeeren|himbeeren|blaubeeren|trauben|orange|zitronen|tomate|tomaten|gurke|gurken|salat|romanasalat|möhre|möhren|karotte|karotten|brokkoli|blumenkohl|paprika|kartoffel|kartoffeln|speisekartoffeln|zwiebeln|knoblauch|champignons|pilze|spinat|zucchini)\b/.test(n) || c.includes('fruits') || c.includes('vegetables')) {
+    return 'fruits_veg';
+  }
+
+  return defaultCategory || 'other';
 }
 
 function parsePackageGrams(quantityStr) {
@@ -260,11 +324,13 @@ function loadAndEnrichBaseCatalog() {
   try {
     const rawItems = eval(match[1]);
     return rawItems.map(item => {
+      const cat = detectCategory(item.name, item.categories_tags || [], item.category, item.id);
+      let res = { ...item, category: cat };
       // Wenn für dieses Basis-Produkt ein echtes Netto-Foto gemappt ist, verwende es zwingend
       if (REAL_IMAGE_MAP[item.id]) {
         const m = REAL_IMAGE_MAP[item.id];
-        return {
-          ...item,
+        res = {
+          ...res,
           imageUrl: typeof m === 'string' ? m : m.imageUrl,
           brand: typeof m === 'object' && m.brand ? m.brand : item.brand,
           ean: typeof m === 'object' && m.ean ? m.ean : item.ean,
@@ -272,7 +338,7 @@ function loadAndEnrichBaseCatalog() {
           imageLicense: 'ODbL / CC-BY-SA 3.0'
         };
       }
-      return item;
+      return res;
     });
   } catch {
     return [];
@@ -348,7 +414,7 @@ async function runImport() {
     seenIds.add(id);
 
     const packageGrams = parsePackageGrams(p.quantity);
-    const category = detectCategory(name, p.categories_tags, defaultCategory);
+    const category = detectCategory(name, p.categories_tags, defaultCategory, id);
     const serving = determineServing(category, name, packageGrams);
     const price = estimatePrice(category, packageGrams, brandName.toLowerCase().includes('bio'));
 

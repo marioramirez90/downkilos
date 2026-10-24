@@ -13,6 +13,9 @@ import { NettoOfferImportAdapter } from './adapters/netto-offer-import.adapter';
 import { ManualPriceAdapter } from './adapters/manual-price.adapter';
 import { LicensedRetailDataAdapter, CommercialFeedPayload } from './adapters/licensed-retail-data.adapter';
 
+import { classifyProductCategory } from './product-classifier.util';
+import { ProductValidatorService, CatalogValidationReport } from './product-validator.service';
+
 const PRODUCTS_STORAGE_KEY = 'down_kilos_netto_products';
 const PRICE_HISTORY_STORAGE_KEY = 'down_kilos_price_history';
 const IMPORT_LOGS_STORAGE_KEY = 'down_kilos_import_logs';
@@ -27,6 +30,7 @@ export class ProductService {
   private offerAdapter = inject(NettoOfferImportAdapter);
   private manualAdapter = inject(ManualPriceAdapter);
   private licensedAdapter = inject(LicensedRetailDataAdapter);
+  private validator = inject(ProductValidatorService);
 
   readonly products = signal<ProductItem[]>([]);
   readonly priceHistory = signal<PriceHistoryEntry[]>([]);
@@ -84,14 +88,36 @@ export class ProductService {
 
     // 3. Sicherheitsbereinigung: Garantiere, dass KEIN Produkt einen lokalen Platzhalter ('images/products/...') behält
     catalog = catalog.map(p => {
+      let updated = p;
       if (p.imageUrl && p.imageUrl.startsWith('images/')) {
         const fallback = officialCatalogMap.get(p.id);
         if (fallback && fallback.imageUrl && !fallback.imageUrl.startsWith('images/')) {
           needsResave = true;
-          return { ...p, imageUrl: fallback.imageUrl };
+          updated = { ...updated, imageUrl: fallback.imageUrl };
         }
       }
-      return p;
+
+      // 4. Strikte Kategorie-Korrektur (Haferdrink -> plant_drinks, Nudeln -> pasta_rice, Salami -> meat_sausage etc.)
+      const accurateCat = classifyProductCategory(updated);
+      if (updated.category !== accurateCat) {
+        needsResave = true;
+        updated = { ...updated, category: accurateCat };
+      }
+
+      // 5. Preis-Plausibilisierung: Keine negativen oder Fantasie-Preise
+      if (updated.price !== null && updated.price !== undefined) {
+        if (isNaN(updated.price) || updated.price <= 0) {
+          needsResave = true;
+          updated = {
+            ...updated,
+            price: null,
+            priceStatus: 'unknown',
+            priceUnit: 'Preis nicht verfügbar'
+          };
+        }
+      }
+
+      return updated;
     });
 
     if (needsResave) {
@@ -151,6 +177,10 @@ export class ProductService {
 
   getAllProducts(): ProductItem[] {
     return this.products();
+  }
+
+  validateCatalog(): CatalogValidationReport {
+    return this.validator.validateCatalog(this.products());
   }
 
   getProductById(id: string): ProductItem | undefined {

@@ -11,7 +11,30 @@ export type PriceStatus =
 
 export type DataQualityStatus = 'verified' | 'partial' | 'pending';
 
-export type ProductCategory = 'fruits_veg' | 'meat_fish' | 'dairy' | 'grains' | 'pantry' | 'ready_meal' | 'beverages' | 'all';
+export type ProductCategory = 
+  | 'fruits_veg'          // Obst & Gemüse
+  | 'bakery'              // Brot & Backwaren
+  | 'dairy'               // Milchprodukte
+  | 'plant_drinks'        // Pflanzliche Drinks (Haferdrink, Sojadrink etc.)
+  | 'eggs'                // Eier
+  | 'meat_sausage'        // Fleisch & Wurst
+  | 'fish'                // Fisch
+  | 'pasta_rice'          // Nudeln & Reis
+  | 'canned'              // Konserven
+  | 'frozen'              // Tiefkühlprodukte
+  | 'beverages'           // Getränke
+  | 'snacks_sweets'       // Snacks & Süßigkeiten
+  | 'breakfast_cereals'   // Frühstück & Müsli
+  | 'sauces'              // Soßen & Dressings
+  | 'oils_fats'           // Öle & Fette
+  | 'ready_meal'          // Fertiggerichte
+  | 'other'               // Sonstiges
+  // Abwärtskompatible Aliase für bestehende Tests & Komponenten
+  | 'meat_fish'
+  | 'grains'
+  | 'pantry'
+  | 'snacks'
+  | 'all';
 
 export type ProductDataSource = 
   | 'open_prices' 

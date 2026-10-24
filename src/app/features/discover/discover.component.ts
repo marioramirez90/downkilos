@@ -11,6 +11,8 @@ import { ProductItem, CalorieFilterType, ProductSortType } from '../../core/mode
 import { MealType } from '../../core/models/recipe.model';
 import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-nav.component';
 
+import { getProductServingDetail } from '../../core/services/product-classifier.util';
+
 export interface CategoryCardItem {
   id: string;
   label: string;
@@ -38,7 +40,16 @@ export class DiscoverComponent implements OnInit {
 
   readonly Math = Math;
 
-  searchQuery = '';
+  // Reaktives Such-Signal mit Getter/Setter für Template- & Test-Kompatibilität
+  private readonly _searchQuery = signal<string>('');
+
+  get searchQuery(): string {
+    return this._searchQuery();
+  }
+  set searchQuery(value: string) {
+    this._searchQuery.set(value || '');
+  }
+
   activeCategoryFilter = signal<string>('all');
   activeCalorieFilter = signal<CalorieFilterType>('all');
   activeSortBy = signal<ProductSortType>('relevance');
@@ -62,19 +73,24 @@ export class DiscoverComponent implements OnInit {
   toastMessage = signal<string | null>(null);
 
   /**
-   * Horizontal scrollbare Kategorienreihe exakt wie im Referenzbild
+   * Horizontal scrollbare Kategorienreihe mit präzisen Lebensmittel-Kategorien
    */
   readonly categories: CategoryCardItem[] = [
     { id: 'all', label: 'Alle', icon: 'basket' },
     { id: 'fruits_veg', label: 'Obst & Gemüse', icon: 'apple' },
-    { id: 'grains', label: 'Brot & Getreide', icon: 'bread' },
+    { id: 'bakery', label: 'Brot & Backwaren', icon: 'bread' },
     { id: 'dairy', label: 'Milchprodukte', icon: 'milk' },
-    { id: 'pantry', label: 'Konserven', icon: 'can' },
-    { id: 'snacks', label: 'Snacks & Süßes', icon: 'candy' },
-    { id: 'meat_fish', label: 'Fleisch & Fisch', icon: 'meat' },
+    { id: 'plant_drinks', label: 'Pflanzliche Drinks', icon: 'drink' },
     { id: 'eggs', label: 'Eier', icon: 'egg' },
+    { id: 'meat_sausage', label: 'Fleisch & Wurst', icon: 'meat' },
+    { id: 'pasta_rice', label: 'Nudeln & Reis', icon: 'pasta' },
+    { id: 'canned', label: 'Konserven', icon: 'can' },
     { id: 'ready_meal', label: 'Fertiggerichte', icon: 'meal' },
     { id: 'beverages', label: 'Getränke', icon: 'beverage' },
+    { id: 'breakfast_cereals', label: 'Müsli & Flocken', icon: 'cereal' },
+    { id: 'snacks_sweets', label: 'Snacks & Süßes', icon: 'candy' },
+    { id: 'oils_fats', label: 'Öle & Fette', icon: 'oil' },
+    { id: 'sauces', label: 'Soßen & Dressings', icon: 'sauce' },
     { id: 'low_cal', label: 'Kalorienarm', icon: 'leaf' },
     { id: 'high_protein', label: 'Proteinreich', icon: 'fire' }
   ];
@@ -137,9 +153,17 @@ export class DiscoverComponent implements OnInit {
     return cat ? cat.label : 'Alle Produkte';
   }
 
+  onSearchInput(val: string): void {
+    this._searchQuery.set(val || '');
+  }
+
+  clearSearch(): void {
+    this._searchQuery.set('');
+  }
+
   resetFilters(): void {
     this.activeCategoryFilter.set('all');
-    this.searchQuery = '';
+    this._searchQuery.set('');
     this.activeCalorieFilter.set('all');
     this.filterByRemainingKcal.set(false);
   }
@@ -151,41 +175,81 @@ export class DiscoverComponent implements OnInit {
 
   readonly filteredProducts = computed(() => {
     let list = this.productService.products();
-    const query = this.searchQuery.trim().toLowerCase();
+    const rawQuery = this._searchQuery().trim();
     const cat = this.activeCategoryFilter();
     const calFilter = this.activeCalorieFilter();
 
-    // 1. Textsuche nach Name, Marke, Barcode oder Kategorie
-    if (query) {
-      list = list.filter(p =>
-        p.name.toLowerCase().includes(query) ||
-        p.brand?.toLowerCase().includes(query) ||
-        (p.ean && p.ean.includes(query)) ||
-        (p.category && p.category.toLowerCase().includes(query)) ||
-        (p.ingredientsText && p.ingredientsText.toLowerCase().includes(query))
-      );
+    // 1. Reaktive Textsuche nach Name, Marke, Barcode oder Zutaten
+    if (rawQuery) {
+      const terms = rawQuery.toLowerCase().split(/\s+/).filter(Boolean);
+      list = list.filter(p => {
+        const name = (p.name || '').toLowerCase();
+        const brand = (p.brand || '').toLowerCase();
+        const ean = (p.ean || '').toLowerCase();
+        const catName = (p.category || '').toLowerCase();
+        const ing = (p.ingredientsText || '').toLowerCase();
+
+        return terms.every(term =>
+          name.includes(term) ||
+          brand.includes(term) ||
+          ean.includes(term) ||
+          catName.includes(term) ||
+          ing.includes(term)
+        );
+      });
     }
 
-    // 2. Kategorie-Filter
-    if (cat === 'fruits_veg' || cat === 'meat_fish' || cat === 'dairy' || cat === 'grains' || cat === 'pantry' || cat === 'ready_meal' || cat === 'beverages') {
-      list = list.filter(p => p.category === cat);
+    // 2. Präziser Kategorie-Filter (verhindert falsche Zuordnungen)
+    if (cat === 'all') {
+      // kein Filter
+    } else if (cat === 'fruits_veg') {
+      list = list.filter(p => p.category === 'fruits_veg');
+    } else if (cat === 'bakery') {
+      list = list.filter(p => p.category === 'bakery' || p.category === 'grains');
+    } else if (cat === 'grains') {
+      // Abwärtskompatibilität für bestehende Tests
+      list = list.filter(p => p.category === 'grains' || p.category === 'bakery' || p.category === 'pasta_rice' || p.category === 'breakfast_cereals');
+    } else if (cat === 'dairy') {
+      list = list.filter(p => p.category === 'dairy');
+    } else if (cat === 'plant_drinks') {
+      list = list.filter(p => p.category === 'plant_drinks');
     } else if (cat === 'eggs') {
-      list = list.filter(p => p.pieceUnitName === 'Ei' || p.name.toLowerCase().includes('ei') || p.id.includes('egg'));
-    } else if (cat === 'snacks') {
-      list = list.filter(p => p.mealTags?.includes('snack') || p.category === 'grains' || p.category === 'pantry');
+      list = list.filter(p => p.category === 'eggs' || p.pieceUnitName === 'Ei' || p.id.includes('egg'));
+    } else if (cat === 'meat_sausage') {
+      list = list.filter(p => p.category === 'meat_sausage' || p.category === 'meat_fish');
+    } else if (cat === 'meat_fish') {
+      list = list.filter(p => p.category === 'meat_fish' || p.category === 'meat_sausage' || p.category === 'fish');
+    } else if (cat === 'pasta_rice') {
+      list = list.filter(p => p.category === 'pasta_rice');
+    } else if (cat === 'canned' || cat === 'pantry') {
+      list = list.filter(p => p.category === 'canned' || p.category === 'pantry' || p.category === 'sauces' || p.category === 'oils_fats');
+    } else if (cat === 'ready_meal') {
+      list = list.filter(p => p.category === 'ready_meal');
+    } else if (cat === 'beverages') {
+      list = list.filter(p => p.category === 'beverages' || p.category === 'plant_drinks');
+    } else if (cat === 'breakfast_cereals') {
+      list = list.filter(p => p.category === 'breakfast_cereals');
+    } else if (cat === 'snacks_sweets' || cat === 'snacks') {
+      list = list.filter(p => p.category === 'snacks_sweets' || (cat === 'snacks' && p.mealTags?.includes('snack')));
+    } else if (cat === 'oils_fats') {
+      list = list.filter(p => p.category === 'oils_fats');
+    } else if (cat === 'sauces') {
+      list = list.filter(p => p.category === 'sauces');
     } else if (cat === 'low_cal') {
-      list = list.filter(p => p.nutrition.caloriesPer100g < 40);
+      list = list.filter(p => p.nutrition.caloriesPer100g <= 40);
     } else if (cat === 'high_protein') {
       list = list.filter(p => p.nutrition.proteinPer100g >= 10);
     } else if (cat === 'budget') {
       list = list.filter(p => p.price !== null && p.price <= 1.50);
     } else if (cat === 'offers') {
       list = list.filter(p => p.priceStatus === 'confirmed_offer');
+    } else {
+      list = list.filter(p => p.category === cat);
     }
 
     // 3. Kalorienfilter
     if (calFilter === 'low_cal') {
-      list = list.filter(p => p.nutrition.caloriesPer100g < 40);
+      list = list.filter(p => p.nutrition.caloriesPer100g <= 40);
     }
 
     // 4. Sortierung
@@ -200,7 +264,7 @@ export class DiscoverComponent implements OnInit {
       list = [...list].sort((a, b) => b.nutrition.caloriesPer100g - a.nutrition.caloriesPer100g);
     } else if (sort === 'protein_desc') {
       list = [...list].sort((a, b) => b.nutrition.proteinPer100g - a.nutrition.proteinPer100g);
-    } else if (cat === 'all' && !query) {
+    } else if (cat === 'all' && !rawQuery) {
       // Natürliche Anordnung nach Referenzbild (Banane, Eier, Toast, Skyr, Kidney-Bohnen, Tomaten...)
       const preferredOrder = [
         'netto-bananas-1kg',
@@ -275,17 +339,8 @@ export class DiscoverComponent implements OnInit {
    * Beschriftung der Stück- bzw. Portionsspalte
    */
   getPieceUnitName(prod: ProductItem): string {
-    if (prod.pieceUnitName) {
-      return `1 ${prod.pieceUnitName}`;
-    }
-    const name = prod.name.toLowerCase();
-    if (name.includes('toast') || name.includes('brot')) return '1 Scheibe';
-    if (name.includes('ei')) return '1 Ei';
-    if (name.includes('banan')) return '1 Stück';
-    if (name.includes('skyr') || prod.packageSize.toLowerCase().includes('becher')) return '1 Becher';
-    if (name.includes('bohne') || name.includes('dose')) return '1 Portion';
-    if (name.includes('tomate')) return '1 Portion';
-    return '1 Portion';
+    const detail = getProductServingDetail(prod);
+    return detail.servingLabel;
   }
 
   isCupProduct(prod: ProductItem): boolean {
@@ -304,12 +359,13 @@ export class DiscoverComponent implements OnInit {
    * Kalorienwert der Stück- bzw. Portionsspalte
    */
   getPieceCaloriesDisplay(prod: ProductItem): string {
+    const detail = getProductServingDetail(prod);
+    if (detail.servingCalories !== null && detail.servingCalories > 0) {
+      return `${detail.servingCalories} kcal`;
+    }
     const pieceInfo = this.getPieceInfo(prod);
     if (pieceInfo && pieceInfo.calories > 0) {
       return `${pieceInfo.calories} kcal`;
-    }
-    if (prod.name.toLowerCase().includes('banan')) {
-      return '95 kcal';
     }
     if (prod.servingSizeGrams && prod.nutrition?.caloriesPer100g) {
       const yieldFactor = prod.edibleYieldPercent !== undefined && prod.edibleYieldPercent !== null

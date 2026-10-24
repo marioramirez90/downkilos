@@ -70,3 +70,34 @@ router-outlet + * {
 .safe-area-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
+
+/* Mobile Touch & Immediate Button Responsiveness (< 100ms) */
+button,
+a,
+input,
+select,
+textarea,
+[role="button"],
+.clickable-widget {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:not(:disabled),
+a[href],
+[role="button"]:not([aria-disabled="true"]) {
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+
+  &:active {
+    transform: scale(0.97);
+    transition: transform 0.05s ease;
+  }
+}
+
+button:disabled,
+[role="button"][aria-disabled="true"] {
+  cursor: not-allowed;
+  pointer-events: none;
+}

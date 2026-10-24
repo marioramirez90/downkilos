@@ -126,7 +126,7 @@ export class DashboardComponent implements OnInit {
   });
 
   readonly dashboardRingDashOffset = computed(() => {
-    const circumference = 552.92;
+    const circumference = 565.49;
     return Math.round(circumference * (1 - this.calorieRatio()));
   });
 

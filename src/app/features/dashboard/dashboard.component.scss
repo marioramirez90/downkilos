@@ -172,14 +172,14 @@
         .ring-bg-track {
           fill: none;
           stroke: #E2EBE3;
-          stroke-width: 24;
+          stroke-width: 18;
         }
 
         // 2. Heller, kräftig grüner Bogen
         .ring-arc-bright {
           fill: none;
           stroke: #39CD50;
-          stroke-width: 24;
+          stroke-width: 18;
           stroke-linecap: round;
         }
 
@@ -187,7 +187,7 @@
         .ring-arc-dark {
           fill: none;
           stroke: #005333;
-          stroke-width: 24;
+          stroke-width: 18;
           stroke-linecap: round;
         }
 
@@ -210,26 +210,27 @@
         justify-content: center;
         text-align: center;
         pointer-events: none;
-        transform: translateY(-2px);
+        padding: 8px;
 
         .ring-number {
-          font-size: 2.1rem;
+          font-size: clamp(1.45rem, 4.5vw, 1.85rem);
           font-weight: 900;
           color: #102521;
-          line-height: 1;
-          letter-spacing: -0.03em;
+          line-height: 1.05;
+          letter-spacing: -0.02em;
+          white-space: nowrap;
         }
 
         .ring-unit {
-          font-size: 0.95rem;
+          font-size: clamp(0.78rem, 2.5vw, 0.9rem);
           font-weight: 800;
           color: #102521;
           margin-top: 1px;
         }
 
         .ring-sub {
-          font-size: 0.76rem;
-          font-weight: 500;
+          font-size: clamp(0.68rem, 2.2vw, 0.76rem);
+          font-weight: 600;
           color: #66716D;
           margin-top: 2px;
         }

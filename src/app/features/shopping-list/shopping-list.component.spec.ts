@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { ShoppingListComponent } from './shopping-list.component';
@@ -29,11 +30,11 @@ describe('ShoppingListComponent', () => {
     localStorage.clear();
   });
 
-  it('should create the shopping list component', () => {
+  it('1. should create the shopping list component', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should render empty state for a new user with 0€ and 0 kcal (Section 14 & 18)', () => {
+  it('2. should render empty state for a new user with 0€ and 0 kcal (Section 14 & 18)', () => {
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('Deine Einkaufsliste ist noch leer.');
     expect(el.textContent).toContain('Entdecke Netto-Produkte und füge deine ersten Lebensmittel hinzu.');
@@ -41,7 +42,7 @@ describe('ShoppingListComponent', () => {
     expect(el.textContent).toContain('Gesamtkalorien: 0 kcal');
   });
 
-  it('should render items when items are in list', () => {
+  it('3. should render items when items are in list', () => {
     shoppingService.generateListFromPlan();
     fixture.detectChanges();
 
@@ -52,7 +53,7 @@ describe('ShoppingListComponent', () => {
     expect(el.textContent).toContain('Haferflocken');
   });
 
-  it('should render total sum in summary row when items are present', () => {
+  it('4. should render total sum in summary row when items are present', () => {
     shoppingService.generateListFromPlan();
     fixture.detectChanges();
 
@@ -61,7 +62,7 @@ describe('ShoppingListComponent', () => {
     expect(el.textContent).toMatch(/\d+[.,]\d{2}\s*€/);
   });
 
-  it('should filter items by category', () => {
+  it('5. should filter items by category', () => {
     shoppingService.generateListFromPlan();
     fixture.detectChanges();
 
@@ -72,7 +73,7 @@ describe('ShoppingListComponent', () => {
     expect(items.every(i => i.category === 'meat_fish')).toBe(true);
   });
 
-  it('should add custom item through modal', () => {
+  it('6. should add custom item through modal', () => {
     component.newItemName = 'Zitronen';
     component.newItemPrice = 1.29;
     component.addCustomItem();
@@ -83,7 +84,7 @@ describe('ShoppingListComponent', () => {
     expect(component.shoppingService.summary().totalCost).toBe(1.29);
   });
 
-  it('should toggle item checked status', () => {
+  it('7. should toggle item checked status', () => {
     shoppingService.generateListFromPlan();
     fixture.detectChanges();
 
@@ -97,7 +98,7 @@ describe('ShoppingListComponent', () => {
     expect(updated.isChecked).toBe(!initialStatus);
   });
 
-  it('should increase item quantity and update total price & calories', () => {
+  it('8. should increase item quantity and update total price & calories', () => {
     shoppingService.generateListFromPlan();
     fixture.detectChanges();
 
@@ -113,7 +114,7 @@ describe('ShoppingListComponent', () => {
     expect(component.shoppingService.summary().totalCost).toBeGreaterThanOrEqual(initialCost);
   });
 
-  it('should remove item when clicking delete', () => {
+  it('9. should remove item when clicking delete', () => {
     shoppingService.generateListFromPlan();
     fixture.detectChanges();
 
@@ -125,5 +126,77 @@ describe('ShoppingListComponent', () => {
 
     expect(component.displayedItems().length).toBe(initialLength - 1);
     expect(component.displayedItems().some(i => i.id === first.id)).toBe(false);
+  });
+
+  it('10. should render sample items matching reference image (Toastbrot, Eier, Bananen)', () => {
+    component.loadSample();
+    fixture.detectChanges();
+
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.textContent).toContain('Toastbrot Vollkorn');
+    expect(el.textContent).toContain('Eier');
+    expect(el.textContent).toContain('Bananen');
+
+    // Prices and base prices
+    expect(el.textContent).toContain('1,79 €');
+    expect(el.textContent).toContain('(0,36 €/100 g)');
+    expect(el.textContent).toContain('2,99 €');
+    expect(el.textContent).toContain('(0,30 €/Stück)');
+    expect(el.textContent).toContain('1,69 €');
+    expect(el.textContent).toContain('(0,17 €/100 g)');
+
+    // Calorie breakdown columns
+    expect(el.textContent).toContain('246 kcal');
+    expect(el.textContent).toContain('82 kcal');
+    expect(el.textContent).toContain('1.230 kcal');
+
+    expect(el.textContent).toContain('143 kcal');
+    expect(el.textContent).toContain('78 kcal');
+    expect(el.textContent).toContain('780 kcal');
+
+    expect(el.textContent).toContain('89 kcal');
+    expect(el.textContent).toContain('95 kcal');
+    expect(el.textContent).toContain('890 kcal');
+
+    // Summary Card (2x2)
+    expect(el.textContent).toContain('3 Artikel');
+    expect(el.textContent).toContain('in deiner Liste');
+    expect(el.textContent).toContain('6,47 €');
+    expect(el.textContent).toContain('100 g pro Artikel');
+    expect(el.textContent).toContain('478 kcal');
+    expect(el.textContent).toContain('2.900 kcal');
+  });
+
+  it('11. should not delete item when clicking minus at quantity 1', () => {
+    component.loadSample();
+    fixture.detectChanges();
+
+    const toast = component.displayedItems().find(i => i.name === 'Toastbrot Vollkorn')!;
+    expect(toast.packageCount).toBe(1);
+
+    component.updateCount(toast.id, -1);
+    fixture.detectChanges();
+
+    expect(component.displayedItems().some(i => i.id === toast.id)).toBe(true);
+    expect(component.displayedItems().find(i => i.id === toast.id)!.packageCount).toBe(1);
+  });
+
+  it('12. should double price and total calories when quantity increases from 1 to 2', () => {
+    component.loadSample();
+    fixture.detectChanges();
+
+    const toast = component.displayedItems().find(i => i.name === 'Toastbrot Vollkorn')!;
+    component.updateCount(toast.id, 1);
+    fixture.detectChanges();
+
+    const updatedToast = component.displayedItems().find(i => i.id === toast.id)!;
+    expect(updatedToast.packageCount).toBe(2);
+    expect(updatedToast.totalCost).toBe(3.58);
+    expect(updatedToast.totalCalories).toBe(2460);
+
+    // Summary updates immediately
+    const summary = component.summary();
+    expect(summary.totalCost).toBe(8.26); // 3.58 + 2.99 + 1.69 = 8.26
+    expect(summary.totalCalories).toBe(4130); // 2460 + 780 + 890 = 4130
   });
 });

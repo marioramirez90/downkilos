@@ -1,110 +1,176 @@
 <div class="shopping-screen">
-  <!-- 1. Header (Oben) -->
+  <!-- 1. Header mit rundem Zurück-Button & zentriertem Titel -->
   <header class="shopping-header">
-    <div class="header-main-row">
+    <div class="header-inner">
       <button
         type="button"
         (click)="goBack()"
-        class="back-arrow-btn"
+        class="back-btn-circle"
         aria-label="Zurück zum Dashboard"
         title="Zurück zum Dashboard"
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M15 18l-6-6 6-6" />
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
         </svg>
       </button>
 
-      <h1 class="screen-title">Meine Einkaufsliste</h1>
+      <div class="header-titles">
+        <h1 class="screen-title">Meine Einkaufsliste</h1>
+        <p class="screen-subtitle">
+          {{ displayedItems().length }} {{ displayedItems().length === 1 ? 'Artikel' : 'Artikel' }} in deiner Liste
+        </p>
+      </div>
 
-      <button
-        type="button"
-        (click)="openAddModal()"
-        class="header-add-btn"
-        title="Artikel hinzufügen"
-      >
-        + Artikel
-      </button>
+      <!-- Unsichtbarer Ausgleichs-Spacer für exakte Zentrierung -->
+      <div class="header-spacer" aria-hidden="true"></div>
     </div>
   </header>
 
-  <!-- 2. Scrollbare Produktliste (Sofort unter der Überschrift, Section 15) -->
+  <!-- 2. Scrollbarer Inhaltsbereich -->
   <main class="shopping-scroll-area">
-    <div class="items-list">
+    <div class="shopping-cards-container">
       @for (item of displayedItems(); track item.id) {
-        <div class="shopping-item-row" [class.is-checked]="item.isChecked">
-          <!-- Checkbox "Gekauft" -->
-          <label class="item-checkbox-container" [title]="item.isChecked ? 'Als noch nicht gekauft markieren' : 'Als gekauft abhaken'">
-            <input
-              type="checkbox"
-              [checked]="item.isChecked"
-              (change)="toggleChecked(item.id)"
-              class="hidden-native-checkbox"
-            />
-            <span class="custom-checkbox-visual">
-              @if (item.isChecked) {
-                <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12"></polyline>
+        <article class="product-card">
+          <!-- Oberer Kartenbereich: Bild, Name, Packungsgröße, Mengensteuerung & Preis -->
+          <div class="card-top-row">
+            <!-- Produktbild -->
+            <div class="product-img-wrapper">
+              <img [src]="item.imageUrl" [alt]="item.name" loading="lazy" />
+            </div>
+
+            <!-- Produktdaten & Aktionen -->
+            <div class="product-info-col">
+              <!-- Titel & Papierkorb-Icon -->
+              <div class="title-trash-row">
+                <h2 class="product-title">{{ item.name }}</h2>
+                <button
+                  type="button"
+                  (click)="removeItem(item.id)"
+                  class="trash-btn"
+                  title="Artikel aus Liste entfernen"
+                  aria-label="Artikel entfernen"
+                >
+                  <svg class="trash-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Packungsgröße -->
+              <p class="package-size-label">{{ item.packageSize }}</p>
+
+              <!-- Mengensteuerung & Preis-Zeile -->
+              <div class="stepper-price-row">
+                <!-- Hellgrüner Mengen-Pill-Stepper [-] 1 [+] -->
+                <div class="stepper-pill">
+                  <button
+                    type="button"
+                    (click)="updateCount(item.id, -1)"
+                    class="stepper-btn minus"
+                    [class.disabled]="item.packageCount <= 1"
+                    [disabled]="item.packageCount <= 1"
+                    aria-label="Packungsmenge verringern"
+                    title="Menge verringern"
+                  >
+                    –
+                  </button>
+                  <span class="stepper-count">{{ item.packageCount }}</span>
+                  <button
+                    type="button"
+                    (click)="updateCount(item.id, 1)"
+                    class="stepper-btn plus"
+                    aria-label="Packungsmenge erhöhen"
+                    title="Menge erhöhen"
+                  >
+                    +
+                  </button>
+                </div>
+
+                <!-- Preis und Grundpreis -->
+                <div class="price-container">
+                  <strong class="item-main-price">
+                    {{ item.totalCost !== null && item.totalCost !== undefined ? priceService.formatPrice(item.totalCost) : '–' }}
+                  </strong>
+                  @if (getBasePriceText(item); as basePrice) {
+                    <span class="item-base-price">{{ basePrice }}</span>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Unterer Kartenbereich: 3 gleichmäßige Informationsspalten -->
+          <div class="nutrition-breakdown-row">
+            <!-- Spalte 1: Kalorien pro 100 g mit grünem Flammen-Icon -->
+            <div class="nutrition-col">
+              <div class="col-top-label">
+                <svg class="col-icon flame-icon" viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3.5z" />
                 </svg>
-              }
-            </span>
-          </label>
-
-          <!-- Kleines Produktbild -->
-          <div class="item-image-wrapper">
-            <img [src]="item.imageUrl" [alt]="item.name" loading="lazy" />
-          </div>
-
-          <!-- Mittlere Spalte: Name, Packungsgröße, Kalorien -->
-          <div class="item-details-col">
-            <span class="item-name" [class.strikethrough]="item.isChecked">{{ item.name }}</span>
-            <div class="item-sub-info">
-              <span class="item-package-size">{{ item.packageSize }}</span>
-              @if (item.totalCalories !== null && item.totalCalories !== undefined) {
-                <span class="item-calories-badge">🔥 {{ item.totalCalories }} kcal</span>
-              }
-            </div>
-          </div>
-
-          <!-- Rechte Spalte: Preis, Mengenwähler [-] [+] und Entfernen -->
-          <div class="item-actions-col">
-            <strong class="item-price">
-              {{ item.totalCost !== null && item.totalCost !== undefined ? priceService.formatPrice(item.totalCost) : '–' }}
-            </strong>
-
-            <div class="quantity-stepper">
-              <button
-                type="button"
-                (click)="updateCount(item.id, -1)"
-                class="stepper-btn"
-                [disabled]="item.packageCount <= 1"
-                aria-label="Menge verringern"
-              >
-                –
-              </button>
-              <span class="quantity-number">{{ item.packageCount }}</span>
-              <button
-                type="button"
-                (click)="updateCount(item.id, 1)"
-                class="stepper-btn"
-                aria-label="Menge erhöhen"
-              >
-                +
-              </button>
+                <span>100 g</span>
+              </div>
+              <strong class="col-main-val">
+                {{ item.caloriesPer100g !== null && item.caloriesPer100g !== undefined ? item.caloriesPer100g + ' kcal' : '–' }}
+              </strong>
             </div>
 
-            <button
-              type="button"
-              (click)="removeItem(item.id)"
-              class="item-delete-btn"
-              title="Artikel entfernen"
-              aria-label="Artikel entfernen"
-            >
-              ✕
-            </button>
+            <div class="col-divider"></div>
+
+            <!-- Spalte 2: Kalorien pro Stück (Scheibe, Ei, Banane) mit spezifischem Icon -->
+            <div class="nutrition-col">
+              <div class="col-top-label">
+                @if (item.name.toLowerCase().includes('toast') || item.pieceUnitName === 'Scheibe') {
+                  <!-- Toast Scheibe Icon -->
+                  <svg class="col-icon" viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 11V7a4 4 0 0 1 8-2 4 4 0 0 1 8 2v4a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3z"/>
+                    <path d="M4 11v6a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-6"/>
+                  </svg>
+                } @else if (item.name.toLowerCase().includes('ei') || item.pieceUnitName === 'Ei') {
+                  <!-- Ei Icon -->
+                  <svg class="col-icon" viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2">
+                    <path d="M12 2C8 2 5 7 5 13a7 7 0 0 0 14 0c0-6-3-11-7-11z" />
+                  </svg>
+                } @else if (item.name.toLowerCase().includes('banan') || item.pieceUnitName === 'Banane') {
+                  <!-- Banane Icon -->
+                  <svg class="col-icon" viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round">
+                    <path d="M4 13c3 5 8 7 14 6 1 0 2-.5 3-1.5s.5-2.5 0-3c-4-4-9-5-14-3" />
+                    <path d="M4 13c-1-1-1.5-2-1.5-3" />
+                  </svg>
+                } @else {
+                  <!-- Generisches Stück-Icon -->
+                  <svg class="col-icon" viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="9"/>
+                    <path d="M12 8v8M8 12h8"/>
+                  </svg>
+                }
+                <span>{{ getPieceUnitLabel(item) }}</span>
+              </div>
+              <strong class="col-main-val">
+                {{ getPieceCalories(item) !== null && getPieceCalories(item) !== undefined ? getPieceCalories(item) + ' kcal' : '–' }}
+              </strong>
+            </div>
+
+            <div class="col-divider"></div>
+
+            <!-- Spalte 3: Kalorien Packung / Gesamt mit grünem 3D-Paket-Icon -->
+            <div class="nutrition-col">
+              <div class="col-top-label">
+                <svg class="col-icon box-icon" viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                  <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                  <line x1="12" y1="22.08" x2="12" y2="12" />
+                </svg>
+                <span>{{ getPackageUnitLabel(item) }}</span>
+              </div>
+              <strong class="col-main-val">
+                {{ formatCalories(getPackageCalories(item)) }} kcal
+              </strong>
+            </div>
           </div>
-        </div>
+        </article>
       } @empty {
-        <!-- Leere Liste State (Section 14) -->
+        <!-- Leere Liste State (wenn noch keine Produkte vorhanden sind) -->
         <div class="empty-list-card">
           <div class="empty-icon-circle" aria-hidden="true">🛒</div>
           <h2 class="empty-title">Deine Einkaufsliste ist noch leer.</h2>
@@ -112,6 +178,9 @@
             Entdecke Netto-Produkte und füge deine ersten Lebensmittel hinzu.
           </p>
           <div class="empty-actions-row">
+            <button type="button" (click)="loadSample()" class="empty-sample-btn">
+              ✨ Beispiel-Einkaufsliste laden
+            </button>
             <button type="button" (click)="openAddModal()" class="empty-add-btn">
               + Artikel hinzufügen
             </button>
@@ -121,47 +190,93 @@
           </div>
         </div>
       }
+
+      <!-- 3. Hellgrüne Gesamtsummenkarte (2x2 Grid wie im Referenzbild) -->
+      <section class="summary-card" aria-label="Gesamtsummen">
+        <div class="summary-grid-row">
+          <!-- Oben links: Einkaufswagen-Icon + X Artikel in deiner Liste -->
+          <div class="summary-cell">
+            <div class="summary-cell-icon-wrap">
+              <svg class="summary-green-icon" viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1" />
+                <circle cx="20" cy="21" r="1" />
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+              </svg>
+            </div>
+            <div class="summary-cell-text">
+              <strong class="summary-strong-title">
+                {{ summary().totalItems }} Artikel
+              </strong>
+              <span class="summary-sub-caption">in deiner Liste</span>
+            </div>
+          </div>
+
+          <div class="summary-vertical-divider"></div>
+
+          <!-- Oben rechts: Münzstapel-Icon + Gesamtpreis X,XX € -->
+          <div class="summary-cell">
+            <div class="summary-cell-icon-wrap">
+              <svg class="summary-green-icon" viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <ellipse cx="12" cy="5" rx="9" ry="3" />
+                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+                <path d="M21 8.5c0 1.66-4 3-9 3s-9-1.34-9-3" />
+              </svg>
+            </div>
+            <div class="summary-cell-text">
+              <span class="summary-sub-caption">Gesamtpreis<span class="sr-only"> (Einkaufskosten)</span></span>
+              <strong class="summary-strong-title price-highlight">
+                Gesamtpreis: {{ priceService.formatPrice(summary().totalCost) }}
+              </strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-horizontal-divider"></div>
+
+        <div class="summary-grid-row">
+          <!-- Unten links: Flammen-Icon + 100 g pro Artikel XXX kcal -->
+          <div class="summary-cell">
+            <div class="summary-cell-icon-wrap">
+              <svg class="summary-green-icon" viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3.5z" />
+              </svg>
+            </div>
+            <div class="summary-cell-text">
+              <span class="summary-sub-caption">100 g pro Artikel</span>
+              <strong class="summary-strong-title">
+                {{ formatCalories(sumCaloriesPer100g()) }} kcal
+              </strong>
+            </div>
+          </div>
+
+          <div class="summary-vertical-divider"></div>
+
+          <!-- Unten rechts: Flammen-Icon + Gesamtkalorien X.XXX kcal -->
+          <div class="summary-cell">
+            <div class="summary-cell-icon-wrap">
+              <svg class="summary-green-icon" viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3.5z" />
+              </svg>
+            </div>
+            <div class="summary-cell-text">
+              <span class="summary-sub-caption">Gesamtkalorien</span>
+              <strong class="summary-strong-title calories-highlight">
+                Gesamtkalorien: {{ formatCalories(summary().totalCalories || 0) }} kcal
+              </strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Subtiler Button zum schnellen Hinzufügen weiterer Artikel am Listenende -->
+      <div class="bottom-action-banner">
+        <button type="button" (click)="openAddModal()" class="bottom-add-btn">
+          + Weiteren Artikel zur Liste hinzufügen
+        </button>
+      </div>
     </div>
   </main>
-
-  <!-- 3. Feste Zusammenfassung (Unten, oberhalb der Bottom-Nav, Section 15) -->
-  <aside class="fixed-bottom-summary">
-    <div class="summary-content-bar">
-      <!-- Gesamtpreis (Einkaufskosten) -->
-      <div class="summary-metric-item">
-        <span class="metric-caption">Einkaufskosten</span>
-        <strong class="metric-value">
-          Gesamtpreis: {{ priceService.formatPrice(shoppingService.summary().totalCost) }}
-          @if (shoppingService.summary().hasMissingPrices) {
-            <span class="asterisk-hint" title="Preise für einzelne Artikel fehlen">*</span>
-          }
-        </strong>
-      </div>
-
-      <div class="summary-vertical-line"></div>
-
-      <!-- Gesamtkalorien -->
-      <div class="summary-metric-item">
-        <span class="metric-caption">Packungsinhalt</span>
-        <strong class="metric-value">
-          Gesamtkalorien: {{ (shoppingService.summary().totalCalories || 0) | number:'1.0-0' }} kcal
-          @if (shoppingService.summary().hasMissingCalories) {
-            <span class="asterisk-hint" title="Nährwerte für einzelne Artikel fehlen">*</span>
-          }
-        </strong>
-      </div>
-    </div>
-
-    <!-- Statuszeile: X von Y abgehakt -->
-    <div class="summary-progress-row">
-      <span class="progress-checked-text">
-        {{ shoppingService.summary().checkedItems }} von {{ shoppingService.summary().totalItems }} Artikeln im Korb
-      </span>
-      @if (shoppingService.summary().hasMissingPrices || shoppingService.summary().hasMissingCalories) {
-        <span class="incomplete-notice">* Teilsumme unvollständig</span>
-      }
-    </div>
-  </aside>
 
   <!-- 4. Feste untere Navigation -->
   <footer class="shopping-footer-nav">

@@ -151,13 +151,13 @@ export class ShoppingListService {
     const planProductIds: Array<{ id: string; neededAmount: number; unit: string; defaultPackageCount?: number }> = [
       { id: 'netto-toast-500', neededAmount: 500, unit: 'g' },
       { id: 'netto-eggs-10stk', neededAmount: 10, unit: 'Stück' },
-      { id: 'netto-kidney-beans-400', neededAmount: 400, unit: 'g' },
+      { id: 'netto-bananas-1kg', neededAmount: 1, unit: 'kg' },
       { id: 'netto-chicken-400', neededAmount: 400, unit: 'g' },
       { id: 'netto-brown-rice-500', neededAmount: 500, unit: 'g' },
       { id: 'netto-broccoli-1stk', neededAmount: 1, unit: 'Stück' },
       { id: 'netto-oats-500', neededAmount: 500, unit: 'g' },
       { id: 'netto-skyr-500', neededAmount: 500, unit: 'g' },
-      { id: 'netto-bananas-1kg', neededAmount: 1, unit: 'kg' }
+      { id: 'netto-kidney-beans-400', neededAmount: 400, unit: 'g' }
     ];
 
     const baseItems: ShoppingListItem[] = planProductIds.map(def => {
@@ -182,6 +182,7 @@ export class ShoppingListService {
         neededUnit: def.unit,
         packageSize: prod?.packageSize || `${def.neededAmount} ${def.unit}`,
         packageWeightGrams: prod?.packageWeightGrams || 500,
+        piecesPerPackage: prod?.piecesPerPackage,
         packageCount,
         packagePrice: price,
         portionCost: itemTotals.totalCostEuro,
@@ -202,6 +203,84 @@ export class ShoppingListService {
 
     const combined = [...baseItems, ...customItems];
     this.items.set(combined);
+  }
+
+  loadSampleList(): void {
+    const list: ShoppingListItem[] = [
+      {
+        id: 'item-netto-toast-500',
+        productId: 'netto-toast-500',
+        ean: '4311501789012',
+        name: 'Toastbrot Vollkorn',
+        brand: 'Grafschafter',
+        category: 'grains',
+        imageUrl: 'images/products/toast.jpg',
+        neededAmount: 500,
+        neededUnit: 'g',
+        packageSize: '500 g Packung',
+        packageWeightGrams: 500,
+        piecesPerPackage: 15,
+        packageCount: 1,
+        packagePrice: 1.79,
+        portionCost: 1.79,
+        totalCost: 1.79,
+        packageCalories: 1230,
+        totalCalories: 1230,
+        caloriesPer100g: 246,
+        caloriesPerPiece: 82,
+        pieceUnitName: 'Scheibe',
+        isChecked: false
+      },
+      {
+        id: 'item-netto-eggs-10stk',
+        productId: 'netto-eggs-10stk',
+        ean: '4311501438204',
+        name: 'Eier',
+        brand: 'Gut Ponholz',
+        category: 'dairy',
+        imageUrl: 'images/products/eggs.jpg',
+        neededAmount: 10,
+        neededUnit: 'Stück',
+        packageSize: '10er Packung',
+        packageWeightGrams: 530,
+        piecesPerPackage: 10,
+        packageCount: 1,
+        packagePrice: 2.99,
+        portionCost: 2.99,
+        totalCost: 2.99,
+        packageCalories: 780,
+        totalCalories: 780,
+        caloriesPer100g: 143,
+        caloriesPerPiece: 78,
+        pieceUnitName: 'Ei',
+        isChecked: false
+      },
+      {
+        id: 'item-netto-bananas-1kg',
+        productId: 'netto-bananas-1kg',
+        ean: '4311501901128',
+        name: 'Bananen',
+        brand: 'BioBio',
+        category: 'fruits_veg',
+        imageUrl: 'images/products/bananas.jpg',
+        neededAmount: 1,
+        neededUnit: 'kg',
+        packageSize: '1 kg',
+        packageWeightGrams: 1000,
+        packageCount: 1,
+        packagePrice: 1.69,
+        portionCost: 1.69,
+        totalCost: 1.69,
+        packageCalories: 890,
+        totalCalories: 890,
+        caloriesPer100g: 89,
+        caloriesPerPiece: 95,
+        pieceUnitName: 'Banane',
+        isChecked: false
+      }
+    ];
+    this.items.set(list);
+    this.saveItems(list);
   }
 
   /**

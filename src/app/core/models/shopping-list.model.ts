@@ -12,6 +12,7 @@ export interface ShoppingListItem {
   neededUnit: string;
   packageSize: string;      // Ganze Packungsgröße (z.B. 500 g)
   packageWeightGrams?: number;
+  piecesPerPackage?: number;
   packageCount: number;     // Tatsächlich zu kaufende ganze Packungen (z.B. 1 statt 3)
   packagePrice: number | null; // Preis je voller Packung bei Netto
   portionCost: number | null;  // Anteilige Kosten der tatsächlich verbrauchten Menge

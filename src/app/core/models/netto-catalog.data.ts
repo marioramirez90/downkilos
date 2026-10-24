@@ -9,7 +9,7 @@ export const NETTO_PRODUCT_CATALOG: ProductItem[] = [
   {
     id: 'netto-toast-500',
     ean: '4311501789012',
-    name: 'Butter Toastbrot extra saftig',
+    name: 'Toastbrot Vollkorn',
     brand: 'Grafschafter',
     category: 'grains',
     imageUrl: 'images/products/toast.jpg',
@@ -17,16 +17,16 @@ export const NETTO_PRODUCT_CATALOG: ProductItem[] = [
     imageLicense: 'ODbL / CC-BY-SA 3.0',
     retailer: 'netto_marken_discount',
     retailerScope: 'Netto Marken-Discount (rot-gelb, ohne Hund)',
-    packageSize: '500 g Packung (20 Scheiben)',
+    packageSize: '500 g Packung',
     packageWeightGrams: 500,
-    piecesPerPackage: 20,
-    pieceWeightGrams: 25,
+    piecesPerPackage: 15,
+    pieceWeightGrams: 33.3,
     pieceUnitName: 'Scheibe',
-    servingSizeGrams: 50, // 2 Scheiben
-    servingUnit: '2 Scheiben (50 g)',
+    servingSizeGrams: 33.3, // 1 Scheibe
+    servingUnit: '1 Scheibe (33 g)',
     edibleYieldPercent: 1.0,
-    price: 1.49,
-    priceUnit: '€ (2,98 € / kg)',
+    price: 1.79,
+    priceUnit: '€ (0,36 €/100 g)',
     priceStatus: 'confirmed_offer',
     dataSource: 'netto_official_offer',
     priceSource: 'Netto Prospekt Wochenkracher',
@@ -36,15 +36,15 @@ export const NETTO_PRODUCT_CATALOG: ProductItem[] = [
     regionBranch: 'Bundesweit',
     dataQualityStatus: 'verified',
     allergens: ['Weizen / Gluten'],
-    ingredientsText: 'Weizenmehl, Wasser, Butter (3,5%), Hefe, Salz, Rapsöl',
+    ingredientsText: 'Weizenvollkornmehl, Wasser, Hefe, Salz, Rapsöl',
     isBudgetFriendly: true,
     mealTags: ['breakfast', 'snack', 'pantry_staple'],
     nutrition: {
-      caloriesPer100g: 250,
+      caloriesPer100g: 246,
       proteinPer100g: 8.5,
       carbsPer100g: 48.0,
       fatPer100g: 2.2,
-      fiberPer100g: 3.0
+      fiberPer100g: 5.0
     }
   },
   {
@@ -199,7 +199,7 @@ export const NETTO_PRODUCT_CATALOG: ProductItem[] = [
   {
     id: 'netto-bananas-1kg',
     ean: '4311501901128',
-    name: 'Bio Bananen Fairtrade',
+    name: 'Bananen',
     brand: 'BioBio',
     category: 'fruits_veg',
     imageUrl: 'images/products/bananas.jpg',
@@ -209,11 +209,13 @@ export const NETTO_PRODUCT_CATALOG: ProductItem[] = [
     retailerScope: 'Netto Marken-Discount (rot-gelb, ohne Hund)',
     packageSize: '1 kg',
     packageWeightGrams: 1000,
-    servingSizeGrams: 120, // 1 mittelgroße Banane essbarer Anteil (ca. 175g brutto)
-    servingUnit: '1 Banane (ca. 120g essbar)',
+    pieceUnitName: 'Banane',
+    pieceWeightGrams: 157,
+    servingSizeGrams: 107, // 1 Banane (ca. 95 kcal)
+    servingUnit: '1 Banane (ca. 107g essbar)',
     edibleYieldPercent: 0.68, // 68% essbarer Anteil (32% Bananenschale)
     price: 1.69,
-    priceUnit: '€ / kg',
+    priceUnit: '€ (0,17 €/100 g)',
     priceStatus: 'confirmed_offer',
     dataSource: 'netto_official_offer',
     priceSource: 'Netto Online Prospekt',
@@ -313,7 +315,7 @@ export const NETTO_PRODUCT_CATALOG: ProductItem[] = [
   {
     id: 'netto-eggs-10stk',
     ean: '4311501438204',
-    name: 'Frische Eier aus Bodenhaltung Klasse M',
+    name: 'Eier',
     brand: 'Gut Ponholz',
     category: 'dairy',
     imageUrl: 'images/products/eggs.jpg',
@@ -321,16 +323,16 @@ export const NETTO_PRODUCT_CATALOG: ProductItem[] = [
     imageLicense: 'ODbL / CC-BY-SA 3.0',
     retailer: 'netto_marken_discount',
     retailerScope: 'Netto Marken-Discount (rot-gelb, ohne Hund)',
-    packageSize: '10 Stück (Klasse M)',
+    packageSize: '10er Packung',
     packageWeightGrams: 530,
     piecesPerPackage: 10,
     pieceWeightGrams: 53,
     pieceUnitName: 'Ei',
-    servingSizeGrams: 106, // 2 Eier (ca. 106g essbar, 14g Schale)
-    servingUnit: '2 Eier (Klasse M)',
-    edibleYieldPercent: 0.88,
-    price: 1.99,
-    priceUnit: '€ (0,20 € / Stk.)',
+    servingSizeGrams: 53, // 1 Ei (ca. 78 kcal)
+    servingUnit: '1 Ei (Klasse M)',
+    edibleYieldPercent: 1.0, // Direkt 100% essbar bei Portionskalorienrechnung (78 kcal)
+    price: 2.99,
+    priceUnit: '€ (0,30 €/Stück)',
     priceStatus: 'last_observed',
     dataSource: 'open_prices',
     priceSource: 'Open Prices Erfassung',

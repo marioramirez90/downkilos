@@ -1,15 +1,24 @@
 const fs = require('fs');
 const path = require('path');
 
-// Die echten Eigenmarken von Netto Marken-Discount
+// Umfassende Liste ALLER Eigenmarken von Netto Marken-Discount
 const NETTO_BRANDS = [
-  { tag: 'biobio', brandName: 'BioBio', defaultCategory: 'pantry' },
-  { tag: 'gut-ponholz', brandName: 'Gut Ponholz', defaultCategory: 'meat_fish' },
-  { tag: 'gutes-land', brandName: 'Gutes Land', defaultCategory: 'dairy' },
-  { tag: 'beste-ernte', brandName: 'Beste Ernte', defaultCategory: 'fruits_veg' },
-  { tag: 'grafschafter', brandName: 'Grafschafter', defaultCategory: 'grains' },
-  { tag: 'vehappy', brandName: 'vehappy', defaultCategory: 'pantry' },
-  { tag: 'markttag', brandName: 'Markttag', defaultCategory: 'fruits_veg' }
+  { tag: 'biobio', brandName: 'BioBio', defaultCategory: 'pantry', maxPages: 3 },
+  { tag: 'gut-ponholz', brandName: 'Gut Ponholz', defaultCategory: 'meat_fish', maxPages: 2 },
+  { tag: 'gutes-land', brandName: 'Gutes Land', defaultCategory: 'dairy', maxPages: 3 },
+  { tag: 'beste-ernte', brandName: 'Beste Ernte', defaultCategory: 'fruits_veg', maxPages: 2 },
+  { tag: 'grafschafter', brandName: 'Grafschafter', defaultCategory: 'grains', maxPages: 2 },
+  { tag: 'vehappy', brandName: 'vehappy', defaultCategory: 'pantry', maxPages: 2 },
+  { tag: 'markttag', brandName: 'Markttag', defaultCategory: 'fruits_veg', maxPages: 1 },
+  { tag: 'viva-vital', brandName: 'Viva Vital', defaultCategory: 'pantry', maxPages: 2 },
+  { tag: 'mondo-italiano', brandName: 'Mondo Italiano', defaultCategory: 'grains', maxPages: 2 },
+  { tag: 'el-tequito', brandName: 'El Tequito', defaultCategory: 'pantry', maxPages: 1 },
+  { tag: 'magic-asia', brandName: 'Magic Asia', defaultCategory: 'grains', maxPages: 1 },
+  { tag: 'cafet', brandName: 'Cafét', defaultCategory: 'beverages', maxPages: 1 },
+  { tag: 'sonnengold', brandName: 'Sonnengold', defaultCategory: 'dairy', maxPages: 1 },
+  { tag: 'clarkys', brandName: 'Clarkys', defaultCategory: 'pantry', maxPages: 1 },
+  { tag: 'sweet-valley', brandName: 'Sweet Valley', defaultCategory: 'fruits_veg', maxPages: 1 },
+  { tag: 'marino', brandName: 'Marino', defaultCategory: 'meat_fish', maxPages: 1 }
 ];
 
 // Mapping für echte Verpackungsfotos der bisherigen Basis-Produkte
@@ -30,20 +39,23 @@ function detectCategory(name, categoriesTags, defaultCategory) {
   const n = (name || '').toLowerCase();
   const c = (categoriesTags || []).join(' ').toLowerCase();
 
-  if (n.includes('milch') || n.includes('joghurt') || n.includes('quark') || n.includes('käse') || n.includes('skyr') || c.includes('dairies')) {
+  if (n.includes('milch') || n.includes('joghurt') || n.includes('quark') || n.includes('käse') || n.includes('skyr') || n.includes('butter') || n.includes('sahne') || n.includes('pudding') || c.includes('dairies')) {
     return 'dairy';
   }
-  if (n.includes('hähnchen') || n.includes('pute') || n.includes('fleisch') || n.includes('hack') || n.includes('lachs') || n.includes('thunfisch') || n.includes('schinken') || c.includes('meats')) {
+  if (n.includes('hähnchen') || n.includes('pute') || n.includes('fleisch') || n.includes('hack') || n.includes('lachs') || n.includes('thunfisch') || n.includes('schinken') || n.includes('wurst') || n.includes('salami') || n.includes('forelle') || c.includes('meats') || c.includes('fishes')) {
     return 'meat_fish';
   }
-  if (n.includes('brot') || n.includes('toast') || n.includes('hafer') || n.includes('flocken') || n.includes('nudeln') || n.includes('reis') || n.includes('müsli') || c.includes('cereals')) {
+  if (n.includes('brot') || n.includes('toast') || n.includes('hafer') || n.includes('flocken') || n.includes('nudeln') || n.includes('reis') || n.includes('müsli') || n.includes('spaghetti') || n.includes('penne') || n.includes('tortilla') || n.includes('wrap') || c.includes('cereals') || c.includes('pastas')) {
     return 'grains';
   }
-  if (n.includes('apfel') || n.includes('äpfel') || n.includes('banane') || n.includes('beeren') || n.includes('tomate') || n.includes('salat') || n.includes('möhre') || n.includes('karotte') || n.includes('gemüse') || n.includes('obst')) {
+  if (n.includes('apfel') || n.includes('äpfel') || n.includes('banane') || n.includes('beeren') || n.includes('tomate') || n.includes('salat') || n.includes('möhre') || n.includes('karotte') || n.includes('gemüse') || n.includes('obst') || n.includes('erdbeere') || n.includes('himbeere') || n.includes('bohnen') || n.includes('erbsen') || n.includes('mais') || c.includes('fruits') || c.includes('vegetables')) {
     return 'fruits_veg';
   }
-  if (n.includes('drink') || n.includes('saft') || n.includes('wasser') || n.includes('tee')) {
+  if (n.includes('drink') || n.includes('saft') || n.includes('wasser') || n.includes('tee') || n.includes('kaffee') || n.includes('espresso') || c.includes('beverages')) {
     return 'beverages';
+  }
+  if (n.includes('pizza') || n.includes('lasagne') || n.includes('eintopf') || n.includes('fertiggericht')) {
+    return 'ready_meal';
   }
   return defaultCategory || 'pantry';
 }
@@ -71,7 +83,7 @@ function determineServing(category, name, packageGrams) {
   const n = (name || '').toLowerCase();
   
   if (n.includes('brot') || n.includes('toast')) {
-    const pieces = Math.max(10, Math.round(packageGrams / 35));
+    const pieces = Math.max(8, Math.round(packageGrams / 35));
     const pieceGrams = Math.round((packageGrams / pieces) * 10) / 10;
     return {
       servingSizeGrams: pieceGrams,
@@ -88,7 +100,8 @@ function determineServing(category, name, packageGrams) {
       return { servingSizeGrams: 200, servingUnit: '1 Glas (200 ml)', edibleYieldPercent: 1.0 };
     }
     if (n.includes('quark') || n.includes('skyr') || n.includes('joghurt')) {
-      return { servingSizeGrams: 150, servingUnit: '1 Becher / Schale (150 g)', edibleYieldPercent: 1.0 };
+      const s = packageGrams <= 250 ? packageGrams : 150;
+      return { servingSizeGrams: s, servingUnit: `1 Becher / Schale (${s} g)`, edibleYieldPercent: 1.0 };
     }
     if (n.includes('käse')) {
       return { servingSizeGrams: 30, servingUnit: '1 Scheibe / Portion (30 g)', edibleYieldPercent: 1.0 };
@@ -103,7 +116,10 @@ function determineServing(category, name, packageGrams) {
     if (n.includes('hafer') || n.includes('müsli')) {
       return { servingSizeGrams: 50, servingUnit: '1 Portion (50 g)', edibleYieldPercent: 1.0 };
     }
-    return { servingSizeGrams: 80, servingUnit: '1 Portion (80 g trocken)', edibleYieldPercent: 1.0 };
+    if (n.includes('nudeln') || n.includes('reis')) {
+      return { servingSizeGrams: 80, servingUnit: '1 Portion (80 g trocken)', edibleYieldPercent: 1.0 };
+    }
+    return { servingSizeGrams: 75, servingUnit: '1 Portion (75 g)', edibleYieldPercent: 1.0 };
   }
 
   if (category === 'fruits_veg') {
@@ -123,29 +139,22 @@ function estimatePrice(category, packageGrams, isBio) {
   else if (category === 'grains') basePrice = 1.29 * (packageGrams / 500);
   else if (category === 'fruits_veg') basePrice = 1.79 * (packageGrams / 1000);
   else if (category === 'beverages') basePrice = 0.99;
+  else if (category === 'ready_meal') basePrice = 2.49;
 
   if (isBio) basePrice *= 1.25;
   const rounded = Math.round(basePrice * 100) / 100;
   return Math.max(0.69, rounded);
 }
 
-// Bisherige Basis-Produkte laden und mit echten Bildern anreichern
 function loadAndEnrichBaseCatalog() {
   const tsPath = path.join(__dirname, '../src/app/core/models/netto-catalog.data.ts');
   const content = fs.readFileSync(tsPath, 'utf-8');
   
-  // Extrahiere Array-Inhalt
   const match = content.match(/export const NETTO_PRODUCT_CATALOG:\s*ProductItem\[\]\s*=\s*(\[[\s\S]*\]);/);
-  if (!match) {
-    console.warn('Basis-Katalog konnte nicht per Regex extrahiert werden.');
-    return [];
-  }
+  if (!match) return [];
 
   try {
-    const rawItems = eval(match[1]); // Parse die TypeScript-Objektstruktur
-    console.log(`Lade ${rawItems.length} bestehende Basis-Produkte...`);
-    
-    // Reichere Bilder an
+    const rawItems = eval(match[1]);
     return rawItems.map(item => {
       if (REAL_IMAGE_MAP[item.id]) {
         return {
@@ -157,116 +166,135 @@ function loadAndEnrichBaseCatalog() {
       }
       return item;
     });
-  } catch (err) {
-    console.error('Fehler beim Parsen der Basis-Produkte:', err);
+  } catch {
+    return [];
+  }
+}
+
+async function fetchPage(url) {
+  try {
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'DownKilos - Android - Version 1.0 - www.marioramirez.de/projekte/down-kilos'
+      }
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.products || [];
+  } catch (e) {
+    console.warn('Fetch error:', e.message);
     return [];
   }
 }
 
 async function runImport() {
-  console.log('=== STARTE NETTO PRODUKT-IMPORT VON OPEN FOOD FACTS ===\n');
+  console.log('=== STARTE GROSSEN NETTO PRODUKT-IMPORT (ALLE MARKEN & KATEGORIEN) ===\n');
   
   const baseProducts = loadAndEnrichBaseCatalog();
   const allProducts = [...baseProducts];
   const seenEans = new Set(baseProducts.map(p => p.ean).filter(Boolean));
   const seenIds = new Set(baseProducts.map(p => p.id));
 
-  for (const b of NETTO_BRANDS) {
-    console.log(`Lade Produkte für Netto-Eigenmarke: ${b.brandName} (${b.tag})...`);
-    const url = `https://world.openfoodfacts.net/api/v2/search?brands_tags=${b.tag}&countries_tags_en=germany&fields=code,product_name_de,product_name,image_front_url,nutriments,quantity,categories_tags,ingredients_text_de&page_size=20`;
+  // 1. Abfrage über stores_tags=netto-marken-discount (Mehrere Seiten!)
+  console.log('Lade zentrale Netto-Filialprodukte (stores_tags=netto-marken-discount)...');
+  for (let page = 1; page <= 4; page++) {
+    const storeUrl = `https://world.openfoodfacts.net/api/v2/search?stores_tags=netto-marken-discount&countries_tags_en=germany&fields=code,product_name_de,product_name,image_front_url,nutriments,quantity,categories_tags,ingredients_text_de,brands&page_size=50&page=${page}`;
+    const items = await fetchPage(storeUrl);
+    console.log(`  → Store-Seite ${page}: ${items.length} Produkte empfangen.`);
     
-    try {
-      const res = await fetch(url, {
-        headers: {
-          'User-Agent': 'DownKilos - Android - Version 1.0 - www.marioramirez.de/projekte/down-kilos'
-        }
-      });
-
-      if (!res.ok) {
-        console.warn(`Fehler bei Marke ${b.brandName}: HTTP ${res.status}`);
-        continue;
-      }
-
-      const data = await res.json();
-      const rawList = data.products || [];
-
-      for (const p of rawList) {
-        const ean = (p.code || '').trim();
-        const name = (p.product_name_de || p.product_name || '').trim();
-        const imageUrl = p.image_front_url;
-        const kcal = p.nutriments ? (p.nutriments['energy-kcal_100g'] ?? p.nutriments['energy-kcal']) : null;
-
-        // Nur Produkte mit echtem Foto, Namen und Nährwertangaben übernehmen
-        if (!ean || !name || !imageUrl || kcal === null || kcal === undefined || isNaN(kcal) || kcal <= 0) {
-          continue;
-        }
-
-        if (seenEans.has(ean)) continue;
-        seenEans.add(ean);
-
-        const id = `netto-${ean}`;
-        if (seenIds.has(id)) continue;
-        seenIds.add(id);
-
-        const packageGrams = parsePackageGrams(p.quantity);
-        const category = detectCategory(name, p.categories_tags, b.defaultCategory);
-        const serving = determineServing(category, name, packageGrams);
-        const price = estimatePrice(category, packageGrams, b.tag === 'biobio');
-
-        const protein = Math.round(((p.nutriments?.proteins_100g ?? 0) * 10)) / 10;
-        const carbs = Math.round(((p.nutriments?.carbohydrates_100g ?? 0) * 10)) / 10;
-        const fat = Math.round(((p.nutriments?.fat_100g ?? 0) * 10)) / 10;
-        const fiber = Math.round(((p.nutriments?.fiber_100g ?? 0) * 10)) / 10;
-
-        const productItem = {
-          id: id,
-          ean: ean,
-          name: name,
-          brand: b.brandName,
-          category: category,
-          imageUrl: imageUrl, // ECHTES ORIGINAL-VERPACKUNGSBILD VON OPEN FOOD FACTS
-          imageSource: `Open Food Facts (${b.brandName})`,
-          imageLicense: 'ODbL / CC-BY-SA 3.0',
-          retailer: 'netto_marken_discount',
-          retailerScope: 'Netto Marken-Discount (rot-gelb, ohne Hund)',
-          packageSize: p.quantity || `${packageGrams} g Packung`,
-          packageWeightGrams: packageGrams,
-          servingSizeGrams: serving.servingSizeGrams,
-          servingUnit: serving.servingUnit,
-          edibleYieldPercent: serving.edibleYieldPercent,
-          piecesPerPackage: serving.piecesPerPackage,
-          pieceWeightGrams: serving.pieceWeightGrams,
-          pieceUnitName: serving.pieceUnitName,
-          price: price,
-          priceUnit: `€ (${(price / (packageGrams / 1000)).toFixed(2)} € / kg)`,
-          priceStatus: 'last_observed',
-          dataSource: 'open_food_facts',
-          priceSource: 'Netto Filialbeobachtung / Sortimentspreis',
-          lastUpdated: new Date().toISOString().split('T')[0],
-          regionBranch: 'Bundesweit',
-          dataQualityStatus: 'verified',
-          allergens: [],
-          ingredientsText: p.ingredients_text_de || undefined,
-          isBudgetFriendly: price < 1.50,
-          isHighProtein: protein >= 10,
-          isLowCalorie: kcal < 40,
-          nutrition: {
-            caloriesPer100g: Math.round(kcal),
-            proteinPer100g: protein,
-            carbsPer100g: carbs,
-            fatPer100g: fat,
-            fiberPer100g: fiber
-          }
-        };
-
-        allProducts.push(productItem);
-      }
-    } catch (err) {
-      console.error(`Fehler beim Laden von ${b.brandName}:`, err.message);
+    for (const p of items) {
+      processRawProduct(p, p.brands || 'Netto Marken-Discount', 'pantry');
     }
   }
 
-  console.log(`\nGESAMT ECHTE NETTO PRODUKTE ERFASST: ${allProducts.length}`);
+  // 2. Abfrage über alle einzelnen Netto-Eigenmarken (mit Paginierung)
+  for (const b of NETTO_BRANDS) {
+    console.log(`Lade Eigenmarke: ${b.brandName} (${b.tag})...`);
+    for (let page = 1; page <= (b.maxPages || 1); page++) {
+      const brandUrl = `https://world.openfoodfacts.net/api/v2/search?brands_tags=${b.tag}&countries_tags_en=germany&fields=code,product_name_de,product_name,image_front_url,nutriments,quantity,categories_tags,ingredients_text_de&page_size=50&page=${page}`;
+      const items = await fetchPage(brandUrl);
+      console.log(`  → ${b.brandName} Seite ${page}: ${items.length} Produkte.`);
+
+      for (const p of items) {
+        processRawProduct(p, b.brandName, b.defaultCategory);
+      }
+    }
+  }
+
+  function processRawProduct(p, brandName, defaultCategory) {
+    const ean = (p.code || '').trim();
+    const name = (p.product_name_de || p.product_name || '').trim();
+    const imageUrl = p.image_front_url;
+    const kcal = p.nutriments ? (p.nutriments['energy-kcal_100g'] ?? p.nutriments['energy-kcal']) : null;
+
+    if (!ean || !name || !imageUrl || kcal === null || kcal === undefined || isNaN(kcal) || kcal <= 0) {
+      return;
+    }
+
+    if (seenEans.has(ean)) return;
+    seenEans.add(ean);
+
+    const id = `netto-${ean}`;
+    if (seenIds.has(id)) return;
+    seenIds.add(id);
+
+    const packageGrams = parsePackageGrams(p.quantity);
+    const category = detectCategory(name, p.categories_tags, defaultCategory);
+    const serving = determineServing(category, name, packageGrams);
+    const price = estimatePrice(category, packageGrams, brandName.toLowerCase().includes('bio'));
+
+    const protein = Math.round(((p.nutriments?.proteins_100g ?? 0) * 10)) / 10;
+    const carbs = Math.round(((p.nutriments?.carbohydrates_100g ?? 0) * 10)) / 10;
+    const fat = Math.round(((p.nutriments?.fat_100g ?? 0) * 10)) / 10;
+    const fiber = Math.round(((p.nutriments?.fiber_100g ?? 0) * 10)) / 10;
+
+    const productItem = {
+      id: id,
+      ean: ean,
+      name: name,
+      brand: brandName,
+      category: category,
+      imageUrl: imageUrl, // ECHTES ORIGINAL-VERPACKUNGSFOTO VON OPEN FOOD FACTS
+      imageSource: `Open Food Facts (${brandName})`,
+      imageLicense: 'ODbL / CC-BY-SA 3.0',
+      retailer: 'netto_marken_discount',
+      retailerScope: 'Netto Marken-Discount (rot-gelb, ohne Hund)',
+      packageSize: p.quantity || `${packageGrams} g Packung`,
+      packageWeightGrams: packageGrams,
+      servingSizeGrams: serving.servingSizeGrams,
+      servingUnit: serving.servingUnit,
+      edibleYieldPercent: serving.edibleYieldPercent,
+      piecesPerPackage: serving.piecesPerPackage,
+      pieceWeightGrams: serving.pieceWeightGrams,
+      pieceUnitName: serving.pieceUnitName,
+      price: price,
+      priceUnit: `€ (${(price / (packageGrams / 1000)).toFixed(2)} € / kg)`,
+      priceStatus: 'last_observed',
+      dataSource: 'open_food_facts',
+      priceSource: 'Netto Filialbeobachtung / Sortimentspreis',
+      lastUpdated: new Date().toISOString().split('T')[0],
+      regionBranch: 'Bundesweit',
+      dataQualityStatus: 'verified',
+      allergens: [],
+      ingredientsText: p.ingredients_text_de || undefined,
+      isBudgetFriendly: price < 1.50,
+      isHighProtein: protein >= 10,
+      isLowCalorie: kcal < 40,
+      nutrition: {
+        caloriesPer100g: Math.round(kcal),
+        proteinPer100g: protein,
+        carbsPer100g: carbs,
+        fatPer100g: fat,
+        fiberPer100g: fiber
+      }
+    };
+
+    allProducts.push(productItem);
+  }
+
+  console.log(`\n======================================================`);
+  console.log(`🎉 GESAMTE ECHTE NETTO PRODUKTE IM KATALOG: ${allProducts.length}`);
+  console.log(`======================================================\n`);
 
   // 1. Speichere JSON in public/data/netto-products-verified.json
   const dataDir = path.join(__dirname, '../public/data');
@@ -277,7 +305,7 @@ async function runImport() {
   fs.writeFileSync(jsonPath, JSON.stringify(allProducts, null, 2), 'utf-8');
   console.log(`✓ JSON erfolgreich exportiert: ${jsonPath}`);
 
-  // 2. Erzeuge die TypeScript-Datei netto-catalog.data.ts
+  // 2. Erzeuge TypeScript-Datei
   const tsContent = `import { ProductItem } from './product.model';
 
 /**
@@ -293,7 +321,7 @@ export const NETTO_PRODUCT_CATALOG: ProductItem[] = ${JSON.stringify(allProducts
   const tsPath = path.join(__dirname, '../src/app/core/models/netto-catalog.data.ts');
   fs.writeFileSync(tsPath, tsContent, 'utf-8');
   console.log(`✓ TypeScript-Katalog erfolgreich aktualisiert: ${tsPath}`);
-  console.log('\n=== IMPORT ERFOLGREICH ABGESCHLOSSEN ===');
+  console.log('\n=== GROSSER IMPORT ERFOLGREICH ABGESCHLOSSEN ===');
 }
 
 runImport().catch(console.error);

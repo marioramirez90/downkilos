@@ -1,7 +1,6 @@
 :host {
   display: block;
-  height: 100dvh;
-  background-color: #FFFFFF;
+  height: 100%;
 }
 
 .weight-screen {
@@ -12,20 +11,39 @@
   color: #102521;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   overflow: hidden;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
 }
 
-.weight-header {
-  flex-shrink: 0;
+// 1. Scrollbarer Inhaltsbereich
+.weight-scrollable-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 10px 16px 20px;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 18px;
-  background-color: #FFFFFF;
-  border-bottom: 1px solid #EBF1EC;
+  flex-direction: column;
+  gap: 12px;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+// 2. Header
+.weight-header {
+  position: relative;
+  text-align: center;
+  padding: 4px 0 2px;
 
   .back-btn {
-    width: 38px;
-    height: 38px;
+    position: absolute;
+    left: 0;
+    top: 4px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     border: none;
     background-color: #F0F6F1;
@@ -34,170 +52,571 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.15s ease;
 
     &:hover {
       background-color: #E2EDE4;
     }
 
     svg {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
     }
   }
 
-  .header-title {
-    font-size: 1.15rem;
-    font-weight: 700;
+  .header-main-title {
+    font-size: 1.28rem;
+    font-weight: 800;
     color: #102521;
-    margin: 0;
+    margin: 2px 0 3px;
+    letter-spacing: -0.02em;
   }
 
-  .header-spacer {
-    width: 38px;
+  .header-desc {
+    font-size: 0.82rem;
+    color: #66716D;
+    line-height: 1.35;
+    margin: 0 auto;
+    max-width: 280px;
   }
 }
 
-.weight-content {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding: 16px 18px 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.current-weight-card {
-  background: linear-gradient(135deg, #F2F9F4 0%, #E8F5EB 100%);
-  border: 1px solid #D2EBD7;
+// 3. Oberste Karte – Aktuelles Gewicht & Zielanzeige (Exakt wie im Referenzbild)
+.hero-weight-card {
+  background-color: #F0F8F2;
+  border: 1.5px solid #D6EFE0;
   border-radius: 20px;
-  padding: 18px;
+  padding: 12px 14px;
   display: flex;
   align-items: center;
-  gap: 16px;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(39, 143, 57, 0.04);
 
-  .card-icon-badge {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
+  // Linke Spalte
+  .hero-left-col {
+    flex: 1.2;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+
+    .scale-icon-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background-color: #E5F5E8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      svg {
+        width: 26px;
+        height: 26px;
+      }
+    }
+
+    .weight-data-box {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+
+      .weight-label {
+        font-size: 0.78rem;
+        color: #66716D;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      .weight-number {
+        font-size: 1.95rem;
+        font-weight: 900;
+        color: #102521;
+        letter-spacing: -0.03em;
+        line-height: 1.05;
+        white-space: nowrap;
+      }
+
+      .weight-entry-date {
+        font-size: 0.68rem;
+        color: #66716D;
+        margin-top: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+  // Dünne vertikale Trennlinie
+  .card-vertical-divider {
+    width: 1px;
+    height: 58px;
+    background-color: #D3E7D8;
+    margin: 0 10px;
+    flex-shrink: 0;
+  }
+
+  // Rechte Spalte (Neu: Pokal & Zielanzeige)
+  .hero-right-col {
+    flex: 0.95;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2px 4px;
+
+    .trophy-sparkle-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      margin-bottom: 3px;
+
+      .sparkle {
+        font-size: 0.65rem;
+        color: #278F39;
+        opacity: 0.85;
+      }
+
+      .trophy-icon-svg {
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    .goal-text-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #005333;
+      font-size: 0.75rem;
+      line-height: 1.25;
+      font-weight: 500;
+
+      .goal-line {
+        display: block;
+        white-space: nowrap;
+      }
+
+      .goal-highlight {
+        display: block;
+        white-space: nowrap;
+
+        strong {
+          font-weight: 800;
+          color: #005333;
+        }
+      }
+
+      .btn-set-goal-link {
+        background: none;
+        border: none;
+        color: #278F39;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+        padding: 0;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+// 4. Großer grüner Eintragen-Button
+.btn-add-weight-primary {
+  width: 100%;
+  height: 50px;
+  border-radius: 9999px;
+  background-color: #278F39;
+  color: #FFFFFF;
+  font-size: 0.96rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 4px 14px rgba(39, 143, 57, 0.28);
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #217A30;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  .plus-icon-circle {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
     background-color: #FFFFFF;
+    color: #278F39;
+    font-size: 15px;
+    font-weight: 900;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(39, 143, 57, 0.1);
-    flex-shrink: 0;
+    line-height: 1;
+  }
+}
 
-    svg {
-      width: 26px;
-      height: 26px;
+// 5. Meine Einträge Karte
+.entries-card {
+  background-color: #FFFFFF;
+  border: 1px solid #EAEFEA;
+  border-radius: 20px;
+  padding: 14px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+
+  .entries-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+
+    .entries-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #102521;
+      margin: 0;
+      letter-spacing: -0.01em;
+    }
+
+    .see-all-btn {
+      background: none;
+      border: none;
+      color: #278F39;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0;
+
+      &:hover {
+        text-decoration: underline;
+      }
     }
   }
 
-  .current-info {
+  .entries-table-stack {
     display: flex;
     flex-direction: column;
 
-    .current-label {
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: #66716D;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
+    .entry-row-item {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1.1fr 28px;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px solid #F0F4F1;
+      font-size: 0.86rem;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .entry-date-cell {
+        color: #66716D;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      .entry-weight-cell {
+        color: #102521;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .entry-diff-cell {
+        font-weight: 700;
+        white-space: nowrap;
+
+        &.loss {
+          color: #278F39;
+        }
+
+        &.gain {
+          color: #DC2626;
+        }
+
+        &.neutral {
+          color: #66716D;
+          font-weight: 500;
+        }
+      }
+
+      .menu-relative-box {
+        position: relative;
+        display: flex;
+        justify-content: flex-end;
+
+        .menu-dots-trigger {
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          border: none;
+          background: transparent;
+          color: #66716D;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          &:hover {
+            background-color: #F0F6F1;
+            color: #102521;
+          }
+
+          svg {
+            width: 16px;
+            height: 16px;
+          }
+        }
+
+        .menu-popover {
+          position: absolute;
+          right: 0;
+          top: 26px;
+          background-color: #FFFFFF;
+          border: 1px solid #D6DFD8;
+          border-radius: 12px;
+          padding: 4px;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+          z-index: 100;
+          display: flex;
+          flex-direction: column;
+          min-width: 120px;
+
+          .popover-item {
+            padding: 8px 12px;
+            text-align: left;
+            background: none;
+            border: none;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #102521;
+            border-radius: 8px;
+            cursor: pointer;
+
+            &:hover {
+              background-color: #F4FAF5;
+            }
+
+            &.text-danger {
+              color: #DC2626;
+
+              &:hover {
+                background-color: #FEE2E2;
+              }
+            }
+          }
+        }
+      }
     }
 
-    .weight-display-val {
-      display: flex;
-      align-items: baseline;
-      gap: 4px;
-      margin-top: 2px;
+    .empty-entries-notice {
+      padding: 16px;
+      text-align: center;
+      color: #66716D;
+      font-size: 0.85rem;
+    }
+  }
+}
 
-      .number-val {
-        font-size: 2rem;
+// 6. Dein Fortschritt & Diagramm Karte
+.progress-chart-card {
+  background-color: #FFFFFF;
+  border: 1px solid #EAEFEA;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+
+  // Oberer hellgrüner Banner
+  .progress-banner-row {
+    background-color: #F2F9F4;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .banner-icon-badge {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background-color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(39, 143, 57, 0.1);
+
+      svg {
+        width: 22px;
+        height: 22px;
+      }
+    }
+
+    .banner-text-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+
+      .banner-title {
+        font-size: 0.95rem;
         font-weight: 800;
         color: #102521;
-        letter-spacing: -0.02em;
-        line-height: 1;
+        letter-spacing: -0.01em;
       }
 
-      .unit-val {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #278F39;
+      .banner-subtitle {
+        font-size: 0.8rem;
+        color: #66716D;
+        margin-top: 1px;
       }
     }
 
-    .weight-display-empty {
-      font-size: 0.95rem;
-      color: #66716D;
-      font-weight: 500;
-      margin-top: 4px;
+    .banner-chevron {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #278F39;
+    }
+  }
+
+  // SVG Diagramm Container
+  .chart-viewport-box {
+    padding: 14px 12px 10px;
+
+    .weight-chart-svg {
+      width: 100%;
+      height: 135px;
+      overflow: visible;
+
+      .grid-line {
+        stroke: #E5EDE7;
+        stroke-width: 1;
+        stroke-dasharray: 2 3;
+      }
+
+      .y-tick-label {
+        font-size: 9.5px;
+        fill: #66716D;
+        font-weight: 500;
+        text-anchor: end;
+      }
+
+      .chart-polyline {
+        fill: none;
+        stroke: #278F39;
+        stroke-width: 2.6;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .chart-dot {
+        fill: #278F39;
+        stroke: #FFFFFF;
+        stroke-width: 2;
+        transition: r 0.2s ease;
+
+        &:hover {
+          r: 6;
+        }
+      }
+
+      .x-axis-date {
+        font-size: 9.5px;
+        fill: #66716D;
+        font-weight: 500;
+        text-anchor: middle;
+      }
     }
   }
 }
 
-.explanation-box {
-  background-color: #F8FAF9;
-  border-radius: 14px;
-  padding: 12px 14px;
-  border: 1px solid #EAEFEA;
-
-  p {
-    font-size: 0.85rem;
-    line-height: 1.45;
-    color: #4A5652;
-    margin: 0;
-  }
+// 7. Modal für Gewichtseingabe
+.weight-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(16, 37, 33, 0.45);
+  backdrop-filter: blur(2px);
+  z-index: 1000;
 }
 
-.entry-form-card {
+.weight-modal-dialog {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 480px;
+  margin: 0 auto;
   background-color: #FFFFFF;
-  border: 1px solid #E5EBE6;
-  border-radius: 20px;
-  padding: 18px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  border-radius: 24px 24px 0 0;
+  padding: 20px 20px 28px;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 
-  .form-title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #102521;
-    margin: 0 0 14px;
+  .modal-header-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .modal-heading {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #102521;
+      margin: 0;
+    }
+
+    .modal-close-x {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background-color: #F0F6F1;
+      color: #66716D;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
   }
 
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+  .modal-body-fields {
+    display: flex;
+    flex-direction: column;
     gap: 12px;
-    margin-bottom: 16px;
 
-    .form-field {
+    .field-wrap {
       display: flex;
       flex-direction: column;
       gap: 6px;
 
-      &.full-width {
-        grid-column: 1 / -1;
-      }
-
       .field-label {
-        font-size: 0.8rem;
+        font-size: 0.82rem;
         font-weight: 600;
         color: #374340;
       }
 
-      .input-with-unit {
+      .kg-input-box {
         position: relative;
         display: flex;
         align-items: center;
 
-        .weight-input {
+        .number-input {
           width: 100%;
-          padding: 10px 36px 10px 12px;
+          padding: 12px 40px 12px 14px;
           border: 1.5px solid #D6DFD8;
           border-radius: 12px;
           font-size: 1.05rem;
-          font-weight: 600;
+          font-weight: 700;
           color: #102521;
           outline: none;
           background-color: #FAFCFA;
@@ -209,10 +628,10 @@
           }
         }
 
-        .unit-tag {
+        .unit-symbol {
           position: absolute;
-          right: 12px;
-          font-size: 0.85rem;
+          right: 14px;
+          font-size: 0.9rem;
           font-weight: 700;
           color: #66716D;
           pointer-events: none;
@@ -220,12 +639,12 @@
       }
 
       .date-input,
-      .note-input {
+      .text-input {
         width: 100%;
-        padding: 10px 12px;
+        padding: 12px 14px;
         border: 1.5px solid #D6DFD8;
         border-radius: 12px;
-        font-size: 0.92rem;
+        font-size: 0.95rem;
         color: #102521;
         outline: none;
         background-color: #FAFCFA;
@@ -239,130 +658,56 @@
     }
   }
 
-  .save-weight-btn {
-    width: 100%;
-    padding: 14px 20px;
-    border-radius: 9999px;
-    background-color: #278F39;
-    color: #FFFFFF;
-    font-size: 0.95rem;
-    font-weight: 700;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 3px 10px rgba(39, 143, 57, 0.25);
-    transition: all 0.2s ease;
-
-    &:hover:not(:disabled) {
-      background-color: #227D32;
-      transform: translateY(-1px);
-    }
-
-    &:active:not(:disabled) {
-      transform: translateY(0);
-    }
-
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-  }
-}
-
-.history-list-section {
-  .history-title {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #102521;
-    margin: 0 0 10px;
-  }
-
-  .entries-stack {
+  .modal-actions-buttons {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 
-    .entry-item-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 14px;
-      background-color: #F8FAF9;
-      border: 1px solid #E7EDE8;
-      border-radius: 14px;
-
-      .entry-meta {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-
-        .entry-date {
-          font-size: 0.88rem;
-          font-weight: 600;
-          color: #102521;
-        }
-
-        .entry-note {
-          font-size: 0.78rem;
-          color: #66716D;
-        }
-      }
-
-      .entry-value-box {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-
-        .entry-kg {
-          font-size: 1rem;
-          font-weight: 700;
-          color: #278F39;
-        }
-
-        .entry-delete-btn {
-          width: 24px;
-          height: 24px;
-          border-radius: 50%;
-          border: none;
-          background-color: #EAEFEA;
-          color: #66716D;
-          font-size: 0.75rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-
-          &:hover {
-            background-color: #FEE2E2;
-            color: #DC2626;
-          }
-        }
-      }
+    .btn-cancel {
+      flex: 1;
+      padding: 14px;
+      border-radius: 9999px;
+      border: 1px solid #D6DFD8;
+      background-color: #FFFFFF;
+      color: #4A5652;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
     }
-  }
 
-  .empty-history-notice {
-    text-align: center;
-    padding: 20px 14px;
-    background-color: #F8FAF9;
-    border-radius: 14px;
-    border: 1px dashed #D6DFD8;
+    .btn-save-confirm {
+      flex: 2;
+      padding: 14px;
+      border-radius: 9999px;
+      border: none;
+      background-color: #278F39;
+      color: #FFFFFF;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(39, 143, 57, 0.28);
+      transition: background-color 0.2s ease;
 
-    p {
-      font-size: 0.85rem;
-      color: #66716D;
-      margin: 0;
+      &:hover:not(:disabled) {
+        background-color: #217A30;
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
     }
   }
 }
 
-.weight-toast {
+// Toast Bubble
+.weight-toast-bubble {
   position: fixed;
   bottom: 80px;
   left: 50%;
   transform: translateX(-50%);
   background-color: #102521;
   color: #FFFFFF;
-  padding: 10px 18px;
+  padding: 10px 20px;
   border-radius: 9999px;
   font-size: 0.85rem;
   font-weight: 600;
@@ -371,7 +716,9 @@
   white-space: nowrap;
 }
 
+// 8. Feste untere Navigation
 .weight-footer-nav {
   flex-shrink: 0;
   background-color: #FFFFFF;
+  border-top: 1px solid #EBF1EC;
 }

@@ -1,156 +1,299 @@
-<div class="weight-screen">
-  <!-- Header with Back Button and Title -->
-  <header class="weight-header">
-    <button
-      type="button"
-      (click)="goBack()"
-      class="back-btn"
-      aria-label="Zurück zum Dashboard"
-      title="Zurück zum Dashboard"
-    >
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M15 18l-6-6 6-6" />
-      </svg>
-    </button>
-    <h1 class="header-title">Mein Gewicht</h1>
-    <div class="header-spacer"></div>
-  </header>
-
-  <!-- Scrollable Content Area -->
-  <main class="weight-content">
-    <!-- Current Weight Hero Card -->
-    <section class="current-weight-card">
-      <div class="card-icon-badge">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="3" width="18" height="18" rx="5" ry="5" />
-          <circle cx="12" cy="8" r="2.5" />
-          <path d="M12 7v1.5" />
+<div class="weight-screen" (click)="closeAllMenus()">
+  <!-- Scrollable Main Content -->
+  <main class="weight-scrollable-content">
+    <!-- 1. Header (Zurück-Pfeil, Titel, Subtitle) -->
+    <header class="weight-header">
+      <button
+        type="button"
+        (click)="goBack()"
+        class="back-btn"
+        aria-label="Zurück zum Dashboard"
+        title="Zurück zum Dashboard"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18l-6-6 6-6" />
         </svg>
+      </button>
+
+      <h1 class="header-main-title">Mein aktuelles Gewicht</h1>
+      <p class="header-desc">Trage hier regelmäßig dein Gewicht ein, um deine Entwicklung zu sehen.</p>
+    </header>
+
+    <!-- 2. Oberste Karte – Aktuelles Gewicht & Persönliche Zielanzeige -->
+    <section class="hero-weight-card">
+      <!-- Linker Bereich: Waagen-Icon, Aktuelles Gewicht, Letzter Eintrag -->
+      <div class="hero-left-col">
+        <div class="scale-icon-badge">
+          <svg viewBox="0 0 24 24" fill="#278F39">
+            <rect x="2" y="3" width="20" height="18" rx="5" ry="5" fill="#278F39" />
+            <circle cx="12" cy="8" r="2.8" fill="#FFFFFF" />
+            <path d="M12 6.5v1.8" stroke="#278F39" stroke-width="1.2" stroke-linecap="round" />
+          </svg>
+        </div>
+
+        <div class="weight-data-box">
+          <span class="weight-label">Aktuelles Gewicht</span>
+          <strong class="weight-number">{{ currentWeightFormatted() }} kg</strong>
+          <span class="weight-entry-date">Letzter Eintrag: {{ latestEntryFormatted() }}</span>
+        </div>
       </div>
 
-      <div class="current-info">
-        <span class="current-label">Aktuell erfasstes Gewicht</span>
-        @if (currentWeight(); as w) {
-          <div class="weight-display-val">
-            <strong class="number-val">{{ w.toFixed(1) }}</strong>
-            <span class="unit-val">kg</span>
-          </div>
+      <!-- Dünne vertikale Trennlinie -->
+      <div class="card-vertical-divider"></div>
+
+      <!-- Rechter Bereich: Pokal-Icon, Sterne & Automatisch berechnetes Ziel -->
+      <div class="hero-right-col">
+        <div class="trophy-sparkle-box">
+          <span class="sparkle">✦</span>
+          <svg class="trophy-icon-svg" viewBox="0 0 24 24" fill="#278F39">
+            <path d="M7 4h10v2a5 5 0 0 1-5 5 5 5 0 0 1-5-5V4zm10 2h3a2 2 0 0 1 2 2 3 3 0 0 1-3 3h-2V6zm-10 0H4a3 3 0 0 0-3 3 2 2 0 0 0 2 2h4V6zm4 7a7 7 0 0 0 6.93-6H4.07A7 7 0 0 0 11 13v3H9v2h6v-2h-2v-3a6.97 6.97 0 0 0-2 0z"/>
+          </svg>
+          <span class="sparkle">✦</span>
+        </div>
+
+        <div class="goal-text-group">
+          @switch (goalStatus()) {
+            @case ('lose') {
+              <span class="goal-line">Super, noch</span>
+              <span class="goal-highlight"><strong>{{ remainingKgFormatted() }} Kilo</strong> bis zu</span>
+              <span class="goal-line">deinem</span>
+              <span class="goal-line">Wunschgewicht!</span>
+            }
+            @case ('reached') {
+              <span class="goal-line">Du hast dein</span>
+              <span class="goal-highlight"><strong>Wunschgewicht</strong></span>
+              <span class="goal-line">erreicht! 🎉</span>
+            }
+            @case ('maintain') {
+              <span class="goal-line">Dein Ziel:</span>
+              <span class="goal-highlight"><strong>Gewicht halten</strong></span>
+              <span class="goal-line">Stabil bleiben!</span>
+            }
+            @case ('missing') {
+              <button type="button" (click)="goToSettings()" class="btn-set-goal-link">
+                Wunschgewicht festlegen →
+              </button>
+            }
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Einziger prominenter Button: Neues Gewicht eintragen -->
+    <button
+      type="button"
+      (click)="openNewWeightModal()"
+      class="btn-add-weight-primary"
+      id="btn-add-new-weight"
+    >
+      <span class="plus-icon-circle">+</span>
+      <span>Neues Gewicht eintragen</span>
+    </button>
+
+    <!-- 4. Meine Einträge Karte -->
+    <section class="entries-card">
+      <div class="entries-header-row">
+        <h2 class="entries-title">Meine Einträge</h2>
+        <button
+          type="button"
+          (click)="toggleShowAll()"
+          class="see-all-btn"
+          id="btn-toggle-entries"
+        >
+          {{ showAllEntries() ? 'Weniger anzeigen ‹' : 'Alle anzeigen ›' }}
+        </button>
+      </div>
+
+      <div class="entries-table-stack">
+        @if (displayEntries().length > 0) {
+          @for (entry of displayEntries(); track entry.id) {
+            <div class="entry-row-item">
+              <span class="entry-date-cell">{{ entry.formattedDate }}</span>
+              <strong class="entry-weight-cell">{{ entry.weightFormatted }}</strong>
+              <span
+                class="entry-diff-cell"
+                [class.loss]="entry.diffSign === 'loss'"
+                [class.gain]="entry.diffSign === 'gain'"
+                [class.neutral]="entry.diffSign === 'neutral'"
+              >
+                {{ entry.diffFormatted }}
+              </span>
+
+              <!-- Drei-Punkte-Menü Button -->
+              <div class="menu-relative-box">
+                <button
+                  type="button"
+                  (click)="toggleEntryMenu(entry.id, $event)"
+                  class="menu-dots-trigger"
+                  aria-label="Eintragsoptionen öffnen"
+                  title="Optionen"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="5" r="2" />
+                    <circle cx="12" cy="12" r="2" />
+                    <circle cx="12" cy="19" r="2" />
+                  </svg>
+                </button>
+
+                <!-- Popover Menü -->
+                @if (activeMenuEntryId() === entry.id) {
+                  <div class="menu-popover" (click)="$event.stopPropagation()">
+                    <button type="button" (click)="openEditEntryModal(entry)" class="popover-item">
+                      ✏️ Bearbeiten
+                    </button>
+                    <button type="button" (click)="deleteEntry(entry.id)" class="popover-item text-danger">
+                      🗑️ Löschen
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+          }
         } @else {
-          <div class="weight-display-empty">
-            <span>Noch kein Gewicht erfasst</span>
+          <div class="empty-entries-notice">
+            <p>Noch keine Wiegungen erfasst.</p>
           </div>
         }
       </div>
     </section>
 
-    <!-- Brief Explanation -->
-    <div class="explanation-box">
-      <p>
-        Verfolge dein Gewicht regelmäßig. Jeder Eintrag hilft dir, deine Kalorienziele optimal anzupassen und deinen Fortschritt im Blick zu behalten.
-      </p>
-    </div>
+    <!-- 5. Dein Fortschritt & Diagramm Karte -->
+    <section class="progress-chart-card">
+      <!-- Hellgrüner oberer Header mit Icon & Zusammenfassung -->
+      <div class="progress-banner-row">
+        <div class="banner-icon-badge">
+          <!-- 3 grüne ansteigende Balken Icon -->
+          <svg viewBox="0 0 24 24" fill="#278F39">
+            <rect x="4" y="14" width="3" height="6" rx="1.5" />
+            <rect x="10.5" y="10" width="3" height="10" rx="1.5" />
+            <rect x="17" y="6" width="3" height="14" rx="1.5" />
+          </svg>
+        </div>
 
-    <!-- Weight Entry Form -->
-    <section class="entry-form-card">
-      <h2 class="form-title">Neues Gewicht eintragen</h2>
+        <div class="banner-text-col">
+          <strong class="banner-title">Dein Fortschritt</strong>
+          <span class="banner-subtitle">
+            @if (lostSoFar() > 0) {
+              Du hast bereits {{ lostSoFarFormatted() }} kg abgenommen.
+            } @else {
+              Hier siehst du bald deine Gewichtsentwicklung.
+            }
+          </span>
+        </div>
 
-      <div class="form-grid">
-        <div class="form-field">
-          <label for="input-weight" class="field-label">Gewicht (in kg)</label>
-          <div class="input-with-unit">
+        <span class="banner-chevron">›</span>
+      </div>
+
+      <!-- Grünes Liniendiagramm -->
+      <div class="chart-viewport-box">
+        <svg viewBox="0 0 340 140" class="weight-chart-svg" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="weightAreaGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#278F39" stop-opacity="0.28" />
+              <stop offset="100%" stop-color="#278F39" stop-opacity="0.02" />
+            </linearGradient>
+          </defs>
+
+          <!-- Y-Achse Hilfslinien & Zahlen -->
+          @for (tick of chartData().yTicks; track tick.value) {
+            <line x1="36" [attr.y1]="tick.y" x2="330" [attr.y2]="tick.y" class="grid-line" />
+            <text x="28" [attr.y]="tick.y + 3.5" class="y-tick-label">{{ tick.value }}</text>
+          }
+
+          <!-- Gradient Area unter der Verlaufslinie -->
+          @if (chartData().areaPoints) {
+            <polygon [attr.points]="chartData().areaPoints" fill="url(#weightAreaGrad)" />
+          }
+
+          <!-- Grüne Verlaufslinie -->
+          @if (chartData().polyLine) {
+            <polyline [attr.points]="chartData().polyLine" class="chart-polyline" />
+          }
+
+          <!-- Messpunkte & Datumsangaben -->
+          @for (pt of chartData().points; track pt.id) {
+            <circle [attr.cx]="pt.x" [attr.cy]="pt.y" r="4.5" class="chart-dot" />
+            <text [attr.x]="pt.x" y="132" class="x-axis-date">{{ pt.label }}</text>
+          }
+        </svg>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal: Neues Gewicht eintragen / bearbeiten -->
+  @if (showModal()) {
+    <div class="weight-modal-backdrop" (click)="closeModal()"></div>
+    <div class="weight-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modalHeading">
+      <div class="modal-header-line">
+        <h3 id="modalHeading" class="modal-heading">
+          {{ editingEntryId() ? 'Gewicht bearbeiten' : 'Neues Gewicht eintragen' }}
+        </h3>
+        <button type="button" (click)="closeModal()" class="modal-close-x">✕</button>
+      </div>
+
+      <div class="modal-body-fields">
+        <div class="field-wrap">
+          <label for="inpKg" class="field-label">Gewicht (in kg)</label>
+          <div class="kg-input-box">
             <input
-              id="input-weight"
+              id="inpKg"
               type="number"
               step="0.1"
               min="30"
               max="300"
               [(ngModel)]="inputWeight"
-              placeholder="z.B. 74.5"
-              class="weight-input"
+              placeholder="z.B. 78.5"
+              class="number-input"
             />
-            <span class="unit-tag">kg</span>
+            <span class="unit-symbol">kg</span>
           </div>
         </div>
 
-        <div class="form-field">
-          <label for="input-date" class="field-label">Datum</label>
+        <div class="field-wrap">
+          <label for="inpDate" class="field-label">Datum</label>
           <input
-            id="input-date"
+            id="inpDate"
             type="date"
             [(ngModel)]="inputDate"
             class="date-input"
           />
         </div>
 
-        <div class="form-field full-width">
-          <label for="input-note" class="field-label">Notiz (optional)</label>
+        <div class="field-wrap">
+          <label for="inpNote" class="field-label">Notiz (optional)</label>
           <input
-            id="input-note"
+            id="inpNote"
             type="text"
             [(ngModel)]="inputNote"
-            placeholder="z.B. morgens nüchtern nach dem Aufstehen"
-            class="note-input"
+            placeholder="z.B. morgens nüchtern"
+            class="text-input"
           />
         </div>
       </div>
 
-      <button
-        type="button"
-        (click)="saveWeight()"
-        [disabled]="isSubmitting()"
-        class="save-weight-btn"
-        id="btn-save-weight"
-      >
-        <span>Gewicht speichern</span>
-      </button>
-    </section>
-
-    <!-- Logged Entries List (Only real saved entries) -->
-    <section class="history-list-section">
-      <h2 class="history-title">Bisherige Einträge</h2>
-
-      @if (weightHistory().length > 0) {
-        <div class="entries-stack">
-          @for (entry of weightHistory().slice().reverse(); track entry.id) {
-            <div class="entry-item-row">
-              <div class="entry-meta">
-                <span class="entry-date">{{ entry.date }}</span>
-                @if (entry.note) {
-                  <span class="entry-note">{{ entry.note }}</span>
-                }
-              </div>
-
-              <div class="entry-value-box">
-                <strong class="entry-kg">{{ entry.weight.toFixed(1) }} kg</strong>
-                <button
-                  type="button"
-                  (click)="deleteEntry(entry.id)"
-                  class="entry-delete-btn"
-                  title="Eintrag löschen"
-                  aria-label="Eintrag löschen"
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
-          }
-        </div>
-      } @else {
-        <div class="empty-history-notice">
-          <p>Noch keine Einträge vorhanden. Trage oben dein aktuelles Gewicht ein.</p>
-        </div>
-      }
-    </section>
-  </main>
+      <div class="modal-actions-buttons">
+        <button type="button" (click)="closeModal()" class="btn-cancel">Abbrechen</button>
+        <button
+          type="button"
+          (click)="saveWeight()"
+          [disabled]="isSubmitting()"
+          class="btn-save-confirm"
+          id="btn-confirm-save-weight"
+        >
+          <span>Gewicht speichern</span>
+        </button>
+      </div>
+    </div>
+  }
 
   <!-- Toast Notification -->
   @if (toastMessage(); as msg) {
-    <div class="weight-toast">
+    <div class="weight-toast-bubble">
       <span>{{ msg }}</span>
     </div>
   }
 
-  <!-- Sticky Bottom Navigation -->
+  <!-- 6. Feste untere Navigation (5 Menüpunkte, Gewicht aktiv) -->
   <footer class="weight-footer-nav">
     <app-bottom-nav></app-bottom-nav>
   </footer>

@@ -33,7 +33,18 @@ describe('ShoppingListComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should render items matching reference image (Hähnchenbrustfilet, Naturreis, etc.)', () => {
+  it('should render empty state for a new user with 0€ and 0 kcal (Section 14 & 18)', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.textContent).toContain('Deine Einkaufsliste ist noch leer.');
+    expect(el.textContent).toContain('Entdecke Netto-Produkte und füge deine ersten Lebensmittel hinzu.');
+    expect(el.textContent).toContain('Gesamtpreis: 0,00 €');
+    expect(el.textContent).toContain('Gesamtkalorien: 0 kcal');
+  });
+
+  it('should render items when items are in list', () => {
+    shoppingService.generateListFromPlan();
+    fixture.detectChanges();
+
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('Hähnchenbrustfilet');
     expect(el.textContent).toContain('Naturreis');
@@ -41,13 +52,19 @@ describe('ShoppingListComponent', () => {
     expect(el.textContent).toContain('Haferflocken');
   });
 
-  it('should render total sum in summary row', () => {
+  it('should render total sum in summary row when items are present', () => {
+    shoppingService.generateListFromPlan();
+    fixture.detectChanges();
+
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('Einkaufskosten');
     expect(el.textContent).toMatch(/\d+[.,]\d{2}\s*€/);
   });
 
   it('should filter items by category', () => {
+    shoppingService.generateListFromPlan();
+    fixture.detectChanges();
+
     component.setCategory('meat_fish');
     fixture.detectChanges();
 
@@ -63,9 +80,13 @@ describe('ShoppingListComponent', () => {
 
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('Zitronen');
+    expect(component.shoppingService.summary().totalCost).toBe(1.29);
   });
 
   it('should toggle item checked status', () => {
+    shoppingService.generateListFromPlan();
+    fixture.detectChanges();
+
     const first = component.displayedItems()[0];
     const initialStatus = first.isChecked;
 
@@ -77,6 +98,9 @@ describe('ShoppingListComponent', () => {
   });
 
   it('should increase item quantity and update total price & calories', () => {
+    shoppingService.generateListFromPlan();
+    fixture.detectChanges();
+
     const first = component.displayedItems()[0];
     const initialCount = first.packageCount;
     const initialCost = component.shoppingService.summary().totalCost;
@@ -90,6 +114,9 @@ describe('ShoppingListComponent', () => {
   });
 
   it('should remove item when clicking delete', () => {
+    shoppingService.generateListFromPlan();
+    fixture.detectChanges();
+
     const initialLength = component.displayedItems().length;
     const first = component.displayedItems()[0];
 

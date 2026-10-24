@@ -321,6 +321,14 @@ export class FoodLogService {
     this.saveTodayLog(updated);
   }
 
+  /**
+   * Leert alle Einträge des aktuellen Tages (z. B. bei neuem Onboarding).
+   */
+  clearTodayLog(): void {
+    this.loggedItems.set([]);
+    this.saveTodayLog([]);
+  }
+
   private saveTodayLog(items: FoodLogItem[]): void {
     try {
       localStorage.setItem(FOOD_LOG_STORAGE_KEY, JSON.stringify(items));

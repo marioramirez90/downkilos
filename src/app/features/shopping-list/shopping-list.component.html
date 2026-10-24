@@ -104,12 +104,12 @@
           </div>
         </div>
       } @empty {
-        <!-- Leere Liste State -->
+        <!-- Leere Liste State (Section 14) -->
         <div class="empty-list-card">
-          <div class="empty-icon-circle">🛒</div>
-          <h2 class="empty-title">Deine Einkaufsliste ist leer</h2>
+          <div class="empty-icon-circle" aria-hidden="true">🛒</div>
+          <h2 class="empty-title">Deine Einkaufsliste ist noch leer.</h2>
           <p class="empty-desc">
-            Füge Produkte aus dem Netto-Sortiment hinzu oder trage einen eigenen Artikel ein.
+            Entdecke Netto-Produkte und füge deine ersten Lebensmittel hinzu.
           </p>
           <div class="empty-actions-row">
             <button type="button" (click)="openAddModal()" class="empty-add-btn">

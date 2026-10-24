@@ -19,7 +19,19 @@ describe('ShoppingListService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should generate shopping list items from the planned meal ingredients with real Netto products', () => {
+  it('should start with an empty list, 0 cost and 0 calories for new users (Section 14 & 15)', () => {
+    const items = service.items();
+    expect(items.length).toBe(0);
+
+    const summary = service.summary();
+    expect(summary.totalItems).toBe(0);
+    expect(summary.totalCost).toBe(0);
+    expect(summary.totalCalories).toBe(0);
+    expect(summary.checkedItems).toBe(0);
+  });
+
+  it('should generate shopping list items when generateListFromPlan is explicitly called', () => {
+    service.generateListFromPlan();
     const items = service.items();
     expect(items.length).toBeGreaterThanOrEqual(8);
 
@@ -32,7 +44,8 @@ describe('ShoppingListService', () => {
     expect(oats?.packagePrice).toBe(0.79);
   });
 
-  it('should calculate the total shopping sum and reflect estimated notices when older prices are present', () => {
+  it('should calculate the total shopping sum and reflect estimated notices when older prices are present in plan', () => {
+    service.generateListFromPlan();
     const summary = service.summary();
     expect(summary.totalCost).toBeGreaterThan(10);
     expect(summary.totalItems).toBeGreaterThanOrEqual(8);
@@ -42,6 +55,7 @@ describe('ShoppingListService', () => {
   });
 
   it('should exclude items from totalCost when marked as present in pantry (Vorrat)', () => {
+    service.generateListFromPlan();
     const initialCost = service.summary().totalCost;
     const chicken = service.items().find(i => i.productId === 'netto-chicken-400')!;
 
@@ -52,6 +66,7 @@ describe('ShoppingListService', () => {
   });
 
   it('should apply budget buffer percentage', () => {
+    service.generateListFromPlan();
     const baseCost = service.summary().totalCost;
     service.setBudgetBuffer(10); // +10%
 
@@ -60,47 +75,23 @@ describe('ShoppingListService', () => {
     expect(summaryWithBuffer.totalCostWithBuffer).toBe(Math.round((baseCost * 1.1) * 100) / 100);
   });
 
-  it('should toggle item checked state', () => {
-    const first = service.items()[0];
-    const initialStatus = first.isChecked;
+  it('should add custom items and update summary without generating dummy plan items', () => {
+    service.addCustomItem('Bio Äpfel', 2.49, 'fruits_veg', '1 kg', 250);
 
-    service.toggleItemChecked(first.id);
-    const updated = service.items().find(i => i.id === first.id)!;
-    expect(updated.isChecked).toBe(!initialStatus);
+    const items = service.items();
+    expect(items.length).toBe(1);
+    expect(items[0].name).toBe('Bio Äpfel');
+    expect(items[0].totalCost).toBe(2.49);
+    expect(service.summary().totalCost).toBe(2.49);
+    expect(service.summary().totalCalories).toBe(250);
   });
 
-  it('should add and remove custom items', () => {
-    service.addCustomItem('Mineralwasser', 0.59);
-    const added = service.items().find(i => i.name === 'Mineralwasser');
-    expect(added).toBeDefined();
-    expect(added?.totalCost).toBe(0.59);
+  it('should remove items correctly', () => {
+    service.addCustomItem('Bio Bananen', 1.99);
+    expect(service.items().length).toBe(1);
 
-    service.removeCustomItem(added!.id);
-    const removed = service.items().find(i => i.name === 'Mineralwasser');
-    expect(removed).toBeUndefined();
-  });
-
-  it('should calculate total calories of all purchased packages and update when package count changes', () => {
-    const summary = service.summary();
-    expect(summary.totalCalories).toBeGreaterThan(1000);
-
-    const toast = service.items().find(i => i.productId === 'netto-toast-500');
-    expect(toast).toBeDefined();
-    expect(toast?.packageCalories).toBe(1250);
-    expect(toast?.totalCalories).toBe(1250);
-    const initialTotalCals = summary.totalCalories!;
-    const initialCost = summary.totalCost;
-
-    // Packungsanzahl um 1 erhöhen (+1 Toastbrot)
-    service.updatePackageCount(toast!.id, 1);
-
-    const updatedToast = service.items().find(i => i.id === toast!.id)!;
-    expect(updatedToast.packageCount).toBe(2);
-    expect(updatedToast.totalCalories).toBe(2500);
-    expect(updatedToast.totalCost).toBe(2.98);
-
-    const updatedSummary = service.summary();
-    expect(updatedSummary.totalCalories).toBe(initialTotalCals + 1250);
-    expect(updatedSummary.totalCost).toBe(Math.round((initialCost + 1.49) * 100) / 100);
+    service.removeItem(service.items()[0].id);
+    expect(service.items().length).toBe(0);
+    expect(service.summary().totalCost).toBe(0);
   });
 });

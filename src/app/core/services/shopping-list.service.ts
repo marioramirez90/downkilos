@@ -6,6 +6,7 @@ import { PackageCalorieCalculatorService } from './package-calorie-calculator.se
 import { ProductCategory, ProductItem } from '../models/product.model';
 import { Recipe } from '../models/recipe.model';
 
+const STORAGE_ITEMS_KEY = 'down_kilos_shopping_items';
 const STORAGE_CHECKED_KEY = 'down_kilos_shopping_checked';
 const STORAGE_PANTRY_KEY = 'down_kilos_shopping_pantry';
 const STORAGE_CUSTOM_ITEMS_KEY = 'down_kilos_shopping_custom';
@@ -104,7 +105,37 @@ export class ShoppingListService {
   });
 
   constructor() {
-    this.generateListFromPlan();
+    this.loadSavedItems();
+  }
+
+  loadSavedItems(): void {
+    try {
+      const raw = localStorage.getItem(STORAGE_ITEMS_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          this.items.set(parsed);
+          return;
+        }
+      }
+    } catch {
+      // ignore
+    }
+    // STRICT REQUIREMENT (Section 14): Starts completely empty for new users
+    this.items.set([]);
+  }
+
+  saveItems(list: ShoppingListItem[]): void {
+    try {
+      localStorage.setItem(STORAGE_ITEMS_KEY, JSON.stringify(list));
+    } catch {
+      // ignore
+    }
+  }
+
+  clearAllItems(): void {
+    this.items.set([]);
+    this.saveItems([]);
   }
 
   setBudgetBuffer(percent: number): void {
@@ -301,6 +332,7 @@ export class ShoppingListService {
     });
 
     this.items.set(list);
+    this.saveItems(list);
   }
 
   /**
@@ -309,6 +341,7 @@ export class ShoppingListService {
   removeItem(id: string): void {
     const remaining = this.items().filter(i => i.id !== id);
     this.items.set(remaining);
+    this.saveItems(remaining);
 
     if (id.startsWith('custom-')) {
       this.removeCustomItem(id);
@@ -360,7 +393,9 @@ export class ShoppingListService {
       inPantry: false
     };
 
-    this.items.set([newItem, ...this.items()]);
+    const updated = [newItem, ...this.items()];
+    this.items.set(updated);
+    this.saveItems(updated);
   }
 
   addCustomItem(name: string, price: number | null, category: ProductCategory = 'pantry', packageSize = '1 Packung', packageCalories: number | null = null): void {
@@ -396,14 +431,18 @@ export class ShoppingListService {
     currentCustom.push(newItem);
     this.saveCustomItems(currentCustom);
 
-    this.generateListFromPlan();
+    const updated = [newItem, ...this.items()];
+    this.items.set(updated);
+    this.saveItems(updated);
   }
 
   removeCustomItem(id: string): void {
     let currentCustom = this.getSavedCustomItems();
     currentCustom = currentCustom.filter(i => i.id !== id);
     this.saveCustomItems(currentCustom);
-    this.items.set(this.items().filter(i => i.id !== id));
+    const updated = this.items().filter(i => i.id !== id);
+    this.items.set(updated);
+    this.saveItems(updated);
   }
 
   private saveCheckedState(list: ShoppingListItem[]): void {

@@ -14,12 +14,14 @@ $divider-color: #eef3ee;
 .shopping-screen {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
   background-color: $background;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: $text-main;
   position: relative;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .sr-only {
@@ -120,10 +122,11 @@ $divider-color: #eef3ee;
    2. Scrollbarer Bereich
    ========================================================================== */
 .shopping-scroll-area {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 14px 16px calc(88px + env(safe-area-inset-bottom, 16px)) 16px;
+  padding: 14px 16px calc(110px + env(safe-area-inset-bottom, 24px)) 16px;
 
   .shopping-cards-container {
     max-width: 440px;
@@ -131,6 +134,7 @@ $divider-color: #eef3ee;
     display: flex;
     flex-direction: column;
     gap: 16px;
+    padding-bottom: 24px;
   }
 }
 
@@ -556,6 +560,45 @@ $divider-color: #eef3ee;
       &:hover {
         text-decoration: underline;
       }
+    }
+  }
+}
+
+/* ==========================================================================
+   5b. Weiteren Artikel hinzufügen Button
+   ========================================================================== */
+.bottom-action-banner {
+  padding: 12px 0 20px 0;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+
+  .bottom-add-btn {
+    width: 100%;
+    min-height: 50px;
+    background: #ffffff;
+    border: 1.5px dashed $primary-green;
+    color: $primary-green;
+    font-weight: 700;
+    font-size: 14.5px;
+    border-radius: 14px;
+    padding: 12px 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    box-shadow: 0 2px 8px rgba(39, 143, 57, 0.06);
+
+    &:hover {
+      background: $light-green;
+      border-color: $bright-green;
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: scale(0.98);
+      background: #d6ebd9;
     }
   }
 }

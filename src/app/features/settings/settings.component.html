@@ -266,9 +266,14 @@
         <p class="modal-description">
           Es findet kein Tracking deiner persönlichen Essgewohnheiten statt und keine deiner privaten Daten werden an Dritte weitergegeben.
         </p>
-        <button type="button" (click)="showPrivacyModal.set(false)" class="modal-btn-primary">
-          Verstanden
-        </button>
+        <div class="modal-actions-column">
+          <button type="button" (click)="goToPrivacy()" class="modal-btn-secondary">
+            Ausführliche Datenschutzerklärung lesen →
+          </button>
+          <button type="button" (click)="showPrivacyModal.set(false)" class="modal-btn-primary">
+            Verstanden
+          </button>
+        </div>
       </div>
     </div>
   }
@@ -323,12 +328,22 @@
         <p class="modal-description">
           Version {{ appVersion }} • Dein smarter Einkaufs- und Kalorien-Begleiter für Netto Marken-Discount.
         </p>
-        <p class="modal-description text-xs text-[#66716D]">
-          Entwickelt mit Angular 21, TypeScript und modernster Offline-First-Technologie.
-        </p>
-        <button type="button" (click)="showAboutModal.set(false)" class="modal-btn-primary">
-          Schließen
-        </button>
+        <div class="about-disclaimer-box">
+          <p class="text-xs text-[#4E6157] mb-1">
+            <strong>Unabhängigkeitshinweis:</strong> Down Kilos ist eine unabhängige Anwendung und steht in keiner offiziellen oder geschäftlichen Verbindung zu Netto Marken-Discount.
+          </p>
+          <p class="text-xs text-[#4E6157]">
+            <strong>Gesundheitshinweis:</strong> Kein Medizinprodukt. Berechnete Kalorienwerte sind wissenschaftlich orientierte Schätzungen.
+          </p>
+        </div>
+        <div class="modal-actions-column mt-3">
+          <button type="button" (click)="goToImprint()" class="modal-btn-secondary">
+            Impressum & rechtliche Informationen →
+          </button>
+          <button type="button" (click)="showAboutModal.set(false)" class="modal-btn-primary">
+            Schließen
+          </button>
+        </div>
       </div>
     </div>
   }

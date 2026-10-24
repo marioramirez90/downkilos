@@ -1,0 +1,91 @@
+<div class="imprint-screen">
+  <!-- Header -->
+  <header class="imprint-header">
+    <div class="header-top-row">
+      <button
+        type="button"
+        (click)="goBack()"
+        class="circle-back-btn"
+        aria-label="Zurück zu Einstellungen"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18l-6-6 6-6" />
+        </svg>
+      </button>
+
+      <span class="header-label">Rechtliche Angaben</span>
+    </div>
+
+    <div class="header-headings">
+      <h1 class="screen-title">Impressum & Anbieterkennzeichnung</h1>
+      <p class="screen-subtitle">Angaben gemäß § 5 Digitale-Dienste-Gesetz (DDG)</p>
+    </div>
+  </header>
+
+  <!-- Scrollbarer Inhaltsbereich -->
+  <main class="imprint-scroll-area">
+    <div class="draft-notice-banner">
+      <div class="notice-icon">⚠️</div>
+      <div class="notice-text">
+        <strong>Vorab-Entwurf:</strong> Die Hausnummer sowie die Telefon- und E-Mail-Erreichbarkeit müssen vor der Store-Veröffentlichung durch den Entwickler vervollständigt werden.
+      </div>
+    </div>
+
+    <div class="content-cards">
+      <!-- 1. Diensteanbieter -->
+      <section class="info-card">
+        <h2 class="card-heading">Diensteanbieter / Verantwortlicher</h2>
+        <div class="address-box">
+          <strong>Mario Ramirez</strong><br />
+          Im Torfmoor [Hausnummer vor Veröffentlichung zu ergänzen]<br />
+          22417 Hamburg<br />
+          Deutschland
+        </div>
+      </section>
+
+      <!-- 2. Kontakt -->
+      <section class="info-card">
+        <h2 class="card-heading">Kontaktmöglichkeiten</h2>
+        <p class="card-text">
+          <strong>E-Mail:</strong> [E-Mail-Adresse vor Veröffentlichung einzusetzen]<br />
+          <strong>Telefon:</strong> [Telefonnummer vor Veröffentlichung einzusetzen]<br />
+          <strong>Projekt-Website:</strong> <a href="https://www.marioramirez.de/projekte/down-kilos/" target="_blank" rel="noopener">www.marioramirez.de/projekte/down-kilos/</a>
+        </p>
+      </section>
+
+      <!-- 3. Medizinischer Haftungsausschluss -->
+      <section class="info-card medical-card">
+        <h2 class="card-heading text-emerald-800">Wichtiger medizinischer Hinweis</h2>
+        <p class="card-text">
+          Down Kilos ist <strong>kein Medizinprodukt</strong> und dient ausdrücklich <strong>nicht</strong> der medizinischen Diagnose, Beratung, Behandlung, Heilung oder Vorbeugung von Krankheiten oder Essstörungen.
+        </p>
+        <p class="card-text">
+          Alle dargestellten Kalorienbedarfs-, Nährwert- und Abnehmberechnungen sind rein rechnerische, unverbindliche Schätzungen auf Basis allgemeiner mathematischer Formeln (z. B. Mifflin-St. Jeor). Sie ersetzen keinesfalls eine professionelle ärztliche oder ernährungstherapeutische Beratung. Bei gesundheitlichen Beschwerden, Vorerkrankungen, Untergewicht oder Schwangerschaft konsultieren Sie bitte stets qualifiziertes medizinisches Fachpersonal.
+        </p>
+      </section>
+
+      <!-- 4. Unabhängigkeit von Supermärkten & Markenzeichen -->
+      <section class="info-card">
+        <h2 class="card-heading">Marken- und Händlerunabhängigkeit</h2>
+        <p class="card-text">
+          <strong>Down Kilos ist eine unabhängige Anwendung und steht in keiner geschäftlichen, partnerschaftlichen oder offiziellen Verbindung zu Netto Marken-Discount Stiftung & Co. KG oder anderen Supermarktketten.</strong>
+        </p>
+        <p class="card-text text-sm text-[#4E6157]">
+          Namen von Supermärkten, Händlern, Produktmarken und Herstellern werden ausschließlich zur Identifikation und sachlichen Information über verfügbare Lebensmittel und deren Nährwerte verwendet. Alle Marken und Warenzeichen sind Eigentum der jeweiligen Inhaber.
+        </p>
+      </section>
+
+      <!-- 5. Urheberrecht & Datenquellen -->
+      <section class="info-card">
+        <h2 class="card-heading">Quellen & Lizenzen</h2>
+        <ul class="points-list">
+          <li><strong>Open Food Facts:</strong> Nährwertdaten und Produktinformationen stehen unter der Open Database License (ODbL).</li>
+          <li><strong>OpenStreetMap:</strong> Geodaten und Kartendarstellungen stehen unter © OpenStreetMap-Mitwirkende (ODbL).</li>
+          <li><strong>Icons:</strong> Lucide Icons (ISC License).</li>
+        </ul>
+      </section>
+    </div>
+  </main>
+
+  <app-bottom-nav></app-bottom-nav>
+</div>

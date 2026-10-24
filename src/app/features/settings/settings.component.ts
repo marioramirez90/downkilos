@@ -79,6 +79,16 @@ export class SettingsComponent implements OnInit {
     this.showAboutModal.set(true);
   }
 
+  goToPrivacy(): void {
+    this.showPrivacyModal.set(false);
+    this.router.navigate(['/settings/privacy']);
+  }
+
+  goToImprint(): void {
+    this.showAboutModal.set(false);
+    this.router.navigate(['/settings/imprint']);
+  }
+
   confirmResetModal(): void {
     this.resetErrorMessage.set(null);
     this.showResetDialog.set(true);

@@ -1,0 +1,130 @@
+<div class="privacy-screen">
+  <!-- Header -->
+  <header class="privacy-header">
+    <div class="header-top-row">
+      <button
+        type="button"
+        (click)="goBack()"
+        class="circle-back-btn"
+        aria-label="Zurück zu Einstellungen"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18l-6-6 6-6" />
+        </svg>
+      </button>
+
+      <span class="header-label">Datenschutz & Transparenz</span>
+    </div>
+
+    <div class="header-headings">
+      <h1 class="screen-title">Datenschutzerklärung</h1>
+      <p class="screen-subtitle">Rechtlicher Entwurf – Stand: Oktober 2026</p>
+    </div>
+  </header>
+
+  <!-- Scrollbarer Inhaltsbereich -->
+  <main class="privacy-scroll-area">
+    <div class="draft-notice-banner">
+      <div class="notice-icon">ℹ️</div>
+      <div class="notice-text">
+        <strong>Juristischer Entwurf:</strong> Diese Datenschutzerklärung bildet die tatsächliche technische Datenverarbeitung von Down Kilos ab. Vor Veröffentlichung im Play Store sind die Kontaktdaten final zu bestätigen.
+      </div>
+    </div>
+
+    <div class="content-cards">
+      <!-- 1. Verantwortlicher -->
+      <section class="info-card">
+        <h2 class="card-heading">1. Verantwortlicher</h2>
+        <p class="card-text">
+          Verantwortlicher im Sinne der Datenschutz-Grundverordnung (DSGVO) und sonstiger datenschutzrechtlicher Bestimmungen:
+        </p>
+        <div class="contact-box">
+          <strong>Mario Ramirez</strong><br />
+          Im Torfmoor [Hausnummer vor Veröffentlichung zu ergänzen]<br />
+          22417 Hamburg, Deutschland<br />
+          E-Mail: [E-Mail-Adresse vor Veröffentlichung einzusetzen]<br />
+          Website: <a href="https://www.marioramirez.de/projekte/down-kilos/" target="_blank" rel="noopener">www.marioramirez.de/projekte/down-kilos/</a>
+        </div>
+      </section>
+
+      <!-- 2. Grundprinzip: Lokale Speicherung ohne Benutzerkonto -->
+      <section class="info-card">
+        <h2 class="card-heading">2. Lokale Speicherung ohne Benutzerkonto (Gastmodus)</h2>
+        <p class="card-text">
+          Down Kilos funktioniert in Version 1.0 vollständig ohne Registrierung, ohne Benutzerkonto und ohne Pflicht zur Anmeldung.
+        </p>
+        <p class="card-text">
+          Sämtliche von Ihnen eingegebenen persönlichen Daten verbleiben <strong>ausschließlich lokal auf Ihrem Endgerät</strong> (im Browser-Speicher IndexedDB sowie LocalStorage). Es findet <strong>keine Übertragung persönlicher Gesundheits- oder Profildaten an eigene Server oder Cloud-Datenbanken</strong> statt.
+        </p>
+        <div class="data-tags-list">
+          <span class="data-tag">Vorname / Rufname</span>
+          <span class="data-tag">Geburtsdatum & Alter</span>
+          <span class="data-tag">Biologisches Geschlecht</span>
+          <span class="data-tag">Körpergröße & Gewicht</span>
+          <span class="data-tag">Wunschgewicht & Ziel</span>
+          <span class="data-tag">Aktivitätsniveau</span>
+          <span class="data-tag">Ernährungsweise & Allergien</span>
+          <span class="data-tag">Gewichtsverlaufshistorie</span>
+          <span class="data-tag">Ernährungstagebucheinträge</span>
+          <span class="data-tag">Einkaufslisten & Favoriten</span>
+        </div>
+      </section>
+
+      <!-- 3. Externe Netzwerkabrufe & Schnittstellen -->
+      <section class="info-card">
+        <h2 class="card-heading">3. Externe Netzwerkabrufe (HTTPS)</h2>
+        <p class="card-text">
+          Um Ihnen Lebensmitteldaten und Supermärkte anzuzeigen, greift die App bei aktiver Internetverbindung über verschlüsselte HTTPS-Verbindungen auf folgende Drittanbieterdienste zu:
+        </p>
+        <ul class="points-list">
+          <li>
+            <strong>Open Food Facts (de.openfoodfacts.org):</strong> Abruf von Nährwertangaben, Produktnamen und Produktbildern anhand von Barcodes oder Suchbegriffen. Dabei werden ausschließlich produktbezogene Abfrageparameter und technische Verbindungsdaten (z. B. IP-Adresse) übermittelt.
+          </li>
+          <li>
+            <strong>Open Prices (prices.openfoodfacts.org):</strong> Abruf von Preisbeobachtungen zu Lebensmitteln.
+          </li>
+          <li>
+            <strong>OpenStreetMap / Overpass API & Nominatim:</strong> Wenn Sie die Funktion zur Marktsuche nutzen, werden die Koordinaten Ihres Suchradius übermittelt, um Supermarktfilialen in Ihrer Nähe zu ermitteln.
+          </li>
+        </ul>
+        <p class="card-text text-sm text-[#4E6157]">
+          Zu keinem Zeitpunkt werden Ihre persönlichen Gesundheitsdaten, Kalorienziele oder Ernährungstagebücher an diese Dienste übermittelt.
+        </p>
+      </section>
+
+      <!-- 4. Keine Tracking- oder Werbe-SDKs -->
+      <section class="info-card">
+        <h2 class="card-heading">4. Kein Tracking, keine Werbung, keine Analyse-SDKs</h2>
+        <p class="card-text">
+          In Down Kilos sind <strong>keine Drittanbieter-Tracking-SDKs</strong> (wie Google Analytics, Firebase Analytics, Meta Pixel oder Werbenetzwerke) und keine Crash-Reporting-Tools eingebunden. Ihr Nutzungsverhalten wird nicht ausgewertet oder monetarisiert.
+        </p>
+      </section>
+
+      <!-- 5. Löschung Ihrer Daten -->
+      <section class="info-card">
+        <h2 class="card-heading">5. Löschung und Datenkontrolle</h2>
+        <p class="card-text">
+          Da Ihre Daten nur lokal auf Ihrem Gerät gespeichert sind, haben Sie jederzeit die vollständige Kontrolle:
+        </p>
+        <ul class="points-list">
+          <li>
+            <strong>Direkt in der App:</strong> Über <em>Mehr → Einstellungen → Alle Daten zurücksetzen</em> werden sämtliche Profildaten, Gewichtsverläufe, Tagebucheinträge und Einkaufslisten unwiderruflich von Ihrem Gerät gelöscht.
+          </li>
+          <li>
+            <strong>Über das Betriebssystem:</strong> Durch Deinstallation der App oder Löschen des App-Speichers in den Android-Systemeinstellungen werden ebenfalls alle lokalen Daten rückstandsfrei entfernt.
+          </li>
+        </ul>
+      </section>
+
+      <!-- 6. Ihre Rechte nach DSGVO -->
+      <section class="info-card">
+        <h2 class="card-heading">6. Ihre Rechte</h2>
+        <p class="card-text">
+          Ihnen stehen nach der DSGVO die Rechte auf Auskunft (Art. 15), Berichtigung (Art. 16), Löschung (Art. 17) sowie Einschränkung der Verarbeitung (Art. 18) zu. Da Down Kilos keine Daten auf zentralen Servern speichert und keinen Zugriff auf Ihr Smartphone hat, können Sie diese Rechte direkt und unmittelbar über die Reset-Funktion in der App ausüben.
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <app-bottom-nav></app-bottom-nav>
+</div>

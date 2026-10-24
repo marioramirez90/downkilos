@@ -479,6 +479,42 @@ $border-color: #e5ebe5;
       }
     }
   }
+
+  .modal-actions-column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+    width: 100%;
+
+    .modal-btn-secondary {
+      width: 100%;
+      padding: 11px 16px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: $primary-green;
+      background-color: #f0f7f2;
+      border: 1px solid #d8ebd9;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+
+      &:hover {
+        background-color: #e5f2e8;
+      }
+    }
+  }
+
+  .about-disclaimer-box {
+    margin-top: 10px;
+    padding: 10px 12px;
+    background-color: #f6f8f6;
+    border-radius: 10px;
+    border-left: 3px solid $primary-green;
+    text-align: left;
+    line-height: 1.4;
+  }
 }
 
 /* Toast */

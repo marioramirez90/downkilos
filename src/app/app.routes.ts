@@ -109,6 +109,28 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'settings/privacy',
+    loadComponent: () =>
+      import('./features/settings/privacy/privacy.component').then((m) => m.PrivacyComponent),
+    title: 'Down Kilos – Datenschutzerklärung',
+  },
+  {
+    path: 'datenschutz',
+    redirectTo: 'settings/privacy',
+    pathMatch: 'full',
+  },
+  {
+    path: 'settings/imprint',
+    loadComponent: () =>
+      import('./features/settings/imprint/imprint.component').then((m) => m.ImprintComponent),
+    title: 'Down Kilos – Impressum & Anbieterkennzeichnung',
+  },
+  {
+    path: 'impressum',
+    redirectTo: 'settings/imprint',
+    pathMatch: 'full',
+  },
+  {
     path: 'discover',
     loadComponent: () =>
       import('./features/discover/discover.component').then((m) => m.DiscoverComponent),

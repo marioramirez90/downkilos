@@ -1,449 +1,349 @@
-<div class="discover-container">
-  <!-- Bereich A: Fester Header -->
+<div class="discover-screen">
+  <!-- 1. Header (Oben) -->
   <header class="discover-header">
-    <div class="header-main-row">
-      <div class="header-title-box">
-        <app-logo size="sm"></app-logo>
-        <div>
-          <h1>{{ 'DISCOVER.HEADER_TITLE' | translate }}</h1>
-          <span>{{ 'DISCOVER.HEADER_SUBTITLE' | translate }}</span>
-        </div>
-      </div>
+    <div class="header-top-row">
+      <!-- Leaf Logo & Brand Name -->
+      <button type="button" (click)="goToDashboard()" class="brand-link-btn" title="Zum Dashboard">
+        <svg class="brand-leaf-icon" viewBox="0 0 24 24" fill="#278F39">
+          <path d="M12 2C6.48 2 2 6.48 2 12c0 3.31 1.61 6.24 4.09 8.04C6.03 19.37 6 18.69 6 18c0-5.52 4.48-10 10-10 1.05 0 2.06.16 3 .46.63-1.89 1-3.9 1-6.06 0-.27-.01-.54-.03-.8C18.15 2.58 15.22 2 12 2zm8 9c-4.42 0-8 3.58-8 8 0 1.05.2 2.05.57 2.97C14.07 21.98 14.15 22 14.24 22c4.42 0 8-3.58 8-8 0-.41-.03-.82-.09-1.22-.05-.01-.1-.01-.15-.01z"/>
+        </svg>
+        <span class="brand-name">Down Kilos</span>
+      </button>
 
-      <div class="header-action-pills">
-        <span class="netto-badge">Netto</span>
-        <button
-          type="button"
-          (click)="showBarcodeScanner.set(true)"
-          class="barcode-btn"
-          title="Barcode scannen"
-        >
-          📷
-        </button>
-        <app-hamburger-button></app-hamburger-button>
-      </div>
-    </div>
-
-    <!-- Quick Actions Banner: Kalorienbudget -->
-    <div class="budget-banner">
-      <div class="budget-info">
-        <span class="budget-icon">🎯</span>
-        <div>
-          <span class="budget-text">
-            Noch {{ remainingCalories() }} kcal für heute frei
-          </span>
-          <span class="budget-sub">
-            Tagesziel: {{ foodLogService.targetCalories() }} kcal
-          </span>
-        </div>
-      </div>
-
-      <button
-        type="button"
-        (click)="filterByRemainingKcal.set(!filterByRemainingKcal())"
-        class="budget-toggle-btn"
-        [class.active]="filterByRemainingKcal()"
-      >
-        {{ filterByRemainingKcal() ? ('DISCOVER.BUDGET_ACTIVE' | translate) : ('DISCOVER.BUDGET_FIT' | translate) }}
+      <!-- Zahnrad-Icon für Einstellungen -->
+      <button type="button" (click)="goToSettings()" class="settings-gear-btn" aria-label="Einstellungen" title="Einstellungen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
       </button>
     </div>
 
-    <!-- Suchleiste & Sortierung -->
-    <div class="search-sort-row">
-      <div class="search-input-wrapper">
-        <input
-          type="text"
-          [(ngModel)]="searchQuery"
-          [placeholder]="'DISCOVER.SEARCH_PLACEHOLDER' | translate"
-        />
-        <span class="search-icon">🔍</span>
-      </div>
-
-      <!-- Sortierung Dropdown -->
-      <select
-        [ngModel]="activeSortBy()"
-        (ngModelChange)="activeSortBy.set($event)"
-        class="sort-dropdown"
-      >
-        <option value="relevance">{{ 'DISCOVER.SORT_RELEVANCE' | translate }}</option>
-        <option value="price_asc">{{ 'DISCOVER.SORT_PRICE_ASC' | translate }}</option>
-        <option value="calories_asc">{{ 'DISCOVER.SORT_CALORIES_ASC' | translate }}</option>
-        <option value="protein_desc">{{ 'DISCOVER.SORT_PROTEIN_DESC' | translate }}</option>
-      </select>
+    <!-- Titel & Untertitel -->
+    <div class="header-headings">
+      <h1 class="page-title">Produkte</h1>
+      <p class="page-subtitle">Entdecke Lebensmittel und ihre Kalorien.</p>
     </div>
 
-    <!-- Filter Pills -->
-    <div class="category-pills-bar">
-      @for (pill of categoryPills; track pill.id) {
+    <!-- 2. Produktsuche (Hellgraue runde Pillenform) -->
+    <div class="search-bar-pill">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        placeholder="Produkt suchen (z. B. Milch, Brot, Banane ...)"
+        class="search-input"
+        aria-label="Produkte durchsuchen"
+      />
+      @if (searchQuery) {
+        <button type="button" (click)="searchQuery = ''" class="clear-search-btn" title="Suche leeren">✕</button>
+      }
+    </div>
+
+    <!-- 3. Horizontal scrollbare Kategorienreihe -->
+    <div class="categories-scroll-row" role="tablist" aria-label="Kategorien">
+      @for (cat of categories; track cat.id) {
         <button
           type="button"
-          (click)="activeCategoryFilter.set(pill.id)"
-          class="category-pill"
-          [class.active]="activeCategoryFilter() === pill.id"
+          (click)="setCategoryFilter(cat.id)"
+          class="category-card-btn"
+          [class.active]="activeCategoryFilter() === cat.id"
+          role="tab"
+          [attr.aria-selected]="activeCategoryFilter() === cat.id"
         >
-          {{ pill.label }}
+          <!-- Kategorie-spezifisches Icon -->
+          <div class="cat-icon-wrap">
+            @if (cat.icon === 'basket') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <path d="M16 10a4 4 0 0 1-8 0"/>
+              </svg>
+            } @else if (cat.icon === 'apple') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/>
+                <path d="M10 2c1 .5 2 2 2 5"/>
+              </svg>
+            } @else if (cat.icon === 'bread') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/>
+                <line x1="6" y1="17" x2="18" y2="17"/>
+              </svg>
+            } @else if (cat.icon === 'milk') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 2h8l2 5v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7l2-5Z"/>
+                <path d="M6 9h12"/>
+              </svg>
+            } @else if (cat.icon === 'can') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <ellipse cx="12" cy="5" rx="7" ry="3"/>
+                <path d="M5 5v14c0 1.66 3.13 3 7 3s7-1.34 7-3V5"/>
+                <path d="M5 12c0 1.66 3.13 3 7 3s7-1.34 7-3"/>
+              </svg>
+            } @else if (cat.icon === 'candy') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m9.5 7.5-2-2a2 2 0 0 0-2.83 0l-.17.17a2 2 0 0 0 0 2.83l2 2"/>
+                <path d="m14.5 16.5 2 2a2 2 0 0 0 2.83 0l.17-.17a2 2 0 0 0 0-2.83l-2-2"/>
+                <circle cx="12" cy="12" r="4"/>
+              </svg>
+            } @else if (cat.icon === 'meat') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m15 11-1 1a3 3 0 0 1-4.24 0l-.88-.88a3 3 0 0 1 0-4.24l1-1a3 3 0 0 1 4.24 0l.88.88a3 3 0 0 1 0 4.24Z"/>
+                <path d="M18 11.5 14.5 8"/>
+                <path d="M12.5 15.5 9 12"/>
+              </svg>
+            } @else if (cat.icon === 'egg') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2C8 2 5 7 5 13a7 7 0 0 0 14 0c0-6-3-11-7-11z" />
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="m12 6 4 6h-8l4-6z"/>
+              </svg>
+            }
+          </div>
+          <span class="cat-label">{{ cat.label }}</span>
         </button>
       }
     </div>
   </header>
 
-  <!-- Toast Notification -->
+  <!-- Toast Benachrichtigung -->
   @if (toastMessage(); as msg) {
-    <div class="toast-popup">
-      <span>✓</span>
+    <div class="toast-popup" role="status">
+      <span class="toast-check">✓</span>
       <span>{{ msg }}</span>
     </div>
   }
 
-  <!-- Bereich B: Scrollbare Produktkarten -->
-  <main class="discover-content">
-    <div class="products-count-header">
-      <span>{{ filteredProducts().length }} {{ 'DISCOVER.VERIFIED_COUNT' | translate }}</span>
-      <button (click)="goToShoppingList()">
-        {{ 'DISCOVER.GO_TO_CART' | translate }}
+  <!-- 4. Scrollbarer Hauptbereich -->
+  <main class="discover-scroll-area">
+    <!-- Produktüberschrift & Zurücksetzen / Anzeigen -->
+    <div class="products-section-header">
+      <h2 class="section-title">{{ getActiveCategoryTitle() }}</h2>
+      <button
+        type="button"
+        (click)="resetFilters()"
+        class="category-action-link"
+        title="Alle Kategorien anzeigen"
+      >
+        Kategorie anzeigen →
       </button>
     </div>
 
-    <div class="products-grid">
+    <!-- 5. Vertikale Einspaltige Produktliste (EIN PRODUKT = EINE KOMPLETTE HORIZONTALE ZEILE) -->
+    <div class="products-list-col">
       @for (prod of filteredProducts(); track prod.id) {
-        <div class="product-card">
-          <!-- Top Row: Bild, Name, Marke, Preis -->
-          <div class="card-header-row" (click)="openProductDetail(prod)">
-            <div class="product-thumb">
+        <article class="product-row-card" (click)="openProductDetail(prod)">
+          <!-- Oberer Kartenbereich: Bild, Info, Aktionen -->
+          <div class="card-main-row">
+            <!-- Produktbild links -->
+            <div class="product-img-box">
               <img [src]="prod.imageUrl" [alt]="prod.name" loading="lazy" />
-              <span class="thumb-badge">Netto</span>
             </div>
 
+            <!-- Produktinformationen mittig -->
             <div class="product-info-col">
-              <div class="brand-row">
-                <span>{{ prod.brand }}</span>
-                @if (prod.isHighProtein) {
-                  <span class="protein-tag">Protein</span>
-                }
-              </div>
-
-              <h3>{{ prod.name }}</h3>
-
-              <div class="package-meta">
-                <span>{{ prod.packageSize }}</span>
-                @if (prod.drainedWeightGrams) {
-                  <span class="drained-badge">
-                    {{ prod.drainedWeightGrams }} g {{ 'DISCOVER.DRAINED_WEIGHT' | translate }}
-                  </span>
-                }
-                @if (prod.edibleYieldPercent && prod.edibleYieldPercent < 1.0 && !prod.drainedWeightGrams) {
-                  <span class="yield-badge">
-                    ({{ Math.round(prod.edibleYieldPercent * 100) }}% essbar)
-                  </span>
-                }
-              </div>
-
-              <div class="price-row">
-                <span class="main-price">{{ priceService.formatPrice(prod.price) }}</span>
-                @if (prod.priceUnit && prod.price !== null) {
-                  <span class="price-unit">({{ prod.priceUnit }})</span>
-                }
-              </div>
+              <h3 class="product-name">{{ prod.name }}</h3>
+              <p class="product-size">{{ prod.packageSize }}</p>
+              <strong class="product-price">{{ getProductPriceDisplay(prod) }}</strong>
             </div>
-          </div>
 
-          <!-- PROMINENTE KALORIEN-KARTE (Ganze Packung, 100g, Stück) -->
-          <div class="calories-banner-grid">
-            <!-- 1. Ganze Packung -->
-            <div class="package-cals-card">
-              <span>{{ 'DISCOVER.PER_PACKAGE' | translate }}</span>
-              <span class="cals-val">
-                @if (getPackageCalories(prod); as pCal) {
-                  {{ pCal }} kcal
+            <!-- Aktionen rechts (Herz oben, Plus unten) -->
+            <div class="product-actions-col">
+              <!-- Herz-Icon für Favoriten -->
+              <button
+                type="button"
+                (click)="toggleFavorite($event, prod.id)"
+                class="favorite-btn"
+                [class.favorited]="isFavorite(prod.id)"
+                [attr.aria-label]="isFavorite(prod.id) ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen'"
+                title="Favorit"
+              >
+                @if (isFavorite(prod.id)) {
+                  <svg viewBox="0 0 24 24" fill="#E11D48" stroke="#E11D48" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                  </svg>
                 } @else {
-                  <span class="unknown-val">k.A.</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                  </svg>
                 }
-              </span>
-              <small>{{ 'DISCOVER.EDIBLE_AMOUNT' | translate }}</small>
-            </div>
+              </button>
 
-            <!-- 2. Je 100g -->
-            <div class="per-100g-box">
-              <span>{{ 'DISCOVER.PER_100G' | translate }}</span>
-              <span class="cals-val">{{ prod.nutrition.caloriesPer100g }} kcal</span>
-              <small>{{ prod.nutrition.proteinPer100g }}g Eiweiß</small>
-            </div>
-
-            <!-- 3. Je Stück / Portion -->
-            <div class="per-piece-box">
-              @if (getPieceInfo(prod); as piece) {
-                <span>1 {{ piece.unitName }}</span>
-                <span class="cals-val">{{ piece.calories }} kcal</span>
-                <small>ca. {{ piece.pieceWeightGrams }}g</small>
-              } @else if (prod.servingSizeGrams) {
-                <span>Portion</span>
-                <span class="cals-val">
-                  {{ Math.round((prod.servingSizeGrams * (prod.edibleYieldPercent || 1) * prod.nutrition.caloriesPer100g) / 100) }} kcal
-                </span>
-                <small>{{ prod.servingSizeGrams }}g</small>
-              } @else {
-                <span>Stückwert</span>
-                <span class="cals-val-italic">variabel</span>
-              }
+              <!-- Großer runder grüner Plus-Button -->
+              <button
+                type="button"
+                (click)="addToCart($event, prod)"
+                class="add-to-cart-circle-btn"
+                aria-label="Zur Einkaufsliste hinzufügen"
+                title="Zur Einkaufsliste hinzufügen"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </button>
             </div>
           </div>
 
-          <!-- Aktionsbuttons: "Produkt ansehen" und "Zur Einkaufsliste" -->
-          <div class="card-buttons-row">
-            <button
-              type="button"
-              (click)="openProductDetail(prod)"
-              class="view-detail-btn"
-            >
-              <span>🔍</span>
-              <span>{{ 'DISCOVER.VIEW_PRODUCT' | translate }}</span>
-            </button>
+          <!-- Unterer Bereich: Die 3 Kalorienspalten pro Produkt -->
+          <div class="card-calories-row">
+            <!-- Spalte 1: 100 g / 100 ml mit grünem Flammen-Icon -->
+            <div class="cal-col">
+              <div class="cal-label-row">
+                <svg class="cal-icon flame-icon" viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3.5z" />
+                </svg>
+                <span>{{ prod.category === 'beverages' ? '100 ml' : '100 g' }}</span>
+              </div>
+              <strong class="cal-val">{{ prod.nutrition.caloriesPer100g }} kcal</strong>
+            </div>
 
-            <button
-              type="button"
-              (click)="addToShoppingList(prod)"
-              class="add-cart-btn"
-            >
-              <span>🛒</span>
-              <span>{{ 'DISCOVER.ADD_TO_CART' | translate }}</span>
-            </button>
+            <div class="cal-divider"></div>
+
+            <!-- Spalte 2: 1 Stück / 1 Portion mit passendem Lebensmittel-Icon -->
+            <div class="cal-col">
+              <div class="cal-label-row">
+                @if (prod.pieceUnitName === 'Scheibe' || prod.name.toLowerCase().includes('toast')) {
+                  <svg class="cal-icon" viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 11V7a4 4 0 0 1 8-2 4 4 0 0 1 8 2v4a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3z"/>
+                    <path d="M4 11v6a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-6"/>
+                  </svg>
+                } @else if (prod.pieceUnitName === 'Ei' || prod.name.toLowerCase().includes('ei')) {
+                  <svg class="cal-icon" viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2">
+                    <path d="M12 2C8 2 5 7 5 13a7 7 0 0 0 14 0c0-6-3-11-7-11z" />
+                  </svg>
+                } @else if (prod.pieceUnitName === 'Banane' || prod.name.toLowerCase().includes('banan')) {
+                  <svg class="cal-icon" viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round">
+                    <path d="M4 13c3 5 8 7 14 6 1 0 2-.5 3-1.5s.5-2.5 0-3c-4-4-9-5-14-3" />
+                    <path d="M4 13c-1-1-1.5-2-1.5-3" />
+                  </svg>
+                } @else if (isCupProduct(prod)) {
+                  <svg class="cal-icon" viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 4h14l-1.5 16H6.5L5 4z"/>
+                    <path d="M4 4h16"/>
+                  </svg>
+                } @else if (isCanProduct(prod)) {
+                  <svg class="cal-icon" viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <ellipse cx="12" cy="5" rx="7" ry="3"/>
+                    <path d="M5 5v14c0 1.66 3.13 3 7 3s7-1.34 7-3V5"/>
+                  </svg>
+                } @else {
+                  <svg class="cal-icon" viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="9"/>
+                    <path d="M12 8v8M8 12h8"/>
+                  </svg>
+                }
+                <span>{{ getPieceUnitName(prod) }}</span>
+              </div>
+              <strong class="cal-val">{{ getPieceCaloriesDisplay(prod) }}</strong>
+            </div>
+
+            <div class="cal-divider"></div>
+
+            <!-- Spalte 3: Ganze Packung mit grünem 3D-Paket-Icon -->
+            <div class="cal-col">
+              <div class="cal-label-row">
+                <svg class="cal-icon box-icon" viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                  <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                  <line x1="12" y1="22.08" x2="12" y2="12" />
+                </svg>
+                <span>Packung</span>
+              </div>
+              <strong class="cal-val">{{ getPackageCaloriesDisplay(prod) }}</strong>
+            </div>
           </div>
-        </div>
+        </article>
       } @empty {
-        <div class="empty-results-card">
-          <span>🔍</span>
-          <p>{{ 'DISCOVER.EMPTY_NOTICE' | translate }}</p>
+        <div class="empty-products-state">
+          <div class="empty-icon">🔍</div>
+          <h3>Keine Produkte gefunden</h3>
+          <p>Für deine Suchanfrage oder diesen Filter wurden keine Artikel gefunden.</p>
+          <button type="button" (click)="resetFilters()" class="reset-filter-btn">
+            Filter zurücksetzen
+          </button>
         </div>
       }
     </div>
   </main>
 
-  <!-- Bereich C: Fester Footer mit Hauptnavigation -->
-  <footer class="discover-footer">
-    <div class="footer-action-row">
-      <button
-        type="button"
-        (click)="goToRecipes()"
-        class="recipe-link-btn"
-      >
-        {{ 'DISCOVER.VIEW_RECIPES' | translate }}
-      </button>
-      <button
-        type="button"
-        (click)="goToShoppingList()"
-        class="cart-link-btn"
-      >
-        <span>{{ 'NAV.SHOPPING_LIST' | translate }}</span>
-        <span>→</span>
-      </button>
-    </div>
+  <!-- 6. Feste untere Navigation -->
+  <footer class="discover-footer-nav">
     <app-bottom-nav></app-bottom-nav>
   </footer>
 
-  <!-- PRODUKTDETAIL-MODAL -->
-  @if (selectedProductDetail(); as p) {
-    <div class="modal-backdrop" (click)="closeProductDetail()">
-      <div class="modal-card" (click)="$event.stopPropagation()">
-        <!-- Header -->
-        <div class="modal-header-row">
-          <div class="modal-title-box">
-            <div class="modal-thumb">
-              <img [src]="p.imageUrl" [alt]="p.name" />
-            </div>
-            <div class="modal-title-text">
-              <span>{{ p.brand }}</span>
-              <h3>{{ p.name }}</h3>
-              <p>{{ p.packageSize }} • {{ priceService.formatPrice(p.price) }}</p>
-            </div>
-          </div>
-          <button (click)="closeProductDetail()" class="modal-close-btn">✕</button>
-        </div>
-
-        <!-- KALORIEN DER GESAMTEN PACKUNG -->
-        <div class="modal-hero-cals-card">
-          <span>{{ 'DISCOVER.MODAL_PACKAGE_CALS' | translate }}</span>
-          <span class="hero-cals-num">
-            @if (getPackageCalories(p); as packCals) {
-              {{ packCals }} kcal
-            } @else {
-              <small>Nährwerte nicht verfügbar</small>
-            }
-          </span>
-          <small>
-            bezogen auf die vollständige essbare Menge ({{ calorieCalc.calculatePackageEdibleGrams(p) }} g)
-          </small>
-        </div>
-
-        <!-- INTERAKTIVE MENGENAUSWAHL -->
-        <div class="modal-amount-selector-box">
-          <label>{{ 'DISCOVER.INTERACTIVE_AMOUNT' | translate }}</label>
-
-          <div class="quick-amounts-grid">
-            @if (getPieceInfo(p); as piece) {
-              <button
-                type="button"
-                (click)="setDetailSelection(1, 'pieces')"
-                [class.selected]="detailMode() === 'pieces' && detailAmount() === 1"
-              >
-                1 {{ piece.unitName }}
-              </button>
-              <button
-                type="button"
-                (click)="setDetailSelection(2, 'pieces')"
-                [class.selected]="detailMode() === 'pieces' && detailAmount() === 2"
-              >
-                2 {{ piece.unitName }}er
-              </button>
-            } @else {
-              <button
-                type="button"
-                (click)="setDetailSelection(100, 'grams')"
-                [class.selected]="detailMode() === 'grams' && detailAmount() === 100"
-              >
-                100 g
-              </button>
-              <button
-                type="button"
-                (click)="setDetailSelection(200, 'grams')"
-                [class.selected]="detailMode() === 'grams' && detailAmount() === 200"
-              >
-                200 g
-              </button>
-            }
-
-            <button
-              type="button"
-              (click)="setDetailSelection(1, 'packages')"
-              [class.selected]="detailMode() === 'packages' && detailAmount() === 1"
-            >
-              {{ 'DISCOVER.PER_PACKAGE' | translate }}
-            </button>
-          </div>
-
-          <div class="custom-amount-row">
-            <span>{{ 'DISCOVER.CUSTOM_AMOUNT' | translate }}</span>
-            <input
-              type="number"
-              min="1"
-              max="5000"
-              [ngModel]="detailAmount()"
-              (ngModelChange)="detailAmount.set($event)"
-            />
-            <select
-              [ngModel]="detailMode()"
-              (ngModelChange)="detailMode.set($event)"
-            >
-              @if (getPieceInfo(p); as piece) {
-                <option value="pieces">{{ piece.unitName }}</option>
-              }
-              <option value="grams">Gramm (g)</option>
-              <option value="packages">Packung(en)</option>
-            </select>
-          </div>
-
-          <div class="live-calculated-cals-row">
-            <span>{{ 'DISCOVER.SELECTED_AMOUNT' | translate }}</span>
-            <span class="result-cals">
-              @if (calculatedDetailCalories(); as cals) {
-                {{ cals }} kcal
-              } @else {
-                k.A.
-              }
-            </span>
-          </div>
-        </div>
-
-        <!-- Nährwerte Übersicht (100g) -->
-        <div class="modal-nutrition-grid-box">
-          <span>{{ 'DISCOVER.NUTRITION_100G' | translate }}</span>
-          <div class="nutrition-cards-row">
-            <div class="nutri-stat-card">
-              <small>Kalorien</small>
-              <strong>{{ p.nutrition.caloriesPer100g }} kcal</strong>
-            </div>
-            <div class="nutri-stat-card">
-              <small>Eiweiß</small>
-              <strong class="protein-text">{{ p.nutrition.proteinPer100g }} g</strong>
-            </div>
-            <div class="nutri-stat-card">
-              <small>Kohlenhydrate</small>
-              <strong class="carbs-text">{{ p.nutrition.carbsPer100g }} g</strong>
-            </div>
-            <div class="nutri-stat-card">
-              <small>Fett</small>
-              <strong class="fat-text">{{ p.nutrition.fatPer100g }} g</strong>
-            </div>
-          </div>
-        </div>
-
-        <!-- Modal Actions -->
-        <div class="modal-actions-box">
-          <button
-            type="button"
-            (click)="addToShoppingList(p); closeProductDetail()"
-            class="modal-add-cart-btn"
-          >
-            <span>🛒</span>
-            <span>{{ 'DISCOVER.ADD_TO_CART' | translate }}</span>
-          </button>
-
-          <div class="modal-eat-row">
-            <select [(ngModel)]="selectedMealType">
-              <option value="breakfast">Frühstück</option>
-              <option value="lunch">Mittagessen</option>
-              <option value="dinner">Abendessen</option>
-              <option value="snack">Snack</option>
-            </select>
-            <button
-              type="button"
-              (click)="logAsEatenFromDetail()"
-              class="modal-eat-btn"
-            >
-              <span>🍽️</span>
-              <span>{{ 'DISCOVER.LOG_AS_EATEN' | translate }}</span>
-            </button>
-          </div>
-        </div>
+  <!-- 7. Detail-Modal (Bleibt vollständig erhalten für Tiefeninteraktion) -->
+  @if (selectedProductDetail(); as prod) {
+    <div class="modal-backdrop" (click)="closeProductDetail()"></div>
+    <div class="detail-modal" role="dialog" aria-modal="true" [attr.aria-label]="prod.name">
+      <div class="modal-header">
+        <h3 class="modal-product-title">{{ prod.name }}</h3>
+        <button type="button" (click)="closeProductDetail()" class="modal-close-btn" aria-label="Schließen">✕</button>
       </div>
-    </div>
-  }
 
-  <!-- BARCODE-SCANNER MODAL -->
-  @if (showBarcodeScanner()) {
-    <div class="modal-backdrop">
-      <div class="modal-card barcode-dialog">
-        <div class="dialog-header">
-          <h3>{{ 'DISCOVER.BARCODE_TITLE' | translate }}</h3>
-          <button (click)="showBarcodeScanner.set(false)">✕</button>
+      <div class="modal-scroll-body">
+        <div class="modal-img-wrap">
+          <img [src]="prod.imageUrl" [alt]="prod.name" />
         </div>
 
-        <p>Scanne den EAN-Barcode eines Netto-Produkts oder gib die Ziffern ein:</p>
-
-        <div class="dialog-input-row">
-          <input
-            type="text"
-            [(ngModel)]="barcodeInput"
-            placeholder="z.B. 4311501789012 (Toastbrot)"
-          />
-          @if (barcodeScanError(); as err) {
-            <span class="error-msg">{{ err }}</span>
-          }
+        <div class="modal-meta-row">
+          <span class="modal-brand">{{ prod.brand }}</span>
+          <strong class="modal-price">{{ priceService.formatPrice(prod.price) }}</strong>
         </div>
 
-        <div class="dialog-actions-row">
-          <button
-            type="button"
-            (click)="showBarcodeScanner.set(false)"
-            class="cancel-btn"
-          >
-            {{ 'COMMON.CANCEL' | translate }}
+        <div class="modal-nutrition-table">
+          <div class="table-row">
+            <span>Brennwert (100g)</span>
+            <strong>{{ prod.nutrition.caloriesPer100g }} kcal</strong>
+          </div>
+          <div class="table-row">
+            <span>Eiweiß</span>
+            <span>{{ prod.nutrition.proteinPer100g }} g</span>
+          </div>
+          <div class="table-row">
+            <span>Kohlenhydrate</span>
+            <span>{{ prod.nutrition.carbsPer100g }} g</span>
+          </div>
+          <div class="table-row">
+            <span>Fett</span>
+            <span>{{ prod.nutrition.fatPer100g }} g</span>
+          </div>
+        </div>
+
+        <!-- Portions- / Mengenauswahl -->
+        <div class="modal-amount-section">
+          <label>Portionsmenge:</label>
+          <div class="amount-stepper-row">
+            <button
+              type="button"
+              (click)="detailAmount.set(Math.max(1, detailAmount() - 1))"
+              class="modal-stepper-btn"
+            >
+              –
+            </button>
+            <span class="modal-amount-number">{{ detailAmount() }}</span>
+            <button
+              type="button"
+              (click)="detailAmount.set(detailAmount() + 1)"
+              class="modal-stepper-btn"
+            >
+              +
+            </button>
+          </div>
+        </div>
+
+        <div class="modal-action-buttons">
+          <button type="button" (click)="addToShoppingList(prod)" class="btn-add-cart">
+            🛒 Zur Einkaufsliste
           </button>
-          <button
-            type="button"
-            (click)="searchByBarcode()"
-            class="search-btn"
-          >
-            {{ 'COMMON.SEARCH' | translate }}
+          <button type="button" (click)="logAsEatenFromDetail()" class="btn-log-eaten">
+            ✓ Als gegessen verbuchen
           </button>
         </div>
       </div>

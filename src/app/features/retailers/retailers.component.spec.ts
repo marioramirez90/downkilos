@@ -82,7 +82,7 @@ describe('RetailersComponent', () => {
         weeklyBudget: 45
       })
     );
-    expect(router.navigate).toHaveBeenCalledWith(['/loading']);
+    expect(router.navigate).toHaveBeenCalledWith(['/loading'], { queryParams: { step: 'dashboard' } });
   });
 
   it('should navigate back to /calculator when clicking back button', () => {

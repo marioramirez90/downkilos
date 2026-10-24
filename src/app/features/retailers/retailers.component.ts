@@ -78,6 +78,6 @@ export class RetailersComponent implements OnInit {
     };
 
     await this.retailerService.savePreference(pref);
-    this.router.navigate(['/loading']);
+    this.router.navigate(['/loading'], { queryParams: { step: 'dashboard' } });
   }
 }

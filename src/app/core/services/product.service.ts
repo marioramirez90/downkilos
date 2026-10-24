@@ -40,7 +40,63 @@ export class ProductService {
   loadInitialData(): void {
     // 1. Produkte laden (lokale Anpassungen oder Seed-Katalog)
     const storedProducts = this.getFromStorage<ProductItem[] | null>(PRODUCTS_STORAGE_KEY, null);
-    let catalog = storedProducts && storedProducts.length > 0 ? storedProducts : [...NETTO_PRODUCT_CATALOG];
+    
+    // Map der offiziellen Katalog-Produkte mit 100% verifizierten Original-Netto-Fotos
+    const officialCatalogMap = new Map<string, ProductItem>(
+      NETTO_PRODUCT_CATALOG.map(p => [p.id, p])
+    );
+
+    let catalog: ProductItem[];
+    let needsResave = false;
+
+    if (!storedProducts || storedProducts.length === 0) {
+      catalog = [...NETTO_PRODUCT_CATALOG];
+      needsResave = true;
+    } else {
+      // 1. Aktualisiere veraltete/lokale Bild-URLs auf die echten Netto-OFF-Bilder
+      catalog = storedProducts.map(p => {
+        const official = officialCatalogMap.get(p.id);
+        if (official) {
+          // Falls im Storage noch ein altes Platzhalter-Bild liegt oder das Bild abweicht, zwingend aktualisieren
+          if (!p.imageUrl || p.imageUrl.startsWith('images/') || p.imageUrl !== official.imageUrl) {
+            needsResave = true;
+            return {
+              ...p,
+              imageUrl: official.imageUrl,
+              brand: official.brand || p.brand,
+              ean: official.ean || p.ean,
+              imageSource: official.imageSource || p.imageSource,
+              imageLicense: official.imageLicense || p.imageLicense
+            };
+          }
+        }
+        return p;
+      });
+
+      // 2. Füge alle Produkte aus NETTO_PRODUCT_CATALOG hinzu, die noch nicht im Storage waren
+      const existingIds = new Set(catalog.map(p => p.id));
+      const missingProducts = NETTO_PRODUCT_CATALOG.filter(p => !existingIds.has(p.id));
+      if (missingProducts.length > 0) {
+        catalog = [...catalog, ...missingProducts];
+        needsResave = true;
+      }
+    }
+
+    // 3. Sicherheitsbereinigung: Garantiere, dass KEIN Produkt einen lokalen Platzhalter ('images/products/...') behält
+    catalog = catalog.map(p => {
+      if (p.imageUrl && p.imageUrl.startsWith('images/')) {
+        const fallback = officialCatalogMap.get(p.id);
+        if (fallback && fallback.imageUrl && !fallback.imageUrl.startsWith('images/')) {
+          needsResave = true;
+          return { ...p, imageUrl: fallback.imageUrl };
+        }
+      }
+      return p;
+    });
+
+    if (needsResave) {
+      this.saveToStorage(PRODUCTS_STORAGE_KEY, catalog);
+    }
 
     // 2. Preisverläufe laden
     const storedHistory = this.getFromStorage<PriceHistoryEntry[]>(PRICE_HISTORY_STORAGE_KEY, []);

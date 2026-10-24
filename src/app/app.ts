@@ -1,7 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterOutlet, Router } from '@angular/router';
 import { Location } from '@angular/common';
-import { SidebarMenuComponent } from './shared/components/sidebar-menu/sidebar-menu.component';
 import { Capacitor } from '@capacitor/core';
 import { App as CapApp } from '@capacitor/app';
 import { StatusBar, Style } from '@capacitor/status-bar';
@@ -9,7 +8,7 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, SidebarMenuComponent],
+  imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

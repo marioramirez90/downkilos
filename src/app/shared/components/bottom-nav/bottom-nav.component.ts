@@ -16,6 +16,8 @@ export class BottomNavComponent {
   readonly isMoreActive = computed(() => {
     const url = this.router.url;
     return (
+      url.startsWith('/more') ||
+      url.startsWith('/mehr') ||
       url.startsWith('/progress') ||
       url.startsWith('/settings') ||
       url.startsWith('/einstellungen') ||

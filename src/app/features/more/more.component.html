@@ -1,0 +1,152 @@
+<div class="more-screen">
+  <!-- 1. Header (Logo, Brand, Einstellungen) -->
+  <header class="more-header">
+    <div class="header-top-row">
+      <button type="button" (click)="goToDashboard()" class="brand-link-btn" title="Zum Dashboard">
+        <svg class="brand-leaf-icon" viewBox="0 0 24 24" fill="#278F39">
+          <path d="M12 2C6.48 2 2 6.48 2 12c0 3.31 1.61 6.24 4.09 8.04C6.03 19.37 6 18.69 6 18c0-5.52 4.48-10 10-10 1.05 0 2.06.16 3 .46.63-1.89 1-3.9 1-6.06 0-.27-.01-.54-.03-.8C18.15 2.58 15.22 2 12 2zm8 9c-4.42 0-8 3.58-8 8 0 1.05.2 2.05.57 2.97C14.07 21.98 14.15 22 14.24 22c4.42 0 8-3.58 8-8 0-.41-.03-.82-.09-1.22-.05-.01-.1-.01-.15-.01z"/>
+        </svg>
+        <span class="brand-name">Down Kilos</span>
+      </button>
+
+      <button type="button" (click)="goToSettings()" class="settings-gear-btn" aria-label="Einstellungen" title="Einstellungen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="header-headings">
+      <h1 class="page-title">Mehr entdecken</h1>
+      <p class="page-subtitle">Deine weiteren Down-Kilos-Funktionen.</p>
+    </div>
+  </header>
+
+  <!-- 2. Scrollbarer Hauptbereich -->
+  <main class="more-scroll-area">
+    <div class="cards-container">
+      <!-- 4 Hauptkarten (Exakt nach Spezifikation) -->
+      <section class="primary-cards-section" aria-label="Hauptfunktionen">
+        @for (item of primaryItems; track item.id) {
+          <article
+            class="more-card primary-card"
+            (click)="navigateTo(item.route)"
+            role="button"
+            tabindex="0"
+            [id]="'card-' + item.id"
+            [attr.aria-label]="item.title"
+          >
+            <!-- Grünes Icon im Kreis -->
+            <div class="card-icon-bubble">
+              @if (item.icon === 'recipes') {
+                <!-- Grüne Kochmütze -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/>
+                  <line x1="6" y1="17" x2="18" y2="17"/>
+                </svg>
+              } @else if (item.icon === 'progress') {
+                <!-- Grünes Trenddiagramm -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                  <polyline points="16 7 22 7 22 13"></polyline>
+                </svg>
+              } @else if (item.icon === 'profile') {
+                <!-- Grüner Benutzer -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              } @else if (item.icon === 'settings') {
+                <!-- Grünes Zahnrad -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+              }
+            </div>
+
+            <!-- Kartentext -->
+            <div class="card-text-col">
+              <h2 class="card-title">{{ item.title }}</h2>
+              <p class="card-subtitle">{{ item.subtitle }}</p>
+            </div>
+
+            <!-- Grüner Chevron Pfeil rechts -->
+            <div class="card-chevron-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
+          </article>
+        }
+      </section>
+
+      <!-- Zusätzliche nützliche Funktionen (bereits in der App enthalten) -->
+      <section class="secondary-cards-section" aria-label="Weitere Tools">
+        <h3 class="secondary-section-title">Weitere Bereiche</h3>
+        <div class="secondary-grid">
+          @for (item of secondaryItems; track item.id) {
+            <article
+              class="more-card secondary-card"
+              (click)="navigateTo(item.route)"
+              role="button"
+              tabindex="0"
+              [id]="'card-' + item.id"
+              [attr.aria-label]="item.title"
+            >
+              <div class="sec-card-header">
+                <div class="sec-icon-wrap">
+                  @if (item.icon === 'planner') {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                  } @else if (item.icon === 'market') {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/>
+                    </svg>
+                  } @else if (item.icon === 'calculator') {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="4" y="2" width="16" height="20" rx="2"></rect>
+                      <line x1="8" y1="6" x2="16" y2="6"></line>
+                      <line x1="16" y1="14" x2="16" y2="18"></line>
+                      <path d="M16 10h.01"></path>
+                      <path d="M12 10h.01"></path>
+                      <path d="M8 10h.01"></path>
+                      <path d="M12 14h.01"></path>
+                      <path d="M8 14h.01"></path>
+                      <path d="M12 18h.01"></path>
+                      <path d="M8 18h.01"></path>
+                    </svg>
+                  } @else {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                  }
+                </div>
+                <h4 class="sec-card-title">{{ item.title }}</h4>
+              </div>
+              <p class="sec-card-desc">{{ item.subtitle }}</p>
+            </article>
+          }
+        </div>
+      </section>
+
+      <!-- App-Info Footer Card -->
+      <footer class="app-version-card">
+        <span class="app-version-badge">Down Kilos App v10.0</span>
+        <span class="app-slogan">Schnell. Einfach. Zuverlässig.</span>
+      </footer>
+    </div>
+  </main>
+
+  <!-- 3. Feste untere Navigation -->
+  <footer class="more-footer-nav">
+    <app-bottom-nav></app-bottom-nav>
+  </footer>
+</div>

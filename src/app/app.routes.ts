@@ -179,6 +179,17 @@ export const routes: Routes = [
     title: 'Down Kilos – Fortschritt',
   },
   {
+    path: 'more',
+    loadComponent: () =>
+      import('./features/more/more.component').then((m) => m.MoreComponent),
+    title: 'Down Kilos – Mehr entdecken',
+  },
+  {
+    path: 'mehr',
+    redirectTo: 'more',
+    pathMatch: 'full',
+  },
+  {
     path: '**',
     redirectTo: '',
   },

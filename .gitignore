@@ -42,3 +42,13 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Android & Keystore security
+android/.gradle/
+android/build/
+android/app/build/
+android/captures/
+*.jks
+*.keystore
+google-services.json
+

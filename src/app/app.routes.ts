@@ -82,6 +82,33 @@ export const routes: Routes = [
     title: 'Down Kilos – Einstellungen',
   },
   {
+    path: 'einstellungen',
+    redirectTo: 'settings',
+    pathMatch: 'full',
+  },
+  {
+    path: 'settings/profile',
+    loadComponent: () =>
+      import('./features/settings/profile-edit/profile-edit.component').then((m) => m.ProfileEditComponent),
+    title: 'Down Kilos – Profil bearbeiten',
+  },
+  {
+    path: 'einstellungen/profil',
+    redirectTo: 'settings/profile',
+    pathMatch: 'full',
+  },
+  {
+    path: 'settings/goals',
+    loadComponent: () =>
+      import('./features/settings/goals-edit/goals-edit.component').then((m) => m.GoalsEditComponent),
+    title: 'Down Kilos – Meine Daten & Ziele',
+  },
+  {
+    path: 'einstellungen/ziele',
+    redirectTo: 'settings/goals',
+    pathMatch: 'full',
+  },
+  {
     path: 'discover',
     loadComponent: () =>
       import('./features/discover/discover.component').then((m) => m.DiscoverComponent),

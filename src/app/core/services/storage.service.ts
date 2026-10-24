@@ -353,7 +353,8 @@ export class StorageService {
         'down_kilos_shopping_list_checked',
         'down_kilos_swapped_meals',
         'down_kilos_user_custom_prices',
-        'down_kilos_user_prices'
+        'down_kilos_user_prices',
+        'down_kilos_favorite_products'
       ];
 
       for (const key of keysToRemove) {

@@ -55,34 +55,30 @@ describe('SettingsComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('2. should display profile details (Vorname, Gewicht, Größe, Ziel)', () => {
+  it('2. should display settings cards matching reference design', () => {
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toContain('Mario');
-    expect(el.textContent).toContain('82 kg');
-    expect(el.textContent).toContain('180 cm');
-    expect(el.textContent).toContain('Mein Profil und Ziel');
-    expect(component.userFirstName()).toBe('Mario');
+    expect(el.textContent).toContain('Einstellungen');
+    expect(el.textContent).toContain('Profil bearbeiten');
+    expect(el.textContent).toContain('App-Einstellungen');
+    expect(el.textContent).toContain('Datenschutz');
+    expect(el.textContent).toContain('Hilfe & Support');
+    expect(el.textContent).toContain('App bewerten');
+    expect(el.textContent).toContain('Über Down Kilos');
+    expect(el.textContent).toContain('Alle Daten zurücksetzen');
+    expect(component.appVersion).toBe('1.0.0');
   });
 
-  it('3. should display calorie metrics (Tagesziel, Erhaltungsbedarf, Defizit)', () => {
-    const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toContain('Tages-Kalorienziel');
-    expect(component.targetCalories()).toBeGreaterThan(1200);
-    expect(component.maintenanceCalories()).toBeGreaterThan(component.targetCalories());
-    expect(component.calorieDeficit()).toBeGreaterThan(0);
-  });
-
-  it('4. should navigate to /onboarding when clicking Profil bearbeiten', () => {
+  it('3. should navigate to /settings/profile when clicking Profil bearbeiten (NOT to onboarding)', () => {
     component.openEditProfile();
-    expect(router.navigate).toHaveBeenCalledWith(['/onboarding']);
+    expect(router.navigate).toHaveBeenCalledWith(['/settings/profile']);
   });
 
-  it('5. should navigate to /calculator when clicking Kalorienziel bearbeiten', () => {
+  it('4. should navigate to /settings/goals when calling openEditGoal', () => {
     component.openEditGoal();
-    expect(router.navigate).toHaveBeenCalledWith(['/calculator']);
+    expect(router.navigate).toHaveBeenCalledWith(['/settings/goals']);
   });
 
-  it('6. should open confirmation modal when clicking Alle meine Daten zurücksetzen', () => {
+  it('5. should open confirmation modal when clicking Alle Daten zurücksetzen', () => {
     expect(component.showResetDialog()).toBe(false);
 
     component.confirmResetModal();
@@ -90,11 +86,11 @@ describe('SettingsComponent', () => {
 
     expect(component.showResetDialog()).toBe(true);
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toContain('Down Kilos zurücksetzen?');
-    expect(el.textContent).toContain('Alle Daten löschen');
+    expect(el.textContent).toContain('Alle Daten zurücksetzen?');
+    expect(el.textContent).toContain('Ja, alles löschen');
   });
 
-  it('7. should close modal when clicking Abbrechen', () => {
+  it('6. should close modal when clicking Abbrechen', () => {
     component.confirmResetModal();
     expect(component.showResetDialog()).toBe(true);
 
@@ -102,7 +98,7 @@ describe('SettingsComponent', () => {
     expect(component.showResetDialog()).toBe(false);
   });
 
-  it('8. should call storageService.resetAllData and navigate to / on confirm', async () => {
+  it('7. should call storageService.resetAllData and navigate to / on confirm', async () => {
     const resetSpy = vi.spyOn(storageService, 'resetAllData').mockResolvedValue(true);
 
     await component.executeReset();
@@ -111,8 +107,25 @@ describe('SettingsComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/']);
   });
 
-  it('9. should navigate back to /dashboard when clicking back arrow', () => {
+  it('8. should navigate back to /dashboard when clicking back arrow or brand link', () => {
     component.goBack();
     expect(router.navigate).toHaveBeenCalledWith(['/dashboard']);
+
+    component.goToDashboard();
+    expect(router.navigate).toHaveBeenCalledWith(['/dashboard']);
+  });
+
+  it('9. should open info modals for privacy, app settings, support, and about', () => {
+    component.openPrivacy();
+    expect(component.showPrivacyModal()).toBe(true);
+
+    component.openAppSettings();
+    expect(component.showAppSettingsModal()).toBe(true);
+
+    component.openSupport();
+    expect(component.showSupportModal()).toBe(true);
+
+    component.openAbout();
+    expect(component.showAboutModal()).toBe(true);
   });
 });

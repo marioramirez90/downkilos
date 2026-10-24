@@ -84,8 +84,10 @@ export class DashboardComponent implements OnInit {
       }
       this.profile.set(p);
 
-      const calc = this.calorieService.calculate(p);
-      this.calculation.set(calc);
+      if (p) {
+        const calc = this.calorieService.calculate(p);
+        this.calculation.set(calc);
+      }
 
       // Marktpräferenz laden
       await this.retailerService.loadPreference();

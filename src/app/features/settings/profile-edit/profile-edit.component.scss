@@ -1,0 +1,394 @@
+$primary-green: #278f39;
+$dark-green: #103a2a;
+$bright-green: #31bc45;
+$light-green: #e5f5e8;
+$background: #ffffff;
+$secondary-bg: #f6f9f6;
+$text-main: #102521;
+$text-muted: #66716d;
+$border-color: #e5ebe5;
+
+.profile-screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: $background;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: $text-main;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+.profile-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 8px 16px;
+  border-bottom: 1px solid rgba(229, 235, 229, 0.6);
+  max-width: 440px;
+  margin: 0 auto;
+  width: 100%;
+
+  .header-nav-row {
+    display: flex;
+    align-items: center;
+
+    .circle-back-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: $light-green;
+      color: $primary-green;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      padding: 0;
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      &:active {
+        transform: scale(0.92);
+      }
+    }
+  }
+
+  .header-text-block {
+    text-align: center;
+    margin-top: 8px;
+
+    .page-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: $dark-green;
+      margin: 0;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .page-subtitle {
+      font-size: 13.5px;
+      color: $text-muted;
+      margin: 4px 0 0 0;
+      line-height: 1.35;
+    }
+  }
+}
+
+/* ==========================================================================
+   Scrollbarer Bereich
+   ========================================================================== */
+.profile-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px 16px calc(88px + env(safe-area-inset-bottom, 16px)) 16px;
+  max-width: 440px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+
+  /* Avatar */
+  .avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 8px 0 20px 0;
+
+    .avatar-circle-wrapper {
+      position: relative;
+      width: 86px;
+      height: 86px;
+
+      .avatar-circle {
+        width: 86px;
+        height: 86px;
+        border-radius: 50%;
+        background-color: $light-green;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+
+        .avatar-svg {
+          width: 50px;
+          height: 50px;
+        }
+      }
+
+      .camera-badge-btn {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: $primary-green;
+        border: 2px solid #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 0;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+
+        svg {
+          width: 16px;
+          height: 16px;
+        }
+
+        &:active {
+          transform: scale(0.92);
+        }
+      }
+    }
+
+    .avatar-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: $text-muted;
+      margin-top: 8px;
+    }
+  }
+
+  .error-banner {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 14px;
+  }
+
+  /* Formular */
+  .profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+
+      .field-label {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: $text-main;
+      }
+
+      .input-field-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background-color: #ffffff;
+        border: 1px solid $border-color;
+        border-radius: 14px;
+        padding: 11px 14px;
+        box-shadow: 0 1px 3px rgba(16, 58, 42, 0.03);
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        position: relative;
+
+        &:focus-within {
+          border-color: $primary-green;
+          box-shadow: 0 0 0 3px rgba(39, 143, 57, 0.12);
+        }
+
+        .field-icon {
+          width: 18px;
+          height: 18px;
+          color: $text-muted;
+          flex-shrink: 0;
+        }
+
+        input {
+          flex: 1;
+          border: none;
+          outline: none;
+          font-size: 14.5px;
+          font-weight: 500;
+          color: $text-main;
+          background: transparent;
+          font-family: inherit;
+
+          &::placeholder {
+            color: #9ca8a3;
+            font-size: 13.5px;
+          }
+        }
+
+        &.select-wrap {
+          cursor: pointer;
+
+          select {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14.5px;
+            font-weight: 500;
+            color: $text-main;
+            background: transparent;
+            font-family: inherit;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+          }
+
+          .chevron-down-icon {
+            width: 18px;
+            height: 18px;
+            color: $text-muted;
+            pointer-events: none;
+            flex-shrink: 0;
+          }
+        }
+      }
+    }
+
+    /* Ziele-Verknüpfung */
+    .goals-link-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #f6fbf7;
+      border: 1px solid #d3e9d8;
+      border-radius: 16px;
+      padding: 12px 14px;
+      margin-top: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+
+      &:hover {
+        background-color: #eef7f0;
+      }
+
+      .goals-link-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        .goals-link-icon-wrap {
+          width: 34px;
+          height: 34px;
+          border-radius: 10px;
+          background-color: $light-green;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+
+          svg {
+            width: 20px;
+            height: 20px;
+          }
+        }
+
+        .goals-link-text {
+          display: flex;
+          flex-direction: column;
+
+          strong {
+            font-size: 14px;
+            font-weight: 700;
+            color: $dark-green;
+          }
+
+          span {
+            font-size: 11.5px;
+            color: $text-muted;
+          }
+        }
+      }
+
+      .arrow-right-icon {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+      }
+    }
+
+    /* Submit Button */
+    .submit-button-wrap {
+      margin-top: 10px;
+
+      .btn-save-profile {
+        width: 100%;
+        background-color: $primary-green;
+        color: #ffffff;
+        border: none;
+        border-radius: 16px;
+        padding: 14px 20px;
+        font-size: 15.5px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background-color 0.15s ease, transform 0.1s ease;
+        box-shadow: 0 3px 12px rgba(39, 143, 57, 0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover:not(:disabled) {
+          background-color: #217a30;
+        }
+
+        &:active:not(:disabled) {
+          transform: scale(0.98);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}
+
+/* Toast */
+.toast-popup {
+  position: fixed;
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #102521;
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  z-index: 100;
+  font-size: 13.5px;
+  font-weight: 600;
+  animation: fadeInDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+
+  .toast-check {
+    color: #31bc45;
+    font-weight: 800;
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}

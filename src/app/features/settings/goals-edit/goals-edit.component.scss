@@ -1,0 +1,411 @@
+$primary-green: #278f39;
+$dark-green: #103a2a;
+$bright-green: #31bc45;
+$light-green: #e5f5e8;
+$background: #ffffff;
+$secondary-bg: #f6f9f6;
+$text-main: #102521;
+$text-muted: #66716d;
+$border-color: #e5ebe5;
+
+.goals-screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: $background;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: $text-main;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+.goals-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 8px 16px;
+  border-bottom: 1px solid rgba(229, 235, 229, 0.6);
+  max-width: 440px;
+  margin: 0 auto;
+  width: 100%;
+
+  .header-nav-row {
+    display: flex;
+    align-items: center;
+
+    .circle-back-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: $light-green;
+      color: $primary-green;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      padding: 0;
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      &:active {
+        transform: scale(0.92);
+      }
+    }
+  }
+
+  .header-text-block {
+    margin-top: 10px;
+
+    .page-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: $dark-green;
+      margin: 0;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .page-subtitle {
+      font-size: 13.5px;
+      color: $text-muted;
+      margin: 4px 0 0 0;
+      line-height: 1.35;
+    }
+  }
+}
+
+/* ==========================================================================
+   Scrollbarer Bereich
+   ========================================================================== */
+.goals-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 14px 16px calc(88px + env(safe-area-inset-bottom, 16px)) 16px;
+  max-width: 440px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .error-banner {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  /* Karten */
+  .settings-card {
+    background: #ffffff;
+    border: 1px solid $border-color;
+    border-radius: 20px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(16, 58, 42, 0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    .card-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 2px;
+
+      .title-icon-box {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background-color: $light-green;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        svg {
+          width: 20px;
+          height: 20px;
+        }
+      }
+
+      .card-heading {
+        font-size: 17.5px;
+        font-weight: 800;
+        color: $text-main;
+        margin: 0;
+        letter-spacing: -0.015em;
+      }
+    }
+
+    /* Eingabefelder */
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+
+      .input-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: $text-muted;
+      }
+
+      .input-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background-color: #ffffff;
+        border: 1px solid $border-color;
+        border-radius: 14px;
+        padding: 11px 14px;
+        box-shadow: 0 1px 3px rgba(16, 58, 42, 0.03);
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        position: relative;
+
+        &:focus-within {
+          border-color: $primary-green;
+          box-shadow: 0 0 0 3px rgba(39, 143, 57, 0.12);
+        }
+
+        .icon-wrap {
+          width: 20px;
+          height: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: $text-main;
+          flex-shrink: 0;
+
+          svg {
+            width: 18px;
+            height: 18px;
+          }
+        }
+
+        select {
+          flex: 1;
+          border: none;
+          outline: none;
+          font-size: 14.5px;
+          font-weight: 600;
+          color: $text-main;
+          background: transparent;
+          font-family: inherit;
+          appearance: none;
+          -webkit-appearance: none;
+          cursor: pointer;
+        }
+
+        .chevron-icon {
+          width: 18px;
+          height: 18px;
+          color: $text-muted;
+          pointer-events: none;
+          flex-shrink: 0;
+        }
+      }
+    }
+
+    /* Info-Box */
+    .info-notice-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background-color: $light-green;
+      border: 1px solid #d0ebd4;
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-top: 4px;
+
+      .info-icon {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+
+      p {
+        font-size: 12px;
+        color: $dark-green;
+        line-height: 1.45;
+        margin: 0;
+        font-weight: 500;
+      }
+    }
+
+    /* Kalorien-Vorschau */
+    .calorie-preview-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #f7fbf8;
+      border: 1px dashed #b9dec0;
+      border-radius: 12px;
+      padding: 10px 14px;
+
+      .preview-label {
+        font-size: 13px;
+        color: $text-muted;
+        font-weight: 500;
+      }
+
+      .preview-cals {
+        font-size: 15px;
+        font-weight: 800;
+        color: $primary-green;
+      }
+    }
+
+    /* Checkboxen */
+    .checkbox-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 4px 0;
+
+      .custom-checkbox-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        user-select: none;
+
+        input[type='checkbox'] {
+          position: absolute;
+          opacity: 0;
+          pointer-events: none;
+
+          &:checked + .checkbox-box {
+            background-color: $primary-green;
+            border-color: $primary-green;
+
+            &::after {
+              opacity: 1;
+              transform: scale(1);
+            }
+          }
+        }
+
+        .checkbox-box {
+          width: 22px;
+          height: 22px;
+          border-radius: 7px;
+          border: 1.8px solid #cbd5cf;
+          background-color: #ffffff;
+          position: relative;
+          transition: all 0.15s ease;
+          flex-shrink: 0;
+
+          &::after {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 3px;
+            width: 5px;
+            height: 10px;
+            border: solid #ffffff;
+            border-width: 0 2.2px 2.2px 0;
+            transform: rotate(45deg) scale(0.6);
+            opacity: 0;
+            transition: all 0.15s ease;
+          }
+        }
+
+        .checkbox-text {
+          font-size: 14.5px;
+          font-weight: 500;
+          color: $text-main;
+        }
+
+        &:hover .checkbox-box {
+          border-color: $primary-green;
+        }
+      }
+    }
+  }
+
+  /* Submit Button */
+  .submit-button-wrap {
+    margin-top: 4px;
+
+    .btn-save-goals {
+      width: 100%;
+      background-color: $primary-green;
+      color: #ffffff;
+      border: none;
+      border-radius: 16px;
+      padding: 14px 20px;
+      font-size: 15.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.15s ease, transform 0.1s ease;
+      box-shadow: 0 3px 12px rgba(39, 143, 57, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover:not(:disabled) {
+        background-color: #217a30;
+      }
+
+      &:active:not(:disabled) {
+        transform: scale(0.98);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+/* Toast */
+.toast-popup {
+  position: fixed;
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #102521;
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  z-index: 100;
+  font-size: 13.5px;
+  font-weight: 600;
+  animation: fadeInDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+
+  .toast-check {
+    color: #31bc45;
+    font-weight: 800;
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}

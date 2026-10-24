@@ -11,6 +11,8 @@ export interface UserProfile {
   currentWeight: number; // in kg
   height: number; // in cm
   targetWeight?: number; // optional target in kg
+  targetPaceWeeklyKg?: number; // optional pace in kg/week (e.g. 0.5)
+  email?: string; // optional email
   activityLevel: ActivityLevel;
   goal: UserGoal;
   dietaryPreference?: DietaryPreference;

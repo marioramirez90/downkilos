@@ -21,9 +21,21 @@ export class SettingsComponent implements OnInit {
 
   readonly profile = signal<UserProfile | null>(null);
   readonly calculation = signal<CalorieCalculationResult | null>(null);
+
+  // Modals & Dialoge
   readonly showResetDialog = signal<boolean>(false);
+  readonly showAppSettingsModal = signal<boolean>(false);
+  readonly showPrivacyModal = signal<boolean>(false);
+  readonly showSupportModal = signal<boolean>(false);
+  readonly showAboutModal = signal<boolean>(false);
+  readonly showRateModal = signal<boolean>(false);
+
   readonly isResetting = signal<boolean>(false);
   readonly resetErrorMessage = signal<string | null>(null);
+  readonly toastMessage = signal<string | null>(null);
+
+  // App-Version (aus package.json / Config)
+  readonly appVersion = '1.0.0';
 
   async ngOnInit(): Promise<void> {
     const p = await this.storageService.loadProfile();
@@ -39,56 +51,32 @@ export class SettingsComponent implements OnInit {
     return this.profile()?.name?.split(' ')[0] || 'Gast';
   });
 
-  readonly formattedBirthDate = computed(() => {
-    const bd = this.profile()?.birthDate;
-    if (!bd) return '–';
-    try {
-      const d = new Date(bd);
-      return d.toLocaleDateString('de-DE');
-    } catch {
-      return bd;
-    }
-  });
-
-  readonly activityLabel = computed(() => {
-    const act = this.profile()?.activityLevel;
-    switch (act) {
-      case 'sedentary': return 'Sitzend (Bürojob, wenig Bewegung)';
-      case 'light': return 'Leicht aktiv (1–3 Tage/Woche Sport)';
-      case 'moderate': return 'Moderat aktiv (3–5 Tage/Woche Sport)';
-      case 'very_active': return 'Sehr aktiv (5+ Tage/Woche Sport)';
-      default: return 'Moderat aktiv';
-    }
-  });
-
-  readonly goalLabel = computed(() => {
-    const g = this.profile()?.goal;
-    switch (g) {
-      case 'lose_weight': return 'Gewicht reduzieren (gesundes Abnehmen)';
-      case 'maintain_weight': return 'Gewicht halten';
-      case 'gain_weight': return 'Muskelaufbau / Zunehmen';
-      default: return 'Gewicht reduzieren';
-    }
-  });
-
-  readonly targetCalories = computed(() => {
-    return this.calculation()?.dailyTargetKcal || 2000;
-  });
-
-  readonly maintenanceCalories = computed(() => {
-    return this.calculation()?.tdee || 2400;
-  });
-
-  readonly calorieDeficit = computed(() => {
-    return this.calculation()?.deficit || 400;
-  });
-
   openEditProfile(): void {
-    this.router.navigate(['/onboarding']);
+    this.router.navigate(['/settings/profile']);
   }
 
   openEditGoal(): void {
-    this.router.navigate(['/calculator']);
+    this.router.navigate(['/settings/goals']);
+  }
+
+  openAppSettings(): void {
+    this.showAppSettingsModal.set(true);
+  }
+
+  openPrivacy(): void {
+    this.showPrivacyModal.set(true);
+  }
+
+  openSupport(): void {
+    this.showSupportModal.set(true);
+  }
+
+  openRate(): void {
+    this.showRateModal.set(true);
+  }
+
+  openAbout(): void {
+    this.showAboutModal.set(true);
   }
 
   confirmResetModal(): void {
@@ -110,7 +98,6 @@ export class SettingsComponent implements OnInit {
 
     if (success) {
       this.showResetDialog.set(false);
-      // Vollständiger Neustart zum Willkommensbildschirm
       this.router.navigate(['/']);
     } else {
       this.resetErrorMessage.set('Das Zurücksetzen ist fehlgeschlagen. Bitte versuche es erneut.');
@@ -119,5 +106,16 @@ export class SettingsComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/dashboard']);
+  }
+
+  goToDashboard(): void {
+    this.router.navigate(['/dashboard']);
+  }
+
+  showToast(msg: string): void {
+    this.toastMessage.set(msg);
+    setTimeout(() => {
+      this.toastMessage.set(null);
+    }, 2800);
   }
 }

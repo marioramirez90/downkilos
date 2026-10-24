@@ -1,0 +1,339 @@
+<div class="goals-screen">
+  <!-- Toast Notification -->
+  @if (toastMessage(); as msg) {
+    <div class="toast-popup" role="status">
+      <span class="toast-check">✓</span>
+      <span>{{ msg }}</span>
+    </div>
+  }
+
+  <!-- Header -->
+  <header class="goals-header">
+    <div class="header-nav-row">
+      <button
+        type="button"
+        (click)="goBack()"
+        class="circle-back-btn"
+        aria-label="Zurück zu Einstellungen"
+        title="Zurück zu Einstellungen"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18l-6-6 6-6" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="header-text-block">
+      <h1 class="page-title">Meine Daten & Ziele</h1>
+      <p class="page-subtitle">Passe deine Daten und Ziele jederzeit an.</p>
+    </div>
+  </header>
+
+  <!-- Scrollbarer Inhaltsbereich -->
+  <main class="goals-scroll-area">
+    @if (errorMessage(); as err) {
+      <div class="error-banner">
+        <span>{{ err }}</span>
+      </div>
+    }
+
+    <!-- 1. KARTE: KÖRPERDATEN -->
+    <section class="settings-card body-data-card">
+      <div class="card-title-row">
+        <div class="title-icon-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <h2 class="card-heading">Körperdaten</h2>
+      </div>
+
+      <!-- Größe -->
+      <div class="input-group">
+        <label for="select-height" class="input-label">Größe</label>
+        <div class="input-box select-box">
+          <div class="icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v20M8 5l4-3 4 3M8 19l4 3 4-3"/>
+            </svg>
+          </div>
+          <select
+            id="select-height"
+            [ngModel]="height()"
+            (ngModelChange)="height.set(+$event)"
+          >
+            @for (h of heightOptions; track h) {
+              <option [value]="h">{{ h }} cm</option>
+            }
+          </select>
+          <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Aktuelles Gewicht -->
+      <div class="input-group">
+        <label for="select-weight" class="input-label">Aktuelles Gewicht</label>
+        <div class="input-box select-box">
+          <div class="icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="5" ry="5"/>
+              <circle cx="12" cy="8" r="2.5"/>
+              <path d="M12 7v1.5"/>
+            </svg>
+          </div>
+          <select
+            id="select-weight"
+            [ngModel]="currentWeight()"
+            (ngModelChange)="currentWeight.set(+$event)"
+          >
+            @for (w of weightOptions; track w) {
+              <option [value]="w">{{ w }} kg</option>
+            }
+          </select>
+          <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Wunschgewicht -->
+      <div class="input-group">
+        <label for="select-target-weight" class="input-label">Wunschgewicht</label>
+        <div class="input-box select-box">
+          <div class="icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <circle cx="12" cy="12" r="6"/>
+              <circle cx="12" cy="12" r="2"/>
+            </svg>
+          </div>
+          <select
+            id="select-target-weight"
+            [ngModel]="targetWeight()"
+            (ngModelChange)="targetWeight.set(+$event)"
+          >
+            @for (tw of targetWeightOptions; track tw) {
+              <option [value]="tw">{{ tw }} kg</option>
+            }
+          </select>
+          <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Aktivitätslevel -->
+      <div class="input-group">
+        <label for="select-activity" class="input-label">Aktivitätslevel</label>
+        <div class="input-box select-box">
+          <div class="icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 14l-4-4 2-5-5 3-4-2"/>
+              <path d="M4 17l5-2 3 5"/>
+              <circle cx="17" cy="4" r="2"/>
+            </svg>
+          </div>
+          <select
+            id="select-activity"
+            [ngModel]="activityLevel()"
+            (ngModelChange)="activityLevel.set($event)"
+          >
+            <option value="sedentary">Wenig aktiv</option>
+            <option value="light">Leicht aktiv</option>
+            <option value="moderate">Moderat aktiv</option>
+            <option value="very_active">Sehr aktiv</option>
+          </select>
+          <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Informationshinweis -->
+      <div class="info-notice-card">
+        <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="16" x2="12" y2="12"/>
+          <line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>
+        <p>Deine Angaben werden für die Berechnung deines Kalorienbedarfs und deiner persönlichen Empfehlungen verwendet.</p>
+      </div>
+    </section>
+
+    <!-- 2. KARTE: ZIELE -->
+    <section class="settings-card goals-card">
+      <div class="card-title-row">
+        <div class="title-icon-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <circle cx="12" cy="12" r="6"/>
+            <circle cx="12" cy="12" r="2"/>
+          </svg>
+        </div>
+        <h2 class="card-heading">Ziele</h2>
+      </div>
+
+      <!-- Mein Ziel -->
+      <div class="input-group">
+        <label for="select-goal" class="input-label">Mein Ziel</label>
+        <div class="input-box select-box">
+          <div class="icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+              <line x1="4" y1="22" x2="4" y2="15"/>
+            </svg>
+          </div>
+          <select
+            id="select-goal"
+            [ngModel]="goal()"
+            (ngModelChange)="goal.set($event)"
+          >
+            <option value="lose_weight">Abnehmen</option>
+            <option value="maintain_weight">Gewicht halten</option>
+            <option value="gain_weight">Muskelaufbau / Zunehmen</option>
+          </select>
+          <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Zieltempo (nur wenn Abnehmen ausgewählt ist) -->
+      @if (goal() === 'lose_weight') {
+        <div class="input-group">
+          <label for="select-pace" class="input-label">Zieltempo</label>
+          <div class="input-box select-box">
+            <div class="icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                <polyline points="17 6 23 6 23 12"/>
+              </svg>
+            </div>
+            <select
+              id="select-pace"
+              [ngModel]="targetPaceWeeklyKg()"
+              (ngModelChange)="targetPaceWeeklyKg.set(+$event)"
+            >
+              <option [value]="0.25">0,25 kg pro Woche (Sanft)</option>
+              <option [value]="0.5">0,5 kg pro Woche (Empfohlen)</option>
+              <option [value]="0.75">0,75 kg pro Woche (Ambitioniert)</option>
+            </select>
+            <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </div>
+        </div>
+      }
+
+      <!-- Kalorien-Vorschau Box -->
+      <div class="calorie-preview-box">
+        <span class="preview-label">Berechnetes Kalorienziel:</span>
+        <strong class="preview-cals">{{ calculatedTargetCalories() }} kcal / Tag</strong>
+      </div>
+
+      <!-- Informationshinweis -->
+      <div class="info-notice-card">
+        <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="16" x2="12" y2="12"/>
+          <line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>
+        <p>Du kannst dein Ziel und das Tempo jederzeit anpassen. Deine bisherigen Einträge bleiben erhalten.</p>
+      </div>
+    </section>
+
+    <!-- 3. KARTE: ERNÄHRUNGSVORLIEBEN -->
+    <section class="settings-card preferences-card">
+      <div class="card-title-row">
+        <div class="title-icon-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 2v6a3 3 0 0 1-3 3 3 3 0 0 1-3-3V2"/>
+            <path d="M15 11v11"/>
+            <path d="M6 2v20"/>
+            <path d="M6 7h4"/>
+          </svg>
+        </div>
+        <h2 class="card-heading">Ernährungsvorlieben</h2>
+      </div>
+
+      <div class="checkbox-list">
+        <!-- Vegetarisch -->
+        <label class="custom-checkbox-row">
+          <input
+            type="checkbox"
+            [ngModel]="isVegetarian()"
+            (ngModelChange)="isVegetarian.set($event)"
+          />
+          <span class="checkbox-box"></span>
+          <span class="checkbox-text">Vegetarisch</span>
+        </label>
+
+        <!-- Vegan -->
+        <label class="custom-checkbox-row">
+          <input
+            type="checkbox"
+            [ngModel]="isVegan()"
+            (ngModelChange)="isVegan.set($event)"
+          />
+          <span class="checkbox-box"></span>
+          <span class="checkbox-text">Vegan</span>
+        </label>
+
+        <!-- Laktosefrei -->
+        <label class="custom-checkbox-row">
+          <input
+            type="checkbox"
+            [ngModel]="isLactoseFree()"
+            (ngModelChange)="isLactoseFree.set($event)"
+          />
+          <span class="checkbox-box"></span>
+          <span class="checkbox-text">Laktosefrei</span>
+        </label>
+
+        <!-- Glutenfrei -->
+        <label class="custom-checkbox-row">
+          <input
+            type="checkbox"
+            [ngModel]="isGlutenFree()"
+            (ngModelChange)="isGlutenFree.set($event)"
+          />
+          <span class="checkbox-box"></span>
+          <span class="checkbox-text">Glutenfrei</span>
+        </label>
+
+        <!-- Keine Schweinefleischprodukte -->
+        <label class="custom-checkbox-row">
+          <input
+            type="checkbox"
+            [ngModel]="noPork()"
+            (ngModelChange)="noPork.set($event)"
+          />
+          <span class="checkbox-box"></span>
+          <span class="checkbox-text">Keine Schweinefleischprodukte</span>
+        </label>
+      </div>
+    </section>
+
+    <!-- Großer grüner Speichern-Button -->
+    <div class="submit-button-wrap">
+      <button
+        type="button"
+        (click)="saveChanges()"
+        class="btn-save-goals"
+        [disabled]="isSaving()"
+      >
+        @if (isSaving()) {
+          <span>Wird gespeichert...</span>
+        } @else {
+          <span>Änderungen speichern</span>
+        }
+      </button>
+    </div>
+  </main>
+
+  <!-- Feste untere Navigation mit 'Mehr' aktiv -->
+  <app-bottom-nav></app-bottom-nav>
+</div>

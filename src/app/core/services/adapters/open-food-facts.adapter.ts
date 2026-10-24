@@ -29,15 +29,17 @@ export interface OFFProductResult {
   providedIn: 'root'
 })
 export class OpenFoodFactsAdapter {
-  private readonly baseUrl = 'https://de.openfoodfacts.org/api/v2/product';
-  private readonly worldBaseUrl = 'https://world.openfoodfacts.org/api/v2/product';
-  private readonly userAgent = 'DownKilosApp/1.0 (contact@downkilos.de)';
+  private readonly v3BaseUrl = 'https://world.openfoodfacts.org/api/v3/product';
+  private readonly v2DeBaseUrl = 'https://de.openfoodfacts.org/api/v2/product';
+  private readonly v2WorldBaseUrl = 'https://world.openfoodfacts.org/api/v2/product';
+  private readonly userAgent = 'DownKilos - Android - Version 1.0 - https://downkilos.de (contact@downkilos.de)';
 
   // Lokaler Cache zur Schonung der Open Food Facts Server und Vermeidung von 503-Fehlern
   private memoryCache = new Map<string, Partial<ProductItem>>();
 
   /**
    * Ruft offizielle Produktdaten zu einem verifizierten Barcode (EAN) ab.
+   * Bevorzugt die aktuelle offizielle Open Food Facts API v3 mit Fallback auf v2.
    */
   async fetchProductByBarcode(barcode: string): Promise<Partial<ProductItem> | null> {
     const cleanEan = barcode.trim();
@@ -48,16 +50,24 @@ export class OpenFoodFactsAdapter {
     }
 
     try {
-      // Primäre deutsche Instanz anfragen
-      const response = await this.queryOFF(`${this.baseUrl}/${cleanEan}.json`);
-      if (response && response.status === 1 && response.product) {
-        const item = this.mapOFFToProduct(cleanEan, response.product);
+      // 1. Offizielle API v3 anfragen
+      const v3Response = await this.queryOFF(`${this.v3BaseUrl}/${cleanEan}.json`);
+      if (v3Response && (v3Response.status === 1 || (v3Response as any).status === 'success') && v3Response.product) {
+        const item = this.mapOFFToProduct(cleanEan, v3Response.product);
         this.memoryCache.set(cleanEan, item);
         return item;
       }
 
-      // Fallback: World-Instanz
-      const worldResponse = await this.queryOFF(`${this.worldBaseUrl}/${cleanEan}.json`);
+      // 2. Fallback: Deutsche v2-Instanz
+      const v2Response = await this.queryOFF(`${this.v2DeBaseUrl}/${cleanEan}.json`);
+      if (v2Response && v2Response.status === 1 && v2Response.product) {
+        const item = this.mapOFFToProduct(cleanEan, v2Response.product);
+        this.memoryCache.set(cleanEan, item);
+        return item;
+      }
+
+      // 3. Fallback: World v2-Instanz
+      const worldResponse = await this.queryOFF(`${this.v2WorldBaseUrl}/${cleanEan}.json`);
       if (worldResponse && worldResponse.status === 1 && worldResponse.product) {
         const item = this.mapOFFToProduct(cleanEan, worldResponse.product);
         this.memoryCache.set(cleanEan, item);
@@ -72,18 +82,27 @@ export class OpenFoodFactsAdapter {
   }
 
   private async queryOFF(url: string): Promise<OFFProductResult | null> {
-    const res = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': this.userAgent
-      }
-    });
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
 
-    if (!res.ok) {
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': this.userAgent
+        },
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      if (!res.ok) {
+        return null;
+      }
+      return (await res.json()) as OFFProductResult;
+    } catch {
       return null;
     }
-    return (await res.json()) as OFFProductResult;
   }
 
   mapOFFToProduct(ean: string, raw: NonNullable<OFFProductResult['product']>): Partial<ProductItem> {

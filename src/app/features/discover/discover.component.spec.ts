@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { DiscoverComponent } from './discover.component';
+import { ProductLookupService } from '../../core/services/product-lookup.service';
 
 describe('DiscoverComponent', () => {
   let component: DiscoverComponent;
@@ -113,4 +114,62 @@ describe('DiscoverComponent', () => {
     const el = fixture.nativeElement as HTMLElement;
     expect(el.querySelector('.detail-modal')).toBeTruthy();
   });
+
+  it('10. should render green camera button in search bar pill', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    const cameraBtn = el.querySelector('#btn-open-barcode-scanner');
+    expect(cameraBtn).toBeTruthy();
+    expect(cameraBtn?.getAttribute('aria-label')).toBe('Barcode scannen');
+  });
+
+  it('11. should open barcode scanner modal on button click and close it', () => {
+    expect(component.showBarcodeScanner()).toBe(false);
+
+    component.openBarcodeScanner();
+    fixture.detectChanges();
+
+    expect(component.showBarcodeScanner()).toBe(true);
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('.scanner-modal')).toBeTruthy();
+
+    component.closeBarcodeScanner();
+    fixture.detectChanges();
+
+    expect(component.showBarcodeScanner()).toBe(false);
+  });
+
+  it('12. should perform lookup on barcode scan and open product detail if found', async () => {
+    const localProds = component.filteredProducts();
+    const itemWithEan = localProds.find(p => !!p.ean);
+    expect(itemWithEan).toBeDefined();
+
+    if (itemWithEan?.ean) {
+      component.openBarcodeScanner();
+      await component.handleBarcodeFound(itemWithEan.ean);
+      fixture.detectChanges();
+
+      // Scanner modal closed, detail modal opened
+      expect(component.showBarcodeScanner()).toBe(false);
+      expect(component.selectedProductDetail()?.id).toBe(itemWithEan.id);
+    }
+  });
+
+  it('13. should show "Produkt noch nicht gefunden" on unknown barcode', async () => {
+    const productLookup = TestBed.inject(ProductLookupService);
+    vi.spyOn(productLookup, 'lookupByBarcode').mockResolvedValue({
+      found: false,
+      source: 'none',
+      product: null,
+      errorMessage: 'Produkt noch nicht gefunden',
+      rawEan: '0000000000000'
+    });
+
+    component.openBarcodeScanner();
+    await component.handleBarcodeFound('0000000000000');
+    fixture.detectChanges();
+
+    expect(component.showBarcodeScanner()).toBe(true);
+    expect(component.barcodeScanError()).toContain('Produkt noch nicht gefunden');
+  });
 });
+

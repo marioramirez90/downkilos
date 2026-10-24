@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -7,9 +7,12 @@ import { PriceService } from '../../core/services/price.service';
 import { FoodLogService } from '../../core/services/food-log.service';
 import { ShoppingListService } from '../../core/services/shopping-list.service';
 import { PackageCalorieCalculatorService, PieceCalorieInfo } from '../../core/services/package-calorie-calculator.service';
+import { BarcodeScannerService } from '../../core/services/barcode-scanner.service';
+import { ProductLookupService } from '../../core/services/product-lookup.service';
 import { ProductItem, CalorieFilterType, ProductSortType } from '../../core/models/product.model';
 import { MealType } from '../../core/models/recipe.model';
 import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-nav.component';
+import { Capacitor } from '@capacitor/core';
 
 import { getProductServingDetail } from '../../core/services/product-classifier.util';
 
@@ -30,13 +33,15 @@ export interface CategoryCardItem {
   templateUrl: './discover.component.html',
   styleUrl: './discover.component.scss'
 })
-export class DiscoverComponent implements OnInit {
+export class DiscoverComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   productService = inject(ProductService);
   priceService = inject(PriceService);
   foodLogService = inject(FoodLogService);
   shoppingListService = inject(ShoppingListService);
   calorieCalc = inject(PackageCalorieCalculatorService);
+  barcodeScanner = inject(BarcodeScannerService);
+  productLookup = inject(ProductLookupService);
 
   readonly Math = Math;
 
@@ -65,10 +70,18 @@ export class DiscoverComponent implements OnInit {
   detailAmount = signal<number>(1);
   selectedMealType: MealType = 'snack';
 
-  // Barcode-Scanner Modal
+  // Barcode-Scanner State
   showBarcodeScanner = signal<boolean>(false);
   barcodeInput = '';
   barcodeScanError = signal<string | null>(null);
+  isSearchingProduct = signal<boolean>(false);
+  private scanAnimFrameId: number | null = null;
+
+  @ViewChild('scannerVideo') set videoRef(ref: ElementRef<HTMLVideoElement> | undefined) {
+    if (ref && ref.nativeElement && this.showBarcodeScanner() && !Capacitor.isNativePlatform()) {
+      this.initWebCamera(ref.nativeElement);
+    }
+  }
 
   toastMessage = signal<string | null>(null);
 
@@ -102,6 +115,10 @@ export class DiscoverComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadFavorites();
+  }
+
+  ngOnDestroy(): void {
+    this.closeBarcodeScanner();
   }
 
   loadFavorites(): void {
@@ -453,19 +470,130 @@ export class DiscoverComponent implements OnInit {
     this.closeProductDetail();
   }
 
-  // Barcode-Suche
-  searchByBarcode(): void {
-    const code = this.barcodeInput.trim();
-    if (!code) return;
+  // Barcode-Scanner & Product Lookup Methoden
+  async openBarcodeScanner(): Promise<void> {
+    this.showBarcodeScanner.set(true);
+    this.barcodeScanError.set(null);
+    this.barcodeInput = '';
 
-    const matched = this.productService.products().find(p => p.ean === code);
-    if (matched) {
-      this.barcodeScanError.set(null);
-      this.showBarcodeScanner.set(false);
-      this.barcodeInput = '';
-      this.openProductDetail(matched);
+    if (Capacitor.isNativePlatform()) {
+      const result = await this.barcodeScanner.scanBarcode();
+      if (result.success && result.barcode) {
+        await this.handleBarcodeFound(result.barcode);
+      } else if (result.errorMessage) {
+        this.barcodeScanError.set(result.errorMessage);
+      }
+    }
+  }
+
+  private async initWebCamera(videoEl: HTMLVideoElement): Promise<void> {
+    const stream = await this.barcodeScanner.startWebCamera(videoEl);
+    if (!stream) {
+      if (this.barcodeScanner.errorMessage()) {
+        this.barcodeScanError.set(this.barcodeScanner.errorMessage());
+      }
+      return;
+    }
+
+    // Falls BarcodeDetector im Browser verfügbar ist, starte Erkennungsschleife
+    if (typeof window !== 'undefined' && 'BarcodeDetector' in window) {
+      try {
+        const detector = new (window as any).BarcodeDetector({
+          formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e']
+        });
+
+        const detectFrame = async () => {
+          if (!this.showBarcodeScanner() || this.isSearchingProduct()) return;
+          try {
+            if (videoEl.readyState >= 2) {
+              const detected = await detector.detect(videoEl);
+              if (detected && detected.length > 0) {
+                const code = detected[0].rawValue;
+                if (code) {
+                  await this.handleBarcodeFound(code);
+                  return;
+                }
+              }
+            }
+          } catch {
+            // frame error ignorieren
+          }
+
+          if (this.showBarcodeScanner()) {
+            this.scanAnimFrameId = requestAnimationFrame(detectFrame);
+          }
+        };
+
+        this.scanAnimFrameId = requestAnimationFrame(detectFrame);
+      } catch {
+        // Fallback zu manueller Eingabe
+      }
+    }
+  }
+
+  closeBarcodeScanner(): void {
+    if (this.scanAnimFrameId !== null) {
+      cancelAnimationFrame(this.scanAnimFrameId);
+      this.scanAnimFrameId = null;
+    }
+    this.barcodeScanner.stopScanning();
+    this.showBarcodeScanner.set(false);
+    this.barcodeScanError.set(null);
+    this.isSearchingProduct.set(false);
+  }
+
+  async handleBarcodeFound(barcode: string): Promise<void> {
+    const clean = (barcode || '').trim();
+    if (!clean || this.isSearchingProduct()) return;
+
+    this.isSearchingProduct.set(true);
+    this.barcodeScanError.set(null);
+
+    // Kamera stoppen, damit Bild anhält
+    if (this.scanAnimFrameId !== null) {
+      cancelAnimationFrame(this.scanAnimFrameId);
+      this.scanAnimFrameId = null;
+    }
+    this.barcodeScanner.stopScanning();
+
+    const result = await this.productLookup.lookupByBarcode(clean);
+    this.isSearchingProduct.set(false);
+
+    if (result.found && result.product) {
+      this.closeBarcodeScanner();
+      this.openProductDetail(result.product);
+
+      if (result.source === 'open_food_facts') {
+        this.showToast(`"${result.product.name}" via Open Food Facts erkannt!`);
+      } else {
+        this.showToast(`"${result.product.name}" im Katalog gefunden!`);
+      }
     } else {
-      this.barcodeScanError.set(`Kein verifiziertes Netto-Produkt mit EAN "${code}" gefunden.`);
+      this.barcodeScanError.set(result.errorMessage || 'Produkt noch nicht gefunden');
+    }
+  }
+
+  searchByManualBarcode(): void {
+    if (this.barcodeInput.trim()) {
+      this.handleBarcodeFound(this.barcodeInput.trim());
+    }
+  }
+
+  // Abwärtskompatible Methode für bestehende Tests
+  searchByBarcode(): void {
+    this.searchByManualBarcode();
+  }
+
+  retryScan(): void {
+    this.barcodeScanError.set(null);
+    this.openBarcodeScanner();
+  }
+
+  switchToManualSearch(): void {
+    const code = this.barcodeInput.trim();
+    this.closeBarcodeScanner();
+    if (code) {
+      this.searchQuery = code;
     }
   }
 

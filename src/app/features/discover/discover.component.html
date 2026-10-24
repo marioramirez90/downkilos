@@ -42,6 +42,21 @@
       @if (searchQuery) {
         <button type="button" (click)="searchQuery = ''" class="clear-search-btn" title="Suche leeren">✕</button>
       }
+
+      <!-- Grünes Kamera-Icon für Barcode-Scanner -->
+      <button
+        type="button"
+        (click)="openBarcodeScanner()"
+        class="barcode-camera-btn"
+        id="btn-open-barcode-scanner"
+        aria-label="Barcode scannen"
+        title="Barcode mit Kamera scannen"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+          <circle cx="12" cy="13" r="4"></circle>
+        </svg>
+      </button>
     </div>
 
     <!-- 3. Horizontal scrollbare Kategorienreihe -->
@@ -391,6 +406,103 @@
           </button>
           <button type="button" (click)="logAsEatenFromDetail()" class="btn-log-eaten">
             ✓ Als gegessen verbuchen
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- 8. Barcode-Scanner Modal & Viewfinder -->
+  @if (showBarcodeScanner()) {
+    <div class="modal-backdrop" (click)="closeBarcodeScanner()"></div>
+    <div class="scanner-modal" role="dialog" aria-modal="true" aria-label="Barcode scannen">
+      <div class="scanner-modal-header">
+        <div class="scanner-title-group">
+          <svg class="scanner-header-icon" viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
+          </svg>
+          <h3 class="scanner-modal-title">Barcode scannen</h3>
+        </div>
+        <button
+          type="button"
+          (click)="closeBarcodeScanner()"
+          class="modal-close-btn"
+          id="btn-close-scanner"
+          aria-label="Scanner schließen"
+          title="Schließen"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div class="scanner-viewport-wrap">
+        <!-- Kamera-Video-Stream (Web & Android) -->
+        <video #scannerVideo class="scanner-video" playsinline muted></video>
+
+        <!-- Ziel-Rahmen mit animierter grüner Laserlinie -->
+        <div class="scanner-target-box">
+          <div class="corner corner-tl"></div>
+          <div class="corner corner-tr"></div>
+          <div class="corner corner-bl"></div>
+          <div class="corner corner-br"></div>
+          <div class="laser-scanline"></div>
+        </div>
+
+        <p class="scanner-hint-text">
+          @if (isSearchingProduct()) {
+            <span class="searching-spinner"></span> Produkt wird gesucht...
+          } @else {
+            Halte den Barcode (EAN) in den Rahmen
+          }
+        </p>
+      </div>
+
+      <!-- Fehlermeldung bei unbekanntem Produkt oder verweigerter Berechtigung -->
+      @if (barcodeScanError(); as errorMsg) {
+        <div class="scanner-error-card" role="alert">
+          <div class="error-msg-row">
+            <span class="error-icon">⚠️</span>
+            <div class="error-text-wrap">
+              <strong>{{ errorMsg }}</strong>
+              @if (errorMsg.includes('noch nicht gefunden')) {
+                <p>Möchtest du manuell suchen oder den Code nochmals scannen?</p>
+              }
+            </div>
+          </div>
+          <div class="error-actions-row">
+            <button type="button" (click)="retryScan()" class="retry-scan-btn">
+              Erneut scannen
+            </button>
+            <button type="button" (click)="switchToManualSearch()" class="manual-search-btn">
+              Manuell suchen
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Manuelle Barcode-Eingabe als verlässliche Alternative -->
+      <div class="manual-barcode-section">
+        <label for="manual-barcode-input" class="manual-barcode-label">Code manuell eingeben:</label>
+        <div class="manual-input-row">
+          <input
+            type="text"
+            id="manual-barcode-input"
+            [(ngModel)]="barcodeInput"
+            (keyup.enter)="searchByManualBarcode()"
+            placeholder="z. B. 4012345678901"
+            class="manual-barcode-field"
+            inputmode="numeric"
+            maxlength="14"
+          />
+          <button
+            type="button"
+            (click)="searchByManualBarcode()"
+            [disabled]="isSearchingProduct() || !barcodeInput.trim()"
+            class="manual-barcode-submit-btn"
+            id="btn-submit-manual-barcode"
+          >
+            Prüfen
           </button>
         </div>
       </div>

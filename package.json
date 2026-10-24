@@ -7,7 +7,8 @@
     "build": "ng build",
     "build:prod": "ng build --base-href /projekte/down-kilos/",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "import:netto": "node scripts/import-real-netto-products.js"
   },
   "private": true,
   "packageManager": "npm@11.6.2",

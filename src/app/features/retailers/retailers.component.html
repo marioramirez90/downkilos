@@ -163,7 +163,16 @@
       <div class="budget-headline-row">
         <h3>Dein Wochenbudget</h3>
         <div class="budget-value-box">
-          <strong>{{ weeklyBudget }}</strong>
+          <input
+            id="budgetNumberInput"
+            type="number"
+            min="10"
+            max="250"
+            step="1"
+            [(ngModel)]="weeklyBudget"
+            aria-label="Wochenbudget in Euro"
+            class="budget-num-input"
+          />
           <span>€</span>
         </div>
       </div>
@@ -173,20 +182,21 @@
           id="budgetSlider"
           type="range"
           min="20"
-          max="100"
+          max="120"
           step="5"
           [(ngModel)]="weeklyBudget"
+          aria-label="Wochenbudget Schieberegler"
         />
         <div class="slider-scale-row">
           <span>20 €</span>
-          <span>100 €</span>
+          <span>120 €</span>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- Sticky Footer Button -->
-  <footer class="retailers-footer safe-area-bottom">
+  <!-- Fixed, fully accessible Footer Button (never cut off, safe area padding guaranteed) -->
+  <footer class="retailers-footer">
     <button
       type="button"
       (click)="confirmSelection()"

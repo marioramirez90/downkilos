@@ -15,15 +15,25 @@
 }
 
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0%;
+  min-height: 0;
   height: 100%;
+  width: 100%;
+  overflow: hidden;
 }
 
 .retailers-container {
-  @include flexbox(column, space-between, stretch);
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0%;
+  min-height: 0;
   height: 100%;
+  width: 100%;
   background-color: $bg-white;
   overflow: hidden;
+  position: relative;
 
   .retailers-header {
     flex-shrink: 0;
@@ -83,8 +93,11 @@
   }
 
   .retailers-body {
-    flex: 1;
+    flex: 1 1 0%;
+    min-height: 0;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
     padding: 16px 20px 24px;
     background-color: $bg-light;
     @include flexbox(column, flex-start, stretch, 14px);
@@ -303,11 +316,37 @@
         }
 
         .budget-value-box {
-          padding: 4px 12px;
+          padding: 4px 10px;
           border-radius: $radius-md;
           border: 1px solid $border-color;
           background-color: $bg-light;
-          @include flexbox(row, center, baseline, 3px);
+          @include flexbox(row, center, center, 4px);
+
+          .budget-num-input {
+            width: 44px;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            font-weight: 900;
+            color: $secondary-color;
+            text-align: right;
+            padding: 0;
+            margin: 0;
+            font-family: inherit;
+            outline: none;
+
+            /* Hide arrows on number input */
+            &::-webkit-outer-spin-button,
+            &::-webkit-inner-spin-button {
+              -webkit-appearance: none;
+              margin: 0;
+            }
+            -moz-appearance: textfield;
+
+            &:focus {
+              color: $primary-color;
+            }
+          }
 
           strong {
             font-size: 16px;
@@ -316,8 +355,8 @@
           }
 
           span {
-            font-size: 13px;
-            font-weight: 700;
+            font-size: 14px;
+            font-weight: 800;
             color: $text-muted;
           }
         }
@@ -346,27 +385,36 @@
   }
 
   .retailers-footer {
-    padding: 14px 20px;
+    flex-shrink: 0;
+    padding: 12px 20px max(14px, calc(12px + env(safe-area-inset-bottom, 0px)));
     background-color: $bg-white;
     border-top: 1px solid $border-color-light;
-    z-index: 10;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.04);
+    z-index: 20;
+    position: relative;
 
     .confirm-button {
       width: 100%;
-      padding: 14px 20px;
+      height: 52px;
+      min-height: 52px;
+      padding: 0 20px;
       border-radius: $radius-full;
       border: none;
       background-color: $primary-color;
       color: $bg-white;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 800;
       cursor: pointer;
       box-shadow: $shadow-button;
       @include flexbox(row, center, center, 8px);
-      transition: background-color 0.15s ease, opacity 0.15s ease;
+      transition: background-color 0.15s ease, opacity 0.15s ease, transform 0.1s ease;
 
       &:hover:not(:disabled) {
         background-color: $primary-dark;
+      }
+
+      &:active:not(:disabled) {
+        transform: scale(0.98);
       }
 
       &:disabled {

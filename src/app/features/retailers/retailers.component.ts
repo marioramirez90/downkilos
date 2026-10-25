@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { RetailerPreference } from '../../core/models/retailer.model';
 import { RetailerService } from '../../core/services/retailer.service';
+import { StorageService } from '../../core/services/storage.service';
 import { HamburgerButtonComponent } from '../../shared/components/hamburger-button/hamburger-button.component';
 
 @Component({
@@ -20,6 +21,7 @@ import { HamburgerButtonComponent } from '../../shared/components/hamburger-butt
 export class RetailersComponent implements OnInit {
   private router = inject(Router);
   private retailerService = inject(RetailerService);
+  private storageService = inject(StorageService);
 
   readonly allRetailers = this.retailerService.getRetailers();
 
@@ -35,6 +37,8 @@ export class RetailersComponent implements OnInit {
       if (saved.retailerId) {
         this.selectedRetailer.set(saved.retailerId);
       }
+    } else {
+      this.weeklyBudget = this.storageService.weeklyBudget() || 40;
     }
   }
 
@@ -78,6 +82,8 @@ export class RetailersComponent implements OnInit {
     };
 
     await this.retailerService.savePreference(pref);
+    await this.storageService.saveWeeklyBudget(Number(this.weeklyBudget));
+    this.storageService.setOnboardingStep('retailer-budget');
     this.router.navigate(['/loading'], { queryParams: { step: 'dashboard' } });
   }
 }

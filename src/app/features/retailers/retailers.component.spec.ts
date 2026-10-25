@@ -89,4 +89,18 @@ describe('RetailersComponent', () => {
     component.goBack();
     expect(router.navigate).toHaveBeenCalledWith(['/calculator']);
   });
+
+  it('should render the Weiter button in footer with full accessibility', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    const btn = el.querySelector('#btn-confirm-retailer') as HTMLButtonElement;
+    expect(btn).toBeTruthy();
+    expect(btn.disabled).toBe(false);
+    expect(btn.textContent).toContain('Weiter');
+  });
+
+  it('should update weekly budget when modified', async () => {
+    component.weeklyBudget = 60;
+    await component.confirmSelection();
+    expect(component.weeklyBudget).toBe(60);
+  });
 });

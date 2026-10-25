@@ -1,4 +1,5 @@
 import { DietaryPreference } from './user-profile.model';
+import { DietaryForm } from './dietary-profile.model';
 
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 
@@ -26,6 +27,8 @@ export interface Recipe {
   subtitle?: string;
   mealType: MealType;
   dietType: DietaryPreference;
+  dietaryForms?: DietaryForm[];
+  tags?: string[];
   imageUrl: string;
   prepTimeMinutes: number;
   cookTimeMinutes: number;

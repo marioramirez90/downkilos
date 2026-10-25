@@ -1089,5 +1089,377 @@ export const RECIPES_DATA: Recipe[] = [
     ],
     mealPrepTips: 'Perfekt als proteinreicher Snack für unterwegs oder im Büro.',
     storageTips: 'In Pergamentpapier gewickelt bis zu 6 Stunden transportfähig.'
+  },
+  {
+    id: 'rec-vegan-apple-oats',
+    title: 'Warmer Apfel-Zimt-Porridge',
+    subtitle: 'Haferflocken · Bio Apfel · Zimt',
+    mealType: 'breakfast',
+    dietType: 'vegan',
+    dietaryForms: ['vegan', 'vegetarian', 'pescatarian', 'omnivore'],
+    tags: ['vegan', 'laktosefrei', 'ballaststoffreich', 'budget'],
+    imageUrl: 'images/meals/porridge-banana.jpg',
+    prepTimeMinutes: 5,
+    cookTimeMinutes: 5,
+    difficulty: 'Einfach',
+    calories: 345,
+    protein: 11.0,
+    carbs: 61.5,
+    fat: 4.8,
+    pricePerPortion: 0.95,
+    fullPackageCost: 3.47,
+    defaultServings: 1,
+    allergens: ['Gluten'],
+    ingredients: [
+      {
+        productId: 'netto-oats-500',
+        name: 'Zarte Haferflocken',
+        amount: 80,
+        unit: 'g',
+        portionCost: 0.13,
+        packageSize: '500 g',
+        packagePrice: 0.79,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-apples-1kg',
+        name: 'Bio Tafeläpfel frisch',
+        amount: 1,
+        unit: 'Stück',
+        portionCost: 0.45,
+        packageSize: '1 kg',
+        packagePrice: 2.19,
+        packagesNeeded: 1
+      },
+      {
+        name: 'Zimt & Wasser',
+        amount: 1,
+        unit: 'Prise',
+        portionCost: 0.05,
+        packageSize: 'Haushaltsvorrat',
+        packagePrice: 0.49,
+        packagesNeeded: 0
+      }
+    ],
+    stepInstructions: [
+      'Schritt 1: Haferflocken mit 200 ml Wasser und einer Prise Salz in einen kleinen Topf geben.',
+      'Schritt 2: Bei mittlerer Hitze ca. 4 Minuten köcheln lassen, bis die gewünschte Konsistenz erreicht ist.',
+      'Schritt 3: Den Apfel waschen, entkernen, in mundgerechte Stücke würfeln und unter den warmen Brei heben.',
+      'Schritt 4: Mit Zimt bestreuen und warm genießen.'
+    ],
+    mealPrepTips: 'Kann am Vorabend angerührt und kalt oder kurz erwärmt verzehrt werden.',
+    storageTips: 'Gekühlt bis zu 2 Tage haltbar.'
+  },
+  {
+    id: 'rec-tofu-veggie-wok',
+    title: 'Knusprige Tofu-Gemüse-Pfanne',
+    subtitle: 'Naturtofu · Brokkoli · Möhren · Naturreis',
+    mealType: 'lunch',
+    dietType: 'vegan',
+    dietaryForms: ['vegan', 'vegetarian', 'pescatarian', 'omnivore'],
+    tags: ['vegan', 'laktosefrei', 'proteinreich', 'pflanzlich'],
+    imageUrl: 'images/meals/chicken-bowl.jpg',
+    prepTimeMinutes: 8,
+    cookTimeMinutes: 14,
+    difficulty: 'Einfach',
+    calories: 460,
+    protein: 24.5,
+    carbs: 58.0,
+    fat: 12.0,
+    pricePerPortion: 2.10,
+    fullPackageCost: 6.56,
+    defaultServings: 1,
+    allergens: ['Soja'],
+    ingredients: [
+      {
+        productId: 'netto-tofu-400',
+        name: 'Bio Natur-Tofu',
+        amount: 150,
+        unit: 'g',
+        portionCost: 0.95,
+        packageSize: '400 g',
+        packagePrice: 2.19,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-brown-rice-500',
+        name: 'Bio Langkorn Naturreis',
+        amount: 60,
+        unit: 'g',
+        portionCost: 0.17,
+        packageSize: '500 g',
+        packagePrice: 1.39,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-broccoli-500',
+        name: 'Frischer Brokkoli',
+        amount: 100,
+        unit: 'g',
+        portionCost: 0.32,
+        packageSize: '500 g',
+        packagePrice: 1.59,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-carrots-1kg',
+        name: 'Bio Möhren',
+        amount: 80,
+        unit: 'g',
+        portionCost: 0.10,
+        packageSize: '1 kg',
+        packagePrice: 1.19,
+        packagesNeeded: 1
+      }
+    ],
+    stepInstructions: [
+      'Schritt 1: Naturreis in leicht gesalzenem Wasser ca. 20 Minuten garen.',
+      'Schritt 2: Tofu trocken tupfen, in Würfel schneiden und in einer Pfanne mit 1 TL Rapsöl knusprig anbraten.',
+      'Schritt 3: Brokkoliröschen und Möhrenscheiben hinzugeben und 6 Minuten bissfest dünsten.',
+      'Schritt 4: Mit 1 EL Sojasauce ablöschen und zusammen mit dem warmen Reis servieren.'
+    ],
+    mealPrepTips: 'Hervorragend als Meal Prep für 2 Tage im Voraus geeignet.',
+    storageTips: 'Gekühlt bis zu 3 Tage haltbar.'
+  },
+  {
+    id: 'rec-chickpea-spinach-curry',
+    title: 'Kichererbsen-Curry mit Blattspinat',
+    subtitle: 'Bio Kichererbsen · Spinat · Rispentomaten · Naturreis',
+    mealType: 'dinner',
+    dietType: 'vegan',
+    dietaryForms: ['vegan', 'vegetarian', 'pescatarian', 'omnivore'],
+    tags: ['vegan', 'laktosefrei', 'glutenfrei', 'proteinreich'],
+    imageUrl: 'images/meals/reispfanne-gemuese.jpg',
+    prepTimeMinutes: 5,
+    cookTimeMinutes: 12,
+    difficulty: 'Einfach',
+    calories: 390,
+    protein: 18.0,
+    carbs: 52.0,
+    fat: 8.5,
+    pricePerPortion: 1.75,
+    fullPackageCost: 5.36,
+    defaultServings: 1,
+    allergens: [],
+    ingredients: [
+      {
+        productId: 'netto-chickpeas-400',
+        name: 'Bio Kichererbsen',
+        amount: 130,
+        unit: 'g (Abtropfgewicht)',
+        portionCost: 0.55,
+        packageSize: '400 g Dose',
+        packagePrice: 0.99,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-spinach-450',
+        name: 'TK Bio Blattspinat',
+        amount: 150,
+        unit: 'g',
+        portionCost: 0.50,
+        packageSize: '450 g',
+        packagePrice: 1.49,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-tomatoes-500',
+        name: 'Rispentomaten',
+        amount: 120,
+        unit: 'g',
+        portionCost: 0.36,
+        packageSize: '500 g',
+        packagePrice: 1.49,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-brown-rice-500',
+        name: 'Bio Naturreis',
+        amount: 50,
+        unit: 'g',
+        portionCost: 0.14,
+        packageSize: '500 g',
+        packagePrice: 1.39,
+        packagesNeeded: 1
+      }
+    ],
+    stepInstructions: [
+      'Schritt 1: Naturreis nach Packungsanweisung gar kochen.',
+      'Schritt 2: Tomaten würfeln und in einer Pfanne kurz anschwitzen.',
+      'Schritt 3: Kichererbsen abspülen und zusammen mit dem Blattspinat hinzugeben.',
+      'Schritt 4: Mit Currypulver, Kreuzkümmel und Salz würzen und 8 Minuten köcheln lassen.'
+    ],
+    mealPrepTips: 'Lässt sich ideal portionieren und am nächsten Tag aufwärmen.',
+    storageTips: 'Gekühlt bis zu 3 Tage haltbar.'
+  },
+  {
+    id: 'rec-salmon-broccoli-potatoes',
+    title: 'Gebratenes Lachsfilet mit Brokkoli & Kartoffeln',
+    subtitle: 'Lachs · Brokkoli · Kartoffeln · Zitrone',
+    mealType: 'dinner',
+    dietType: 'omnivore',
+    dietaryForms: ['pescatarian', 'omnivore'],
+    tags: ['pescetarisch', 'omega-3', 'high-protein', 'laktosefrei', 'glutenfrei'],
+    imageUrl: 'images/meals/chicken-bowl.jpg',
+    prepTimeMinutes: 8,
+    cookTimeMinutes: 18,
+    difficulty: 'Einfach',
+    calories: 490,
+    protein: 36.0,
+    carbs: 42.0,
+    fat: 18.0,
+    pricePerPortion: 3.85,
+    fullPackageCost: 8.87,
+    defaultServings: 1,
+    allergens: ['Fisch'],
+    ingredients: [
+      {
+        productId: 'netto-salmon-250',
+        name: 'Frisches Lachsfilet',
+        amount: 125,
+        unit: 'g',
+        portionCost: 2.40,
+        packageSize: '250 g',
+        packagePrice: 4.79,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-potatoes-2kg',
+        name: 'Speisekartoffeln festkochend',
+        amount: 200,
+        unit: 'g',
+        portionCost: 0.25,
+        packageSize: '2 kg',
+        packagePrice: 2.49,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-broccoli-500',
+        name: 'Frischer Brokkoli',
+        amount: 120,
+        unit: 'g',
+        portionCost: 0.38,
+        packageSize: '500 g',
+        packagePrice: 1.59,
+        packagesNeeded: 1
+      }
+    ],
+    stepInstructions: [
+      'Schritt 1: Kartoffeln schälen, vierteln und in Salzwasser ca. 18 Minuten weich kochen.',
+      'Schritt 2: Brokkoliröschen die letzten 5 Minuten zu den Kartoffeln geben und mitgaren.',
+      'Schritt 3: Lachsfilet mit etwas Zitronensaft beträufeln und in 1 TL heißem Rapsöl von beiden Seiten je 3–4 Minuten sanft braten.',
+      'Schritt 4: Alles zusammen auf einem Teller anrichten und mit Meersalz und Pfeffer würzen.'
+    ],
+    mealPrepTips: 'Lachs am besten frisch verzehren. Kartoffeln und Brokkoli können vorgekocht werden.',
+    storageTips: 'Gekühlt max. 1 Tag haltbar.'
+  },
+  {
+    id: 'rec-tuna-salad',
+    title: 'Mediterraner Thunfischsalat mit Ei',
+    subtitle: 'Thunfisch · Ei · Rispentomaten · Blattsalat',
+    mealType: 'lunch',
+    dietType: 'omnivore',
+    dietaryForms: ['pescatarian', 'omnivore'],
+    tags: ['pescetarisch', 'low-carb', 'high-protein', 'glutenfrei', 'laktosefrei'],
+    imageUrl: 'images/meals/vollkornbrot-ei.jpg',
+    prepTimeMinutes: 6,
+    cookTimeMinutes: 0,
+    difficulty: 'Einfach',
+    calories: 340,
+    protein: 38.0,
+    carbs: 6.5,
+    fat: 16.5,
+    pricePerPortion: 1.95,
+    fullPackageCost: 5.17,
+    defaultServings: 1,
+    allergens: ['Fisch', 'Ei'],
+    ingredients: [
+      {
+        productId: 'netto-tuna-185',
+        name: 'Thunfisch im eigenen Saft',
+        amount: 130,
+        unit: 'g (Abtropfgewicht)',
+        portionCost: 1.25,
+        packageSize: '185 g Dose',
+        packagePrice: 1.69,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-eggs-10stk',
+        name: 'Gekochtes Ei Klasse M',
+        amount: 1,
+        unit: 'Stück',
+        portionCost: 0.20,
+        packageSize: '10 Stück',
+        packagePrice: 1.99,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-tomatoes-500',
+        name: 'Rispentomaten',
+        amount: 100,
+        unit: 'g',
+        portionCost: 0.30,
+        packageSize: '500 g',
+        packagePrice: 1.49,
+        packagesNeeded: 1
+      }
+    ],
+    stepInstructions: [
+      'Schritt 1: Thunfisch gut abtropfen lassen und in eine Schüssel geben.',
+      'Schritt 2: Das hartgekochte Ei pellen und vierteln, Tomaten würfeln.',
+      'Schritt 3: Mit 1 TL Rapsöl, einem Spritzer Essig, Salz und Pfeffer vermengen und frisch servieren.'
+    ],
+    mealPrepTips: 'Perfekter proteinreicher Low-Carb-Salat zum Mitnehmen ins Büro.',
+    storageTips: 'Gekühlt bis zu 24 Stunden haltbar.'
+  },
+  {
+    id: 'rec-apple-almond-snack',
+    title: 'Knackiger Apfel-Mandel-Snack',
+    subtitle: 'Bio Apfel · Ungesalzene Mandeln',
+    mealType: 'snack',
+    dietType: 'vegan',
+    dietaryForms: ['vegan', 'vegetarian', 'pescatarian', 'omnivore'],
+    tags: ['vegan', 'laktosefrei', 'glutenfrei', 'gesunde fette'],
+    imageUrl: 'images/meals/overnight-oats.jpg',
+    prepTimeMinutes: 2,
+    cookTimeMinutes: 0,
+    difficulty: 'Einfach',
+    calories: 195,
+    protein: 4.8,
+    carbs: 21.0,
+    fat: 10.2,
+    pricePerPortion: 0.72,
+    fullPackageCost: 4.68,
+    defaultServings: 1,
+    allergens: ['Schalenfrüchte'],
+    ingredients: [
+      {
+        productId: 'netto-apples-1kg',
+        name: 'Bio Tafelapfel',
+        amount: 1,
+        unit: 'Stück',
+        portionCost: 0.42,
+        packageSize: '1 kg',
+        packagePrice: 2.19,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-almonds-200',
+        name: 'Naturbelassene Mandeln',
+        amount: 15,
+        unit: 'g',
+        portionCost: 0.30,
+        packageSize: '200 g Packung',
+        packagePrice: 2.49,
+        packagesNeeded: 1
+      }
+    ],
+    stepInstructions: [
+      'Schritt 1: Den Apfel waschen, vierteln und das Kerngehäuse entfernen.',
+      'Schritt 2: In Spalten schneiden und zusammen mit den Mandeln als frischen Zwischensnack genießen.'
+    ],
+    mealPrepTips: 'Ideal für unterwegs und gegen Heißhunger.',
+    storageTips: 'Bei Raumtemperatur haltbar.'
   }
 ];

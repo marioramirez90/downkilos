@@ -92,7 +92,7 @@ export interface DietaryProfile {
   customExcludedFoods: string[];
   dislikes: string[];
   notes?: string;
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 export const DEFAULT_DIETARY_PROFILE: DietaryProfile = {

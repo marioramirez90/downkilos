@@ -3,6 +3,7 @@ import { DayPlan, MealType, Recipe } from '../models/recipe.model';
 import { RECIPES_DATA } from '../models/recipes.data';
 import { StorageService } from './storage.service';
 import { CalorieCalculatorService } from './calorie-calculator.service';
+import { RecipeCompatibilityService, RecipeCompatibilityResult } from './recipe-compatibility.service';
 import { DietaryPreference } from '../models/user-profile.model';
 
 const STORAGE_PLAN_KEY = 'down_kilos_meal_plan_v3';
@@ -21,6 +22,7 @@ export interface IngredientPreviewItem {
 export class MealPlannerService {
   private storageService = inject(StorageService);
   private calorieService = inject(CalorieCalculatorService);
+  private compatibilityService = inject(RecipeCompatibilityService);
 
   readonly allRecipes = signal<Recipe[]>(RECIPES_DATA);
   readonly currentDayIndex = signal<number>(0);
@@ -216,30 +218,62 @@ export class MealPlannerService {
    */
   generateDiverseWeeklyPlan(): DayPlan[] {
     const days = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
+    const profile = this.storageService.dietaryProfile() || this.storageService.loadDietaryProfile();
 
-    const rPorridge = this.getRecipeById('rec-porridge-banana') || this.getRecipeById('rec-overnight-oats')!;
-    const rRiceVeggie = this.getRecipeById('rec-rice-veggie-pan') || this.getRecipeById('rec-chicken-rice-pan')!;
-    const rBreadEgg = this.getRecipeById('rec-wholegrain-bread-egg') || this.getRecipeById('rec-scrambled-eggs')!;
-    const rSkyrSnack = this.getRecipeById('rec-skyr-berry-snack')!;
+    const hasRestrictions = !!profile && (
+      (profile.dietaryForm && profile.dietaryForm !== 'omnivore' && profile.dietaryForm !== 'none') ||
+      (profile.allergies && profile.allergies.length > 0) ||
+      (profile.intolerances && profile.intolerances.filter(i => i !== 'none').length > 0) ||
+      (profile.customExcludedFoods && profile.customExcludedFoods.length > 0) ||
+      (profile.dislikes && profile.dislikes.length > 0)
+    );
 
-    const rScrambled = this.getRecipeById('rec-scrambled-eggs')!;
-    const rOats = this.getRecipeById('rec-overnight-oats')!;
-    const rPancakes = this.getRecipeById('rec-quark-pancakes')!;
-    const rChickenPaprika = this.getRecipeById('rec-chicken-paprika-stirfry')!;
-    const rLentils = this.getRecipeById('rec-red-lentil-curry')!;
-    const rBakedPotatoes = this.getRecipeById('rec-baked-potatoes-quark')!;
-    const rBroccoliOmelette = this.getRecipeById('rec-broccoli-omelette')!;
-    const rCarrotSnack = this.getRecipeById('rec-carrot-cottage-snack')!;
+    let rotation: { b: Recipe; l: Recipe; s: Recipe; d: Recipe }[];
 
-    const rotation = [
-      { b: rPorridge, l: rRiceVeggie, s: rSkyrSnack, d: rBreadEgg },
-      { b: rOats, l: rChickenPaprika, s: rCarrotSnack, d: rBroccoliOmelette },
-      { b: rPancakes, l: rLentils, s: rSkyrSnack, d: rScrambled },
-      { b: rPorridge, l: rRiceVeggie, s: rCarrotSnack, d: rBakedPotatoes },
-      { b: rScrambled, l: rChickenPaprika, s: rSkyrSnack, d: rBroccoliOmelette },
-      { b: rPancakes, l: rLentils, s: rCarrotSnack, d: rBakedPotatoes },
-      { b: rOats, l: rRiceVeggie, s: rSkyrSnack, d: rBreadEgg }
-    ];
+    if (hasRestrictions) {
+      // Intelligente personalisierte Rezepte für restriktive Profile (Vegan, Vegetarisch, Allergiker)
+      const compB = this.allRecipes().filter(r => r.mealType === 'breakfast' && this.compatibilityService.isRecipeCompatible(r, profile));
+      const compL = this.allRecipes().filter(r => r.mealType === 'lunch' && this.compatibilityService.isRecipeCompatible(r, profile));
+      const compD = this.allRecipes().filter(r => r.mealType === 'dinner' && this.compatibilityService.isRecipeCompatible(r, profile));
+      const compS = this.allRecipes().filter(r => r.mealType === 'snack' && this.compatibilityService.isRecipeCompatible(r, profile));
+
+      const fallbackB = compB[0] || this.getRecipeById('rec-porridge-banana')!;
+      const fallbackL = compL[0] || this.getRecipeById('rec-rice-veggie-pan')!;
+      const fallbackD = compD[0] || this.getRecipeById('rec-wholegrain-bread-egg')!;
+      const fallbackS = compS[0] || this.getRecipeById('rec-skyr-berry-snack')!;
+
+      rotation = days.map((_, i) => ({
+        b: compB[i % compB.length] || fallbackB,
+        l: compL[i % compL.length] || fallbackL,
+        d: compD[i % compD.length] || fallbackD,
+        s: compS[i % compS.length] || fallbackS
+      }));
+    } else {
+      // Standard-Plan exakt wie in der Referenzvorlage (Tag 0 = Montag)
+      const rPorridge = this.getRecipeById('rec-porridge-banana') || this.getRecipeById('rec-overnight-oats')!;
+      const rRiceVeggie = this.getRecipeById('rec-rice-veggie-pan') || this.getRecipeById('rec-chicken-rice-pan')!;
+      const rBreadEgg = this.getRecipeById('rec-wholegrain-bread-egg') || this.getRecipeById('rec-scrambled-eggs')!;
+      const rSkyrSnack = this.getRecipeById('rec-skyr-berry-snack')!;
+
+      const rScrambled = this.getRecipeById('rec-scrambled-eggs')!;
+      const rOats = this.getRecipeById('rec-overnight-oats')!;
+      const rPancakes = this.getRecipeById('rec-quark-pancakes')!;
+      const rChickenPaprika = this.getRecipeById('rec-chicken-paprika-stirfry')!;
+      const rLentils = this.getRecipeById('rec-red-lentil-curry')!;
+      const rBakedPotatoes = this.getRecipeById('rec-baked-potatoes-quark')!;
+      const rBroccoliOmelette = this.getRecipeById('rec-broccoli-omelette')!;
+      const rCarrotSnack = this.getRecipeById('rec-carrot-cottage-snack')!;
+
+      rotation = [
+        { b: rPorridge, l: rRiceVeggie, s: rSkyrSnack, d: rBreadEgg },
+        { b: rOats, l: rChickenPaprika, s: rCarrotSnack, d: rBroccoliOmelette },
+        { b: rPancakes, l: rLentils, s: rSkyrSnack, d: rScrambled },
+        { b: rPorridge, l: rRiceVeggie, s: rCarrotSnack, d: rBakedPotatoes },
+        { b: rScrambled, l: rChickenPaprika, s: rSkyrSnack, d: rBroccoliOmelette },
+        { b: rPancakes, l: rLentils, s: rCarrotSnack, d: rBakedPotatoes },
+        { b: rOats, l: rRiceVeggie, s: rSkyrSnack, d: rBreadEgg }
+      ];
+    }
 
     const currentCw = this.getCurrentCalendarWeek();
 
@@ -250,10 +284,10 @@ export class MealPlannerService {
         dayName,
         dateStr: this.getDateForDayOffset(idx),
         calendarWeek: currentCw,
-        breakfast: rot.b || rPorridge,
-        lunch: rot.l || rRiceVeggie,
-        snack: rot.s || rSkyrSnack,
-        dinner: rot.d || rBreadEgg,
+        breakfast: rot.b,
+        lunch: rot.l,
+        snack: rot.s,
+        dinner: rot.d,
         selectedMeals: {
           breakfast: true,
           lunch: true,
@@ -269,8 +303,17 @@ export class MealPlannerService {
   }
 
   getFilteredRecipes(mealType: MealType, diet?: DietaryPreference, excludedAllergens: string[] = []): Recipe[] {
+    const profile = this.storageService.dietaryProfile() || this.storageService.loadDietaryProfile();
+
     return this.allRecipes().filter(r => {
       if (r.mealType !== mealType) return false;
+
+      // Filterung gegen aktives Ernährungsprofil
+      if (profile && !this.compatibilityService.isRecipeCompatible(r, profile)) {
+        return false;
+      }
+
+      // Explizite Filter für Test-Rückwärtskompatibilität
       if (diet === 'vegan' && r.dietType !== 'vegan') return false;
       if (diet === 'vegetarian' && r.dietType === 'omnivore') return false;
 
@@ -281,6 +324,11 @@ export class MealPlannerService {
 
       return true;
     });
+  }
+
+  checkRecipeCompatibility(recipe: Recipe): RecipeCompatibilityResult {
+    const profile = this.storageService.dietaryProfile() || this.storageService.loadDietaryProfile();
+    return this.compatibilityService.checkCompatibility(recipe, profile);
   }
 
   /**

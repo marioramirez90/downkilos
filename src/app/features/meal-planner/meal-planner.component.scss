@@ -208,13 +208,70 @@ $divider-color: #eef3ee;
 }
 
 /* ==========================================================================
-   2.2 Wochentags-Navigator
+   2.2 Wochentags-Pillen-Leiste & Navigator
    ========================================================================== */
+.weekday-pills-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  margin: 14px 0 10px 0;
+  padding: 4px;
+  background-color: #f6f9f6;
+  border-radius: 14px;
+  border: 1px solid #e5ebe5;
+
+  .day-pill-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 2px;
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    .pill-day-name {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: $text-muted;
+      line-height: 1.1;
+    }
+
+    .pill-day-date {
+      font-size: 9.5px;
+      font-weight: 500;
+      color: #83918b;
+      margin-top: 1px;
+    }
+
+    &:hover {
+      background-color: rgba(39, 143, 57, 0.08);
+    }
+
+    &.active {
+      background-color: $primary-green;
+      box-shadow: 0 2px 6px rgba(39, 143, 57, 0.3);
+
+      .pill-day-name {
+        color: #ffffff;
+      }
+
+      .pill-day-date {
+        color: rgba(255, 255, 255, 0.85);
+      }
+    }
+  }
+}
+
 .weekday-nav-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 18px 0 14px 0;
+  margin: 6px 0 10px 0;
 
   .day-arrow-btn {
     width: 38px;
@@ -259,6 +316,42 @@ $divider-color: #eef3ee;
       margin: 0;
       letter-spacing: -0.02em;
     }
+  }
+}
+
+.day-progress-summary-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 8px 14px;
+  background-color: #f7faf7;
+  border: 1px solid #e7ede7;
+  border-radius: 12px;
+  margin-bottom: 12px;
+
+  .day-summary-metric {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+
+    .summary-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: $text-muted;
+    }
+
+    .summary-val {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: $dark-green;
+    }
+  }
+
+  .day-summary-divider {
+    width: 1px;
+    height: 24px;
+    background-color: #dbe4dc;
   }
 }
 
@@ -684,14 +777,31 @@ $divider-color: #eef3ee;
         flex: 1;
         min-width: 0;
 
-        .alt-recipe-title {
-          font-size: 14px;
-          font-weight: 700;
-          color: $text-main;
-          margin: 0 0 2px 0;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
+        .alt-title-row {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-bottom: 2px;
+
+          .alt-recipe-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: $text-main;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          .compat-pill-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 999px;
+            background-color: $light-green;
+            color: $dark-green;
+            white-space: nowrap;
+          }
         }
 
         .alt-recipe-sub {

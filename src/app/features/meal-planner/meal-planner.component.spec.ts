@@ -117,4 +117,26 @@ describe('MealPlannerComponent', () => {
     expect(component.showBudgetModal()).toBe(false);
     expect(plannerService.weeklyBudget()).toBe(75);
   });
+
+  it('10. should render 7-day pill bar and switch days on pill click', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    const dayPills = el.querySelectorAll('.day-pill-btn');
+    expect(dayPills.length).toBe(7);
+
+    // Click Wednesday (index 2)
+    const wednesdayPill = el.querySelector('#day-pill-2') as HTMLElement;
+    expect(wednesdayPill).toBeTruthy();
+    wednesdayPill.click();
+    fixture.detectChanges();
+
+    expect(plannerService.currentDayIndex()).toBe(2);
+    expect(plannerService.currentDayPlan().dayName).toBe('Mittwoch');
+  });
+
+  it('11. should render day progress summary with calories and target', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('.day-progress-summary-card')).toBeTruthy();
+    expect(el.textContent).toContain('Geplante Kalorien:');
+    expect(el.textContent).toContain('Tageskosten:');
+  });
 });

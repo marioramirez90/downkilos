@@ -26,6 +26,14 @@ export class MealPlannerComponent {
 
   readonly budgetOptions = [30, 40, 50, 60, 75, 100];
 
+  selectDay(dayIndex: number): void {
+    this.plannerService.setDayIndex(dayIndex);
+  }
+
+  checkCompatibility(recipe: Recipe) {
+    return this.plannerService.checkRecipeCompatibility(recipe);
+  }
+
   goToDashboard(): void {
     this.router.navigate(['/dashboard']);
   }

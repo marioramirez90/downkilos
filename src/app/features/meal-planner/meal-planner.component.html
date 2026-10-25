@@ -62,7 +62,24 @@
         </div>
       </section>
 
-      <!-- 2.2 Wochentags-Navigator -->
+      <!-- 2.2 Wochentags-Pillen-Leiste (Montag bis Sonntag) -->
+      <section class="weekday-pills-bar" aria-label="Wochentage Schnellwahl">
+        @for (day of plannerService.weeklyPlan(); track day.dayIndex) {
+          <button
+            type="button"
+            class="day-pill-btn"
+            [class.active]="plannerService.currentDayIndex() === day.dayIndex"
+            (click)="selectDay(day.dayIndex)"
+            [id]="'day-pill-' + day.dayIndex"
+            [attr.aria-label]="day.dayName + ' auswählen'"
+          >
+            <span class="pill-day-name">{{ day.dayName.substring(0, 2) }}</span>
+            <span class="pill-day-date">{{ day.dateStr.split('.')[0] }}</span>
+          </button>
+        }
+      </section>
+
+      <!-- 2.2b Wochentags-Navigator -->
       <section class="weekday-nav-bar" aria-label="Wochentag auswählen">
         <button
           type="button"
@@ -100,6 +117,19 @@
           </svg>
         </button>
       </section>
+
+      <!-- 2.2c Tagesfortschritt Kalorien & Kosten -->
+      <div class="day-progress-summary-card">
+        <div class="day-summary-metric">
+          <span class="summary-label">Geplante Kalorien:</span>
+          <strong class="summary-val">{{ plannerService.currentDayTotals().calories }} / {{ plannerService.dailyCalorieTarget() | number:'1.0-0' }} kcal</strong>
+        </div>
+        <div class="day-summary-divider"></div>
+        <div class="day-summary-metric">
+          <span class="summary-label">Tageskosten:</span>
+          <strong class="summary-val">{{ plannerService.currentDayTotals().cost | number:'1.2-2' }} €</strong>
+        </div>
+      </div>
 
       <!-- 2.3 Mahlzeiten-Karten des Tages -->
       <section class="meals-list-section" aria-label="Geplante Mahlzeiten">
@@ -334,12 +364,19 @@
           <article class="alt-recipe-card" (click)="confirmSwap(recipe)">
             <img [src]="recipe.imageUrl" [alt]="recipe.title" class="alt-recipe-img" />
             <div class="alt-recipe-info">
-              <h4 class="alt-recipe-title">{{ recipe.title }}</h4>
+              <div class="alt-title-row">
+                <h4 class="alt-recipe-title">{{ recipe.title }}</h4>
+                @if (checkCompatibility(recipe).isCompatible) {
+                  <span class="compat-pill-badge">✓ Passt</span>
+                }
+              </div>
               <p class="alt-recipe-sub">{{ recipe.subtitle }}</p>
               <div class="alt-recipe-meta">
                 <span>ca. {{ recipe.calories }} kcal</span>
                 <span>•</span>
                 <span>ca. {{ recipe.pricePerPortion | number:'1.2-2' }} €</span>
+                <span>•</span>
+                <span>🥩 {{ recipe.protein }}g</span>
               </div>
             </div>
             <button type="button" class="alt-select-btn" (click)="confirmSwap(recipe); $event.stopPropagation()">

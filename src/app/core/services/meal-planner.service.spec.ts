@@ -85,4 +85,25 @@ describe('MealPlannerService', () => {
     service.previousDay();
     expect(service.currentDayIndex()).toBe(0);
   });
+
+  it('should generate personalized vegan weekly plan when dietaryForm is vegan', () => {
+    const storageService = TestBed.inject(MealPlannerService)['storageService'];
+    storageService.saveDietaryProfile({
+      dietaryForm: 'vegan',
+      intolerances: [],
+      allergies: [],
+      customExcludedFoods: [],
+      dislikes: []
+    });
+
+    service.generateWeeklyPlan();
+    const plan = service.weeklyPlan();
+    expect(plan.length).toBe(7);
+
+    for (const day of plan) {
+      expect(day.breakfast.dietType === 'vegan' || day.breakfast.dietaryForms?.includes('vegan')).toBe(true);
+      expect(day.lunch.dietType === 'vegan' || day.lunch.dietaryForms?.includes('vegan')).toBe(true);
+      expect(day.dinner.dietType === 'vegan' || day.dinner.dietaryForms?.includes('vegan')).toBe(true);
+    }
+  });
 });

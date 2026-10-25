@@ -557,6 +557,25 @@
         </section>
       }
 
+      <!-- 2.5 Wochenplan abschließen (Master Prompt Section 25) -->
+      <section class="complete-plan-section">
+        <button
+          type="button"
+          class="btn-complete-plan"
+          (click)="openCompleteModal()"
+          id="btn-complete-plan"
+        >
+          <span class="complete-btn-check-icon">✓</span>
+          <div class="complete-btn-text-col">
+            <strong class="complete-btn-main">Wochenplan abschließen</strong>
+            <span class="complete-btn-sub">Zusammenfassung prüfen & zum Dashboard</span>
+          </div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="complete-chevron">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </section>
+
     </div>
   </main>
 
@@ -723,6 +742,103 @@
             (click)="applyCustomRepeat(rType)"
           >
             Auf {{ selectedRepeatDays().length }} gewählte Tage anwenden
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- 5. Wochenplan abschließen Modal (Section 25) -->
+  @if (showCompleteModal()) {
+    <div class="modal-backdrop" (click)="closeCompleteModal()"></div>
+    <div class="complete-summary-modal" role="dialog" aria-modal="true" aria-label="Wochenplan abschließen">
+      <div class="modal-header">
+        <div class="modal-header-titles">
+          <span class="modal-eyebrow">Zusammenfassung</span>
+          <h3 class="modal-title">Wochenplan abschließen</h3>
+        </div>
+        <button type="button" (click)="closeCompleteModal()" class="modal-close-btn" aria-label="Schließen">✕</button>
+      </div>
+
+      <div class="modal-body-content">
+        @if (plannedMealsStats(); as stats) {
+          <div class="summary-check-list">
+            <!-- 1. Geplante Mahlzeiten -->
+            <div class="check-item">
+              <span class="check-icon-bubble">🍽️</span>
+              <div class="check-item-text">
+                <span class="item-category">Geplante Mahlzeiten</span>
+                <strong class="item-title">{{ stats.mainMealsCount }} von 21 Hauptmahlzeiten verplant</strong>
+                <p class="item-sub">Du kannst fehlende Mahlzeiten auch später im Dashboard jederzeit ergänzen.</p>
+              </div>
+            </div>
+
+            <!-- 2. Geplante Kalorien je Tag -->
+            <div class="check-item">
+              <span class="check-icon-bubble">⚡</span>
+              <div class="check-item-text">
+                <span class="item-category">Geplante Kalorien je Tag</span>
+                <strong class="item-title">Ø {{ stats.averageDailyCalories }} kcal / Tag</strong>
+                <p class="item-sub">Dein persönliches Tagesziel: {{ stats.dailyTarget }} kcal</p>
+              </div>
+            </div>
+
+            <!-- 3. Bekannte Einkaufskosten & Packungen -->
+            @if (plannerService.weeklyBudgetSummary(); as bSummary) {
+              <div class="check-item">
+                <span class="check-icon-bubble">💶</span>
+                <div class="check-item-text">
+                  <span class="item-category">Bekannte Einkaufskosten</span>
+                  <strong class="item-title">{{ bSummary.actualFullPackageCost | number:'1.2-2' }} € für {{ bSummary.totalPackagesCount }} Netto-Packungen</strong>
+                  <p class="item-sub">Portionswert: {{ bSummary.theoreticalPortionCost | number:'1.2-2' }} € (Budget: {{ bSummary.weeklyBudget }} €)</p>
+                </div>
+              </div>
+
+              <!-- 4. Preisstatus -->
+              <div class="check-item">
+                <span class="check-icon-bubble">🏷️</span>
+                <div class="check-item-text">
+                  <span class="item-category">Preisstatus</span>
+                  @if (bSummary.hasMissingPrices) {
+                    <strong class="item-title text-warning">Preise für einzelne Zutaten noch offen</strong>
+                    <p class="item-sub">Werden im Markt oder beim Einkauf automatisch aktualisiert.</p>
+                  } @else {
+                    <strong class="item-title text-success">Netto-Preise vollständig erfasst</strong>
+                    <p class="item-sub">Alle Artikel mit verifizierten Netto-Preisen hinterlegt.</p>
+                  }
+                </div>
+              </div>
+
+              <!-- 5. Restmengen -->
+              @if (bSummary.surplusItems.length > 0) {
+                <div class="check-item">
+                  <span class="check-icon-bubble">📦</span>
+                  <div class="check-item-text">
+                    <span class="item-category">Zutaten mit Restmengen</span>
+                    <strong class="item-title">{{ bSummary.surplusItems.length }} Zutaten mit Vorratsresten</strong>
+                    <p class="item-sub">Restmengen bleiben für Snacks oder die Folgewoche erhalten.</p>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        }
+
+        <div class="complete-modal-actions">
+          <button
+            type="button"
+            class="btn-confirm-complete"
+            (click)="completePlanAndProceed()"
+            id="btn-confirm-complete-plan"
+          >
+            Plan speichern & zum Dashboard →
+          </button>
+          <button
+            type="button"
+            class="btn-cancel-complete"
+            (click)="closeCompleteModal()"
+          >
+            Zurück zum Plan
           </button>
         </div>
       </div>

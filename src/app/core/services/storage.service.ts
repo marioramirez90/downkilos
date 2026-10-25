@@ -452,6 +452,7 @@ export class StorageService {
     }
   }
 
+
   async resetAllData(): Promise<boolean> {
     try {
       // 1. Lokale Benutzerspeicher entfernen (nur App-spezifische Nutzerdaten)

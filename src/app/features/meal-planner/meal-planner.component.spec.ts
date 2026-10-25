@@ -226,6 +226,40 @@ describe('MealPlannerComponent', () => {
 
     expect(router.navigate).toHaveBeenCalledWith(['/shopping-list']);
   });
+
+  it('18. should render "Wochenplan abschließen" button and open summary modal (Section 25)', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    const btn = el.querySelector('#btn-complete-plan') as HTMLButtonElement;
+    expect(btn).toBeTruthy();
+    expect(btn.textContent).toContain('Wochenplan abschließen');
+
+    btn.click();
+    fixture.detectChanges();
+
+    expect(component.showCompleteModal()).toBe(true);
+
+    const modal = el.querySelector('.complete-summary-modal');
+    expect(modal).toBeTruthy();
+    expect(modal?.textContent).toContain('Geplante Mahlzeiten');
+    expect(modal?.textContent).toContain('Geplante Kalorien je Tag');
+    expect(modal?.textContent).toContain('Bekannte Einkaufskosten');
+  });
+
+  it('19. should complete plan, mark onboarding completed, and navigate to /loading?step=dashboard (Section 25)', () => {
+    const storageService = component['storageService'];
+    expect(storageService.isOnboardingCompleted()).toBe(false);
+
+    component.openCompleteModal();
+    fixture.detectChanges();
+
+    component.completePlanAndProceed();
+    fixture.detectChanges();
+
+    expect(component.showCompleteModal()).toBe(false);
+    expect(storageService.isOnboardingCompleted()).toBe(true);
+    expect(router.navigate).toHaveBeenCalledWith(['/loading'], { queryParams: { step: 'dashboard' } });
+  });
 });
+
 
 

@@ -1,9 +1,10 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MealPlannerService } from '../../core/services/meal-planner.service';
 import { ShoppingListService } from '../../core/services/shopping-list.service';
+import { StorageService } from '../../core/services/storage.service';
 import { MealType, Recipe } from '../../core/models/recipe.model';
 import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-nav.component';
 
@@ -18,15 +19,56 @@ export class MealPlannerComponent {
   private router = inject(Router);
   readonly plannerService = inject(MealPlannerService);
   private shoppingListService = inject(ShoppingListService);
+  private storageService = inject(StorageService);
 
   readonly swappingMealType = signal<MealType | null>(null);
   readonly repeatingMealType = signal<MealType | null>(null);
   readonly selectedRepeatDays = signal<number[]>([0, 1, 2, 3, 4]);
   readonly showBudgetModal = signal<boolean>(false);
+  readonly showCompleteModal = signal<boolean>(false);
   readonly customBudget = signal<number>(50);
   readonly toastMessage = signal<string | null>(null);
 
   readonly budgetOptions = [30, 40, 50, 60, 75, 100];
+
+  readonly plannedMealsStats = computed(() => {
+    const plan = this.plannerService.weeklyPlan();
+    let mainMealsCount = 0;
+    let snacksCount = 0;
+    let totalCalories = 0;
+
+    for (const day of plan) {
+      const sel = day.selectedMeals || { breakfast: true, lunch: true, dinner: true, snack: false };
+      const portions = day.portions || { breakfast: 1, lunch: 1, dinner: 1, snack: 1 };
+
+      if (sel.breakfast && day.breakfast) {
+        mainMealsCount++;
+        totalCalories += day.breakfast.calories * (portions.breakfast || 1);
+      }
+      if (sel.lunch && day.lunch) {
+        mainMealsCount++;
+        totalCalories += day.lunch.calories * (portions.lunch || 1);
+      }
+      if (sel.dinner && day.dinner) {
+        mainMealsCount++;
+        totalCalories += day.dinner.calories * (portions.dinner || 1);
+      }
+      if (sel.snack && day.snack) {
+        snacksCount++;
+        totalCalories += day.snack.calories * (portions.snack || 1);
+      }
+    }
+
+    const averageDailyCalories = Math.round(totalCalories / 7);
+
+    return {
+      mainMealsCount,
+      totalMainMealsMax: 21,
+      snacksCount,
+      averageDailyCalories,
+      dailyTarget: this.plannerService.dailyCalorieTarget()
+    };
+  });
 
   readonly weekDaysList = [
     { index: 0, short: 'Mo', name: 'Montag' },
@@ -213,6 +255,21 @@ export class MealPlannerComponent {
     const plan = this.plannerService.weeklyPlan();
     this.shoppingListService.syncWithWeeklyPlan(plan);
     this.showToast('Einkaufsliste mit Wochenplan synchronisiert!');
+  }
+
+  openCompleteModal(): void {
+    this.showCompleteModal.set(true);
+  }
+
+  closeCompleteModal(): void {
+    this.showCompleteModal.set(false);
+  }
+
+  completePlanAndProceed(): void {
+    this.syncAllSelectedToShoppingList();
+    this.storageService.setOnboardingCompleted(true);
+    this.closeCompleteModal();
+    this.router.navigate(['/loading'], { queryParams: { step: 'dashboard' } });
   }
 
   private showToast(msg: string): void {

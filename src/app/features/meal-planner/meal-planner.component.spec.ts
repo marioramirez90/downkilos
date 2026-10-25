@@ -139,4 +139,56 @@ describe('MealPlannerComponent', () => {
     expect(el.textContent).toContain('Geplante Kalorien:');
     expect(el.textContent).toContain('Tageskosten:');
   });
+
+  it('12. should adjust portions using stepper buttons', () => {
+    expect(component.getPortions('breakfast')).toBe(1);
+
+    component.changePortions('breakfast', 1);
+    fixture.detectChanges();
+    expect(component.getPortions('breakfast')).toBe(2);
+
+    component.changePortions('breakfast', -1);
+    fixture.detectChanges();
+    expect(component.getPortions('breakfast')).toBe(1);
+  });
+
+  it('13. should open repeat modal and repeat meal for workdays (Mo–Fr)', () => {
+    component.openRepeatModal('breakfast');
+    fixture.detectChanges();
+
+    expect(component.repeatingMealType()).toBe('breakfast');
+
+    const mondayBreakfast = plannerService.weeklyPlan()[0].breakfast;
+    component.repeatWorkdays('breakfast');
+    fixture.detectChanges();
+
+    expect(component.repeatingMealType()).toBeNull();
+
+    const plan = plannerService.weeklyPlan();
+    for (let day = 0; day <= 4; day++) {
+      expect(plan[day].breakfast.id).toBe(mondayBreakfast.id);
+    }
+  });
+
+  it('14. should open repeat modal and repeat meal for entire week', () => {
+    component.openRepeatModal('dinner');
+    fixture.detectChanges();
+
+    const mondayDinner = plannerService.weeklyPlan()[0].dinner;
+    component.repeatAllWeek('dinner');
+    fixture.detectChanges();
+
+    const plan = plannerService.weeklyPlan();
+    for (let day = 0; day < 7; day++) {
+      expect(plan[day].dinner.id).toBe(mondayDinner.id);
+    }
+  });
+
+  it('15. should sync selected meals with portions to shopping list', () => {
+    component.changePortions('breakfast', 1); // 2 portions
+    component.syncAllSelectedToShoppingList();
+
+    const shoppingListService = component['shoppingListService'];
+    expect(shoppingListService.items().length).toBeGreaterThan(0);
+  });
 });

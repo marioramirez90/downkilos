@@ -151,7 +151,7 @@
                   <svg viewBox="0 0 24 24" fill="#278F39" class="chip-icon">
                     <path d="M12 2c-3.5 4.5-7 8.5-7 13.5a7 7 0 0 0 14 0c0-5-3.5-9-7-13.5z"/>
                   </svg>
-                  ca. {{ breakfast.calories }} kcal
+                  ca. {{ breakfast.calories * getPortions('breakfast') }} kcal
                 </span>
                 <span class="metric-chip price-chip">
                   <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" class="chip-icon">
@@ -159,8 +159,30 @@
                     <path d="M14.5 9h-4a2 2 0 0 0 0 4h3a2 2 0 0 1 0 4h-4.5"></path>
                     <line x1="12" y1="7" x2="12" y2="17"></line>
                   </svg>
-                  ca. {{ breakfast.pricePerPortion | number:'1.2-2' }} €
+                  ca. {{ (breakfast.pricePerPortion * getPortions('breakfast')) | number:'1.2-2' }} €
                 </span>
+              </div>
+
+              <!-- Portionen Stepper -->
+              <div class="meal-portions-row" (click)="$event.stopPropagation()">
+                <span class="portions-label">Portionen:</span>
+                <div class="stepper-wrap">
+                  <button
+                    type="button"
+                    class="btn-step minus"
+                    (click)="changePortions('breakfast', -1, $event)"
+                    [disabled]="getPortions('breakfast') <= 1"
+                    aria-label="Portion verringern"
+                  >−</button>
+                  <span class="step-value">{{ getPortions('breakfast') }}</span>
+                  <button
+                    type="button"
+                    class="btn-step plus"
+                    (click)="changePortions('breakfast', 1, $event)"
+                    [disabled]="getPortions('breakfast') >= 8"
+                    aria-label="Portion erhöhen"
+                  >+</button>
+                </div>
               </div>
             </div>
 
@@ -177,6 +199,21 @@
                 } @else {
                   Auswählen
                 }
+              </button>
+              <button
+                type="button"
+                (click)="openRepeatModal('breakfast', $event)"
+                class="meal-repeat-btn"
+                title="Auf weitere Tage wiederholen"
+                aria-label="Frühstück auf weitere Tage wiederholen"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="repeat-icon">
+                  <path d="m17 2 4 4-4 4"/>
+                  <path d="M3 11v-1a4 4 0 0 1 4-4h14"/>
+                  <path d="m7 22-4-4 4-4"/>
+                  <path d="M21 13v1a4 4 0 0 1-4 4H3"/>
+                </svg>
+                <span>Wiederholen</span>
               </button>
             </div>
           </article>
@@ -199,7 +236,7 @@
                   <svg viewBox="0 0 24 24" fill="#278F39" class="chip-icon">
                     <path d="M12 2c-3.5 4.5-7 8.5-7 13.5a7 7 0 0 0 14 0c0-5-3.5-9-7-13.5z"/>
                   </svg>
-                  ca. {{ lunch.calories }} kcal
+                  ca. {{ lunch.calories * getPortions('lunch') }} kcal
                 </span>
                 <span class="metric-chip price-chip">
                   <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" class="chip-icon">
@@ -207,8 +244,30 @@
                     <path d="M14.5 9h-4a2 2 0 0 0 0 4h3a2 2 0 0 1 0 4h-4.5"></path>
                     <line x1="12" y1="7" x2="12" y2="17"></line>
                   </svg>
-                  ca. {{ lunch.pricePerPortion | number:'1.2-2' }} €
+                  ca. {{ (lunch.pricePerPortion * getPortions('lunch')) | number:'1.2-2' }} €
                 </span>
+              </div>
+
+              <!-- Portionen Stepper -->
+              <div class="meal-portions-row" (click)="$event.stopPropagation()">
+                <span class="portions-label">Portionen:</span>
+                <div class="stepper-wrap">
+                  <button
+                    type="button"
+                    class="btn-step minus"
+                    (click)="changePortions('lunch', -1, $event)"
+                    [disabled]="getPortions('lunch') <= 1"
+                    aria-label="Portion verringern"
+                  >−</button>
+                  <span class="step-value">{{ getPortions('lunch') }}</span>
+                  <button
+                    type="button"
+                    class="btn-step plus"
+                    (click)="changePortions('lunch', 1, $event)"
+                    [disabled]="getPortions('lunch') >= 8"
+                    aria-label="Portion erhöhen"
+                  >+</button>
+                </div>
               </div>
             </div>
 
@@ -225,6 +284,21 @@
                 } @else {
                   Auswählen
                 }
+              </button>
+              <button
+                type="button"
+                (click)="openRepeatModal('lunch', $event)"
+                class="meal-repeat-btn"
+                title="Auf weitere Tage wiederholen"
+                aria-label="Mittagessen auf weitere Tage wiederholen"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="repeat-icon">
+                  <path d="m17 2 4 4-4 4"/>
+                  <path d="M3 11v-1a4 4 0 0 1 4-4h14"/>
+                  <path d="m7 22-4-4 4-4"/>
+                  <path d="M21 13v1a4 4 0 0 1-4 4H3"/>
+                </svg>
+                <span>Wiederholen</span>
               </button>
             </div>
           </article>
@@ -247,7 +321,7 @@
                   <svg viewBox="0 0 24 24" fill="#278F39" class="chip-icon">
                     <path d="M12 2c-3.5 4.5-7 8.5-7 13.5a7 7 0 0 0 14 0c0-5-3.5-9-7-13.5z"/>
                   </svg>
-                  ca. {{ dinner.calories }} kcal
+                  ca. {{ dinner.calories * getPortions('dinner') }} kcal
                 </span>
                 <span class="metric-chip price-chip">
                   <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" class="chip-icon">
@@ -255,8 +329,30 @@
                     <path d="M14.5 9h-4a2 2 0 0 0 0 4h3a2 2 0 0 1 0 4h-4.5"></path>
                     <line x1="12" y1="7" x2="12" y2="17"></line>
                   </svg>
-                  ca. {{ dinner.pricePerPortion | number:'1.2-2' }} €
+                  ca. {{ (dinner.pricePerPortion * getPortions('dinner')) | number:'1.2-2' }} €
                 </span>
+              </div>
+
+              <!-- Portionen Stepper -->
+              <div class="meal-portions-row" (click)="$event.stopPropagation()">
+                <span class="portions-label">Portionen:</span>
+                <div class="stepper-wrap">
+                  <button
+                    type="button"
+                    class="btn-step minus"
+                    (click)="changePortions('dinner', -1, $event)"
+                    [disabled]="getPortions('dinner') <= 1"
+                    aria-label="Portion verringern"
+                  >−</button>
+                  <span class="step-value">{{ getPortions('dinner') }}</span>
+                  <button
+                    type="button"
+                    class="btn-step plus"
+                    (click)="changePortions('dinner', 1, $event)"
+                    [disabled]="getPortions('dinner') >= 8"
+                    aria-label="Portion erhöhen"
+                  >+</button>
+                </div>
               </div>
             </div>
 
@@ -273,6 +369,21 @@
                 } @else {
                   Auswählen
                 }
+              </button>
+              <button
+                type="button"
+                (click)="openRepeatModal('dinner', $event)"
+                class="meal-repeat-btn"
+                title="Auf weitere Tage wiederholen"
+                aria-label="Abendessen auf weitere Tage wiederholen"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="repeat-icon">
+                  <path d="m17 2 4 4-4 4"/>
+                  <path d="M3 11v-1a4 4 0 0 1 4-4h14"/>
+                  <path d="m7 22-4-4 4-4"/>
+                  <path d="M21 13v1a4 4 0 0 1-4 4H3"/>
+                </svg>
+                <span>Wiederholen</span>
               </button>
             </div>
           </article>
@@ -429,6 +540,83 @@
           <span class="custom-budget-currency">€</span>
           <button type="button" (click)="saveCustomBudget()" class="custom-budget-save-btn">
             Übernehmen
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- 5b. Mahlzeit auf weitere Tage wiederholen Modal -->
+  @if (repeatingMealType(); as rType) {
+    <div class="modal-backdrop" (click)="closeRepeatModal()"></div>
+    <div class="repeat-meal-modal" role="dialog" aria-modal="true" aria-label="Mahlzeit wiederholen">
+      <div class="modal-header">
+        <div class="repeat-title-col">
+          <span class="repeat-type-pill">{{ getMealTypeLabel(rType) }} wiederholen</span>
+          <h3 class="modal-title">{{ getCurrentMealRecipe(rType)?.title }}</h3>
+        </div>
+        <button type="button" (click)="closeRepeatModal()" class="modal-close-btn" aria-label="Schließen">✕</button>
+      </div>
+
+      <div class="modal-body repeat-modal-body">
+        <p class="repeat-intro-text">
+          Übernehme dieses Gericht und die Portionen automatisch für weitere Tage deiner Woche:
+        </p>
+
+        <div class="repeat-preset-buttons">
+          <button type="button" class="preset-btn workday-btn" (click)="repeatWorkdays(rType)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="preset-icon">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+            <div class="preset-text">
+              <strong>Montag bis Freitag wiederholen</strong>
+              <small>Übernimmt dieses Gericht für 5 Werktage</small>
+            </div>
+          </button>
+
+          <button type="button" class="preset-btn fullweek-btn" (click)="repeatAllWeek(rType)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="preset-icon">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            <div class="preset-text">
+              <strong>Für die ganze Woche wiederholen</strong>
+              <small>Montag bis Sonntag (7 Tage)</small>
+            </div>
+          </button>
+        </div>
+
+        <div class="repeat-custom-section">
+          <div class="repeat-custom-header">
+            <span>Oder gezielt Tage auswählen:</span>
+            <span class="selected-count-badge">{{ selectedRepeatDays().length }} Tage</span>
+          </div>
+
+          <div class="repeat-days-pills-grid">
+            @for (day of weekDaysList; track day.index) {
+              <button
+                type="button"
+                class="repeat-day-pill"
+                [class.active]="isDaySelectedForRepeat(day.index)"
+                (click)="toggleRepeatDay(day.index)"
+                [attr.aria-pressed]="isDaySelectedForRepeat(day.index)"
+              >
+                <span class="pill-short">{{ day.short }}</span>
+                <span class="pill-name">{{ day.name }}</span>
+              </button>
+            }
+          </div>
+
+          <button
+            type="button"
+            class="btn-apply-repeat-days"
+            [disabled]="selectedRepeatDays().length === 0"
+            (click)="applyCustomRepeat(rType)"
+          >
+            Auf {{ selectedRepeatDays().length }} gewählte Tage anwenden
           </button>
         </div>
       </div>

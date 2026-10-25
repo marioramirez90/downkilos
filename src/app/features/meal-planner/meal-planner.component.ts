@@ -20,14 +20,98 @@ export class MealPlannerComponent {
   private shoppingListService = inject(ShoppingListService);
 
   readonly swappingMealType = signal<MealType | null>(null);
+  readonly repeatingMealType = signal<MealType | null>(null);
+  readonly selectedRepeatDays = signal<number[]>([0, 1, 2, 3, 4]);
   readonly showBudgetModal = signal<boolean>(false);
   readonly customBudget = signal<number>(50);
   readonly toastMessage = signal<string | null>(null);
 
   readonly budgetOptions = [30, 40, 50, 60, 75, 100];
 
+  readonly weekDaysList = [
+    { index: 0, short: 'Mo', name: 'Montag' },
+    { index: 1, short: 'Di', name: 'Dienstag' },
+    { index: 2, short: 'Mi', name: 'Mittwoch' },
+    { index: 3, short: 'Do', name: 'Donnerstag' },
+    { index: 4, short: 'Fr', name: 'Freitag' },
+    { index: 5, short: 'Sa', name: 'Samstag' },
+    { index: 6, short: 'So', name: 'Sonntag' },
+  ];
+
   selectDay(dayIndex: number): void {
     this.plannerService.setDayIndex(dayIndex);
+  }
+
+  getPortions(type: MealType): number {
+    return this.plannerService.getMealPortions(this.plannerService.currentDayIndex(), type);
+  }
+
+  changePortions(type: MealType, delta: number, event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    const current = this.getPortions(type);
+    const next = Math.max(1, Math.min(8, current + delta));
+    this.plannerService.setMealPortions(this.plannerService.currentDayIndex(), type, next);
+  }
+
+  getCurrentMealRecipe(type: MealType): Recipe | undefined {
+    const day = this.plannerService.currentDayPlan();
+    return day ? day[type] : undefined;
+  }
+
+  openRepeatModal(type: MealType, event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.repeatingMealType.set(type);
+    this.selectedRepeatDays.set([0, 1, 2, 3, 4]);
+  }
+
+  closeRepeatModal(): void {
+    this.repeatingMealType.set(null);
+  }
+
+  toggleRepeatDay(dayIndex: number): void {
+    const list = [...this.selectedRepeatDays()];
+    const idx = list.indexOf(dayIndex);
+    if (idx !== -1) {
+      list.splice(idx, 1);
+    } else {
+      list.push(dayIndex);
+      list.sort((a, b) => a - b);
+    }
+    this.selectedRepeatDays.set(list);
+  }
+
+  isDaySelectedForRepeat(dayIndex: number): boolean {
+    return this.selectedRepeatDays().includes(dayIndex);
+  }
+
+  repeatWorkdays(type: MealType): void {
+    const dayIdx = this.plannerService.currentDayIndex();
+    this.plannerService.repeatMealWorkdays(dayIdx, type);
+    const recipe = this.getCurrentMealRecipe(type);
+    this.closeRepeatModal();
+    this.showToast(`"${recipe?.title || this.getMealTypeLabel(type)}" für Montag bis Freitag übernommen!`);
+  }
+
+  repeatAllWeek(type: MealType): void {
+    const dayIdx = this.plannerService.currentDayIndex();
+    this.plannerService.repeatMealAllWeek(dayIdx, type);
+    const recipe = this.getCurrentMealRecipe(type);
+    this.closeRepeatModal();
+    this.showToast(`"${recipe?.title || this.getMealTypeLabel(type)}" für die ganze Woche (Mo–So) übernommen!`);
+  }
+
+  applyCustomRepeat(type: MealType): void {
+    const targetDays = this.selectedRepeatDays();
+    if (targetDays.length === 0) return;
+    const dayIdx = this.plannerService.currentDayIndex();
+    this.plannerService.repeatMealToDays(dayIdx, type, targetDays);
+    const recipe = this.getCurrentMealRecipe(type);
+    this.closeRepeatModal();
+    this.showToast(`"${recipe?.title || this.getMealTypeLabel(type)}" auf ${targetDays.length} Tage angewendet!`);
   }
 
   checkCompatibility(recipe: Recipe) {
@@ -126,13 +210,23 @@ export class MealPlannerComponent {
   }
 
   syncAllSelectedToShoppingList(): void {
+    this.shoppingListService.clearAllItems();
     const plan = this.plannerService.weeklyPlan();
     for (const day of plan) {
       const sel = day.selectedMeals || { breakfast: true, lunch: true, dinner: true, snack: false };
-      if (sel.breakfast && day.breakfast) this.shoppingListService.addRecipeIngredients(day.breakfast, 1);
-      if (sel.lunch && day.lunch) this.shoppingListService.addRecipeIngredients(day.lunch, 1);
-      if (sel.dinner && day.dinner) this.shoppingListService.addRecipeIngredients(day.dinner, 1);
-      if (sel.snack && day.snack) this.shoppingListService.addRecipeIngredients(day.snack, 1);
+      const portions = day.portions || { breakfast: 1, lunch: 1, dinner: 1, snack: 1 };
+      if (sel.breakfast && day.breakfast) {
+        this.shoppingListService.addRecipeIngredients(day.breakfast, portions.breakfast ?? 1);
+      }
+      if (sel.lunch && day.lunch) {
+        this.shoppingListService.addRecipeIngredients(day.lunch, portions.lunch ?? 1);
+      }
+      if (sel.dinner && day.dinner) {
+        this.shoppingListService.addRecipeIngredients(day.dinner, portions.dinner ?? 1);
+      }
+      if (sel.snack && day.snack) {
+        this.shoppingListService.addRecipeIngredients(day.snack, portions.snack ?? 1);
+      }
     }
   }
 

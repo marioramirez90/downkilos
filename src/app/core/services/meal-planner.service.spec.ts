@@ -106,4 +106,54 @@ describe('MealPlannerService', () => {
       expect(day.dinner.dietType === 'vegan' || day.dinner.dietaryForms?.includes('vegan')).toBe(true);
     }
   });
+
+  it('should adjust meal portions and dynamically update currentDayTotals', () => {
+    service.setDayIndex(0);
+    const initialTotals = service.currentDayTotals();
+    const initialPortions = service.getMealPortions(0, 'breakfast');
+    expect(initialPortions).toBe(1);
+
+    // Increase breakfast to 2 portions
+    service.setMealPortions(0, 'breakfast', 2);
+    expect(service.getMealPortions(0, 'breakfast')).toBe(2);
+
+    const updatedTotals = service.currentDayTotals();
+    const breakfastKcal = service.currentDayPlan().breakfast.calories;
+    expect(updatedTotals.calories).toBe(initialTotals.calories + breakfastKcal);
+  });
+
+  it('should repeat meal from Monday to Friday (workdays)', () => {
+    const mondayBreakfast = service.weeklyPlan()[0].breakfast;
+    service.setMealPortions(0, 'breakfast', 2);
+
+    service.repeatMealWorkdays(0, 'breakfast');
+
+    const plan = service.weeklyPlan();
+    for (let day = 0; day <= 4; day++) {
+      expect(plan[day].breakfast.id).toBe(mondayBreakfast.id);
+      expect(plan[day].portions?.breakfast).toBe(2);
+      expect(plan[day].selectedMeals?.breakfast).toBe(true);
+    }
+  });
+
+  it('should repeat meal for the entire week (all 7 days)', () => {
+    const mondayDinner = service.weeklyPlan()[0].dinner;
+    service.repeatMealAllWeek(0, 'dinner');
+
+    const plan = service.weeklyPlan();
+    for (let day = 0; day < 7; day++) {
+      expect(plan[day].dinner.id).toBe(mondayDinner.id);
+      expect(plan[day].selectedMeals?.dinner).toBe(true);
+    }
+  });
+
+  it('should repeat meal to custom targeted days', () => {
+    const mondayLunch = service.weeklyPlan()[0].lunch;
+    service.repeatMealToDays(0, 'lunch', [2, 4, 6]); // Mittwoch, Freitag, Sonntag
+
+    const plan = service.weeklyPlan();
+    expect(plan[2].lunch.id).toBe(mondayLunch.id);
+    expect(plan[4].lunch.id).toBe(mondayLunch.id);
+    expect(plan[6].lunch.id).toBe(mondayLunch.id);
+  });
 });

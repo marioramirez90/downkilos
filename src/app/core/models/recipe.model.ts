@@ -63,4 +63,10 @@ export interface DayPlan {
     dinner: boolean;
     snack: boolean;
   };
+  portions?: {
+    breakfast?: number;
+    lunch?: number;
+    dinner?: number;
+    snack?: number;
+  };
 }

@@ -7,6 +7,7 @@ $background: #ffffff;
 $text-main: #102521;
 $text-muted: #66716d;
 $border-color: #e5ebe5;
+$border-light: #e5ebe5;
 $divider-color: #eef3ee;
 
 .meal-planner-screen {
@@ -460,15 +461,74 @@ $divider-color: #eef3ee;
           }
         }
       }
+
+      .meal-portions-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 6px;
+
+        .portions-label {
+          font-size: 11px;
+          font-weight: 600;
+          color: $text-muted;
+        }
+
+        .stepper-wrap {
+          display: inline-flex;
+          align-items: center;
+          background-color: #f0f7f2;
+          border-radius: 6px;
+          border: 1px solid #dbeef1;
+          padding: 1px 3px;
+
+          .btn-step {
+            width: 22px;
+            height: 22px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            color: $primary-green;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.15s;
+
+            &:hover:not(:disabled) {
+              background-color: #e2f2e5;
+            }
+
+            &:disabled {
+              opacity: 0.35;
+              cursor: not-allowed;
+            }
+          }
+
+          .step-value {
+            font-size: 12px;
+            font-weight: 700;
+            color: $dark-green;
+            min-width: 16px;
+            text-align: center;
+          }
+        }
+      }
     }
 
     .meal-action-col {
       flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
 
       .meal-select-btn {
-        padding: 9px 15px;
+        padding: 8px 13px;
         border-radius: 9999px;
-        font-size: 12.5px;
+        font-size: 12px;
         font-weight: 700;
         cursor: pointer;
         border: none;
@@ -476,7 +536,7 @@ $divider-color: #eef3ee;
         color: #ffffff;
         display: inline-flex;
         align-items: center;
-        gap: 5px;
+        gap: 4px;
         transition: background-color 0.15s ease, transform 0.15s ease;
 
         &:hover {
@@ -495,6 +555,35 @@ $divider-color: #eef3ee;
             font-size: 13px;
             font-weight: 800;
           }
+        }
+      }
+
+      .meal-repeat-btn {
+        padding: 5px 9px;
+        border-radius: 7px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid #d3e7d6;
+        background-color: #f7faf7;
+        color: $primary-green;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.15s ease;
+
+        .repeat-icon {
+          width: 12px;
+          height: 12px;
+        }
+
+        &:hover {
+          background-color: #e8f5e9;
+          border-color: $primary-green;
+        }
+
+        &:active {
+          transform: scale(0.95);
         }
       }
     }
@@ -977,3 +1066,233 @@ $divider-color: #eef3ee;
     transform: translate(-50%, 0);
   }
 }
+
+/* ==========================================================================
+   5b. Repeat Meal Modal
+   ========================================================================== */
+.repeat-meal-modal {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background-color: #ffffff;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.18);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+  animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+
+  .modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 18px 20px 12px 20px;
+    border-bottom: 1px solid $border-light;
+
+    .repeat-title-col {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+
+      .repeat-type-pill {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 700;
+        color: $primary-green;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .modal-title {
+        font-size: 17px;
+        font-weight: 800;
+        color: $text-main;
+        margin: 0;
+      }
+    }
+
+    .modal-close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background-color: #f1f4f1;
+      color: $text-muted;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+  }
+
+  .repeat-modal-body {
+    padding: 16px 20px;
+    overflow-y: auto;
+
+    .repeat-intro-text {
+      font-size: 13.5px;
+      color: $text-muted;
+      margin: 0 0 16px 0;
+      line-height: 1.45;
+    }
+
+    .repeat-preset-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+
+      .preset-btn {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        border: 1.5px solid #dcece0;
+        background-color: #fbfdfb;
+        cursor: pointer;
+        text-align: left;
+        transition: all 0.15s ease;
+
+        .preset-icon {
+          width: 22px;
+          height: 22px;
+          flex-shrink: 0;
+          color: $primary-green;
+        }
+
+        .preset-text {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+
+          strong {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: $dark-green;
+          }
+
+          small {
+            font-size: 11.5px;
+            color: $text-muted;
+          }
+        }
+
+        &:hover {
+          background-color: #edf7ef;
+          border-color: $primary-green;
+          transform: translateY(-1px);
+        }
+
+        &:active {
+          transform: scale(0.98);
+        }
+
+        &.fullweek-btn {
+          border-color: $primary-green;
+          background-color: #f3fbf4;
+        }
+      }
+    }
+
+    .repeat-custom-section {
+      border-top: 1px solid $border-light;
+      padding-top: 16px;
+
+      .repeat-custom-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        font-size: 13px;
+        font-weight: 700;
+        color: $text-main;
+
+        .selected-count-badge {
+          background-color: $light-green;
+          color: $primary-green;
+          font-size: 11.5px;
+          font-weight: 700;
+          padding: 2px 8px;
+          border-radius: 9999px;
+        }
+      }
+
+      .repeat-days-pills-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 6px;
+        margin-bottom: 16px;
+
+        .repeat-day-pill {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 8px 4px;
+          border-radius: 10px;
+          border: 1.5px solid #e2ebe4;
+          background-color: #fcfdfc;
+          cursor: pointer;
+          transition: all 0.15s ease;
+
+          .pill-short {
+            font-size: 12px;
+            font-weight: 800;
+            color: $text-main;
+          }
+
+          .pill-name {
+            display: none;
+          }
+
+          &:hover {
+            border-color: $primary-green;
+          }
+
+          &.active {
+            background-color: $primary-green;
+            border-color: $primary-green;
+
+            .pill-short {
+              color: #ffffff;
+            }
+          }
+        }
+      }
+
+      .btn-apply-repeat-days {
+        width: 100%;
+        padding: 13px;
+        border-radius: 12px;
+        background-color: $primary-green;
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.15s ease, transform 0.15s ease;
+
+        &:hover:not(:disabled) {
+          background-color: #20782f;
+        }
+
+        &:active:not(:disabled) {
+          transform: scale(0.98);
+        }
+
+        &:disabled {
+          background-color: #cbd8cf;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}
+

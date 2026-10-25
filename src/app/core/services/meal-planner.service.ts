@@ -66,19 +66,33 @@ export class MealPlannerService {
       return { calories: 1250, cost: 5.80, protein: 74, carbs: 160, fat: 30 };
     }
     const sel = day.selectedMeals || { breakfast: true, lunch: true, dinner: true, snack: false };
-    const meals: Recipe[] = [];
-    if (sel.breakfast && day.breakfast) meals.push(day.breakfast);
-    if (sel.lunch && day.lunch) meals.push(day.lunch);
-    if (sel.dinner && day.dinner) meals.push(day.dinner);
-    if (sel.snack && day.snack) meals.push(day.snack);
+    const portions = day.portions || { breakfast: 1, lunch: 1, dinner: 1, snack: 1 };
 
-    const calories = meals.reduce((sum, m) => sum + (m?.calories || 0), 0);
-    const cost = Math.round(meals.reduce((sum, m) => sum + (m?.pricePerPortion || 0), 0) * 100) / 100;
-    const protein = Math.round(meals.reduce((sum, m) => sum + (m?.protein || 0), 0) * 10) / 10;
-    const carbs = Math.round(meals.reduce((sum, m) => sum + (m?.carbs || 0), 0) * 10) / 10;
-    const fat = Math.round(meals.reduce((sum, m) => sum + (m?.fat || 0), 0) * 10) / 10;
+    let calories = 0;
+    let cost = 0;
+    let protein = 0;
+    let carbs = 0;
+    let fat = 0;
 
-    return { calories, cost, protein, carbs, fat };
+    const slots: MealType[] = ['breakfast', 'lunch', 'dinner', 'snack'];
+    for (const slot of slots) {
+      if (sel[slot] && day[slot]) {
+        const p = portions[slot] ?? 1;
+        calories += (day[slot]?.calories || 0) * p;
+        cost += (day[slot]?.pricePerPortion || 0) * p;
+        protein += (day[slot]?.protein || 0) * p;
+        carbs += (day[slot]?.carbs || 0) * p;
+        fat += (day[slot]?.fat || 0) * p;
+      }
+    }
+
+    return {
+      calories,
+      cost: Math.round(cost * 100) / 100,
+      protein: Math.round(protein * 10) / 10,
+      carbs: Math.round(carbs * 10) / 10,
+      fat: Math.round(fat * 10) / 10
+    };
   });
 
   /**
@@ -94,49 +108,52 @@ export class MealPlannerService {
 
     for (const day of plan) {
       const sel = day.selectedMeals || { breakfast: true, lunch: true, dinner: true, snack: false };
-      const mealsToInclude: Recipe[] = [];
-      if (sel.breakfast && day.breakfast) mealsToInclude.push(day.breakfast);
-      if (sel.lunch && day.lunch) mealsToInclude.push(day.lunch);
-      if (sel.dinner && day.dinner) mealsToInclude.push(day.dinner);
-      if (sel.snack && day.snack) mealsToInclude.push(day.snack);
+      const portions = day.portions || { breakfast: 1, lunch: 1, dinner: 1, snack: 1 };
+      const slots: MealType[] = ['breakfast', 'lunch', 'dinner', 'snack'];
 
-      for (const meal of mealsToInclude) {
-        for (const ing of meal.ingredients) {
-          const nameLower = ing.name.toLowerCase();
-          const key = ing.productId || nameLower.trim();
+      for (const slot of slots) {
+        if (sel[slot] && day[slot]) {
+          const p = portions[slot] ?? 1;
+          for (const ing of day[slot].ingredients) {
+            const nameLower = ing.name.toLowerCase();
+            const key = ing.productId || nameLower.trim();
 
-          let img = 'images/products/rice.jpg';
-          if (nameLower.includes('banan')) img = 'images/products/bananas.jpg';
-          else if (nameLower.includes('hafer')) img = 'images/products/oats.jpg';
-          else if (nameLower.includes('milch')) img = 'images/products/milk.jpg';
-          else if (nameLower.includes('toast') || nameLower.includes('brot')) img = 'images/products/toast.jpg';
-          else if (nameLower.includes('ei') && !nameLower.includes('reis')) img = 'images/products/eggs.jpg';
-          else if (nameLower.includes('chicken') || nameLower.includes('hähnchen')) img = 'images/products/chicken.jpg';
-          else if (nameLower.includes('brokkoli') || nameLower.includes('broccoli')) img = 'images/products/broccoli.jpg';
-          else if (nameLower.includes('möhre') || nameLower.includes('karotte')) img = 'images/products/carrots.jpg';
-          else if (nameLower.includes('paprika')) img = 'images/products/paprika.jpg';
-          else if (nameLower.includes('skyr') || nameLower.includes('quark')) img = 'images/products/skyr.jpg';
+            let img = 'images/products/rice.jpg';
+            if (nameLower.includes('banan')) img = 'images/products/bananas.jpg';
+            else if (nameLower.includes('hafer')) img = 'images/products/oats.jpg';
+            else if (nameLower.includes('milch')) img = 'images/products/milk.jpg';
+            else if (nameLower.includes('toast') || nameLower.includes('brot')) img = 'images/products/toast.jpg';
+            else if (nameLower.includes('ei') && !nameLower.includes('reis')) img = 'images/products/eggs.jpg';
+            else if (nameLower.includes('chicken') || nameLower.includes('hähnchen')) img = 'images/products/chicken.jpg';
+            else if (nameLower.includes('brokkoli') || nameLower.includes('broccoli')) img = 'images/products/broccoli.jpg';
+            else if (nameLower.includes('möhre') || nameLower.includes('karotte')) img = 'images/products/carrots.jpg';
+            else if (nameLower.includes('paprika')) img = 'images/products/paprika.jpg';
+            else if (nameLower.includes('skyr') || nameLower.includes('quark')) img = 'images/products/skyr.jpg';
 
-          const existing = map.get(key);
-          if (existing) {
-            existing.amount += ing.amount;
-            existing.cost += ing.portionCost || 0;
-          } else {
-            let displayName = ing.name;
-            if (nameLower.includes('banane')) displayName = 'Bananen';
-            else if (nameLower.includes('haferflocke')) displayName = 'Haferflocken';
-            else if (nameLower.includes('milch')) displayName = 'Milch';
-            else if (nameLower.includes('toast') || nameLower.includes('vollkornbrot')) displayName = 'Vollkornbrot';
-            else if (nameLower.includes('ei') && !nameLower.includes('reis')) displayName = 'Eier';
-            else if (nameLower.includes('reis')) displayName = 'Reis';
+            const ingAmount = ing.amount * p;
+            const ingCost = (ing.portionCost || 0) * p;
 
-            map.set(key, {
-              name: displayName,
-              amount: ing.amount,
-              unit: ing.unit,
-              imageUrl: img,
-              cost: ing.portionCost || 0
-            });
+            const existing = map.get(key);
+            if (existing) {
+              existing.amount += ingAmount;
+              existing.cost += ingCost;
+            } else {
+              let displayName = ing.name;
+              if (nameLower.includes('banane')) displayName = 'Bananen';
+              else if (nameLower.includes('haferflocke')) displayName = 'Haferflocken';
+              else if (nameLower.includes('milch')) displayName = 'Milch';
+              else if (nameLower.includes('toast') || nameLower.includes('vollkornbrot')) displayName = 'Vollkornbrot';
+              else if (nameLower.includes('ei') && !nameLower.includes('reis')) displayName = 'Eier';
+              else if (nameLower.includes('reis')) displayName = 'Reis';
+
+              map.set(key, {
+                name: displayName,
+                amount: ingAmount,
+                unit: ing.unit,
+                imageUrl: img,
+                cost: ingCost
+              });
+            }
           }
         }
       }
@@ -293,6 +310,12 @@ export class MealPlannerService {
           lunch: true,
           dinner: true,
           snack: false
+        },
+        portions: {
+          breakfast: 1,
+          lunch: 1,
+          dinner: 1,
+          snack: 1
         }
       };
     });
@@ -376,6 +399,82 @@ export class MealPlannerService {
         [mealType]: true // Bei Tausch automatisch ausgewählt
       }
     };
+
+    this.weeklyPlan.set(plan);
+    this.savePlan(plan);
+  }
+
+  /**
+   * Ändert die Portionsanzahl einer Mahlzeit für einen Tag
+   */
+  setMealPortions(dayIndex: number, mealType: MealType, portions: number): void {
+    const plan = [...this.weeklyPlan()];
+    if (!plan[dayIndex]) return;
+
+    const currentPortions = plan[dayIndex].portions || { breakfast: 1, lunch: 1, dinner: 1, snack: 1 };
+    const validPortions = Math.max(1, Math.min(10, Math.round(portions)));
+
+    plan[dayIndex] = {
+      ...plan[dayIndex],
+      portions: {
+        ...currentPortions,
+        [mealType]: validPortions
+      }
+    };
+
+    this.weeklyPlan.set(plan);
+    this.savePlan(plan);
+  }
+
+  getMealPortions(dayIndex: number, mealType: MealType): number {
+    const day = this.weeklyPlan()[dayIndex];
+    return day?.portions?.[mealType] ?? 1;
+  }
+
+  /**
+   * Wiederholt die Mahlzeit für die gesamte Woche (7 Tage: Mo-So)
+   */
+  repeatMealAllWeek(sourceDayIndex: number, mealType: MealType): void {
+    this.repeatMealToDays(sourceDayIndex, mealType, [0, 1, 2, 3, 4, 5, 6]);
+  }
+
+  /**
+   * Wiederholt die Mahlzeit von Montag bis Freitag (5 Werktage)
+   */
+  repeatMealWorkdays(sourceDayIndex: number, mealType: MealType): void {
+    this.repeatMealToDays(sourceDayIndex, mealType, [0, 1, 2, 3, 4]);
+  }
+
+  /**
+   * Wiederholt die Mahlzeit gezielt auf beliebige ausgewählte Tage
+   */
+  repeatMealToDays(sourceDayIndex: number, mealType: MealType, targetDayIndices: number[]): void {
+    const plan = [...this.weeklyPlan()];
+    const sourceDay = plan[sourceDayIndex];
+    if (!sourceDay || !sourceDay[mealType]) return;
+
+    const sourceRecipe = sourceDay[mealType];
+    const sourcePortions = sourceDay.portions?.[mealType] ?? 1;
+
+    for (const targetIdx of targetDayIndices) {
+      if (plan[targetIdx]) {
+        const curSel = plan[targetIdx].selectedMeals || { breakfast: true, lunch: true, dinner: true, snack: false };
+        const curPortions = plan[targetIdx].portions || { breakfast: 1, lunch: 1, dinner: 1, snack: 1 };
+
+        plan[targetIdx] = {
+          ...plan[targetIdx],
+          [mealType]: sourceRecipe,
+          selectedMeals: {
+            ...curSel,
+            [mealType]: true // Bei Wiederholung automatisch aktiv
+          },
+          portions: {
+            ...curPortions,
+            [mealType]: sourcePortions
+          }
+        };
+      }
+    }
 
     this.weeklyPlan.set(plan);
     this.savePlan(plan);

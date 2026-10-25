@@ -121,4 +121,48 @@ describe('OnboardingComponent', () => {
     component.goBack();
     expect(router.navigate).toHaveBeenCalledWith(['/how-it-works']);
   });
+
+  it('should display error message and not navigate when submitting invalid form', async () => {
+    component.form.patchValue({ name: '' });
+    await component.onSubmit();
+
+    expect(component.formErrorMessage).toBeTruthy();
+    expect(component.formErrorMessage).toContain('Bitte fülle alle Pflichtfelder');
+    expect(router.navigate).not.toHaveBeenCalled();
+    expect(component.isSubmitting).toBe(false);
+  });
+
+  it('should prevent double submission when already submitting', async () => {
+    const saveSpy = vi.spyOn(storageService, 'saveProfile');
+    component.form.patchValue({
+      name: 'Mario',
+      birthDate: '1990-05-14',
+      gender: 'male',
+      height: 180,
+      currentWeight: 82,
+      activityLevel: 'moderate',
+      goal: 'lose_weight'
+    });
+
+    component.isSubmitting = true;
+    await component.onSubmit();
+
+    expect(saveSpy).not.toHaveBeenCalled();
+  });
+
+  it('should restore draft values from StorageService if available', async () => {
+    storageService.saveOnboardingDraft({
+      name: 'Max',
+      birthDate: '1988-12-01',
+      height: 175
+    });
+
+    const newFixture = TestBed.createComponent(OnboardingComponent);
+    const newComp = newFixture.componentInstance;
+    await newComp.ngOnInit();
+
+    expect(newComp.form.value.name).toBe('Max');
+    expect(newComp.form.value.birthDate).toBe('1988-12-01');
+    expect(newComp.form.value.height).toBe(175);
+  });
 });

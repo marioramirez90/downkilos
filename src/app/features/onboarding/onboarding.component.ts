@@ -1,7 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { StorageService } from '../../core/services/storage.service';
 import { FoodLogService } from '../../core/services/food-log.service';
 import { ShoppingListService } from '../../core/services/shopping-list.service';
@@ -23,7 +24,7 @@ import { HamburgerButtonComponent } from '../../shared/components/hamburger-butt
   templateUrl: './onboarding.component.html',
   styleUrl: './onboarding.component.scss'
 })
-export class OnboardingComponent implements OnInit {
+export class OnboardingComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -35,6 +36,8 @@ export class OnboardingComponent implements OnInit {
   readonly goalOptions = GOAL_OPTIONS;
   readonly availableAllergies: string[] = ['Laktose', 'Gluten', 'Nüsse', 'Soja', 'Fruktose'];
   isSubmitting = false;
+  formErrorMessage: string | null = null;
+  private draftSubscription?: Subscription;
 
   // STRICT REQUIREMENT: No dummy data in production. All fields start empty on first launch.
   form: FormGroup = this.fb.group({
@@ -83,7 +86,26 @@ export class OnboardingComponent implements OnInit {
         dietaryPreference: existing.dietaryPreference || 'omnivore',
         allergies: existing.allergies || []
       });
+    } else {
+      // Restore draft if saved previously
+      const draft = this.storageService.getOnboardingDraft();
+      if (draft && typeof draft === 'object') {
+        this.form.patchValue(draft);
+      }
     }
+
+    // Auto-save draft on every change to prevent data loss on crashes or accidental reloads
+    this.draftSubscription = this.form.valueChanges.subscribe(val => {
+      if (!this.isSubmitting) {
+        this.storageService.saveOnboardingDraft(val);
+      }
+    });
+
+    this.storageService.setOnboardingStep('personal-data');
+  }
+
+  ngOnDestroy(): void {
+    this.draftSubscription?.unsubscribe();
   }
 
   isFieldInvalid(field: string): boolean {
@@ -124,9 +146,38 @@ export class OnboardingComponent implements OnInit {
     return current.includes(allergy);
   }
 
+  private scrollToFirstInvalidField(): void {
+    if (typeof document === 'undefined') return;
+    const invalidKey = Object.keys(this.form.controls).find(k => this.form.controls[k].invalid);
+    if (!invalidKey) return;
+
+    // Map control names to specific input or section IDs
+    const element = document.querySelector(
+      `#${invalidKey}Input, [formControlName="${invalidKey}"]`
+    );
+    if (element) {
+      if (typeof element.scrollIntoView === 'function') {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      const htmlEl = element as HTMLElement;
+      if (typeof htmlEl.focus === 'function') {
+        htmlEl.focus();
+      }
+    }
+  }
+
   async onSubmit() {
+    // Prevent duplicate simultaneous submissions
+    if (this.isSubmitting) {
+      return;
+    }
+
+    this.formErrorMessage = null;
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.formErrorMessage = 'Bitte fülle alle Pflichtfelder (Name, Geburtsdatum, Geschlecht, Größe, Gewicht, Aktivitätslevel) korrekt aus.';
+      this.scrollToFirstInvalidField();
       return;
     }
 
@@ -136,7 +187,7 @@ export class OnboardingComponent implements OnInit {
       const formVal = this.form.value;
       const profile: UserProfile = {
         id: 'guest_profile',
-        name: formVal.name.trim(),
+        name: (formVal.name || '').trim(),
         birthDate: formVal.birthDate,
         gender: formVal.gender as BiologicalGender,
         height: Number(formVal.height),
@@ -151,10 +202,14 @@ export class OnboardingComponent implements OnInit {
       };
 
       await this.storageService.saveProfile(profile);
+      this.storageService.clearOnboardingDraft();
+      this.storageService.setOnboardingStep('calorie-target');
       this.foodLogService.clearTodayLog();
       this.shoppingListService.clearAllItems();
-      this.router.navigate(['/loading'], { queryParams: { step: 'calculate' } });
-    } finally {
+      await this.router.navigate(['/loading'], { queryParams: { step: 'calculate' } });
+    } catch (err: unknown) {
+      console.error('Error saving profile in onboarding:', err);
+      this.formErrorMessage = 'Beim Speichern deiner Daten ist ein Fehler aufgetreten. Bitte versuche es erneut.';
       this.isSubmitting = false;
     }
   }

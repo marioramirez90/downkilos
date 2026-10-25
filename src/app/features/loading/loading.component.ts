@@ -29,8 +29,8 @@ export class LoadingComponent implements OnInit {
   readonly hasError = signal<boolean>(false);
   readonly errorMessage = signal<string>('');
 
-  // Target minimum duration: 5.5 seconds (5500 ms) for smooth onboarding experience
-  private readonly MIN_ANIMATION_DURATION_MS = 5500;
+  // Target minimum duration: 1.2 seconds (1200 ms) for smooth and responsive onboarding experience
+  private readonly MIN_ANIMATION_DURATION_MS = 1200;
 
   async ngOnInit(): Promise<void> {
     const stepParam = this.route.snapshot.queryParamMap.get('step');

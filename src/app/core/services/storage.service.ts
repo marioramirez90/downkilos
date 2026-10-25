@@ -11,6 +11,8 @@ const LOCAL_FALLBACK_KEY = 'down_kilos_guest_profile';
 const LOCAL_RETAILER_KEY = 'down_kilos_guest_retailer';
 const LOCAL_WEIGHT_KEY = 'down_kilos_weight_history';
 const LOCAL_ONBOARDING_KEY = 'down_kilos_onboarding_completed';
+const LOCAL_ONBOARDING_STEP_KEY = 'down_kilos_onboarding_step';
+const LOCAL_ONBOARDING_DRAFT_KEY = 'down_kilos_onboarding_draft';
 
 @Injectable({
   providedIn: 'root'
@@ -360,8 +362,43 @@ export class StorageService {
   setOnboardingCompleted(completed: boolean): void {
     if (completed) {
       localStorage.setItem(LOCAL_ONBOARDING_KEY, 'true');
+      localStorage.setItem(LOCAL_ONBOARDING_STEP_KEY, 'completed');
     } else {
       localStorage.removeItem(LOCAL_ONBOARDING_KEY);
+      localStorage.removeItem(LOCAL_ONBOARDING_STEP_KEY);
+    }
+  }
+
+  getOnboardingStep(): string | null {
+    return localStorage.getItem(LOCAL_ONBOARDING_STEP_KEY);
+  }
+
+  setOnboardingStep(step: string): void {
+    localStorage.setItem(LOCAL_ONBOARDING_STEP_KEY, step);
+  }
+
+  getOnboardingDraft<T = Record<string, unknown>>(): T | null {
+    try {
+      const raw = localStorage.getItem(LOCAL_ONBOARDING_DRAFT_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  saveOnboardingDraft(draft: Record<string, unknown>): void {
+    try {
+      localStorage.setItem(LOCAL_ONBOARDING_DRAFT_KEY, JSON.stringify(draft));
+    } catch {
+      // Ignore storage quota errors gracefully
+    }
+  }
+
+  clearOnboardingDraft(): void {
+    try {
+      localStorage.removeItem(LOCAL_ONBOARDING_DRAFT_KEY);
+    } catch {
+      // Ignore
     }
   }
 
@@ -373,6 +410,8 @@ export class StorageService {
         LOCAL_RETAILER_KEY,
         LOCAL_WEIGHT_KEY,
         LOCAL_ONBOARDING_KEY,
+        LOCAL_ONBOARDING_STEP_KEY,
+        LOCAL_ONBOARDING_DRAFT_KEY,
         'down_kilos_today_food_log',
         'down_kilos_shopping_checked',
         'down_kilos_shopping_pantry',

@@ -51,6 +51,10 @@ export class ProfileEditComponent implements OnInit {
     this.router.navigate(['/settings/goals']);
   }
 
+  goToDietaryProfile(): void {
+    this.router.navigate(['/dietary-profile'], { queryParams: { returnUrl: '/settings/profile' } });
+  }
+
   async saveChanges(): Promise<void> {
     const trimmedName = this.name().trim();
     if (!trimmedName) {

@@ -1,7 +1,7 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { StorageService } from '../../core/services/storage.service';
 import {
   COMMON_FRUIT_ALLERGENS,
@@ -22,8 +22,14 @@ import {
   styleUrl: './dietary-profile.component.scss'
 })
 export class DietaryProfileComponent implements OnInit {
+  private route = inject(ActivatedRoute);
   private router = inject(Router);
   private storageService = inject(StorageService);
+
+  readonly returnUrl = signal<string | null>(null);
+  readonly isEditMode = computed(() => {
+    return !!this.returnUrl() || this.storageService.isOnboardingCompleted();
+  });
 
   readonly intoleranceOptions = INTOLERANCE_OPTIONS;
   readonly eu14Allergens = EU_14_ALLERGENS;
@@ -67,6 +73,11 @@ export class DietaryProfileComponent implements OnInit {
   });
 
   async ngOnInit(): Promise<void> {
+    const returnUrlParam = this.route.snapshot.queryParamMap.get('returnUrl');
+    if (returnUrlParam) {
+      this.returnUrl.set(returnUrlParam);
+    }
+
     const existing = this.storageService.loadDietaryProfile();
     if (existing) {
       this.selectedDietaryForm.set(existing.dietaryForm || 'omnivore');
@@ -185,7 +196,14 @@ export class DietaryProfileComponent implements OnInit {
 
   // --- Navigation & Save ---
   goBack(): void {
-    this.router.navigate(['/retailers']);
+    const target = this.returnUrl();
+    if (target) {
+      this.router.navigate([target]);
+    } else if (this.storageService.isOnboardingCompleted()) {
+      this.router.navigate(['/settings']);
+    } else {
+      this.router.navigate(['/retailers']);
+    }
   }
 
   async saveAndContinue(): Promise<void> {
@@ -203,10 +221,16 @@ export class DietaryProfileComponent implements OnInit {
       };
 
       this.storageService.saveDietaryProfile(profile);
-      this.storageService.setOnboardingStep('dietary');
 
-      // Navigate to meal planner (first week)
-      await this.router.navigate(['/meal-planner']);
+      const target = this.returnUrl();
+      if (target) {
+        await this.router.navigate([target]);
+      } else if (this.storageService.isOnboardingCompleted()) {
+        await this.router.navigate(['/settings']);
+      } else {
+        this.storageService.setOnboardingStep('dietary');
+        await this.router.navigate(['/meal-planner']);
+      }
     } finally {
       this.isSaving = false;
     }

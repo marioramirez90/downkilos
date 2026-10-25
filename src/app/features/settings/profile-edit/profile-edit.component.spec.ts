@@ -95,4 +95,11 @@ describe('ProfileEditComponent', () => {
     component.goToGoals();
     expect(router.navigate).toHaveBeenCalledWith(['/settings/goals']);
   });
+
+  it('7. should navigate to /dietary-profile with returnUrl /settings/profile on goToDietaryProfile()', () => {
+    component.goToDietaryProfile();
+    expect(router.navigate).toHaveBeenCalledWith(['/dietary-profile'], {
+      queryParams: { returnUrl: '/settings/profile' }
+    });
+  });
 });

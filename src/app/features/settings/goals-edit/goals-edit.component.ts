@@ -107,11 +107,24 @@ export class GoalsEditComponent implements OnInit {
       this.isLactoseFree.set(allergies.includes('laktosefrei') || allergies.includes('lactose'));
       this.isGlutenFree.set(allergies.includes('glutenfrei') || allergies.includes('gluten'));
       this.noPork.set(allergies.includes('kein_schweinefleisch') || allergies.includes('no_pork'));
+
+      // Zusätzliche Synchronisation mit dem erweiterten Ernährungsprofil
+      const dp = this.storageService.loadDietaryProfile();
+      if (dp) {
+        if (dp.dietaryForm === 'vegan') this.isVegan.set(true);
+        if (dp.dietaryForm === 'vegetarian') this.isVegetarian.set(true);
+        if (dp.intolerances?.includes('lactose')) this.isLactoseFree.set(true);
+        if (dp.intolerances?.includes('gluten_sensitivity') || dp.allergies?.includes('gluten')) this.isGlutenFree.set(true);
+      }
     }
   }
 
   goBack(): void {
     this.router.navigate(['/settings']);
+  }
+
+  goToDietaryProfile(): void {
+    this.router.navigate(['/dietary-profile'], { queryParams: { returnUrl: '/settings/goals' } });
   }
 
   async saveChanges(): Promise<void> {

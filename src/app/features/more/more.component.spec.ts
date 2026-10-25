@@ -81,6 +81,15 @@ describe('MoreComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/settings']);
   });
 
+  it('7b. should navigate to /dietary-profile when clicking Ernährungsprofil card', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    const dietaryCard = el.querySelector('#card-dietary') as HTMLElement;
+    dietaryCard.click();
+    expect(router.navigate).toHaveBeenCalledWith(['/dietary-profile'], {
+      queryParams: { returnUrl: '/more' }
+    });
+  });
+
   it('8. should render bottom navigation', () => {
     const el = fixture.nativeElement as HTMLElement;
     expect(el.querySelector('app-bottom-nav')).toBeTruthy();

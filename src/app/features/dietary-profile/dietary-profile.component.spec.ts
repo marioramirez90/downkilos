@@ -134,8 +134,25 @@ describe('DietaryProfileComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/meal-planner']);
   });
 
-  it('10. should navigate back to /retailers on goBack', () => {
+  it('10. should navigate back to /retailers on goBack when in onboarding', () => {
     component.goBack();
     expect(router.navigate).toHaveBeenCalledWith(['/retailers']);
+  });
+
+  it('11. should navigate back to returnUrl when returnUrl signal is set', () => {
+    component.returnUrl.set('/settings/profile');
+    expect(component.isEditMode()).toBe(true);
+
+    component.goBack();
+    expect(router.navigate).toHaveBeenCalledWith(['/settings/profile']);
+  });
+
+  it('12. should save profile and navigate to returnUrl when returnUrl signal is set', async () => {
+    component.returnUrl.set('/settings');
+    const saveSpy = vi.spyOn(storageService, 'saveDietaryProfile');
+
+    await component.saveAndContinue();
+    expect(saveSpy).toHaveBeenCalled();
+    expect(router.navigate).toHaveBeenCalledWith(['/settings']);
   });
 });

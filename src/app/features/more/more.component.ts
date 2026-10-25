@@ -82,6 +82,13 @@ export class MoreComponent {
       icon: 'calculator'
     },
     {
+      id: 'dietary',
+      title: 'Ernährungsprofil',
+      subtitle: 'Ernährungsform, Allergien & Unverträglichkeiten.',
+      route: '/dietary-profile',
+      icon: 'recipes'
+    },
+    {
       id: 'guide',
       title: 'So funktioniert’s',
       subtitle: 'Prinzipien für gesundes und dauerhaftes Abnehmen.',
@@ -91,7 +98,11 @@ export class MoreComponent {
   ];
 
   navigateTo(route: string): void {
-    this.router.navigate([route]);
+    if (route === '/dietary-profile') {
+      this.router.navigate(['/dietary-profile'], { queryParams: { returnUrl: '/more' } });
+    } else {
+      this.router.navigate([route]);
+    }
   }
 
   goToDashboard(): void {

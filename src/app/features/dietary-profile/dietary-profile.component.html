@@ -7,7 +7,7 @@
         (click)="goBack()"
         class="back-button"
         id="btn-dietary-back"
-        aria-label="Zurück zur Marktauswahl"
+        [attr.aria-label]="isEditMode() ? 'Zurück' : 'Zurück zur Marktauswahl'"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -340,6 +340,9 @@
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
         </svg>
         <span>Wird gespeichert …</span>
+      } @else if (isEditMode()) {
+        <span>Änderungen speichern</span>
+        <span class="btn-arrow">✓</span>
       } @else {
         <span>Weiter zum Wochenplan</span>
         <span class="btn-arrow">→</span>

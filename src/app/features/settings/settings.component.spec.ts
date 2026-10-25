@@ -59,6 +59,7 @@ describe('SettingsComponent', () => {
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('Einstellungen');
     expect(el.textContent).toContain('Profil bearbeiten');
+    expect(el.textContent).toContain('Ernährungsprofil');
     expect(el.textContent).toContain('App-Einstellungen');
     expect(el.textContent).toContain('Datenschutz');
     expect(el.textContent).toContain('Hilfe & Support');
@@ -71,6 +72,13 @@ describe('SettingsComponent', () => {
   it('3. should navigate to /settings/profile when clicking Profil bearbeiten (NOT to onboarding)', () => {
     component.openEditProfile();
     expect(router.navigate).toHaveBeenCalledWith(['/settings/profile']);
+  });
+
+  it('3b. should navigate to /dietary-profile with returnUrl /settings when calling openDietaryProfile', () => {
+    component.openDietaryProfile();
+    expect(router.navigate).toHaveBeenCalledWith(['/dietary-profile'], {
+      queryParams: { returnUrl: '/settings' }
+    });
   });
 
   it('4. should navigate to /settings/goals when calling openEditGoal', () => {

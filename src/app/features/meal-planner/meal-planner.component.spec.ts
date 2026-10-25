@@ -214,5 +214,18 @@ describe('MealPlannerComponent', () => {
     expect(el.querySelector('.surplus-waste-section')).toBeTruthy();
     expect(el.textContent).toContain('Lebensmittelverschwendung minimieren (Restmengen)');
   });
+
+  it('17. should render prominent "Einkaufsliste erstellen" button (Section 24) and navigate', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    const btn = el.querySelector('#btn-create-shopping-list') as HTMLButtonElement;
+    expect(btn).toBeTruthy();
+    expect(btn.textContent).toContain('Einkaufsliste erstellen');
+
+    btn.click();
+    fixture.detectChanges();
+
+    expect(router.navigate).toHaveBeenCalledWith(['/shopping-list']);
+  });
 });
+
 

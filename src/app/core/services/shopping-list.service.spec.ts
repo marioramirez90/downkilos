@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { ShoppingListService } from './shopping-list.service';
+import { MealPlannerService } from './meal-planner.service';
+import { ProductService } from './product.service';
 
 describe('ShoppingListService', () => {
   let service: ShoppingListService;
@@ -94,4 +96,83 @@ describe('ShoppingListService', () => {
     expect(service.items().length).toBe(0);
     expect(service.summary().totalCost).toBe(0);
   });
+
+  it('should synchronize with weekly meal plan and calculate whole packages (Phase 9)', () => {
+    // Phase 9: syncWithWeeklyPlan aggregates 7 days
+    const mealPlannerService = TestBed.inject(MealPlannerService);
+    const plan = mealPlannerService.weeklyPlan();
+
+    service.syncWithWeeklyPlan(plan);
+
+    const items = service.items();
+    expect(items.length).toBeGreaterThanOrEqual(3);
+    expect(service.planItems().length).toBeGreaterThanOrEqual(3);
+
+    // Plan items should have source: 'plan' and calculated package count
+    const oats = items.find(i => i.name.toLowerCase().includes('hafer'));
+    expect(oats).toBeDefined();
+    expect(oats?.source).toBe('plan');
+    expect(oats?.packageCount).toBeGreaterThanOrEqual(1);
+    expect(oats?.totalCost).toBeGreaterThan(0);
+  });
+
+  it('should merge plan items and manual items without creating duplicates (Phase 9)', () => {
+    const productService = TestBed.inject(ProductService);
+    const bananaProduct = productService.getProductById('netto-bananas-1kg');
+
+    // 1. Manuell ein Produkt hinzufügen
+    if (bananaProduct) {
+      service.addProductToShoppingList(bananaProduct);
+    } else {
+      service.addCustomItem('Bananen', 1.69);
+    }
+
+    expect(service.manualItems().length).toBe(1);
+
+    // 2. Wochenplan synchronisieren (enthält ebenfalls Bananen)
+    const mealPlannerService = TestBed.inject(MealPlannerService);
+    service.syncWithWeeklyPlan(mealPlannerService.weeklyPlan());
+
+    const items = service.items();
+    const bananas = items.filter(i => i.name.toLowerCase().includes('banan'));
+
+    // Keine unkontrollierten Duplikate erzeugen (Section 24)
+    expect(bananas.length).toBe(1);
+    expect(bananas[0].source).toBe('both');
+    expect(bananas[0].manualPackageCount).toBe(1);
+    expect(bananas[0].packageCount).toBeGreaterThan(1);
+  });
+
+  it('should preserve manually added items when weekly plan is modified or cleared (Phase 9)', () => {
+    // 1. Manuellen Artikel anlegen
+    service.addCustomItem('Olivenöl Extra Vergine', 4.99, 'pantry', '750 ml', 600);
+    expect(service.items().length).toBe(1);
+
+    // 2. Wochenplan synchronisieren
+    service.generateListFromPlan();
+    expect(service.items().length).toBeGreaterThan(1);
+    expect(service.items().some(i => i.name === 'Olivenöl Extra Vergine')).toBe(true);
+
+    // 3. Wochenplan leeren / Rezept entfernen
+    service.clearPlanItems();
+
+    // Manueller Artikel darf nicht verloren gehen (Section 24)
+    const remaining = service.items();
+    expect(remaining.length).toBe(1);
+    expect(remaining[0].name).toBe('Olivenöl Extra Vergine');
+    expect(remaining[0].totalCost).toBe(4.99);
+  });
+
+  it('should preserve isChecked status when re-synchronizing weekly plan (Phase 9)', () => {
+    service.generateListFromPlan();
+    const firstItem = service.items()[0];
+
+    service.toggleItemChecked(firstItem.id);
+    expect(service.items().find(i => i.id === firstItem.id)?.isChecked).toBe(true);
+
+    // Re-synchronize plan
+    service.generateListFromPlan();
+    expect(service.items().find(i => i.id === firstItem.id)?.isChecked).toBe(true);
+  });
 });
+

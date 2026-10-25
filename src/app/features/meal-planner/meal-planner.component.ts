@@ -210,24 +210,9 @@ export class MealPlannerComponent {
   }
 
   syncAllSelectedToShoppingList(): void {
-    this.shoppingListService.clearAllItems();
     const plan = this.plannerService.weeklyPlan();
-    for (const day of plan) {
-      const sel = day.selectedMeals || { breakfast: true, lunch: true, dinner: true, snack: false };
-      const portions = day.portions || { breakfast: 1, lunch: 1, dinner: 1, snack: 1 };
-      if (sel.breakfast && day.breakfast) {
-        this.shoppingListService.addRecipeIngredients(day.breakfast, portions.breakfast ?? 1);
-      }
-      if (sel.lunch && day.lunch) {
-        this.shoppingListService.addRecipeIngredients(day.lunch, portions.lunch ?? 1);
-      }
-      if (sel.dinner && day.dinner) {
-        this.shoppingListService.addRecipeIngredients(day.dinner, portions.dinner ?? 1);
-      }
-      if (sel.snack && day.snack) {
-        this.shoppingListService.addRecipeIngredients(day.snack, portions.snack ?? 1);
-      }
-    }
+    this.shoppingListService.syncWithWeeklyPlan(plan);
+    this.showToast('Einkaufsliste mit Wochenplan synchronisiert!');
   }
 
   private showToast(msg: string): void {

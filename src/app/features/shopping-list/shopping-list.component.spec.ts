@@ -199,4 +199,37 @@ describe('ShoppingListComponent', () => {
     expect(summary.totalCost).toBe(8.26); // 3.58 + 2.99 + 1.69 = 8.26
     expect(summary.totalCalories).toBe(4130); // 2460 + 780 + 890 = 4130
   });
+
+  it('13. should render origin badges and filter by origin (Phase 9)', () => {
+    // 1. Plan-Item hinzufügen
+    shoppingService.generateListFromPlan();
+    // 2. Manuellen Artikel hinzufügen
+    shoppingService.addCustomItem('Olivenöl', 3.99);
+    fixture.detectChanges();
+
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.textContent).toContain('Wochenplan');
+    expect(el.textContent).toContain('Manuell');
+
+    // Filter auf 'manual' setzen
+    component.setOriginFilter('manual');
+    fixture.detectChanges();
+
+    expect(component.displayedItems().length).toBe(1);
+    expect(component.displayedItems()[0].name).toBe('Olivenöl');
+
+    // Filter zurück auf 'all'
+    component.setOriginFilter('all');
+    fixture.detectChanges();
+    expect(component.displayedItems().length).toBeGreaterThan(1);
+  });
+
+  it('14. should synchronize with meal planner plan via syncWithPlan (Phase 9)', () => {
+    component.syncWithPlan();
+    fixture.detectChanges();
+
+    expect(shoppingService.planItems().length).toBeGreaterThan(0);
+    expect(component.displayedItems().length).toBeGreaterThan(0);
+  });
 });
+

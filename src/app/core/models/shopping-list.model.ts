@@ -29,6 +29,10 @@ export interface ShoppingListItem {
   observationDate?: string;
   isOlderPrice?: boolean;
   inPantry?: boolean;       // Vorrat vorhanden (Kaufpreis entfällt)
+  source?: 'plan' | 'manual' | 'both'; // Ursprung des Bedarfs (Phase 9)
+  planPackageCount?: number;           // Packungsanteil aus dem Wochenplan
+  manualPackageCount?: number;         // Manuell hinzugefügter Packungsanteil
+  surplusText?: string;                // z.B. "80 g Vorrats-Rest"
 }
 
 export interface ShoppingListSummary {

@@ -110,11 +110,70 @@ $divider-color: #eef3ee;
     }
   }
 
-  .header-spacer {
+  .sync-plan-btn {
     width: 44px;
     height: 44px;
-    visibility: hidden;
+    border-radius: 50%;
+    background-color: $light-green;
+    color: $primary-green;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.15s ease, background-color 0.15s ease;
+    padding: 0;
     flex-shrink: 0;
+
+    .sync-icon {
+      width: 20px;
+      height: 20px;
+      stroke: $primary-green;
+      transition: transform 0.3s ease;
+    }
+
+    &:hover {
+      background-color: #d6ebd9;
+      .sync-icon {
+        transform: rotate(90deg);
+      }
+    }
+
+    &:active {
+      transform: scale(0.92);
+    }
+  }
+
+  .origin-filter-bar {
+    max-width: 440px;
+    margin: 10px auto 0 auto;
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .origin-tab-btn {
+      background: #f4f7f4;
+      border: 1px solid #e1e9e2;
+      border-radius: 9999px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: $text-muted;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+
+      &.active {
+        background: $primary-green;
+        color: #ffffff;
+        border-color: $primary-green;
+      }
+    }
   }
 }
 
@@ -147,7 +206,12 @@ $divider-color: #eef3ee;
   border: 1px solid $card-border;
   box-shadow: 0 2px 10px rgba(16, 58, 42, 0.04);
   padding: 16px 16px 14px 16px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
+
+  &.is-checked {
+    opacity: 0.65;
+    background-color: #fafbfa;
+  }
 
   &:hover {
     box-shadow: 0 4px 14px rgba(16, 58, 42, 0.07);
@@ -159,6 +223,7 @@ $divider-color: #eef3ee;
     align-items: center;
 
     .product-img-wrapper {
+      position: relative;
       width: 82px;
       height: 82px;
       min-width: 82px;
@@ -169,12 +234,40 @@ $divider-color: #eef3ee;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      cursor: pointer;
 
       img {
         width: 100%;
         height: 100%;
         object-fit: contain;
         display: block;
+      }
+
+      .item-checkbox-circle {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.9);
+        border: 2px solid #8c9e95;
+        cursor: pointer;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s ease;
+
+        svg {
+          width: 14px;
+          height: 14px;
+        }
+
+        &.checked {
+          background-color: $primary-green;
+          border-color: $primary-green;
+        }
       }
     }
 
@@ -190,16 +283,66 @@ $divider-color: #eef3ee;
         justify-content: space-between;
         gap: 8px;
 
-        .product-title {
-          font-size: 16.5px;
-          font-weight: 700;
-          color: $text-main;
-          margin: 0;
-          line-height: 1.25;
-          letter-spacing: -0.015em;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
+        .title-and-badges {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          min-width: 0;
+
+          .product-title {
+            font-size: 16.5px;
+            font-weight: 700;
+            color: $text-main;
+            margin: 0;
+            line-height: 1.25;
+            letter-spacing: -0.015em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            &.line-through {
+              text-decoration: line-through;
+              color: $text-muted;
+            }
+          }
+
+          .badges-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            align-items: center;
+
+            .origin-pill {
+              font-size: 10px;
+              font-weight: 700;
+              padding: 2px 6px;
+              border-radius: 9999px;
+              line-height: 1.2;
+
+              &.badge-plan {
+                background: #e8f5e9;
+                color: #278f39;
+              }
+              &.badge-both {
+                background: #e0f2fe;
+                color: #0369a1;
+              }
+              &.badge-manual {
+                background: #f1f5f9;
+                color: #475569;
+              }
+            }
+
+            .surplus-pill {
+              font-size: 9.5px;
+              font-weight: 600;
+              color: #15803d;
+              background: #f0fdf4;
+              border: 1px solid #bbf7d0;
+              padding: 1px 5px;
+              border-radius: 4px;
+            }
+          }
         }
 
         .trash-btn {

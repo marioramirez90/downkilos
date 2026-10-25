@@ -21,28 +21,96 @@
         </p>
       </div>
 
-      <!-- Unsichtbarer Ausgleichs-Spacer für exakte Zentrierung -->
-      <div class="header-spacer" aria-hidden="true"></div>
+      <!-- Synchronisieren-Button mit dem Wochenplan (Phase 9) -->
+      <button
+        type="button"
+        (click)="syncWithPlan()"
+        class="sync-plan-btn"
+        aria-label="Mit Wochenplan synchronisieren"
+        title="Mit aktuellem Wochenplan abgleichen"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="sync-icon">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <polyline points="1 20 1 14 7 14"></polyline>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+        </svg>
+      </button>
     </div>
+
+    <!-- Filter nach Ursprung (Wochenplan vs. Manuell) -->
+    @if (shoppingService.items().length > 0) {
+      <div class="origin-filter-bar">
+        <button
+          type="button"
+          class="origin-tab-btn"
+          [class.active]="originFilter() === 'all'"
+          (click)="setOriginFilter('all')"
+        >
+          Alle ({{ shoppingService.items().length }})
+        </button>
+        <button
+          type="button"
+          class="origin-tab-btn"
+          [class.active]="originFilter() === 'plan'"
+          (click)="setOriginFilter('plan')"
+        >
+          📅 Wochenplan ({{ shoppingService.planItems().length }})
+        </button>
+        <button
+          type="button"
+          class="origin-tab-btn"
+          [class.active]="originFilter() === 'manual'"
+          (click)="setOriginFilter('manual')"
+        >
+          ✍️ Manuell ({{ shoppingService.manualItems().length }})
+        </button>
+      </div>
+    }
   </header>
 
   <!-- 2. Scrollbarer Inhaltsbereich -->
   <main class="shopping-scroll-area">
     <div class="shopping-cards-container">
       @for (item of displayedItems(); track item.id) {
-        <article class="product-card">
+        <article class="product-card" [class.is-checked]="item.isChecked">
           <!-- Oberer Kartenbereich: Bild, Name, Packungsgröße, Mengensteuerung & Preis -->
           <div class="card-top-row">
-            <!-- Produktbild -->
-            <div class="product-img-wrapper">
+            <!-- Produktbild mit Abhak-Checkbox -->
+            <div class="product-img-wrapper" (click)="toggleChecked(item.id)">
               <img [src]="item.imageUrl" [alt]="item.name" loading="lazy" />
+              <button
+                type="button"
+                class="item-checkbox-circle"
+                [class.checked]="item.isChecked"
+                [attr.aria-label]="item.name + ' abhaken'"
+              >
+                @if (item.isChecked) {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                }
+              </button>
             </div>
 
             <!-- Produktdaten & Aktionen -->
             <div class="product-info-col">
               <!-- Titel & Papierkorb-Icon -->
               <div class="title-trash-row">
-                <h2 class="product-title">{{ item.name }}</h2>
+                <div class="title-and-badges">
+                  <h2 class="product-title" [class.line-through]="item.isChecked">{{ item.name }}</h2>
+                  <div class="badges-row">
+                    @if (item.source === 'plan') {
+                      <span class="origin-pill badge-plan">Wochenplan</span>
+                    } @else if (item.source === 'both') {
+                      <span class="origin-pill badge-both">Plan + Manuell (+{{ item.manualPackageCount }})</span>
+                    } @else if (item.source === 'manual' || item.isCustom) {
+                      <span class="origin-pill badge-manual">Manuell</span>
+                    }
+                    @if (item.surplusText) {
+                      <span class="surplus-pill">{{ item.surplusText }}</span>
+                    }
+                  </div>
+                </div>
                 <button
                   type="button"
                   (click)="removeItem(item.id)"

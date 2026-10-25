@@ -8,6 +8,8 @@ import { ShoppingListItem } from '../../core/models/shopping-list.model';
 import { ProductCategory } from '../../core/models/product.model';
 import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-nav.component';
 
+import { MealPlannerService } from '../../core/services/meal-planner.service';
+
 @Component({
   selector: 'app-shopping-list',
   standalone: true,
@@ -23,8 +25,10 @@ export class ShoppingListComponent {
   private router = inject(Router);
   readonly shoppingService = inject(ShoppingListService);
   readonly priceService = inject(PriceService);
+  readonly plannerService = inject(MealPlannerService);
 
   readonly showAddModal = signal<boolean>(false);
+  readonly originFilter = computed(() => this.shoppingService.originFilter());
   newItemName = '';
   newItemPrice: number | null = null;
   newItemSize = '1 Packung';
@@ -32,6 +36,15 @@ export class ShoppingListComponent {
   readonly displayedItems = computed<ShoppingListItem[]>(() => {
     return this.shoppingService.filteredItems();
   });
+
+  setOriginFilter(filter: 'all' | 'plan' | 'manual'): void {
+    this.shoppingService.originFilter.set(filter);
+  }
+
+  syncWithPlan(): void {
+    const plan = this.plannerService.weeklyPlan();
+    this.shoppingService.syncWithWeeklyPlan(plan);
+  }
 
   readonly summary = computed(() => {
     return this.shoppingService.summary();

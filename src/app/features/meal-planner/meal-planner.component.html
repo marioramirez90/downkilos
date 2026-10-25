@@ -44,6 +44,7 @@
           <div class="stat-text-wrap">
             <span class="stat-label">Wochenbudget</span>
             <strong class="stat-value">{{ plannerService.weeklyBudget() }} €</strong>
+            <small class="stat-subtext">{{ plannerService.weeklyBudgetSummary().actualFullPackageCost | number:'1.2-2' }} € verplant</small>
           </div>
         </div>
 
@@ -390,6 +391,94 @@
         }
       </section>
 
+      <!-- 2.3b Wöchentliche Packungs- und Budget-Abrechnung (Phase 8) -->
+      @if (plannerService.weeklyBudgetSummary(); as bSummary) {
+        <section class="weekly-budget-breakdown-card" aria-label="Wöchentliche Budget- und Packungsberechnung">
+          <div class="breakdown-header">
+            <div class="breakdown-title-col">
+              <span class="breakdown-badge">Wochen-Abrechnung</span>
+              <h3 class="breakdown-title">Budget & Packungsmengen</h3>
+            </div>
+            <span
+              class="budget-status-pill"
+              [class.status-within]="bSummary.isWithinBudget && !bSummary.hasMissingPrices"
+              [class.status-exceeded]="!bSummary.isWithinBudget && !bSummary.hasMissingPrices"
+              [class.status-incomplete]="bSummary.hasMissingPrices"
+            >
+              @if (bSummary.hasMissingPrices) {
+                Preise unvollständig
+              } @else if (bSummary.isWithinBudget) {
+                ✓ Im Budget ({{ bSummary.budgetDifference | number:'1.2-2' }} € Puffer)
+              } @else {
+                ⚠️ +{{ (bSummary.actualFullPackageCost - bSummary.weeklyBudget) | number:'1.2-2' }} € über Budget
+              }
+            </span>
+          </div>
+
+          <!-- 3-Spalten Metrik-Vergleich (Section 21: Kalorien und Kosten trennen) -->
+          <div class="metrics-comparison-grid">
+            <!-- 1. Einkaufskosten ganze Packungen -->
+            <div class="metric-box box-full-cost">
+              <span class="box-sub">Tatsächlicher Einkauf:</span>
+              <strong class="box-val text-green">{{ bSummary.actualFullPackageCost | number:'1.2-2' }} €</strong>
+              <small class="box-hint">{{ bSummary.totalPackagesCount }} ganze Packungen</small>
+            </div>
+
+            <!-- 2. Rechnerische Portionskosten -->
+            <div class="metric-box box-portion-cost">
+              <span class="box-sub">Portionswert (verzehrt):</span>
+              <strong class="box-val text-dark">{{ bSummary.theoreticalPortionCost | number:'1.2-2' }} €</strong>
+              <small class="box-hint">Rechnerischer Anteil</small>
+            </div>
+
+            <!-- 3. Gesamtkalorien der Einkaufsliste -->
+            <div class="metric-box box-shopping-kcal">
+              <span class="box-sub">Einkaufskalorien gesamt:</span>
+              <strong class="box-val text-dark">{{ bSummary.totalShoppingListCalories | number:'1.0-0' }} kcal</strong>
+              <small class="box-hint">Alle Einkaufspackungen</small>
+            </div>
+          </div>
+
+          <!-- Budget-Fortschrittsbalken -->
+          <div class="budget-progress-wrap">
+            <div class="progress-bar-labels">
+              <span class="label-left">Auslastung: {{ bSummary.budgetPercentageUsed }}% von {{ bSummary.weeklyBudget }} € Budget</span>
+              <span class="label-right">{{ bSummary.actualFullPackageCost | number:'1.2-2' }} € / {{ bSummary.weeklyBudget }} €</span>
+            </div>
+            <div class="budget-track">
+              <div
+                class="budget-fill"
+                [class.fill-danger]="!bSummary.isWithinBudget"
+                [style.width.%]="bSummary.budgetPercentageUsed > 100 ? 100 : bSummary.budgetPercentageUsed"
+              ></div>
+            </div>
+          </div>
+
+          <!-- Restmengen zur Vermeidung von Lebensmittelverschwendung (Section 20) -->
+          @if (bSummary.surplusItems.length > 0) {
+            <div class="surplus-waste-section">
+              <div class="surplus-header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="surplus-icon">
+                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
+                <strong class="surplus-title">Lebensmittelverschwendung minimieren (Restmengen)</strong>
+              </div>
+              <p class="surplus-intro">
+                Da ganze Netto-Packungen gekauft werden, bleiben folgende Mengen für deine nächste Woche oder Snacks übrig:
+              </p>
+              <div class="surplus-chips-list">
+                @for (surplus of bSummary.surplusItems; track surplus.name + '_' + $index) {
+                  <span class="surplus-chip">
+                    <span class="surplus-dot">●</span>
+                    <strong>{{ surplus.surplusText }}</strong>
+                  </span>
+                }
+              </div>
+            </div>
+          }
+        </section>
+      }
+
       <!-- 2.4 Automatische Einkaufsliste (Hellgrüne Zusammenfassungskarte) -->
       @if (plannerService.automaticShoppingList(); as autoList) {
         <section class="auto-shopping-card" (click)="goToShoppingList()" role="button" tabindex="0" aria-label="Zur automatischen Einkaufsliste">
@@ -417,7 +506,7 @@
                 <img [src]="item.imageUrl" [alt]="item.name" class="chip-item-img" />
                 <div class="chip-item-info">
                   <span class="chip-item-name">{{ item.name }}</span>
-                  <span class="chip-item-amount">{{ item.amountText }}</span>
+                  <span class="chip-item-amount">{{ item.packageCount }}x ({{ item.amountText }})</span>
                 </div>
               </div>
             }

@@ -156,4 +156,41 @@ describe('MealPlannerService', () => {
     expect(plan[4].lunch.id).toBe(mondayLunch.id);
     expect(plan[6].lunch.id).toBe(mondayLunch.id);
   });
+
+  it('should calculate weekly package aggregation and distinguish 3 metrics (Phase 8)', () => {
+    // Master Prompt Phase 8: Package, Quantity and Budget calculations
+    const summary = service.weeklyBudgetSummary();
+
+    expect(summary.weeklyBudget).toBe(50);
+    // 1) Actual supermarket checkout cost for whole packages
+    expect(summary.actualFullPackageCost).toBeGreaterThan(0);
+    // 2) Theoretical portion cost
+    expect(summary.theoreticalPortionCost).toBeGreaterThan(0);
+    // Whole packages cost must be >= portion cost because whole packs are purchased
+    expect(summary.actualFullPackageCost).toBeGreaterThanOrEqual(summary.theoreticalPortionCost);
+    // 3) Total calories of all whole purchased packages
+    expect(summary.totalShoppingListCalories).toBeGreaterThan(0);
+
+    // Budget comparison
+    expect(summary.budgetPercentageUsed).toBeGreaterThan(0);
+    expect(typeof summary.isWithinBudget).toBe('boolean');
+    expect(['within_budget', 'exceeded', 'incomplete_prices']).toContain(summary.budgetStatus);
+  });
+
+  it('should calculate surplus items and food waste minimization text (Phase 8)', () => {
+    // If Porridge (80g oats/serving) is eaten on all 7 days: 7 x 80g = 560g needed.
+    // 500g Netto pack size -> 2 packs (1000g) purchased, leaving 440g surplus.
+    service.repeatMealAllWeek(0, 'breakfast');
+    const summary = service.weeklyBudgetSummary();
+
+    const oatsSurplus = summary.surplusItems.find(s => s.name.toLowerCase().includes('haferflocken'));
+    expect(oatsSurplus).toBeDefined();
+    if (oatsSurplus) {
+      expect(oatsSurplus.surplusAmount).toBe(440); // 1000g bought (2 packs) - 560g needed = 440g remaining
+      expect(oatsSurplus.surplusText).toContain('440 g Haferflocken bleiben übrig');
+      expect(oatsSurplus.totalBoughtText).toContain('1000 g gekauft');
+      expect(oatsSurplus.totalUsedText).toContain('560 g für die Woche verplant');
+    }
+  });
 });
+

@@ -191,4 +191,28 @@ describe('MealPlannerComponent', () => {
     const shoppingListService = component['shoppingListService'];
     expect(shoppingListService.items().length).toBeGreaterThan(0);
   });
+
+  it('16. should render Phase 8 weekly budget breakdown card with 3 metrics and food waste minimization', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    const breakdownCard = el.querySelector('.weekly-budget-breakdown-card');
+    expect(breakdownCard).toBeTruthy();
+
+    expect(el.querySelector('.breakdown-header')?.textContent).toContain('Budget & Packungsmengen');
+    expect(el.querySelector('.budget-status-pill')).toBeTruthy();
+
+    // 3 metrics: Tatsächlicher Einkauf, Portionswert, Einkaufskalorien
+    const metricsGrid = el.querySelector('.metrics-comparison-grid');
+    expect(metricsGrid).toBeTruthy();
+    expect(metricsGrid?.textContent).toContain('Tatsächlicher Einkauf');
+    expect(metricsGrid?.textContent).toContain('Portionswert');
+    expect(metricsGrid?.textContent).toContain('Einkaufskalorien');
+
+    // Progress bar
+    expect(el.querySelector('.budget-progress-wrap')).toBeTruthy();
+
+    // Surplus waste section
+    expect(el.querySelector('.surplus-waste-section')).toBeTruthy();
+    expect(el.textContent).toContain('Lebensmittelverschwendung minimieren (Restmengen)');
+  });
 });
+

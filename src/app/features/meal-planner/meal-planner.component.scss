@@ -204,6 +204,14 @@ $divider-color: #eef3ee;
         line-height: 1.2;
         margin-top: 2px;
       }
+
+      .stat-subtext {
+        font-size: 10.5px;
+        font-weight: 600;
+        color: $primary-green;
+        margin-top: 2px;
+        white-space: nowrap;
+      }
     }
   }
 }
@@ -584,6 +592,215 @@ $divider-color: #eef3ee;
 
         &:active {
           transform: scale(0.95);
+        }
+      }
+    }
+  }
+}
+
+/* ==========================================================================
+   2.3b Wöchentliche Budget- und Packungs-Abrechnung (Phase 8)
+   ========================================================================== */
+.weekly-budget-breakdown-card {
+  margin: 16px 0 14px 0;
+  background-color: #ffffff;
+  border: 1.5px solid #dceede;
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 4px 16px rgba(16, 58, 42, 0.05);
+
+  .breakdown-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 14px;
+
+    .breakdown-title-col {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      .breakdown-badge {
+        font-size: 11px;
+        font-weight: 700;
+        color: $primary-green;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .breakdown-title {
+        font-size: 16.5px;
+        font-weight: 800;
+        color: $text-main;
+        margin: 0;
+        letter-spacing: -0.015em;
+      }
+    }
+
+    .budget-status-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      white-space: nowrap;
+
+      &.status-within {
+        background-color: $light-green;
+        color: $primary-green;
+        border: 1px solid #c7e8cc;
+      }
+
+      &.status-exceeded {
+        background-color: #fde8e8;
+        color: #d32f2f;
+        border: 1px solid #f8b4b4;
+      }
+
+      &.status-incomplete {
+        background-color: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fde68a;
+      }
+    }
+  }
+
+  .metrics-comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+
+    .metric-box {
+      background-color: #f8faf8;
+      border: 1px solid #e7efe8;
+      border-radius: 12px;
+      padding: 9px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 2px;
+
+      .box-sub {
+        font-size: 10.5px;
+        font-weight: 600;
+        color: $text-muted;
+        line-height: 1.2;
+      }
+
+      .box-val {
+        font-size: 15px;
+        font-weight: 800;
+        line-height: 1.2;
+
+        &.text-green {
+          color: $primary-green;
+        }
+
+        &.text-dark {
+          color: $dark-green;
+        }
+      }
+
+      .box-hint {
+        font-size: 10px;
+        color: #7b8882;
+      }
+    }
+  }
+
+  .budget-progress-wrap {
+    margin-bottom: 14px;
+
+    .progress-bar-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: $text-muted;
+      margin-bottom: 6px;
+
+      .label-right {
+        font-weight: 700;
+        color: $text-main;
+      }
+    }
+
+    .budget-track {
+      height: 8px;
+      background-color: #eaf3ec;
+      border-radius: 9999px;
+      overflow: hidden;
+
+      .budget-fill {
+        height: 100%;
+        background-color: $primary-green;
+        border-radius: 9999px;
+        transition: width 0.3s ease;
+
+        &.fill-danger {
+          background-color: #d32f2f;
+        }
+      }
+    }
+  }
+
+  .surplus-waste-section {
+    background-color: #f7faf7;
+    border: 1px dashed #cde2d1;
+    border-radius: 12px;
+    padding: 10px 12px;
+
+    .surplus-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+
+      .surplus-icon {
+        width: 15px;
+        height: 15px;
+        color: $primary-green;
+      }
+
+      .surplus-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: $dark-green;
+      }
+    }
+
+    .surplus-intro {
+      font-size: 11px;
+      color: $text-muted;
+      margin: 0 0 8px 0;
+      line-height: 1.35;
+    }
+
+    .surplus-chips-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+
+      .surplus-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background-color: #ffffff;
+        border: 1px solid #d3e7d6;
+        border-radius: 8px;
+        padding: 3px 8px;
+        font-size: 11px;
+        color: $dark-green;
+
+        .surplus-dot {
+          color: $primary-green;
+          font-size: 8px;
+        }
+
+        strong {
+          font-weight: 600;
         }
       }
     }

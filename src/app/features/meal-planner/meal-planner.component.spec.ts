@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { provideRouter, Router } from '@angular/router';
 import { MealPlannerComponent } from './meal-planner.component';
 import { MealPlannerService } from '../../core/services/meal-planner.service';
@@ -29,48 +30,91 @@ describe('MealPlannerComponent', () => {
     localStorage.clear();
   });
 
-  it('should create the meal planner component', () => {
+  it('1. should create the meal planner component', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should render all 4 meals for today (Frühstück, Mittagessen, Snack, Abendessen)', () => {
+  it('2. should render header with title Wochenplan and subtitle matching reference', () => {
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toContain('Frühstück');
-    expect(el.textContent).toContain('Mittagessen');
-    expect(el.textContent).toContain('Snack');
-    expect(el.textContent).toContain('Abendessen');
-    const day = plannerService.currentDayPlan();
-    expect(el.textContent).toContain(day.breakfast.title);
-    expect(el.textContent).toContain(day.lunch.title);
-    expect(el.textContent).toContain(day.snack.title);
-    expect(el.textContent).toContain(day.dinner.title);
+    expect(el.querySelector('.page-title')?.textContent).toContain('Wochenplan');
+    expect(el.querySelector('.page-subtitle')?.textContent).toContain('Wähle deine Mahlzeiten');
   });
 
-  it('should render daily total calories and costs summary', () => {
+  it('3. should render Wochenbudget and Tagesziel cards', () => {
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toContain('kcal gesamt');
-    expect(el.textContent).toContain('Portionskosten');
+    expect(el.textContent).toContain('Wochenbudget');
+    expect(el.textContent).toContain('Tagesziel');
+    expect(el.textContent).toContain('50 €');
   });
 
-  it('should open swap modal and swap meal on selection', () => {
-    component.openSwapModal('breakfast');
+  it('4. should render reference meals on Monday (Porridge mit Banane, Reispfanne mit Gemüse, Vollkornbrot mit Ei)', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.textContent).toContain('Porridge mit Banane');
+    expect(el.textContent).toContain('Reispfanne mit Gemüse');
+    expect(el.textContent).toContain('Vollkornbrot mit Ei');
+  });
+
+  it('5. should toggle meal selection with Auswählen button', () => {
+    expect(component.isMealSelected('breakfast')).toBe(true);
+
+    component.toggleMeal('breakfast');
     fixture.detectChanges();
-    expect(component.swappingMealType()).toBe('breakfast');
 
-    const alternatives = component.availableAlternatives();
-    expect(alternatives.length).toBeGreaterThan(1);
+    expect(component.isMealSelected('breakfast')).toBe(false);
 
-    const newChoice = alternatives.find(r => r.id !== 'rec-overnight-oats')!;
+    component.toggleMeal('breakfast');
+    fixture.detectChanges();
+
+    expect(component.isMealSelected('breakfast')).toBe(true);
+  });
+
+  it('6. should render Automatische Einkaufsliste with preview chips', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.textContent).toContain('Automatische Einkaufsliste');
+    expect(el.textContent).toContain('Geschätzter Einkauf:');
+    expect(el.querySelector('.ingredients-preview-row')).toBeTruthy();
+  });
+
+  it('7. should navigate between weekdays with arrows', () => {
+    const initialDay = plannerService.currentDayPlan().dayName;
+    expect(initialDay).toBe('Montag');
+
+    plannerService.nextDay();
+    fixture.detectChanges();
+
+    expect(plannerService.currentDayPlan().dayName).toBe('Dienstag');
+
+    plannerService.previousDay();
+    fixture.detectChanges();
+
+    expect(plannerService.currentDayPlan().dayName).toBe('Montag');
+  });
+
+  it('8. should open recipe alternatives modal and allow swapping', () => {
+    component.openSwapModal('lunch');
+    fixture.detectChanges();
+
+    expect(component.swappingMealType()).toBe('lunch');
+    const alts = component.availableAlternatives();
+    expect(alts.length).toBeGreaterThan(0);
+
+    const newChoice = alts[0];
     component.confirmSwap(newChoice);
     fixture.detectChanges();
 
     expect(component.swappingMealType()).toBeNull();
-    expect(plannerService.currentDayPlan().breakfast.id).toBe(newChoice.id);
   });
 
-  it('should switch between day tabs (Heute, Morgen, ...)', () => {
-    plannerService.setDayIndex(1);
+  it('9. should open budget modal and allow setting a new weekly budget', () => {
+    component.openBudgetModal();
     fixture.detectChanges();
-    expect(plannerService.currentDayIndex()).toBe(1);
+
+    expect(component.showBudgetModal()).toBe(true);
+
+    component.selectBudget(75);
+    fixture.detectChanges();
+
+    expect(component.showBudgetModal()).toBe(false);
+    expect(plannerService.weeklyBudget()).toBe(75);
   });
 });

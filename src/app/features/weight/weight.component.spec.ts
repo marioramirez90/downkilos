@@ -94,7 +94,8 @@ describe('WeightComponent V2.0', () => {
   it('6. should save new weight and automatically update current weight, remaining kg and chart', async () => {
     component.openNewWeightModal();
     component.inputWeight.set(96.5);
-    component.inputDate.set('2026-10-24');
+    const today = new Date().toISOString().split('T')[0];
+    component.inputDate.set(today);
     await component.saveWeight();
 
     expect(component.currentWeight()).toBe(96.5);

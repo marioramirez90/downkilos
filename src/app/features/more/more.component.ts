@@ -8,7 +8,7 @@ export interface MoreNavigationItem {
   title: string;
   subtitle: string;
   route: string;
-  icon: 'recipes' | 'progress' | 'profile' | 'settings' | 'planner' | 'market' | 'calculator' | 'guide';
+  icon: 'products' | 'recipes' | 'progress' | 'profile' | 'settings' | 'planner' | 'market' | 'calculator' | 'guide';
 }
 
 @Component({
@@ -22,6 +22,13 @@ export class MoreComponent {
   private router = inject(Router);
 
   readonly primaryItems: MoreNavigationItem[] = [
+    {
+      id: 'products',
+      title: 'Produkte entdecken',
+      subtitle: 'Netto-Produkte, Nährwerte & Barcode-Scanner.',
+      route: '/discover',
+      icon: 'products'
+    },
     {
       id: 'recipes',
       title: 'Rezepte entdecken',

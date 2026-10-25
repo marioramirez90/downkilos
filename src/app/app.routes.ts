@@ -140,7 +140,12 @@ export const routes: Routes = [
     path: 'meal-planner',
     loadComponent: () =>
       import('./features/meal-planner/meal-planner.component').then((m) => m.MealPlannerComponent),
-    title: 'Down Kilos – Mahlzeitenplan',
+    title: 'Down Kilos – Wochenplan',
+  },
+  {
+    path: 'wochenplan',
+    redirectTo: 'meal-planner',
+    pathMatch: 'full',
   },
   {
     path: 'shopping-list',

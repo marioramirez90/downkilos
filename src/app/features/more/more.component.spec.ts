@@ -32,26 +32,27 @@ describe('MoreComponent', () => {
     expect(el.querySelector('.page-subtitle')?.textContent).toContain('Deine weiteren Down-Kilos-Funktionen.');
   });
 
-  it('3. should render the 4 required primary cards with correct titles and descriptions', () => {
+  it('3. should render the primary cards including Produkte entdecken', () => {
     const el = fixture.nativeElement as HTMLElement;
     const cards = el.querySelectorAll('.primary-card');
-    expect(cards.length).toBe(4);
+    expect(cards.length).toBe(5);
 
     const cardTexts = Array.from(cards).map(c => c.textContent || '');
-    expect(cardTexts[0]).toContain('Rezepte entdecken');
-    expect(cardTexts[0]).toContain('Einfache Gerichte mit Zutaten und Kalorien.');
-
-    expect(cardTexts[1]).toContain('Meine Fortschritte');
-    expect(cardTexts[1]).toContain('Sieh dir deine Gewichtsentwicklung an.');
-
-    expect(cardTexts[2]).toContain('Mein Profil & Ziele');
-    expect(cardTexts[2]).toContain('Persönliche Angaben und Kalorienziel.');
-
-    expect(cardTexts[3]).toContain('Einstellungen');
-    expect(cardTexts[3]).toContain('Datenschutz und App-Verwaltung.');
+    expect(cardTexts[0]).toContain('Produkte entdecken');
+    expect(cardTexts[1]).toContain('Rezepte entdecken');
+    expect(cardTexts[2]).toContain('Meine Fortschritte');
+    expect(cardTexts[3]).toContain('Mein Profil & Ziele');
+    expect(cardTexts[4]).toContain('Einstellungen');
   });
 
-  it('4. should navigate to /recipes when clicking Rezepte card', () => {
+  it('4. should navigate to /discover when clicking Produkte card', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    const prodCard = el.querySelector('#card-products') as HTMLElement;
+    prodCard.click();
+    expect(router.navigate).toHaveBeenCalledWith(['/discover']);
+  });
+
+  it('4b. should navigate to /recipes when clicking Rezepte card', () => {
     const el = fixture.nativeElement as HTMLElement;
     const recipeCard = el.querySelector('#card-recipes') as HTMLElement;
     recipeCard.click();

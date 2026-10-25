@@ -1,22 +1,869 @@
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
+$primary-green: #278f39;
+$dark-green: #103a2a;
+$bright-green: #31bc45;
+$light-green: #e5f5e8;
+$card-bg-green: #f3faf4;
+$background: #ffffff;
+$text-main: #102521;
+$text-muted: #66716d;
+$border-color: #e5ebe5;
+$divider-color: #eef3ee;
+
+.meal-planner-screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: $background;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: $text-main;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ==========================================================================
+   1. Header
+   ========================================================================== */
+.planner-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(10px);
+  padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 8px 16px;
+  border-bottom: 1px solid rgba(229, 235, 229, 0.6);
+  max-width: 440px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+
+  .header-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .brand-link-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+
+      .brand-leaf-icon {
+        width: 26px;
+        height: 26px;
+        display: block;
+      }
+
+      .brand-name {
+        font-size: 21px;
+        font-weight: 800;
+        color: $text-main;
+        letter-spacing: -0.025em;
+        line-height: 1;
+      }
+    }
+
+    .settings-gear-btn {
+      background: transparent;
+      border: none;
+      padding: 6px;
+      color: $text-main;
+      cursor: pointer;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.15s ease, transform 0.15s ease;
+
+      svg {
+        width: 22px;
+        height: 22px;
+        stroke: $text-main;
+        display: block;
+      }
+
+      &:hover {
+        background-color: rgba(16, 37, 33, 0.05);
+      }
+
+      &:active {
+        transform: scale(0.92);
+      }
+    }
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .header-headings {
+    margin-top: 10px;
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: $text-main;
+      margin: 0;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+
+    .page-subtitle {
+      font-size: 13.5px;
+      color: $text-muted;
+      margin: 4px 0 0 0;
+      font-weight: 400;
+      line-height: 1.35;
+    }
   }
 }
 
-.animate-fade-in {
+/* ==========================================================================
+   2. Main Content
+   ========================================================================== */
+.planner-main-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 16px calc(80px + env(safe-area-inset-bottom, 0px)) 16px;
+  -webkit-overflow-scrolling: touch;
+
+  .planner-content-container {
+    max-width: 440px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+/* ==========================================================================
+   2.1 Wochenbudget & Tagesziel Row
+   ========================================================================== */
+.budget-target-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
+
+  .stat-info-card {
+    background-color: $card-bg-green;
+    border: 1px solid #e1efe3;
+    border-radius: 18px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-sizing: border-box;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+    &.budget-card {
+      cursor: pointer;
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(39, 143, 57, 0.08);
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
+    }
+
+    .stat-icon-wrap {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background-color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(39, 143, 57, 0.08);
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .stat-text-wrap {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+
+      .stat-label {
+        font-size: 12px;
+        font-weight: 500;
+        color: #55625d;
+        line-height: 1.2;
+      }
+
+      .stat-value {
+        font-size: 19px;
+        font-weight: 800;
+        color: $text-main;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+        margin-top: 2px;
+      }
+    }
+  }
+}
+
+/* ==========================================================================
+   2.2 Wochentags-Navigator
+   ========================================================================== */
+.weekday-nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 18px 0 14px 0;
+
+  .day-arrow-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background-color: #eaf6ec;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    &:hover {
+      background-color: #dceede;
+    }
+
+    &:active {
+      transform: scale(0.92);
+    }
+  }
+
+  .current-day-label-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .day-calendar-icon {
+      width: 22px;
+      height: 22px;
+    }
+
+    .current-day-name {
+      font-size: 20px;
+      font-weight: 800;
+      color: $text-main;
+      margin: 0;
+      letter-spacing: -0.02em;
+    }
+  }
+}
+
+/* ==========================================================================
+   2.3 Mahlzeiten-Karten
+   ========================================================================== */
+.meals-list-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .meal-plan-card {
+    background-color: #ffffff;
+    border: 1px solid #e8eee8;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(16, 37, 33, 0.04);
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+      border-color: #d6e8d8;
+      box-shadow: 0 4px 14px rgba(16, 37, 33, 0.07);
+    }
+
+    &:active {
+      transform: scale(0.99);
+    }
+
+    .meal-image-wrap {
+      width: 82px;
+      height: 82px;
+      border-radius: 16px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background-color: #f0f4f1;
+
+      .meal-thumb-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+    }
+
+    .meal-info-col {
+      flex: 1;
+      min-width: 0;
+
+      .meal-type-pill {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        background-color: $light-green;
+        color: $primary-green;
+        margin-bottom: 4px;
+        letter-spacing: 0.01em;
+      }
+
+      .meal-recipe-title {
+        font-size: 15.5px;
+        font-weight: 800;
+        color: $text-main;
+        margin: 0 0 2px 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        letter-spacing: -0.015em;
+        line-height: 1.25;
+      }
+
+      .meal-ingredients-summary {
+        font-size: 12px;
+        color: $text-muted;
+        margin: 0 0 6px 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .meal-metrics-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .metric-chip {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 11.5px;
+          font-weight: 600;
+          color: #55625d;
+          background-color: #f6f9f6;
+          border-radius: 6px;
+          padding: 2px 6px;
+
+          .chip-icon {
+            width: 13px;
+            height: 13px;
+            flex-shrink: 0;
+          }
+        }
+      }
+    }
+
+    .meal-action-col {
+      flex-shrink: 0;
+
+      .meal-select-btn {
+        padding: 9px 15px;
+        border-radius: 9999px;
+        font-size: 12.5px;
+        font-weight: 700;
+        cursor: pointer;
+        border: none;
+        background-color: $primary-green;
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: background-color 0.15s ease, transform 0.15s ease;
+
+        &:hover {
+          background-color: #20782f;
+        }
+
+        &:active {
+          transform: scale(0.94);
+        }
+
+        &.is-selected {
+          background-color: $primary-green;
+          color: #ffffff;
+
+          .check-mark {
+            font-size: 13px;
+            font-weight: 800;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* ==========================================================================
+   2.4 Automatische Einkaufsliste Card
+   ========================================================================== */
+.auto-shopping-card {
+  margin: 18px 0 24px 0;
+  background-color: #f0f8f2;
+  border: 1px solid #dceede;
+  border-radius: 22px;
+  padding: 16px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(39, 143, 57, 0.1);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: scale(0.99);
+  }
+
+  .auto-shopping-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    .auto-cart-icon-bubble {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background-color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(39, 143, 57, 0.12);
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .auto-shopping-header-text {
+      flex: 1;
+
+      .auto-shopping-title {
+        font-size: 16px;
+        font-weight: 800;
+        color: $text-main;
+        margin: 0 0 3px 0;
+        letter-spacing: -0.015em;
+      }
+
+      .auto-shopping-subtitle {
+        font-size: 12px;
+        color: #55665f;
+        line-height: 1.35;
+        margin: 0;
+      }
+    }
+  }
+
+  .ingredients-preview-row {
+    margin: 14px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .ingredient-preview-chip {
+      background-color: #ffffff;
+      border: 1px solid #e0ebe2;
+      border-radius: 14px;
+      padding: 6px 12px 6px 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+
+      .chip-item-img {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        object-fit: cover;
+      }
+
+      .chip-item-info {
+        display: flex;
+        flex-direction: column;
+
+        .chip-item-name {
+          font-size: 12px;
+          font-weight: 700;
+          color: $text-main;
+          line-height: 1.15;
+        }
+
+        .chip-item-amount {
+          font-size: 11px;
+          color: #73807b;
+          line-height: 1.15;
+          margin-top: 1px;
+        }
+      }
+    }
+
+    .preview-arrow-bubble {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background-color: #e2f2e5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: auto;
+      flex-shrink: 0;
+
+      svg {
+        width: 15px;
+        height: 15px;
+      }
+    }
+  }
+
+  .auto-shopping-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #e1efe3;
+    padding-top: 10px;
+
+    .footer-estimate-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .footer-wallet-icon {
+        svg {
+          width: 17px;
+          height: 17px;
+          display: block;
+        }
+      }
+
+      .footer-estimate-label {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: $text-main;
+      }
+    }
+
+    .footer-estimate-right {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      .footer-estimate-sum {
+        font-size: 18px;
+        font-weight: 800;
+        color: $primary-green;
+        letter-spacing: -0.02em;
+      }
+
+      .footer-chevron {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+}
+
+/* ==========================================================================
+   3. Modals & Backdrop
+   ========================================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(16, 37, 33, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 100;
   animation: fadeIn 0.2s ease-out forwards;
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
+.swap-recipe-modal,
+.budget-edit-modal {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 440px;
+  background-color: #ffffff;
+  border-radius: 24px 24px 0 0;
+  padding: 20px 20px calc(24px + env(safe-area-inset-bottom, 0px)) 20px;
+  z-index: 105;
+  box-shadow: 0 -8px 32px rgba(16, 37, 33, 0.16);
+  animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+
+    .modal-title {
+      font-size: 19px;
+      font-weight: 800;
+      color: $text-main;
+      margin: 0;
+      letter-spacing: -0.02em;
+    }
+
+    .modal-close-btn {
+      background: rgba(16, 37, 33, 0.05);
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: $text-muted;
+      font-size: 15px;
+      font-weight: 600;
+
+      &:hover {
+        background-color: rgba(16, 37, 33, 0.1);
+        color: $text-main;
+      }
+    }
+  }
+
+  .modal-recipes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .alt-recipe-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid $border-color;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+
+      &:hover {
+        background-color: #f7faf7;
+        border-color: #d6e8d8;
+      }
+
+      .alt-recipe-img {
+        width: 58px;
+        height: 58px;
+        border-radius: 10px;
+        object-fit: cover;
+        flex-shrink: 0;
+      }
+
+      .alt-recipe-info {
+        flex: 1;
+        min-width: 0;
+
+        .alt-recipe-title {
+          font-size: 14px;
+          font-weight: 700;
+          color: $text-main;
+          margin: 0 0 2px 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .alt-recipe-sub {
+          font-size: 11.5px;
+          color: $text-muted;
+          margin: 0 0 4px 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .alt-recipe-meta {
+          font-size: 11px;
+          font-weight: 600;
+          color: #55625d;
+          display: flex;
+          gap: 4px;
+        }
+      }
+
+      .alt-select-btn {
+        padding: 7px 12px;
+        border-radius: 8px;
+        background-color: $light-green;
+        color: $dark-green;
+        font-size: 12px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+
+        &:hover {
+          background-color: $primary-green;
+          color: #ffffff;
+        }
+      }
+    }
+  }
+
+  /* Budget Modal spezifisch */
+  .budget-modal-desc {
+    font-size: 13.5px;
+    color: $text-muted;
+    margin: 0 0 16px 0;
+    line-height: 1.4;
+  }
+
+  .budget-chips-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+
+    .budget-chip-btn {
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid $border-color;
+      background-color: #ffffff;
+      font-size: 15px;
+      font-weight: 700;
+      color: $text-main;
+      cursor: pointer;
+      transition: all 0.15s ease;
+
+      &:hover {
+        background-color: #f7faf7;
+      }
+
+      &.active {
+        background-color: $primary-green;
+        color: #ffffff;
+        border-color: $primary-green;
+      }
+    }
+  }
+
+  .custom-budget-row {
+    .custom-budget-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: $text-muted;
+      margin-bottom: 6px;
+    }
+
+    .custom-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .custom-budget-input {
+        flex: 1;
+        height: 42px;
+        border-radius: 12px;
+        border: 1px solid $border-color;
+        padding: 0 12px;
+        font-size: 15px;
+        font-weight: 700;
+        color: $text-main;
+        outline: none;
+
+        &:focus {
+          border-color: $primary-green;
+        }
+      }
+
+      .custom-budget-currency {
+        font-size: 16px;
+        font-weight: 700;
+        color: $text-main;
+      }
+
+      .custom-budget-save-btn {
+        padding: 0 16px;
+        height: 42px;
+        border-radius: 12px;
+        background-color: $primary-green;
+        color: #ffffff;
+        font-size: 13.5px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+
+        &:hover {
+          background-color: #20782f;
+        }
+      }
+    }
+  }
 }
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+
+/* ==========================================================================
+   4. Toast
+   ========================================================================== */
+.planner-toast {
+  position: fixed;
+  bottom: calc(75px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: $dark-green;
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(16, 37, 33, 0.25);
+  z-index: 90;
+  animation: fadeInDown 0.2s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translate(-50%, 100%);
+  }
+  to {
+    transform: translate(-50%, 0);
+  }
 }

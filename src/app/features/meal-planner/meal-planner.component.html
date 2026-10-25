@@ -1,332 +1,403 @@
-<div class="flex flex-col h-full bg-[#FFFFFF] overflow-hidden">
-  <!-- Bereich A: Fester Header mit Tag-Auswahl -->
-  <header class="flex-shrink-0 px-5 pt-4 pb-2 bg-white border-b border-[#F0F4F1] z-10 space-y-2">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <button
-          type="button"
-          (click)="goBack()"
-          class="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-[#103A2A] hover:bg-[#F1F5F2] active:scale-95 transition-transform cursor-pointer"
-          aria-label="Zurück"
-        >
-          <svg class="w-6 h-6 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-          </svg>
-        </button>
-        <h1 class="text-xl sm:text-2xl font-extrabold text-[#103A2A] tracking-tight">
-          Dein Mahlzeitenplan
-        </h1>
-      </div>
-      <!-- Top Right Actions: Hamburger + Info -->
-      <div class="flex items-center gap-1">
-        <app-hamburger-button></app-hamburger-button>
-        <button
-          type="button"
-          (click)="showPlanInfo.set(!showPlanInfo())"
-          class="w-9 h-9 rounded-full bg-[#F1F5F2] hover:bg-[#E5F5E8] flex items-center justify-center text-[#278F39] transition-colors cursor-pointer"
-          title="Info zum Plan"
-        >
-          <span class="text-sm font-bold">ℹ️</span>
-        </button>
-      </div>
+<div class="meal-planner-screen">
+  <!-- 1. Header (Logo, Brand, Einstellungen, Titel & Untertitel) -->
+  <header class="planner-header">
+    <div class="header-top-row">
+      <!-- Leaf Logo & Brand Name -->
+      <button type="button" (click)="goToDashboard()" class="brand-link-btn" title="Zum Dashboard">
+        <svg class="brand-leaf-icon" viewBox="0 0 24 24" fill="#278F39">
+          <path d="M12 2C6.48 2 2 6.48 2 12c0 3.31 1.61 6.24 4.09 8.04C6.03 19.37 6 18.69 6 18c0-5.52 4.48-10 10-10 1.05 0 2.06.16 3 .46.63-1.89 1-3.9 1-6.06 0-.27-.01-.54-.03-.8C18.15 2.58 15.22 2 12 2zm8 9c-4.42 0-8 3.58-8 8 0 1.05.2 2.05.57 2.97C14.07 21.98 14.15 22 14.24 22c4.42 0 8-3.58 8-8 0-.41-.03-.82-.09-1.22-.05-.01-.1-.01-.15-.01z"/>
+        </svg>
+        <span class="brand-name">Down Kilos</span>
+      </button>
+
+      <!-- Zahnrad-Icon für Einstellungen -->
+      <button type="button" (click)="goToSettings()" class="settings-gear-btn" aria-label="Einstellungen" title="Einstellungen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
     </div>
 
-    <!-- Plan Info Box -->
-    @if (showPlanInfo()) {
-      <div class="p-3.5 rounded-2xl bg-[#E5F5E8] border border-[#CDE9D2] text-xs text-[#103A2A] leading-relaxed animate-fade-in flex justify-between items-start">
-        <p>
-          Dein Plan ist kalorien- und budgetoptimiert für Netto Marken-Discount. Du kannst jede Mahlzeit flexibel gegen passende Alternativen austauschen!
-        </p>
-        <button (click)="showPlanInfo.set(false)" class="text-xs font-bold text-[#278F39] ml-2 cursor-pointer">✕</button>
-      </div>
-    }
-
-    <!-- Day Selector Tabs (Horizontal Pills) -->
-    <div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar select-none">
-      @for (day of plannerService.weeklyPlan(); track day.dayIndex) {
-        <button
-          type="button"
-          (click)="plannerService.setDayIndex(day.dayIndex)"
-          class="py-2 px-4 rounded-full text-xs font-bold transition-all whitespace-nowrap cursor-pointer flex-shrink-0"
-          [ngClass]="plannerService.currentDayIndex() === day.dayIndex
-            ? 'bg-[#278F39] text-white shadow-soft-sm'
-            : 'bg-[#F1F5F2] text-[#627264] hover:bg-[#E2EDE5]'"
-        >
-          {{ day.dayName }}
-        </button>
-      }
+    <!-- Titel & Untertitel -->
+    <div class="header-headings">
+      <h1 class="page-title">Wochenplan</h1>
+      <p class="page-subtitle">Wähle deine Mahlzeiten und wir erstellen automatisch deine Einkaufsliste.</p>
     </div>
   </header>
 
-  <!-- Bereich B: Scrollbarer Inhalt -->
-  <main class="flex-1 px-5 py-4 space-y-3 min-h-0 overflow-y-auto">
-    <!-- 4 Meal Cards (Matching Screen 5) -->
-    @if (plannerService.currentDayPlan(); as day) {
-      <div class="space-y-3">
-        <!-- 1. Frühstück -->
-        <div class="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E3EBE4] shadow-soft-sm hover:shadow-soft flex items-center justify-between gap-3 transition-all select-none">
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center justify-between">
-              <span class="text-[11px] font-bold text-[#627264] uppercase tracking-wider block">
-                Frühstück
-              </span>
-              <button
-                type="button"
-                (click)="openSwapModal('breakfast')"
-                class="text-[11px] font-bold text-[#278F39] hover:underline cursor-pointer"
-              >
-                Tauschen ⇄
-              </button>
-            </div>
-            <h3
-              (click)="viewRecipe(day.breakfast)"
-              class="text-sm font-bold text-[#103A2A] truncate mt-0.5 hover:text-[#278F39] cursor-pointer"
-            >
-              {{ day.breakfast.title }}
-            </h3>
-            <div class="flex items-center gap-1.5 text-xs text-[#55695C] font-semibold mt-1">
-              <span>🔥 {{ day.breakfast.calories }} kcal</span>
-              <span>•</span>
-              <span>{{ day.breakfast.pricePerPortion.toFixed(2).replace('.', ',') }} € / Port.</span>
-            </div>
-            <button
-              type="button"
-              (click)="viewRecipe(day.breakfast)"
-              class="mt-1 text-[10px] font-bold text-[#278F39] hover:underline cursor-pointer block"
-            >
-              Anleitung & Netto-Zutaten ansehen →
-            </button>
-          </div>
+  <!-- 2. Hauptbereich (Scrollbar) -->
+  <main class="planner-main-scroll">
+    <div class="planner-content-container">
 
-          <!-- Dish Image -->
-          <div
-            (click)="viewRecipe(day.breakfast)"
-            class="w-16 h-16 rounded-2xl overflow-hidden bg-[#F6F8F6] flex-shrink-0 border border-[#E3EBE4] shadow-2xs cursor-pointer hover:scale-105 transition-transform"
-          >
-            <img [src]="day.breakfast.imageUrl" [alt]="day.breakfast.title" class="w-full h-full object-cover" />
+      <!-- 2.1 Wochenbudget & Tagesziel Karten (Zwei Spalten) -->
+      <section class="budget-target-row" aria-label="Ziele und Budget">
+        <!-- Links: Wochenbudget -->
+        <div class="stat-info-card budget-card" (click)="openBudgetModal()" role="button" tabindex="0" title="Wochenbudget anpassen">
+          <div class="stat-icon-wrap wallet-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="4" width="20" height="16" rx="4" ry="4"></rect>
+              <line x1="2" y1="10" x2="22" y2="10"></line>
+              <circle cx="17" cy="15" r="1.5" fill="#278F39"></circle>
+            </svg>
+          </div>
+          <div class="stat-text-wrap">
+            <span class="stat-label">Wochenbudget</span>
+            <strong class="stat-value">{{ plannerService.weeklyBudget() }} €</strong>
           </div>
         </div>
 
-        <!-- 2. Mittagessen -->
-        <div class="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E3EBE4] shadow-soft-sm hover:shadow-soft flex items-center justify-between gap-3 transition-all select-none">
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center justify-between">
-              <span class="text-[11px] font-bold text-[#627264] uppercase tracking-wider block">
-                Mittagessen
-              </span>
-              <button
-                type="button"
-                (click)="openSwapModal('lunch')"
-                class="text-[11px] font-bold text-[#278F39] hover:underline cursor-pointer"
-              >
-                Tauschen ⇄
-              </button>
-            </div>
-            <h3
-              (click)="viewRecipe(day.lunch)"
-              class="text-sm font-bold text-[#103A2A] truncate mt-0.5 hover:text-[#278F39] cursor-pointer"
-            >
-              {{ day.lunch.title }}
-            </h3>
-            <div class="flex items-center gap-1.5 text-xs text-[#55695C] font-semibold mt-1">
-              <span>🔥 {{ day.lunch.calories }} kcal</span>
-              <span>•</span>
-              <span>{{ day.lunch.pricePerPortion.toFixed(2).replace('.', ',') }} € / Port.</span>
-            </div>
-            <button
-              type="button"
-              (click)="viewRecipe(day.lunch)"
-              class="mt-1 text-[10px] font-bold text-[#278F39] hover:underline cursor-pointer block"
-            >
-              Anleitung & Netto-Zutaten ansehen →
-            </button>
+        <!-- Rechts: Tagesziel -->
+        <div class="stat-info-card target-card" title="Berechnetes Tagesziel">
+          <div class="stat-icon-wrap flame-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="#278F39" stroke="#278F39" stroke-width="1.5">
+              <path d="M8.5 14.5A2.5 2.5 0 0 0 11 17c1.38 0 2.5-1.12 2.5-2.5 0-1.63-1.56-3.15-2.5-4.5-.94 1.35-2.5 2.87-2.5 4.5z"/>
+              <path d="M12 2c-3.5 4.5-7 8.5-7 13.5a7 7 0 0 0 14 0c0-5-3.5-9-7-13.5z" fill="none" stroke="#278F39" stroke-width="2"/>
+            </svg>
           </div>
-
-          <!-- Dish Image -->
-          <div
-            (click)="viewRecipe(day.lunch)"
-            class="w-16 h-16 rounded-2xl overflow-hidden bg-[#F6F8F6] flex-shrink-0 border border-[#E3EBE4] shadow-2xs cursor-pointer hover:scale-105 transition-transform"
-          >
-            <img [src]="day.lunch.imageUrl" [alt]="day.lunch.title" class="w-full h-full object-cover" />
+          <div class="stat-text-wrap">
+            <span class="stat-label">Tagesziel</span>
+            <strong class="stat-value">{{ plannerService.dailyCalorieTarget() | number:'1.0-0' }} kcal</strong>
           </div>
         </div>
+      </section>
 
-        <!-- 3. Snack -->
-        <div class="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E3EBE4] shadow-soft-sm hover:shadow-soft flex items-center justify-between gap-3 transition-all select-none">
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center justify-between">
-              <span class="text-[11px] font-bold text-[#627264] uppercase tracking-wider block">
-                Snack
-              </span>
-              <button
-                type="button"
-                (click)="openSwapModal('snack')"
-                class="text-[11px] font-bold text-[#278F39] hover:underline cursor-pointer"
-              >
-                Tauschen ⇄
-              </button>
-            </div>
-            <h3
-              (click)="viewRecipe(day.snack)"
-              class="text-sm font-bold text-[#103A2A] truncate mt-0.5 hover:text-[#278F39] cursor-pointer"
-            >
-              {{ day.snack.title }}
-            </h3>
-            <div class="flex items-center gap-1.5 text-xs text-[#55695C] font-semibold mt-1">
-              <span>🔥 {{ day.snack.calories }} kcal</span>
-              <span>•</span>
-              <span>{{ day.snack.pricePerPortion.toFixed(2).replace('.', ',') }} € / Port.</span>
-            </div>
-            <button
-              type="button"
-              (click)="viewRecipe(day.snack)"
-              class="mt-1 text-[10px] font-bold text-[#278F39] hover:underline cursor-pointer block"
-            >
-              Anleitung & Netto-Zutaten ansehen →
-            </button>
-          </div>
+      <!-- 2.2 Wochentags-Navigator -->
+      <section class="weekday-nav-bar" aria-label="Wochentag auswählen">
+        <button
+          type="button"
+          (click)="plannerService.previousDay()"
+          class="day-arrow-btn prev-day-btn"
+          aria-label="Vorheriger Wochentag"
+          title="Vorheriger Tag"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
 
-          <!-- Dish Image -->
-          <div
-            (click)="viewRecipe(day.snack)"
-            class="w-16 h-16 rounded-2xl overflow-hidden bg-[#F6F8F6] flex-shrink-0 border border-[#E3EBE4] shadow-2xs cursor-pointer hover:scale-105 transition-transform"
-          >
-            <img [src]="day.snack.imageUrl" [alt]="day.snack.title" class="w-full h-full object-cover" />
-          </div>
+        <div class="current-day-label-group">
+          <!-- Grünes Kalender-Icon mit Häkchen -->
+          <svg class="day-calendar-icon" viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+            <path d="m9 16 2 2 4-4" />
+          </svg>
+          <h2 class="current-day-name">{{ plannerService.currentDayPlan().dayName }}</h2>
         </div>
 
-        <!-- 4. Abendessen -->
-        <div class="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E3EBE4] shadow-soft-sm hover:shadow-soft flex items-center justify-between gap-3 transition-all select-none">
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center justify-between">
-              <span class="text-[11px] font-bold text-[#627264] uppercase tracking-wider block">
-                Abendessen
-              </span>
+        <button
+          type="button"
+          (click)="plannerService.nextDay()"
+          class="day-arrow-btn next-day-btn"
+          aria-label="Nächster Wochentag"
+          title="Nächster Tag"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </section>
+
+      <!-- 2.3 Mahlzeiten-Karten des Tages -->
+      <section class="meals-list-section" aria-label="Geplante Mahlzeiten">
+
+        <!-- 1. FRÜHSTÜCK -->
+        @if (plannerService.currentDayPlan().breakfast; as breakfast) {
+          <article class="meal-plan-card" (click)="openSwapModal('breakfast', $event)">
+            <div class="meal-image-wrap">
+              <img [src]="breakfast.imageUrl || 'images/meals/porridge-banana.jpg'" [alt]="breakfast.title" class="meal-thumb-img" />
+            </div>
+
+            <div class="meal-info-col">
+              <span class="meal-type-pill pill-breakfast">Frühstück</span>
+              <h3 class="meal-recipe-title">{{ breakfast.title }}</h3>
+              <p class="meal-ingredients-summary">{{ breakfast.subtitle || 'Haferflocken · Banane · Milch' }}</p>
+
+              <div class="meal-metrics-row">
+                <span class="metric-chip kcal-chip">
+                  <svg viewBox="0 0 24 24" fill="#278F39" class="chip-icon">
+                    <path d="M12 2c-3.5 4.5-7 8.5-7 13.5a7 7 0 0 0 14 0c0-5-3.5-9-7-13.5z"/>
+                  </svg>
+                  ca. {{ breakfast.calories }} kcal
+                </span>
+                <span class="metric-chip price-chip">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" class="chip-icon">
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <path d="M14.5 9h-4a2 2 0 0 0 0 4h3a2 2 0 0 1 0 4h-4.5"></path>
+                    <line x1="12" y1="7" x2="12" y2="17"></line>
+                  </svg>
+                  ca. {{ breakfast.pricePerPortion | number:'1.2-2' }} €
+                </span>
+              </div>
+            </div>
+
+            <div class="meal-action-col">
               <button
                 type="button"
-                (click)="openSwapModal('dinner')"
-                class="text-[11px] font-bold text-[#278F39] hover:underline cursor-pointer"
+                (click)="toggleMeal('breakfast', $event)"
+                class="meal-select-btn"
+                [class.is-selected]="isMealSelected('breakfast')"
+                [attr.aria-label]="isMealSelected('breakfast') ? 'Frühstück abwählen' : 'Frühstück auswählen'"
               >
-                Tauschen ⇄
+                @if (isMealSelected('breakfast')) {
+                  <span class="check-mark">✓</span> Ausgewählt
+                } @else {
+                  Auswählen
+                }
               </button>
             </div>
-            <h3
-              (click)="viewRecipe(day.dinner)"
-              class="text-sm font-bold text-[#103A2A] truncate mt-0.5 hover:text-[#278F39] cursor-pointer"
-            >
-              {{ day.dinner.title }}
-            </h3>
-            <div class="flex items-center gap-1.5 text-xs text-[#55695C] font-semibold mt-1">
-              <span>🔥 {{ day.dinner.calories }} kcal</span>
-              <span>•</span>
-              <span>{{ day.dinner.pricePerPortion.toFixed(2).replace('.', ',') }} € / Port.</span>
+          </article>
+        }
+
+        <!-- 2. MITTAGESSEN -->
+        @if (plannerService.currentDayPlan().lunch; as lunch) {
+          <article class="meal-plan-card" (click)="openSwapModal('lunch', $event)">
+            <div class="meal-image-wrap">
+              <img [src]="lunch.imageUrl || 'images/meals/reispfanne-gemuese.jpg'" [alt]="lunch.title" class="meal-thumb-img" />
             </div>
-            <button
-              type="button"
-              (click)="viewRecipe(day.dinner)"
-              class="mt-1 text-[10px] font-bold text-[#278F39] hover:underline cursor-pointer block"
-            >
-              Anleitung & Netto-Zutaten ansehen →
-            </button>
+
+            <div class="meal-info-col">
+              <span class="meal-type-pill pill-lunch">Mittagessen</span>
+              <h3 class="meal-recipe-title">{{ lunch.title }}</h3>
+              <p class="meal-ingredients-summary">{{ lunch.subtitle || 'Reis · Gemüse · Proteinquelle' }}</p>
+
+              <div class="meal-metrics-row">
+                <span class="metric-chip kcal-chip">
+                  <svg viewBox="0 0 24 24" fill="#278F39" class="chip-icon">
+                    <path d="M12 2c-3.5 4.5-7 8.5-7 13.5a7 7 0 0 0 14 0c0-5-3.5-9-7-13.5z"/>
+                  </svg>
+                  ca. {{ lunch.calories }} kcal
+                </span>
+                <span class="metric-chip price-chip">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" class="chip-icon">
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <path d="M14.5 9h-4a2 2 0 0 0 0 4h3a2 2 0 0 1 0 4h-4.5"></path>
+                    <line x1="12" y1="7" x2="12" y2="17"></line>
+                  </svg>
+                  ca. {{ lunch.pricePerPortion | number:'1.2-2' }} €
+                </span>
+              </div>
+            </div>
+
+            <div class="meal-action-col">
+              <button
+                type="button"
+                (click)="toggleMeal('lunch', $event)"
+                class="meal-select-btn"
+                [class.is-selected]="isMealSelected('lunch')"
+                [attr.aria-label]="isMealSelected('lunch') ? 'Mittagessen abwählen' : 'Mittagessen auswählen'"
+              >
+                @if (isMealSelected('lunch')) {
+                  <span class="check-mark">✓</span> Ausgewählt
+                } @else {
+                  Auswählen
+                }
+              </button>
+            </div>
+          </article>
+        }
+
+        <!-- 3. ABENDESSEN -->
+        @if (plannerService.currentDayPlan().dinner; as dinner) {
+          <article class="meal-plan-card" (click)="openSwapModal('dinner', $event)">
+            <div class="meal-image-wrap">
+              <img [src]="dinner.imageUrl || 'images/meals/vollkornbrot-ei.jpg'" [alt]="dinner.title" class="meal-thumb-img" />
+            </div>
+
+            <div class="meal-info-col">
+              <span class="meal-type-pill pill-dinner">Abendessen</span>
+              <h3 class="meal-recipe-title">{{ dinner.title }}</h3>
+              <p class="meal-ingredients-summary">{{ dinner.subtitle || 'Brot · Eier · Tomaten' }}</p>
+
+              <div class="meal-metrics-row">
+                <span class="metric-chip kcal-chip">
+                  <svg viewBox="0 0 24 24" fill="#278F39" class="chip-icon">
+                    <path d="M12 2c-3.5 4.5-7 8.5-7 13.5a7 7 0 0 0 14 0c0-5-3.5-9-7-13.5z"/>
+                  </svg>
+                  ca. {{ dinner.calories }} kcal
+                </span>
+                <span class="metric-chip price-chip">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" class="chip-icon">
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <path d="M14.5 9h-4a2 2 0 0 0 0 4h3a2 2 0 0 1 0 4h-4.5"></path>
+                    <line x1="12" y1="7" x2="12" y2="17"></line>
+                  </svg>
+                  ca. {{ dinner.pricePerPortion | number:'1.2-2' }} €
+                </span>
+              </div>
+            </div>
+
+            <div class="meal-action-col">
+              <button
+                type="button"
+                (click)="toggleMeal('dinner', $event)"
+                class="meal-select-btn"
+                [class.is-selected]="isMealSelected('dinner')"
+                [attr.aria-label]="isMealSelected('dinner') ? 'Abendessen abwählen' : 'Abendessen auswählen'"
+              >
+                @if (isMealSelected('dinner')) {
+                  <span class="check-mark">✓</span> Ausgewählt
+                } @else {
+                  Auswählen
+                }
+              </button>
+            </div>
+          </article>
+        }
+      </section>
+
+      <!-- 2.4 Automatische Einkaufsliste (Hellgrüne Zusammenfassungskarte) -->
+      @if (plannerService.automaticShoppingList(); as autoList) {
+        <section class="auto-shopping-card" (click)="goToShoppingList()" role="button" tabindex="0" aria-label="Zur automatischen Einkaufsliste">
+          <!-- Karten-Kopf mit Einkaufswagen-Icon -->
+          <div class="auto-shopping-header">
+            <div class="auto-cart-icon-bubble">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+              </svg>
+            </div>
+            <div class="auto-shopping-header-text">
+              <h3 class="auto-shopping-title">Automatische Einkaufsliste</h3>
+              <p class="auto-shopping-subtitle">
+                Aus deinen ausgewählten Mahlzeiten werden Zutaten, Mengen und Preise automatisch zusammengefasst.
+              </p>
+            </div>
           </div>
 
-          <!-- Dish Image -->
-          <div
-            (click)="viewRecipe(day.dinner)"
-            class="w-16 h-16 rounded-2xl overflow-hidden bg-[#F6F8F6] flex-shrink-0 border border-[#E3EBE4] shadow-2xs cursor-pointer hover:scale-105 transition-transform"
-          >
-            <img [src]="day.dinner.imageUrl" [alt]="day.dinner.title" class="w-full h-full object-cover" />
+          <!-- Zutaten-Vorschau-Reihe (Horizontale Chips mit echten Produktbildern) -->
+          <div class="ingredients-preview-row">
+            @for (item of autoList.items.slice(0, 3); track item.id) {
+              <div class="ingredient-preview-chip">
+                <img [src]="item.imageUrl" [alt]="item.name" class="chip-item-img" />
+                <div class="chip-item-info">
+                  <span class="chip-item-name">{{ item.name }}</span>
+                  <span class="chip-item-amount">{{ item.amountText }}</span>
+                </div>
+              </div>
+            }
+            <div class="preview-arrow-bubble" title="Alle Positionen anzeigen">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
           </div>
-        </div>
-      </div>
-    }
 
-    <!-- Daily Totals Summary Row (Matching Screen 5) -->
-    <div class="p-3.5 rounded-2xl bg-[#F6F8F6] border border-[#E3EBE4] flex items-center justify-between text-xs font-bold text-[#103A2A]">
-      <div class="flex items-center gap-1.5">
-        <span>🔥</span>
-        <span>{{ plannerService.currentDayTotals().calories | number }} kcal gesamt</span>
-      </div>
-      <div class="flex items-center gap-1.5">
-        <span>🛒</span>
-        <span>{{ plannerService.currentDayTotals().cost.toFixed(2).replace('.', ',') }} € Portionskosten</span>
-      </div>
+          <!-- Footer-Reihe mit geschätztem Einkaufspreis -->
+          <div class="auto-shopping-footer">
+            <div class="footer-estimate-left">
+              <div class="footer-wallet-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="4" width="20" height="16" rx="4" ry="4"></rect>
+                  <line x1="2" y1="10" x2="22" y2="10"></line>
+                  <circle cx="17" cy="15" r="1.5" fill="#278F39"></circle>
+                </svg>
+              </div>
+              <span class="footer-estimate-label">Geschätzter Einkauf:</span>
+            </div>
+
+            <div class="footer-estimate-right">
+              <strong class="footer-estimate-sum">{{ autoList.totalCost | number:'1.2-2' }} €</strong>
+              <svg class="footer-chevron" viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
+          </div>
+        </section>
+      }
+
     </div>
   </main>
 
-  <!-- Bereich C: Fester unterer Bereich mit Hauptbutton und Navigationsleiste -->
-  <footer class="flex-shrink-0 bg-white border-t border-[#E3EBE4] z-20">
-    <!-- Feedback Banner -->
-    @if (addedToShoppingList()) {
-      <div class="py-1 px-3 bg-[#E5F5E8] border-b border-[#278F39] text-[#278F39] text-[11px] font-bold text-center animate-fade-in">
-        ✓ Alle Tageszutaten wurden zur Einkaufsliste zusammengefasst!
-      </div>
-    }
+  <!-- 3. Toast Benachrichtigung -->
+  @if (toastMessage(); as msg) {
+    <aside class="planner-toast" role="status" aria-live="polite">
+      {{ msg }}
+    </aside>
+  }
 
-    <!-- Feste Hauptbuttons -->
-    <div class="px-5 py-2.5 bg-white border-b border-[#F0F4F1] flex gap-2">
-      <button
-        type="button"
-        (click)="regeneratePlan()"
-        class="py-3 px-3.5 rounded-2xl bg-[#F6F8F6] hover:bg-[#E5F5E8] border border-[#E3EBE4] text-[#103A2A] font-bold text-xs flex items-center justify-center gap-1 transition-all cursor-pointer"
-        title="Abwechslungsreichen Wochenplan neu berechnen"
-      >
-        <span>🔄 Neu mischen</span>
-      </button>
-
-      <button
-        type="button"
-        (click)="addDayToShoppingList()"
-        class="flex-1 py-3 px-4 rounded-2xl bg-[#278F39] hover:bg-[#217A30] active:scale-[0.98] text-white font-bold text-xs sm:text-sm shadow-button flex items-center justify-center gap-2 transition-all cursor-pointer"
-      >
-        <span>🛒 Tageszutaten einkaufen</span>
-        <span>→</span>
-      </button>
-    </div>
-
-    <!-- Untere Navigationsleiste -->
-    <app-bottom-nav></app-bottom-nav>
-  </footer>
-
-  <!-- Meal Swap Modal / Drawer -->
+  <!-- 4. Rezept-Wechseln Modal (Alternative Mahlzeiten) -->
   @if (swappingMealType(); as mealType) {
-    <div class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 animate-fade-in">
-      <div class="bg-white rounded-t-3xl sm:rounded-3xl p-5 w-full max-w-sm max-h-[80vh] flex flex-col space-y-3 shadow-xl border border-[#E3EBE4]">
-        <div class="flex justify-between items-center pb-2 border-b border-[#E3EBE4]">
-          <div>
-            <h3 class="text-sm font-extrabold text-[#103A2A]">
-              {{ getMealTypeLabel(mealType) }} austauschen
-            </h3>
-            <p class="text-[11px] text-[#627264]">Wähle eine gesunde Alternative</p>
-          </div>
+    <div class="modal-backdrop" (click)="closeSwapModal()"></div>
+    <div class="swap-recipe-modal" role="dialog" aria-modal="true" [attr.aria-label]="getMealTypeLabel(mealType) + ' ändern'">
+      <div class="modal-header">
+        <h3 class="modal-title">{{ getMealTypeLabel(mealType) }} ändern</h3>
+        <button type="button" (click)="closeSwapModal()" class="modal-close-btn" aria-label="Schließen">✕</button>
+      </div>
+
+      <div class="modal-recipes-list">
+        @for (recipe of availableAlternatives(); track recipe.id) {
+          <article class="alt-recipe-card" (click)="confirmSwap(recipe)">
+            <img [src]="recipe.imageUrl" [alt]="recipe.title" class="alt-recipe-img" />
+            <div class="alt-recipe-info">
+              <h4 class="alt-recipe-title">{{ recipe.title }}</h4>
+              <p class="alt-recipe-sub">{{ recipe.subtitle }}</p>
+              <div class="alt-recipe-meta">
+                <span>ca. {{ recipe.calories }} kcal</span>
+                <span>•</span>
+                <span>ca. {{ recipe.pricePerPortion | number:'1.2-2' }} €</span>
+              </div>
+            </div>
+            <button type="button" class="alt-select-btn" (click)="confirmSwap(recipe); $event.stopPropagation()">
+              Wählen
+            </button>
+          </article>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- 5. Wochenbudget anpassen Modal -->
+  @if (showBudgetModal()) {
+    <div class="modal-backdrop" (click)="closeBudgetModal()"></div>
+    <div class="budget-edit-modal" role="dialog" aria-modal="true" aria-label="Wochenbudget anpassen">
+      <div class="modal-header">
+        <h3 class="modal-title">Wochenbudget festlegen</h3>
+        <button type="button" (click)="closeBudgetModal()" class="modal-close-btn" aria-label="Schließen">✕</button>
+      </div>
+
+      <p class="budget-modal-desc">
+        Lege fest, wie viel du wöchentlich für deinen Lebensmitteleinkauf ausgeben möchtest:
+      </p>
+
+      <div class="budget-chips-grid">
+        @for (opt of budgetOptions; track opt) {
           <button
             type="button"
-            (click)="closeSwapModal()"
-            class="text-[#627264] hover:text-[#103A2A] font-bold text-base cursor-pointer p-1"
+            class="budget-chip-btn"
+            [class.active]="plannerService.weeklyBudget() === opt"
+            (click)="selectBudget(opt)"
           >
-            ✕
+            {{ opt }} €
           </button>
-        </div>
+        }
+      </div>
 
-        <!-- Recipe options list -->
-        <div class="overflow-y-auto space-y-2 py-2">
-          @for (alt of availableAlternatives(); track alt.id) {
-            <div
-              (click)="confirmSwap(alt)"
-              class="p-2.5 rounded-2xl border border-[#E3EBE4] hover:border-[#278F39] hover:bg-[#E5F5E8]/30 flex items-center justify-between gap-2.5 cursor-pointer transition-all"
-            >
-              <img [src]="alt.imageUrl" [alt]="alt.title" class="w-12 h-12 rounded-xl object-cover flex-shrink-0" />
-              <div class="flex-1 min-w-0">
-                <h4 class="text-xs font-bold text-[#103A2A] truncate">{{ alt.title }}</h4>
-                <span class="text-[10px] text-[#627264] block">
-                  🔥 {{ alt.calories }} kcal • {{ alt.pricePerPortion.toFixed(2).replace('.', ',') }} € • {{ alt.prepTimeMinutes }} Min.
-                </span>
-              </div>
-              <span class="text-xs font-bold text-[#278F39]">Wählen →</span>
-            </div>
-          }
+      <div class="custom-budget-row">
+        <label for="custom-budget-input" class="custom-budget-label">Individueller Betrag:</label>
+        <div class="custom-input-wrap">
+          <input
+            type="number"
+            id="custom-budget-input"
+            [(ngModel)]="customBudget"
+            min="10"
+            max="500"
+            step="5"
+            class="custom-budget-input"
+          />
+          <span class="custom-budget-currency">€</span>
+          <button type="button" (click)="saveCustomBudget()" class="custom-budget-save-btn">
+            Übernehmen
+          </button>
         </div>
       </div>
     </div>
   }
+
+  <!-- 6. Feste untere Navigation -->
+  <app-bottom-nav></app-bottom-nav>
 </div>

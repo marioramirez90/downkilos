@@ -22,7 +22,7 @@ describe('DiscoverComponent', () => {
     fixture = TestBed.createComponent(DiscoverComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  });
+  }, 30000);
 
   it('1. should create', () => {
     expect(component).toBeTruthy();

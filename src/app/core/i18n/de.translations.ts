@@ -5,6 +5,8 @@ export const DE_TRANSLATIONS = {
   },
   NAV: {
     HOME: 'Home',
+    WOCHENPLAN: 'Wochenplan',
+    MEAL_PLANNER: 'Wochenplan',
     PRODUCTS: 'Produkte',
     PLAN: 'Plan',
     DISCOVER: 'Produkte',

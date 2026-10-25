@@ -49,8 +49,15 @@ export interface DayPlan {
   dayIndex: number;
   dayName: string;
   dateStr: string;
+  calendarWeek?: number;
   breakfast: Recipe;
   lunch: Recipe;
   snack: Recipe;
   dinner: Recipe;
+  selectedMeals?: {
+    breakfast: boolean;
+    lunch: boolean;
+    dinner: boolean;
+    snack: boolean;
+  };
 }

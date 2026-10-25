@@ -11,6 +11,191 @@ export const RECIPES_DATA: Recipe[] = [
   // 1. FRÜHSTÜCK (BREAKFAST)
   // =========================================================================
   {
+    id: 'rec-porridge-banana',
+    title: 'Porridge mit Banane',
+    subtitle: 'Haferflocken · Banane · Milch',
+    mealType: 'breakfast',
+    dietType: 'vegetarian',
+    imageUrl: 'images/meals/porridge-banana.jpg',
+    prepTimeMinutes: 5,
+    cookTimeMinutes: 5,
+    difficulty: 'Einfach',
+    calories: 380,
+    protein: 15.2,
+    carbs: 62.4,
+    fat: 6.8,
+    pricePerPortion: 1.60,
+    fullPackageCost: 4.17, // Haferflocken (0,79 €) + Bananen (1,69 €) + Vollmilch (1,69 €)
+    defaultServings: 1,
+    allergens: ['Gluten', 'Milch / Laktose'],
+    ingredients: [
+      {
+        productId: 'netto-oats-500',
+        name: 'Zarte Haferflocken',
+        amount: 80,
+        unit: 'g',
+        portionCost: 0.13,
+        packageSize: '500 g',
+        packagePrice: 0.79,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-bananas-1kg',
+        name: 'Bio Banane',
+        amount: 1,
+        unit: 'Stück',
+        portionCost: 0.28,
+        packageSize: '1 kg',
+        packagePrice: 1.69,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-milk-1l',
+        name: 'Frische Vollmilch 3,5%',
+        amount: 200,
+        unit: 'ml',
+        portionCost: 0.34,
+        packageSize: '1 Liter',
+        packagePrice: 1.69,
+        packagesNeeded: 1
+      }
+    ],
+    stepInstructions: [
+      'Schritt 1: Haferflocken mit Milch und einer Prise Salz in einen kleinen Topf geben.',
+      'Schritt 2: Bei mittlerer Hitze ca. 4–5 Minuten unter ständigem Rühren köcheln lassen, bis ein cremiger Brei entsteht.',
+      'Schritt 3: Die Banane in Scheiben schneiden, auf dem warmen Porridge anrichten und nach Wunsch mit Beeren garnieren.'
+    ],
+    mealPrepTips: 'Kann am Vorabend vorbereitet und morgens kurz aufgewärmt oder kalt genossen werden.',
+    storageTips: 'Gekühlt bis zu 2 Tage haltbar.'
+  },
+  {
+    id: 'rec-rice-veggie-pan',
+    title: 'Reispfanne mit Gemüse',
+    subtitle: 'Reis · Gemüse · Proteinquelle',
+    mealType: 'lunch',
+    dietType: 'omnivore',
+    imageUrl: 'images/meals/reispfanne-gemuese.jpg',
+    prepTimeMinutes: 10,
+    cookTimeMinutes: 15,
+    difficulty: 'Einfach',
+    calories: 520,
+    protein: 38.5,
+    carbs: 64.0,
+    fat: 9.2,
+    pricePerPortion: 2.80,
+    fullPackageCost: 8.95,
+    defaultServings: 1,
+    allergens: ['Soja / Sesam'],
+    ingredients: [
+      {
+        productId: 'netto-rice-1kg',
+        name: 'Langkorn- & Spitzen-Langkornreis',
+        amount: 100,
+        unit: 'g',
+        portionCost: 0.25,
+        packageSize: '1 kg',
+        packagePrice: 1.99,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-chicken-400',
+        name: 'Hähnchenbrustfilet frisch (Proteinquelle)',
+        amount: 150,
+        unit: 'g',
+        portionCost: 1.45,
+        packageSize: '400 g Packung',
+        packagePrice: 3.89,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-broccoli-500',
+        name: 'Frischer Brokkoli',
+        amount: 100,
+        unit: 'g',
+        portionCost: 0.32,
+        packageSize: '500 g',
+        packagePrice: 1.59,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-carrots-1kg',
+        name: 'Speisemöhren frisch',
+        amount: 80,
+        unit: 'g',
+        portionCost: 0.12,
+        packageSize: '1 kg',
+        packagePrice: 1.49,
+        packagesNeeded: 1
+      }
+    ],
+    stepInstructions: [
+      'Schritt 1: Den Reis nach Packungsanweisung in leicht gesalzenem Wasser ca. 12 Minuten gar kochen.',
+      'Schritt 2: Hähnchenbrustfilet und Gemüse in mundgerechte Stücke schneiden.',
+      'Schritt 3: Hähnchen in einer beschichteten Pfanne mit wenig Öl scharf anbraten, Gemüse hinzugeben und 5 Minuten bissfest garen.',
+      'Schritt 4: Den gekochten Reis unterheben, mit Sojasauce oder Kräutern abschmecken und warm servieren.'
+    ],
+    mealPrepTips: 'Hervorragend zum Vorkochen (Meal Prep) geeignet. Portionen lassen sich ideal in Glasbehältern transportieren.',
+    storageTips: 'Im Kühlschrank verschlossen bis zu 3 Tage haltbar.'
+  },
+  {
+    id: 'rec-wholegrain-bread-egg',
+    title: 'Vollkornbrot mit Ei',
+    subtitle: 'Brot · Eier · Tomaten',
+    mealType: 'dinner',
+    dietType: 'vegetarian',
+    imageUrl: 'images/meals/vollkornbrot-ei.jpg',
+    prepTimeMinutes: 5,
+    cookTimeMinutes: 8,
+    difficulty: 'Einfach',
+    calories: 350,
+    protein: 21.0,
+    carbs: 34.5,
+    fat: 14.2,
+    pricePerPortion: 1.40,
+    fullPackageCost: 5.27,
+    defaultServings: 1,
+    allergens: ['Ei', 'Gluten'],
+    ingredients: [
+      {
+        productId: 'netto-toast-500',
+        name: 'Toastbrot Vollkorn / Vollkornbrot',
+        amount: 2,
+        unit: 'Scheiben (ca. 70 g)',
+        portionCost: 0.25,
+        packageSize: '500 g Packung',
+        packagePrice: 1.79,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-eggs-10stk',
+        name: 'Frische Eier (Bodenhaltung Klasse M)',
+        amount: 2,
+        unit: 'Stück',
+        portionCost: 0.40,
+        packageSize: '10 Stück',
+        packagePrice: 1.99,
+        packagesNeeded: 1
+      },
+      {
+        productId: 'netto-tomatoes-500',
+        name: 'Frische Rispentomaten',
+        amount: 100,
+        unit: 'g',
+        portionCost: 0.30,
+        packageSize: '500 g Schale',
+        packagePrice: 1.49,
+        packagesNeeded: 1
+      }
+    ],
+    stepInstructions: [
+      'Schritt 1: Eier in kochendem Wasser ca. 7–8 Minuten wachsweich bis hart kochen, anschließend kalt abschrecken und pellen.',
+      'Schritt 2: Die Vollkornbrotscheiben nach Wunsch kurz anrösten.',
+      'Schritt 3: Eier und Tomaten in gleichmäßige Scheiben schneiden, dekorativ auf dem Brot anrichten und mit Meersalz und Pfeffer würzen.'
+    ],
+    mealPrepTips: 'Die Eier können am Vortag vorgekocht werden für eine Zubereitung in unter 2 Minuten.',
+    storageTips: 'Gekochte Eier mit Schale halten sich im Kühlschrank bis zu 10 Tage.'
+  },
+  {
     id: 'rec-scrambled-eggs',
     title: 'Cremiges Rührei mit Tomaten & Rapsöl',
     subtitle: 'Klassisches eiweißreiches Frühstück aus frischen Netto-Zutaten',

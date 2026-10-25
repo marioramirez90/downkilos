@@ -20,6 +20,7 @@ export class StorageService {
   readonly profile = signal<UserProfile | null>(null);
   readonly retailerPref = signal<RetailerPreference | null>(null);
   readonly weightHistory = signal<WeightEntry[]>([]);
+  readonly weeklyBudget = signal<number>(50);
 
   constructor() {
     this.initDatabase();
@@ -27,6 +28,33 @@ export class StorageService {
       this.loadWeightHistory();
     });
     this.loadRetailerPreference();
+    this.loadWeeklyBudget();
+  }
+
+  loadWeeklyBudget(): number {
+    try {
+      const val = localStorage.getItem('down_kilos_weekly_budget');
+      if (val) {
+        const num = parseFloat(val);
+        if (!isNaN(num) && num > 0) {
+          this.weeklyBudget.set(num);
+          return num;
+        }
+      }
+    } catch {
+      // ignore
+    }
+    return 50;
+  }
+
+  saveWeeklyBudget(amount: number): void {
+    const val = Math.max(10, Math.round(amount));
+    this.weeklyBudget.set(val);
+    try {
+      localStorage.setItem('down_kilos_weekly_budget', val.toString());
+    } catch {
+      // ignore
+    }
   }
 
   private initDatabase(): Promise<IDBDatabase | null> {

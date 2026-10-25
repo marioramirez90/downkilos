@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { MealPlannerService } from './meal-planner.service';
 
 describe('MealPlannerService', () => {
@@ -18,25 +19,45 @@ describe('MealPlannerService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should initialize a 7-day plan with breakfast, lunch, snack, dinner', () => {
+  it('should initialize a 7-day plan with Monday matching reference recipes', () => {
     const plan = service.weeklyPlan();
     expect(plan.length).toBe(7);
 
-    const today = service.currentDayPlan();
-    expect(today.breakfast).toBeTruthy();
-    expect(today.breakfast.title.length).toBeGreaterThan(0);
-    expect(today.lunch).toBeTruthy();
-    expect(today.lunch.title.length).toBeGreaterThan(0);
-    expect(today.snack).toBeTruthy();
-    expect(today.snack.title.length).toBeGreaterThan(0);
-    expect(today.dinner).toBeTruthy();
-    expect(today.dinner.title.length).toBeGreaterThan(0);
+    const monday = plan[0];
+    expect(monday.dayName).toBe('Montag');
+    expect(monday.breakfast.title).toContain('Porridge mit Banane');
+    expect(monday.lunch.title).toContain('Reispfanne mit Gemüse');
+    expect(monday.dinner.title).toContain('Vollkornbrot mit Ei');
   });
 
-  it('should calculate daily total calories and costs accurately', () => {
-    const totals = service.currentDayTotals();
-    expect(totals.calories).toBeGreaterThan(1000);
-    expect(totals.cost).toBeGreaterThan(2.0);
+  it('should manage weeklyBudget and dailyCalorieTarget', () => {
+    expect(service.weeklyBudget()).toBe(50);
+    expect(service.dailyCalorieTarget()).toBeGreaterThanOrEqual(1200);
+
+    service.setWeeklyBudget(75);
+    expect(service.weeklyBudget()).toBe(75);
+  });
+
+  it('should toggle meal selection state', () => {
+    expect(service.isMealSelected(0, 'breakfast')).toBe(true);
+
+    service.toggleMealSelected(0, 'breakfast');
+    expect(service.isMealSelected(0, 'breakfast')).toBe(false);
+
+    service.toggleMealSelected(0, 'breakfast');
+    expect(service.isMealSelected(0, 'breakfast')).toBe(true);
+  });
+
+  it('should aggregate automatic shopping list preview items and cost', () => {
+    const autoList = service.automaticShoppingList();
+    expect(autoList.items.length).toBeGreaterThanOrEqual(3);
+    expect(autoList.totalCost).toBeGreaterThan(0);
+
+    const banana = autoList.items.find(i => i.name === 'Bananen');
+    expect(banana).toBeDefined();
+
+    const oats = autoList.items.find(i => i.name === 'Haferflocken');
+    expect(oats).toBeDefined();
   });
 
   it('should filter recipes by allergy exclusion', () => {
@@ -54,5 +75,14 @@ describe('MealPlannerService', () => {
 
     const totals = service.currentDayTotals();
     expect(totals.calories).toBeGreaterThan(0);
+  });
+
+  it('should navigate between weekdays', () => {
+    expect(service.currentDayIndex()).toBe(0);
+    service.nextDay();
+    expect(service.currentDayIndex()).toBe(1);
+    expect(service.currentDayPlan().dayName).toBe('Dienstag');
+    service.previousDay();
+    expect(service.currentDayIndex()).toBe(0);
   });
 });

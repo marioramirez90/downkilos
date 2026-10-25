@@ -36,6 +36,17 @@ export const routes: Routes = [
     title: 'Down Kilos – Dein Markt',
   },
   {
+    path: 'dietary-profile',
+    loadComponent: () =>
+      import('./features/dietary-profile/dietary-profile.component').then((m) => m.DietaryProfileComponent),
+    title: 'Down Kilos – Deine Ernährung',
+  },
+  {
+    path: 'ernaehrung',
+    redirectTo: 'dietary-profile',
+    pathMatch: 'full',
+  },
+  {
     path: 'loading',
     loadComponent: () =>
       import('./features/loading/loading.component').then((m) => m.LoadingComponent),

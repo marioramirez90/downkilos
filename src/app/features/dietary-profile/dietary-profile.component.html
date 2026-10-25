@@ -1,0 +1,349 @@
+<div class="dietary-container">
+  <!-- Fixed Header -->
+  <header class="dietary-header">
+    <div class="header-main">
+      <button
+        type="button"
+        (click)="goBack()"
+        class="back-button"
+        id="btn-dietary-back"
+        aria-label="Zurück zur Marktauswahl"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
+      </button>
+
+      <div class="title-group">
+        <h1>Deine Ernährung</h1>
+        <p class="subtitle">Damit deine Mahlzeiten zu dir passen.</p>
+      </div>
+    </div>
+
+    <!-- Informative Callout Card -->
+    <div class="info-callout-card">
+      <div class="info-icon-circle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+      </div>
+      <p>
+        Gib an, was du nicht verträgst oder nicht essen möchtest. Wir berücksichtigen deine Angaben bei der Rezeptauswahl.
+      </p>
+    </div>
+  </header>
+
+  <!-- Scrollable Form Body -->
+  <main class="dietary-body">
+    <!-- SECTION 1: Ernährungsform -->
+    <section class="dietary-section">
+      <div class="section-title-row">
+        <span class="section-badge">1</span>
+        <h2>Wie ernährst du dich?</h2>
+      </div>
+
+      <div class="diet-forms-grid">
+        <div
+          class="diet-form-card"
+          [class.selected]="selectedDietaryForm() === 'omnivore'"
+          (click)="selectDietaryForm('omnivore')"
+          role="button"
+          tabindex="0"
+          id="diet-opt-omnivore"
+        >
+          <div class="card-radio-circle">
+            @if (selectedDietaryForm() === 'omnivore') {
+              <div class="radio-dot"></div>
+            }
+          </div>
+          <div class="card-text-box">
+            <strong>Allesesser</strong>
+            <span>Fleisch, Fisch & pflanzliche Kost</span>
+          </div>
+        </div>
+
+        <div
+          class="diet-form-card"
+          [class.selected]="selectedDietaryForm() === 'vegetarian'"
+          (click)="selectDietaryForm('vegetarian')"
+          role="button"
+          tabindex="0"
+          id="diet-opt-vegetarian"
+        >
+          <div class="card-radio-circle">
+            @if (selectedDietaryForm() === 'vegetarian') {
+              <div class="radio-dot"></div>
+            }
+          </div>
+          <div class="card-text-box">
+            <strong>Vegetarisch</strong>
+            <span>Ohne Fleisch und Fisch</span>
+          </div>
+        </div>
+
+        <div
+          class="diet-form-card"
+          [class.selected]="selectedDietaryForm() === 'vegan'"
+          (click)="selectDietaryForm('vegan')"
+          role="button"
+          tabindex="0"
+          id="diet-opt-vegan"
+        >
+          <div class="card-radio-circle">
+            @if (selectedDietaryForm() === 'vegan') {
+              <div class="radio-dot"></div>
+            }
+          </div>
+          <div class="card-text-box">
+            <strong>Vegan</strong>
+            <span>Rein pflanzlich, ohne tierische Produkte</span>
+          </div>
+        </div>
+
+        <div
+          class="diet-form-card"
+          [class.selected]="selectedDietaryForm() === 'pescatarian'"
+          (click)="selectDietaryForm('pescatarian')"
+          role="button"
+          tabindex="0"
+          id="diet-opt-pescatarian"
+        >
+          <div class="card-radio-circle">
+            @if (selectedDietaryForm() === 'pescatarian') {
+              <div class="radio-dot"></div>
+            }
+          </div>
+          <div class="card-text-box">
+            <strong>Pescetarisch</strong>
+            <span>Vegetarisch plus Fisch & Meeresfrüchte</span>
+          </div>
+        </div>
+
+        <div
+          class="diet-form-card"
+          [class.selected]="selectedDietaryForm() === 'none'"
+          (click)="selectDietaryForm('none')"
+          role="button"
+          tabindex="0"
+          id="diet-opt-none"
+        >
+          <div class="card-radio-circle">
+            @if (selectedDietaryForm() === 'none') {
+              <div class="radio-dot"></div>
+            }
+          </div>
+          <div class="card-text-box">
+            <strong>Keine bestimmte Form</strong>
+            <span>Keine Einschränkungen bei der Zubereitung</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: Unverträglichkeiten -->
+    <section class="dietary-section">
+      <div class="section-title-row">
+        <span class="section-badge">2</span>
+        <h2>Was verträgst du nicht gut?</h2>
+      </div>
+
+      <div class="chips-container">
+        @for (opt of intoleranceOptions; track opt.id) {
+          <button
+            type="button"
+            (click)="toggleIntolerance(opt.id)"
+            class="filter-chip"
+            [class.active]="isIntoleranceSelected(opt.id)"
+            [id]="'chip-intolerance-' + opt.id"
+          >
+            <span class="chip-check">{{ isIntoleranceSelected(opt.id) ? '✓' : '+' }}</span>
+            <span class="chip-text">{{ opt.label }}</span>
+          </button>
+        }
+      </div>
+    </section>
+
+    <!-- SECTION 3: Allergien -->
+    <section class="dietary-section">
+      <div class="section-title-row">
+        <span class="section-badge">3</span>
+        <h2>Hast du Lebensmittelallergien?</h2>
+      </div>
+      <p class="section-desc">Die 14 EU-weit kennzeichnungspflichtigen Allergene und Obstallergien:</p>
+
+      <div class="chips-container">
+        @for (allergen of eu14Allergens; track allergen.id) {
+          <button
+            type="button"
+            (click)="toggleAllergy(allergen.id)"
+            class="filter-chip"
+            [class.active]="isAllergySelected(allergen.id)"
+            [id]="'chip-allergen-' + allergen.id"
+          >
+            <span class="chip-check">{{ isAllergySelected(allergen.id) ? '✓' : '+' }}</span>
+            <span class="chip-text">{{ allergen.name }}</span>
+          </button>
+        }
+
+        <!-- Beliebte Fruchtallergien -->
+        @for (fruit of fruitAllergens; track fruit.id) {
+          <button
+            type="button"
+            (click)="toggleAllergy(fruit.id)"
+            class="filter-chip fruit-chip"
+            [class.active]="isAllergySelected(fruit.id)"
+            [id]="'chip-fruit-' + fruit.id"
+          >
+            <span class="chip-check">{{ isAllergySelected(fruit.id) ? '✓' : '+' }}</span>
+            <span class="chip-text">{{ fruit.name }}</span>
+          </button>
+        }
+      </div>
+    </section>
+
+    <!-- SECTION 4: Lebensmittel ausschließen (Suchfeld mit Auto-Vorschlägen) -->
+    <section class="dietary-section">
+      <div class="section-title-row">
+        <span class="section-badge">4</span>
+        <h2>Lebensmittel ausschließen</h2>
+      </div>
+      <p class="section-desc">Bestimmte Lebensmittel gezielt von Rezepten ausschließen:</p>
+
+      <div class="search-input-box">
+        <div class="input-wrapper">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            id="excludeSearchInput"
+            type="text"
+            [ngModel]="excludeSearchQuery()"
+            (ngModelChange)="excludeSearchQuery.set($event)"
+            (focus)="isSearchFocused = true"
+            (keydown.enter)="addCustomExclusion()"
+            placeholder="z. B. Milch, Kiwi, Haselnüsse ..."
+            class="exclude-text-input"
+          />
+          @if (excludeSearchQuery().trim()) {
+            <button
+              type="button"
+              (click)="addCustomExclusion()"
+              class="add-btn"
+              id="btn-add-exclusion"
+            >
+              Hinzufügen
+            </button>
+          }
+        </div>
+
+        <!-- Auto-Suggestions Dropdown -->
+        @if (filteredSuggestions().length > 0) {
+          <div class="suggestions-dropdown animate-fade-in">
+            @for (sug of filteredSuggestions(); track sug.term) {
+              <div
+                class="suggestion-row"
+                (click)="selectSuggestion(sug)"
+                role="button"
+                tabindex="0"
+              >
+                <div class="sug-term-box">
+                  <strong>{{ sug.term }}</strong>
+                  <span class="sug-cat-badge">{{ sug.category }}</span>
+                </div>
+                <span class="sug-clarification">{{ sug.clarification }}</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Ausgeschlossene Zutaten Chips -->
+      @if (customExcludedFoods().length > 0) {
+        <div class="selected-exclusions-list">
+          @for (item of customExcludedFoods(); track item) {
+            <span class="exclusion-pill">
+              <span class="pill-name">{{ item }}</span>
+              <button
+                type="button"
+                (click)="removeExclusion(item)"
+                class="pill-remove-btn"
+                [attr.aria-label]="item + ' entfernen'"
+              >
+                ✕
+              </button>
+            </span>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- SECTION 5: Was magst du nicht? (Abneigungen) -->
+    <section class="dietary-section">
+      <div class="section-title-row">
+        <span class="section-badge">5</span>
+        <h2>Was magst du nicht?</h2>
+      </div>
+      <p class="section-desc">Geschmacksabneigungen (wird bei Rezeptvorschlägen nachrangig behandelt):</p>
+
+      <div class="chips-container">
+        @for (item of standardDislikes; track item) {
+          <button
+            type="button"
+            (click)="toggleDislike(item)"
+            class="filter-chip dislike-chip"
+            [class.active]="isDislikeSelected(item)"
+            [id]="'chip-dislike-' + item"
+          >
+            <span class="chip-check">{{ isDislikeSelected(item) ? '✕' : '+' }}</span>
+            <span class="chip-text">{{ item }}</span>
+          </button>
+        }
+      </div>
+
+      <div class="custom-dislike-row">
+        <input
+          id="customDislikeInput"
+          type="text"
+          [(ngModel)]="customDislikeInput"
+          (keydown.enter)="addCustomDislike()"
+          placeholder="Weitere Zutat eingeben (z. B. Rosenkohl) ..."
+          class="dislike-text-input"
+        />
+        @if (customDislikeInput.trim()) {
+          <button
+            type="button"
+            (click)="addCustomDislike()"
+            class="add-dislike-btn"
+          >
+            +
+          </button>
+        }
+      </div>
+    </section>
+  </main>
+
+  <!-- Sticky Footer Button -->
+  <footer class="dietary-footer">
+    <button
+      type="button"
+      (click)="saveAndContinue()"
+      [disabled]="isSaving"
+      class="continue-button"
+      id="btn-continue-to-meal-planner"
+    >
+      @if (isSaving) {
+        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+        <span>Wird gespeichert …</span>
+      } @else {
+        <span>Weiter zum Wochenplan</span>
+        <span class="btn-arrow">→</span>
+      }
+    </button>
+  </footer>
+</div>

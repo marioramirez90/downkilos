@@ -84,6 +84,6 @@ export class RetailersComponent implements OnInit {
     await this.retailerService.savePreference(pref);
     await this.storageService.saveWeeklyBudget(Number(this.weeklyBudget));
     this.storageService.setOnboardingStep('retailer-budget');
-    this.router.navigate(['/loading'], { queryParams: { step: 'dashboard' } });
+    this.router.navigate(['/dietary-profile']);
   }
 }

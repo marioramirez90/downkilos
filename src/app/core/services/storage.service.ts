@@ -7,12 +7,15 @@ const DB_NAME = 'down_kilos_db';
 const DB_VERSION = 1;
 const STORE_PROFILE = 'user_profile';
 const PROFILE_KEY = 'guest_profile';
+import { DietaryProfile, DEFAULT_DIETARY_PROFILE } from '../models/dietary-profile.model';
+
 const LOCAL_FALLBACK_KEY = 'down_kilos_guest_profile';
 const LOCAL_RETAILER_KEY = 'down_kilos_guest_retailer';
 const LOCAL_WEIGHT_KEY = 'down_kilos_weight_history';
 const LOCAL_ONBOARDING_KEY = 'down_kilos_onboarding_completed';
 const LOCAL_ONBOARDING_STEP_KEY = 'down_kilos_onboarding_step';
 const LOCAL_ONBOARDING_DRAFT_KEY = 'down_kilos_onboarding_draft';
+const LOCAL_DIETARY_PROFILE_KEY = 'down_kilos_dietary_profile';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +26,7 @@ export class StorageService {
   readonly retailerPref = signal<RetailerPreference | null>(null);
   readonly weightHistory = signal<WeightEntry[]>([]);
   readonly weeklyBudget = signal<number>(50);
+  readonly dietaryProfile = signal<DietaryProfile | null>(null);
 
   constructor() {
     this.initDatabase();
@@ -31,6 +35,7 @@ export class StorageService {
     });
     this.loadRetailerPreference();
     this.loadWeeklyBudget();
+    this.loadDietaryProfile();
   }
 
   loadWeeklyBudget(): number {
@@ -402,6 +407,51 @@ export class StorageService {
     }
   }
 
+  loadDietaryProfile(): DietaryProfile | null {
+    try {
+      const raw = localStorage.getItem(LOCAL_DIETARY_PROFILE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        this.dietaryProfile.set(parsed);
+        return parsed;
+      }
+    } catch {
+      // Ignore
+    }
+    return null;
+  }
+
+  saveDietaryProfile(profile: DietaryProfile): void {
+    try {
+      const toSave = {
+        ...profile,
+        updatedAt: new Date().toISOString()
+      };
+      localStorage.setItem(LOCAL_DIETARY_PROFILE_KEY, JSON.stringify(toSave));
+      this.dietaryProfile.set(toSave);
+
+      // Also sync allergies and dietary preference to UserProfile for backward compatibility
+      const currentProfile = this.profile();
+      if (currentProfile) {
+        const prefMap: Record<string, any> = {
+          omnivore: 'omnivore',
+          vegetarian: 'vegetarian',
+          vegan: 'vegan',
+          pescatarian: 'omnivore',
+          none: 'omnivore'
+        };
+        const updated = {
+          ...currentProfile,
+          dietaryPreference: prefMap[profile.dietaryForm] || 'omnivore',
+          allergies: [...profile.allergies, ...profile.intolerances]
+        };
+        this.saveProfile(updated);
+      }
+    } catch {
+      // Ignore quota errors
+    }
+  }
+
   async resetAllData(): Promise<boolean> {
     try {
       // 1. Lokale Benutzerspeicher entfernen (nur App-spezifische Nutzerdaten)
@@ -412,6 +462,7 @@ export class StorageService {
         LOCAL_ONBOARDING_KEY,
         LOCAL_ONBOARDING_STEP_KEY,
         LOCAL_ONBOARDING_DRAFT_KEY,
+        LOCAL_DIETARY_PROFILE_KEY,
         'down_kilos_today_food_log',
         'down_kilos_shopping_checked',
         'down_kilos_shopping_pantry',

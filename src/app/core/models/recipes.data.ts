@@ -12,15 +12,15 @@ export const RECIPES_DATA: Recipe[] = [
   // =========================================================================
   {
     id: 'rec-porridge-banana',
-    title: 'Porridge mit Banane',
-    subtitle: 'Haferflocken · Banane · Milch',
+    title: 'Porridge mit Banane & Beeren',
+    subtitle: 'Haferflocken · Banane · Beeren · Chiasamen',
     mealType: 'breakfast',
     dietType: 'vegetarian',
     imageUrl: 'images/meals/porridge-banana.jpg',
     prepTimeMinutes: 5,
     cookTimeMinutes: 5,
     difficulty: 'Einfach',
-    calories: 380,
+    calories: 420,
     protein: 15.2,
     carbs: 62.4,
     fat: 6.8,

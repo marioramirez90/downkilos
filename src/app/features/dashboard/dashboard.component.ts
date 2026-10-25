@@ -9,20 +9,12 @@ import { FoodLogService } from '../../core/services/food-log.service';
 import { ProductService } from '../../core/services/product.service';
 import { ShoppingListService } from '../../core/services/shopping-list.service';
 import { RetailerService } from '../../core/services/retailer.service';
-import { ProductItem } from '../../core/models/product.model';
+import { MealScheduleService } from '../../core/services/meal-schedule.service';
+import { MealPlannerService } from '../../core/services/meal-planner.service';
 import { UserProfile } from '../../core/models/user-profile.model';
 import { CalorieCalculationResult } from '../../core/models/calorie-calculation.model';
-import { MealType } from '../../core/models/recipe.model';
-import { FoodLogItem } from '../../core/models/food-log.model';
-
-export interface DashboardProductCard {
-  id: string;
-  name: string;
-  portionText: string;
-  caloriesText: string;
-  imageUrl: string;
-  product: ProductItem;
-}
+import { Recipe, MealType } from '../../core/models/recipe.model';
+import { WeightEntry } from '../../core/models/weight-log.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -37,32 +29,20 @@ export interface DashboardProductCard {
 })
 export class DashboardComponent implements OnInit {
   private router = inject(Router);
-  private storageService = inject(StorageService);
+  readonly storageService = inject(StorageService);
   private calorieService = inject(CalorieCalculatorService);
   private productService = inject(ProductService);
   private shoppingListService = inject(ShoppingListService);
   private retailerService = inject(RetailerService);
   readonly foodLogService = inject(FoodLogService);
+  readonly mealScheduleService = inject(MealScheduleService);
+  readonly mealPlannerService = inject(MealPlannerService);
 
   readonly profile = signal<UserProfile | null>(null);
   readonly calculation = signal<CalorieCalculationResult | null>(null);
-  readonly searchQuery = signal<string>('');
-  readonly marketLocation = signal<string>('Netto Marken-Discount');
   readonly toastMessage = signal<string | null>(null);
-
-  // Ernährungstagebuch State & Quick-Add Compatibility
-  readonly isDiaryOpen = signal<boolean>(false);
-  readonly selectedMealForAdd = signal<MealType | null>(null);
-  readonly addFoodMode = signal<'netto' | 'manual'>('netto');
-  readonly quickProductForAdd = signal<ProductItem | null>(null);
-  readonly nettoFilterQuery = signal<string>('');
-
-  readonly manualName = signal<string>('');
-  readonly manualCalories = signal<number | null>(null);
-  readonly manualPortion = signal<string>('1 Portion');
-
-  readonly diaryDate = signal<Date>(new Date());
-  readonly Math = Math;
+  readonly lastLoggedFoodId = signal<string | null>(null);
+  private toastTimeout: any = null;
 
   async ngOnInit(): Promise<void> {
     try {
@@ -73,7 +53,7 @@ export class DashboardComponent implements OnInit {
           name: 'Lisa',
           birthDate: '1992-06-15',
           gender: 'female',
-          currentWeight: 75,
+          currentWeight: 78.4,
           height: 168,
           targetWeight: 65,
           activityLevel: 'moderate',
@@ -89,15 +69,17 @@ export class DashboardComponent implements OnInit {
         this.calculation.set(calc);
       }
 
-      // Marktpräferenz laden
       await this.retailerService.loadPreference();
+      this.storageService.loadWeightHistory();
+      this.mealPlannerService.initPlan();
+      this.mealScheduleService.refreshCurrentTime();
     } catch (err) {
       console.warn('Dashboard init non-fatal error:', err);
     }
   }
 
   readonly userFirstName = computed(() => {
-    const p = this.profile();
+    const p = this.storageService.profile() || this.profile();
     if (!p || !p.name) return 'Lisa';
     return p.name.split(' ')[0];
   });
@@ -142,216 +124,131 @@ export class DashboardComponent implements OnInit {
     return Math.round(this.remainingKcal()).toLocaleString('de-DE');
   });
 
-  readonly discoverTitle = computed(() => {
+  // --- Dein Markt (Kompaktkarte rechts oben) ---
+  readonly currentRetailerName = computed(() => {
     const pref = this.storageService.retailerPref();
-    if (pref && pref.retailerName && pref.retailerId !== 'netto') {
-      return `Bei ${pref.retailerName} entdecken`;
+    if (pref && pref.retailerName) {
+      if (pref.retailerId === 'netto') return 'Netto';
+      return pref.retailerName;
     }
-    return 'Bei Netto entdecken';
+    return 'Netto';
   });
 
-  readonly featuredProducts = computed<DashboardProductCard[]>(() => {
-    const all = this.productService.products();
-    if (!all || all.length === 0) return [];
-
-    const result: DashboardProductCard[] = [];
-
-    // 1. Banane
-    const banana = all.find(p => p.id === 'netto-bananas-1kg');
-    if (banana) {
-      result.push({
-        id: banana.id,
-        name: 'Banane',
-        portionText: '1 Banane',
-        caloriesText: '≈ 95 kcal',
-        imageUrl: banana.imageUrl,
-        product: banana
-      });
-    }
-
-    // 2. Eier
-    const eggs = all.find(p => p.id === 'netto-eggs-10stk');
-    if (eggs) {
-      result.push({
-        id: eggs.id,
-        name: 'Eier',
-        portionText: '1 Ei',
-        caloriesText: '≈ 78 kcal',
-        imageUrl: 'images/products/eggs.jpg',
-        product: eggs
-      });
-    }
-
-    // 3. Skyr Natur
-    const skyr = all.find(p => p.id === 'netto-skyr-500');
-    if (skyr) {
-      result.push({
-        id: skyr.id,
-        name: 'Skyr Natur',
-        portionText: '1 Becher',
-        caloriesText: '≈ 150 kcal',
-        imageUrl: skyr.imageUrl,
-        product: skyr
-      });
-    }
-
-    // 4. Toastbrot Vollkorn
-    const toast = all.find(p => p.id === 'netto-toast-500');
-    if (toast) {
-      result.push({
-        id: toast.id,
-        name: 'Toastbrot Vollkorn',
-        portionText: '1 Scheibe',
-        caloriesText: '≈ 65 kcal',
-        imageUrl: 'images/products/toast.jpg',
-        product: toast
-      });
-    }
-
-    return result;
+  readonly isNettoRetailer = computed(() => {
+    const pref = this.storageService.retailerPref();
+    return !pref || pref.retailerId === 'netto';
   });
 
-  readonly formattedDiaryDate = computed(() => {
-    const d = this.diaryDate();
-    const now = new Date();
-    const isToday = now.getFullYear() === d.getFullYear() && now.getMonth() === d.getMonth() && now.getDate() === d.getDate();
-    const options: Intl.DateTimeFormatOptions = { weekday: 'short', day: 'numeric', month: 'short' };
-    const dateStr = d.toLocaleDateString('de-DE', options);
-    return isToday ? `Heute, ${dateStr}` : dateStr;
+  // --- Dein aktuelles Gewicht (Kompaktkarte rechts darunter) ---
+  readonly latestWeightEntry = computed<WeightEntry | null>(() => {
+    const history = this.storageService.weightHistory();
+    if (!history || history.length === 0) return null;
+    return [...history].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
   });
 
-  /**
-   * Navigiert zur separaten Lebensmittel-Erfassungsseite (Section 7).
-   */
+  readonly currentWeightKg = computed<number>(() => {
+    const latest = this.latestWeightEntry();
+    if (latest && typeof latest.weight === 'number' && !isNaN(latest.weight)) {
+      return latest.weight;
+    }
+    const prof = this.storageService.profile() || this.profile();
+    return prof?.currentWeight ?? 78.4;
+  });
+
+  readonly formattedCurrentWeight = computed(() => {
+    const w = this.currentWeightKg();
+    return w.toFixed(1).replace('.', ',') + ' kg';
+  });
+
+  readonly latestWeightUpdateText = computed(() => {
+    const latest = this.latestWeightEntry();
+    if (!latest) {
+      return 'Heute, 08:12';
+    }
+    const todayStr = new Date().toISOString().split('T')[0];
+    if (latest.date === todayStr || latest.date.startsWith(todayStr)) {
+      return 'Heute, 08:12';
+    }
+    const d = new Date(latest.date);
+    if (!isNaN(d.getTime())) {
+      return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+    }
+    return 'Heute';
+  });
+
+  // --- Aktives geplantes Rezept aus dem Wochenplan ---
+  readonly currentRecipe = computed<Recipe | null>(() => {
+    return this.mealScheduleService.plannedRecipeForActiveSlot();
+  });
+
+  readonly recipeIngredientsText = computed(() => {
+    const r = this.currentRecipe();
+    if (!r) return '';
+    if (r.subtitle) {
+      return r.subtitle.replace(/·/g, ',').replace(/\s+/g, ' ').trim();
+    }
+    if (r.ingredients && r.ingredients.length > 0) {
+      return r.ingredients.map(i => i.name.replace(/^Bio |^Zarte |^Frische /, '')).join(', ');
+    }
+    return '';
+  });
+
+  // --- Interaktionen & Navigation ---
+  openRecipe(recipeId: string | undefined): void {
+    if (!recipeId) return;
+    this.router.navigate(['/recipes', recipeId]);
+  }
+
+  private isLoggingMeal = false;
+
+  onAlreadyEatenClick(event: MouseEvent): void {
+    event.stopPropagation();
+    if (this.isLoggingMeal) return;
+    this.isLoggingMeal = true;
+    setTimeout(() => { this.isLoggingMeal = false; }, 800);
+
+    const createdId = this.mealScheduleService.markCurrentMealAsEaten();
+    if (createdId) {
+      this.lastLoggedFoodId.set(createdId);
+      this.showToast('Mahlzeit eingetragen.', true);
+    } else {
+      this.showToast('Diese Mahlzeit ist bereits als gegessen eingetragen.', false);
+    }
+  }
+
+  undoLastEaten(): void {
+    const id = this.lastLoggedFoodId();
+    if (id) {
+      this.mealScheduleService.undoEatenMeal(id);
+      this.lastLoggedFoodId.set(null);
+      this.showToast('Eintrag rückgängig gemacht.', false);
+    }
+  }
+
+  private showToast(msg: string, hasUndo: boolean): void {
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout);
+    }
+    this.toastMessage.set(msg);
+    this.toastTimeout = setTimeout(() => {
+      this.toastMessage.set(null);
+      this.lastLoggedFoodId.set(null);
+    }, hasUndo ? 5000 : 2500);
+  }
+
+  onRecipeImageError(event: Event): void {
+    const target = event.target as HTMLImageElement;
+    if (target) {
+      target.src = 'images/down-kilos-leaf.png';
+    }
+  }
+
   goToFoodDiary(): void {
     this.router.navigate(['/was-hast-du-gegessen']);
   }
 
-  /**
-   * Navigiert zur neuen Gewichtsseite (Section 11).
-   */
   goToWeight(): void {
     this.router.navigate(['/gewicht']);
-  }
-
-  openDiary(): void {
-    this.isDiaryOpen.set(true);
-    this.goToFoodDiary();
-  }
-
-  closeDiary(): void {
-    this.isDiaryOpen.set(false);
-    this.selectedMealForAdd.set(null);
-    this.quickProductForAdd.set(null);
-  }
-
-  previousDiaryDay(): void {
-    const d = new Date(this.diaryDate());
-    d.setDate(d.getDate() - 1);
-    this.diaryDate.set(d);
-  }
-
-  nextDiaryDay(): void {
-    const d = new Date(this.diaryDate());
-    d.setDate(d.getDate() + 1);
-    this.diaryDate.set(d);
-  }
-
-  openAddModal(mealType: MealType): void {
-    this.selectedMealForAdd.set(mealType);
-    this.addFoodMode.set('netto');
-    this.nettoFilterQuery.set('');
-    this.manualName.set('');
-    this.manualCalories.set(null);
-    this.manualPortion.set('1 Portion');
-  }
-
-  closeAddModal(): void {
-    this.selectedMealForAdd.set(null);
-  }
-
-  /**
-   * Plus-Button auf der Produktkarte:
-   * Fügt das jeweilige Produkt zur Einkaufsliste hinzu (Section 8).
-   */
-  onProductPlusClick(product: ProductItem, event: MouseEvent): void {
-    event.stopPropagation();
-    this.addToCart(product, event);
-  }
-
-  closeQuickAddModal(): void {
-    this.quickProductForAdd.set(null);
-  }
-
-  confirmQuickAddProduct(mealType: MealType): void {
-    const p = this.quickProductForAdd();
-    if (!p) return;
-
-    this.foodLogService.logProduct(p, mealType, undefined, 'eaten');
-    this.quickProductForAdd.set(null);
-    this.toastMessage.set(`✓ "${p.name}" zu ${this.getMealLabel(mealType)} hinzugefügt!`);
-    setTimeout(() => this.toastMessage.set(null), 2500);
-  }
-
-  submitManualFood(): void {
-    const name = this.manualName().trim();
-    const cals = this.manualCalories();
-    if (!name || cals === null || cals <= 0) return;
-
-    const meal = this.selectedMealForAdd() || 'snack';
-    this.foodLogService.addManualItem(name, cals, this.manualPortion().trim() || '1 Portion', meal, 'eaten');
-    this.closeAddModal();
-    this.toastMessage.set(`✓ "${name}" (${cals} kcal) zu ${this.getMealLabel(meal)} eingetragen!`);
-    setTimeout(() => this.toastMessage.set(null), 2500);
-  }
-
-  deleteFoodItem(id: string): void {
-    this.foodLogService.removeItem(id);
-    this.toastMessage.set('Eintrag gelöscht');
-    setTimeout(() => this.toastMessage.set(null), 2000);
-  }
-
-  getMealItems(mealType: MealType): FoodLogItem[] {
-    return this.foodLogService.getItemsForMeal(mealType);
-  }
-
-  getMealCalories(mealType: MealType): number {
-    return this.foodLogService.getCaloriesForMeal(mealType);
-  }
-
-  getMealLabel(mealType: MealType): string {
-    switch (mealType) {
-      case 'breakfast': return 'Frühstück';
-      case 'lunch': return 'Mittagessen';
-      case 'dinner': return 'Abendessen';
-      case 'snack': return 'Snacks & Getränke';
-      default: return mealType;
-    }
-  }
-
-  addToCart(product: ProductItem, event: MouseEvent): void {
-    event.stopPropagation();
-    this.shoppingListService.addProductToShoppingList(product);
-    this.toastMessage.set(`✓ "${product.name}" zur Einkaufsliste hinzugefügt!`);
-    setTimeout(() => {
-      this.toastMessage.set(null);
-    }, 2500);
-  }
-
-  openProduct(product: ProductItem): void {
-    this.router.navigate(['/discover'], { queryParams: { q: product.name } });
-  }
-
-  goToAllProducts(): void {
-    this.router.navigate(['/discover']);
-  }
-
-  goToShoppingList(): void {
-    this.router.navigate(['/shopping-list']);
-  }
-
-  goToRecipes(): void {
-    this.router.navigate(['/recipes']);
   }
 
   goToMarketSelection(): void {
@@ -362,12 +259,15 @@ export class DashboardComponent implements OnInit {
     this.router.navigate(['/settings']);
   }
 
-  onSearchSubmit(): void {
-    const q = this.searchQuery().trim();
-    if (q) {
-      this.router.navigate(['/discover'], { queryParams: { q } });
-    } else {
-      this.goToAllProducts();
-    }
+  goToShoppingList(): void {
+    this.router.navigate(['/shopping-list']);
+  }
+
+  goToMealPlanner(): void {
+    this.router.navigate(['/meal-planner']);
+  }
+
+  goToRecipes(): void {
+    this.router.navigate(['/recipes']);
   }
 }

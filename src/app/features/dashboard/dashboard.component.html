@@ -26,12 +26,12 @@
         </button>
       </div>
 
-      <!-- Große Begrüßung (ohne Emoji, exakt wie im Bild) -->
+      <!-- Große Begrüßung (exakt wie im Referenzbild) -->
       <h1 class="user-greeting-title">Hallo {{ userFirstName() }}!</h1>
       <p class="calorie-target-subtitle">Dein Kalorienziel für heute</p>
     </header>
 
-    <!-- 2. Hero-Bereich: Mehrfarbiger Kalorienring (Links) & Dein Markt (Rechts) -->
+    <!-- 2. Hero-Bereich: Kalorienring (Links) & Dein Markt + Aktuelles Gewicht (Rechts) -->
     <div class="hero-widgets-row">
       <!-- Links: Großer freistehender Kalorienring (Klickbar -> /was-hast-du-gegessen) -->
       <div
@@ -95,32 +95,69 @@
         </div>
       </div>
 
-      <!-- Rechts: Dein Markt Karte (Exakt wie im Bild: OHNE Adresse, OHNE PLZ) -->
-      <div class="market-card-widget">
-        <div class="market-top-row">
-          <span class="market-heading">Dein Markt</span>
-          <svg class="market-pin-icon" viewBox="0 0 24 24" fill="#278F39">
-            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/>
-          </svg>
-        </div>
-
-        <!-- Netto Gelbes Logo-Banner -->
-        <div class="netto-banner-box" (click)="goToMarketSelection()" role="button" tabindex="0" title="Markt ändern">
-          <div class="netto-badge-visual">
-            <span class="netto-main-text">Netto</span>
-            <span class="netto-sub-text">Marken-Discount</span>
+      <!-- Rechts: Zwei gestapelte Kompaktkarten (Dein Markt & Aktuelles Gewicht) -->
+      <div class="hero-side-cards">
+        <!-- Karte 1: Dein Markt (Kompakt, Klickbar -> /retailers) -->
+        <div
+          class="compact-info-card market-card"
+          (click)="goToMarketSelection()"
+          role="button"
+          tabindex="0"
+          title="Dein Markt ändern"
+          id="card-market"
+        >
+          <div class="compact-card-left">
+            <!-- Netto Gelbes Logo-Badge -->
+            <div class="netto-badge-visual">
+              <span class="netto-main-text">Netto</span>
+            </div>
+            <div class="compact-card-texts">
+              <span class="compact-label">Dein Markt</span>
+              <strong class="compact-title">{{ currentRetailerName() }}</strong>
+            </div>
           </div>
-          <span class="netto-chevron">›</span>
+          <span class="compact-chevron">›</span>
         </div>
 
-        <!-- Ändern Link (rechtsbündig, keine Adresse, keine PLZ) -->
-        <div class="market-bottom-row">
-          <button type="button" (click)="goToMarketSelection()" class="change-link">Ändern</button>
+        <!-- Karte 2: Dein aktuelles Gewicht (Kompakt, Klickbar -> /gewicht) -->
+        <div
+          class="compact-info-card weight-card"
+          (click)="goToWeight()"
+          role="button"
+          tabindex="0"
+          title="Gewicht eintragen"
+          id="card-weight"
+        >
+          <div class="weight-card-main-row">
+            <div class="compact-card-left">
+              <!-- Waage-Icon im abgerundeten Quadrat -->
+              <div class="scale-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="5" ry="5"></rect>
+                  <circle cx="12" cy="8" r="2.5"></circle>
+                  <path d="M12 7v1.5"></path>
+                </svg>
+              </div>
+              <div class="compact-card-texts">
+                <span class="compact-label">Dein aktuelles Gewicht</span>
+                <strong class="compact-title">{{ formattedCurrentWeight() }}</strong>
+              </div>
+            </div>
+            <span class="compact-chevron">›</span>
+          </div>
+
+          <!-- Unterzeile: Letzte Aktualisierung mit Refresh-Icon -->
+          <div class="weight-card-sub-row">
+            <span class="update-subtext">Letzte Aktualisierung: {{ latestWeightUpdateText() }}</span>
+            <svg class="refresh-sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.19"/>
+            </svg>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- 3. Bereits gegessen und Noch verfügbar Karte -->
+    <!-- 3. Bereits gegessen und Noch verfügbar Karte (Exakt wie im Bild) -->
     <div class="status-summary-card">
       <!-- Links: Bereits gegessen mit Besteck-Icon (Vollständig klickbar -> /was-hast-du-gegessen) -->
       <div
@@ -130,7 +167,7 @@
         role="button"
         tabindex="0"
         aria-label="Bereits gegessen: Was hast du heute gegessen?"
-        title="Tippen um Lebensmittel einzutragen"
+        title="Tippen um Ernährungstagebuch zu öffnen"
       >
         <div class="icon-circle cutlery-circle">
           <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
@@ -149,7 +186,7 @@
       <!-- Vertikaler Teiler -->
       <div class="status-divider"></div>
 
-      <!-- Rechts: Noch verfügbar mit Flammen-Icon (NICHT klickbar, nur Info) -->
+      <!-- Rechts: Noch verfügbar mit Flammen-Icon -->
       <div class="status-col remaining-col">
         <div class="icon-circle flame-circle">
           <svg viewBox="0 0 24 24" fill="#278F39">
@@ -163,45 +200,114 @@
       </div>
     </div>
 
-    <!-- 4. "Bei Netto entdecken" Horizontale Lebensmittelkarten -->
-    <section class="discover-products-section">
-      <div class="section-title-row">
-        <h2 class="section-heading">{{ discoverTitle() }}</h2>
-        <a (click)="goToAllProducts()" class="see-all-link">Alle Produkte ›</a>
-      </div>
-      <p class="section-desc">Produkte mit wenig Kalorien, passend zu deinem Ziel.</p>
-
-      <!-- Horizontale Scrollleiste mit Produktkarten -->
-      <div class="horizontal-cards-track">
-        @for (item of featuredProducts(); track item.id) {
-          <div class="product-tile-card" (click)="openProduct(item.product)" role="button" tabindex="0">
-            <div class="product-thumb-box">
-              <img [src]="item.imageUrl" [alt]="item.name" loading="lazy" />
-            </div>
-
-            <h3 class="tile-title">{{ item.name }}</h3>
-            <span class="tile-portion">{{ item.portionText }}</span>
-
-            <div class="tile-bottom-line">
-              <span class="tile-cals">{{ item.caloriesText }}</span>
-              <button
-                type="button"
-                (click)="onProductPlusClick(item.product, $event)"
-                class="tile-add-btn"
-                title="Zur Einkaufsliste hinzufügen"
-                aria-label="Zur Einkaufsliste hinzufügen"
-              >
-                +
-              </button>
-            </div>
+    <!-- 4. NEUER HAUPTBEREICH: TAGESAKTUELLES REZEPT -->
+    <section class="daily-meal-section">
+      <!-- Dynamische Überschriftenzeile: Links Mahlzeit + Tag, Rechts Uhrzeit -->
+      <div class="meal-header-row">
+        <h2 class="meal-section-title">{{ mealScheduleService.dynamicHeading() }}</h2>
+        @if (mealScheduleService.dynamicTimeRangeText(); as timeText) {
+          <div class="meal-time-badge">
+            <svg class="clock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>{{ timeText }}</span>
           </div>
         }
       </div>
+      <p class="meal-section-subtitle">Passend zu deiner Uhrzeit und deinem Plan.</p>
+
+      <!-- Großes Rezeptkarten-Design (Exakt wie im Referenzbild) -->
+      @if (currentRecipe(); as recipe) {
+        <div class="featured-recipe-card" id="current-recipe-card">
+          <!-- Großes Rezeptbild (Klickbar -> Rezeptdetailseite) -->
+          <div
+            class="recipe-image-wrap"
+            (click)="openRecipe(recipe.id)"
+            role="button"
+            tabindex="0"
+            title="Rezept öffnen"
+          >
+            <img
+              [src]="recipe.imageUrl"
+              [alt]="recipe.title"
+              class="recipe-img"
+              (error)="onRecipeImageError($event)"
+            />
+          </div>
+
+          <!-- Unterer Inhaltsbereich mit Titel, Zutaten, Kalorien und "Schon gegessen"-Button -->
+          <div class="recipe-card-content">
+            <div class="recipe-info-left">
+              <h3
+                class="recipe-title"
+                (click)="openRecipe(recipe.id)"
+                role="button"
+                tabindex="0"
+                title="Rezeptdetails öffnen"
+              >
+                {{ recipe.title }}
+              </h3>
+              @if (recipeIngredientsText(); as ingredients) {
+                <p class="recipe-ingredients-preview">{{ ingredients }}</p>
+              }
+              <span class="recipe-calories-text">ca. {{ recipe.calories }} kcal</span>
+            </div>
+
+            <!-- Grüner Button "✓ Schon gegessen" (Pillen-Design) -->
+            <button
+              type="button"
+              (click)="onAlreadyEatenClick($event)"
+              class="already-eaten-btn"
+              id="btn-schon-gegessen"
+              aria-label="Als gegessen markieren"
+            >
+              <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span>Schon gegessen</span>
+            </button>
+          </div>
+        </div>
+      } @else if (mealScheduleService.activeMealSlot() === 'all_completed') {
+        <!-- Tagesabschluss: Alle Mahlzeiten für heute bereits erfasst -->
+        <div class="day-completed-card">
+          <div class="completed-icon-circle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+          <h3 class="completed-title">Alle Mahlzeiten für heute eingetragen!</h3>
+          <p class="completed-text">Du hast heute alle geplanten Mahlzeiten im Tagebuch erfasst. Sehr gut gemacht!</p>
+          <div class="completed-actions">
+            <button type="button" (click)="goToMealPlanner()" class="completed-btn outline">Wochenplan ansehen</button>
+            <button type="button" (click)="goToFoodDiary()" class="completed-btn solid">Tagebuch öffnen</button>
+          </div>
+        </div>
+      } @else {
+        <!-- Keine Mahlzeit für diesen Slot geplant -->
+        <div class="empty-meal-card">
+          <div class="empty-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#66716D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+          </div>
+          <h3 class="empty-title">Für diese Mahlzeit ist noch kein Rezept geplant.</h3>
+          <p class="empty-desc">Wähle jetzt ein Rezept aus deinem Wochenplan aus, um dein Kalorienziel einzuhalten.</p>
+          <button type="button" (click)="goToMealPlanner()" class="select-recipe-btn" id="btn-select-recipe">
+            Rezept auswählen
+          </button>
+        </div>
+      }
     </section>
 
-    <!-- 5. Große Aktionsbuttons (Suchleiste entfernt!) -->
+    <!-- 5. Große Aktionsbuttons (Exakt wie im Referenzbild) -->
     <div class="action-buttons-stack">
-      <!-- Großer grüner Einkaufslisten-Button -->
+      <!-- 1. Großer grüner Button: Einkaufsliste öffnen -->
       <button
         type="button"
         (click)="goToShoppingList()"
@@ -216,31 +322,33 @@
         <span>Einkaufsliste öffnen →</span>
       </button>
 
-      <!-- Zweiter Button: Mein aktuelles Gewicht (ersetzt Rezepte entdecken) -->
+      <!-- 2. Großer hellgrüner Button: Weitere Rezepte -->
       <button
         type="button"
-        (click)="goToWeight()"
-        class="open-weight-button"
-        id="btn-open-weight"
+        (click)="goToMealPlanner()"
+        class="open-recipes-button"
+        id="btn-more-recipes"
       >
-        <svg class="btn-icon-scale" viewBox="0 0 24 24" fill="none" stroke="#005333" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="3" width="18" height="18" rx="5" ry="5"></rect>
-          <circle cx="12" cy="8" r="2.5"></circle>
-          <path d="M12 7v1.5"></path>
+        <svg class="btn-icon-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
         </svg>
-        <span>Mein aktuelles Gewicht →</span>
+        <span>Weitere Rezepte →</span>
       </button>
     </div>
   </main>
 
-  <!-- Toast Notification -->
+  <!-- Interaktives Toast-Popup mit "Rückgängig" -->
   @if (toastMessage(); as msg) {
-    <div class="dashboard-toast-popup">
-      <span>{{ msg }}</span>
+    <div class="dashboard-toast-popup" role="status" aria-live="polite">
+      <span class="toast-text">{{ msg }}</span>
+      @if (lastLoggedFoodId()) {
+        <button type="button" (click)="undoLastEaten()" class="toast-undo-btn">Rückgängig</button>
+      }
     </div>
   }
 
-  <!-- 6. Dauerhaft sichtbare untere Navigation (5 Punkte) -->
+  <!-- 6. Dauerhaft sichtbare untere Navigation (5 Menüpunkte) -->
   <footer class="dashboard-footer-nav">
     <app-bottom-nav></app-bottom-nav>
   </footer>

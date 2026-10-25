@@ -11,9 +11,9 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  max-width: 480px;
+  max-width: 440px;
   margin: 0 auto;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: #102521;
 }
 
@@ -25,7 +25,7 @@
   padding: 10px 16px 14px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   -webkit-overflow-scrolling: touch;
 
   &::-webkit-scrollbar {
@@ -64,8 +64,8 @@
     }
 
     .settings-btn {
-      width: 32px;
-      height: 32px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       background: transparent;
       border: none;
@@ -74,22 +74,26 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: opacity 0.2s ease;
+      transition: opacity 0.2s ease, transform 0.15s ease;
 
       svg {
-        width: 20px;
-        height: 20px;
+        width: 22px;
+        height: 22px;
       }
 
       &:hover {
         opacity: 0.75;
+      }
+
+      &:active {
+        transform: rotate(45deg);
       }
     }
   }
 
   .user-greeting-title {
     margin: 6px 0 1px;
-    font-size: 1.8rem;
+    font-size: 1.85rem;
     font-weight: 900;
     color: #102521;
     letter-spacing: -0.03em;
@@ -104,20 +108,20 @@
   }
 }
 
-// 4. Hero Widgets: Kalorienring (Links) & Dein Markt (Rechts)
+// 4. Hero Widgets: Kalorienring (Links) & 2 Gestapelte Karten (Rechts)
 .hero-widgets-row {
   display: grid;
-  grid-template-columns: 165px 1fr;
+  grid-template-columns: 160px 1fr;
   gap: 12px;
   align-items: stretch;
 
   @media (max-width: 375px) {
-    grid-template-columns: 155px 1fr;
+    grid-template-columns: 148px 1fr;
     gap: 10px;
   }
 
   @media (max-width: 350px) {
-    grid-template-columns: 140px 1fr;
+    grid-template-columns: 136px 1fr;
     gap: 8px;
   }
 
@@ -146,21 +150,21 @@
 
     .ring-svg-container {
       position: relative;
-      width: 160px;
-      height: 160px;
+      width: 156px;
+      height: 156px;
       max-width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
 
       @media (max-width: 375px) {
-        width: 150px;
-        height: 150px;
+        width: 144px;
+        height: 144px;
       }
 
       @media (max-width: 350px) {
-        width: 136px;
-        height: 136px;
+        width: 132px;
+        height: 132px;
       }
 
       .ring-svg {
@@ -168,14 +172,14 @@
         height: 100%;
         overflow: visible;
 
-        // 1. Hellgrüner Grundkreis
+        // 1. Hellgrüner Grundkreis (#E2EBE3)
         .ring-bg-track {
           fill: none;
           stroke: #E2EBE3;
           stroke-width: 18;
         }
 
-        // 2. Heller, kräftig grüner Bogen
+        // 2. Heller, kräftig grüner Bogen (#39CD50)
         .ring-arc-bright {
           fill: none;
           stroke: #39CD50;
@@ -183,7 +187,7 @@
           stroke-linecap: round;
         }
 
-        // 3. Dunkelgrüner Bogen
+        // 3. Dunkelgrüner Bogen (#005333)
         .ring-arc-dark {
           fill: none;
           stroke: #005333;
@@ -210,10 +214,10 @@
         justify-content: center;
         text-align: center;
         pointer-events: none;
-        padding: 8px;
+        padding: 6px;
 
         .ring-number {
-          font-size: clamp(1.45rem, 4.5vw, 1.85rem);
+          font-size: clamp(1.4rem, 4.4vw, 1.75rem);
           font-weight: 900;
           color: #102521;
           line-height: 1.05;
@@ -222,123 +226,162 @@
         }
 
         .ring-unit {
-          font-size: clamp(0.78rem, 2.5vw, 0.9rem);
+          font-size: clamp(0.75rem, 2.4vw, 0.88rem);
           font-weight: 800;
           color: #102521;
           margin-top: 1px;
         }
 
         .ring-sub {
-          font-size: clamp(0.68rem, 2.2vw, 0.76rem);
+          font-size: clamp(0.65rem, 2.1vw, 0.74rem);
           font-weight: 600;
           color: #66716D;
-          margin-top: 2px;
+          margin-top: 1px;
         }
       }
     }
   }
 
-  // Dein Markt Widget (Exakt wie im Bild)
-  .market-card-widget {
-    background-color: #F0F8F2;
-    border: 1.5px solid #D6EFE0;
-    border-radius: 18px;
-    padding: 10px 12px;
+  // Rechte Spalte: Zwei gestapelte Kompaktkarten (Dein Markt & Aktuelles Gewicht)
+  .hero-side-cards {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: 140px;
+    gap: 8px;
 
-    .market-top-row {
+    .compact-info-card {
+      background-color: #F8FAF8;
+      border: 1px solid #E5EBE6;
+      border-radius: 16px;
+      padding: 8px 10px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-
-      .market-heading {
-        font-size: 0.88rem;
-        font-weight: 700;
-        color: #102521;
-      }
-
-      .market-pin-icon {
-        width: 17px;
-        height: 17px;
-      }
-    }
-
-    .netto-banner-box {
-      background-color: #FFE600;
-      border-radius: 9px;
-      padding: 6px 9px;
-      margin: 6px 0;
+      justify-content: space-between;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 
       &:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+        background-color: #F0F6F1;
+        box-shadow: 0 2px 6px rgba(16, 37, 33, 0.04);
       }
 
-      .netto-badge-visual {
+      &:active {
+        transform: scale(0.98);
+      }
+
+      .compact-card-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .compact-card-texts {
         display: flex;
         flex-direction: column;
-        align-items: flex-start;
+
+        .compact-label {
+          font-size: 0.68rem;
+          color: #66716D;
+          font-weight: 500;
+          line-height: 1.15;
+        }
+
+        .compact-title {
+          font-size: 0.95rem;
+          font-weight: 800;
+          color: #102521;
+          line-height: 1.2;
+        }
+      }
+
+      .compact-chevron {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #A3AFA8;
+        line-height: 1;
+        margin-left: 4px;
+      }
+
+      // Netto Badge
+      .netto-badge-visual {
+        background-color: #FFE600;
+        border-radius: 6px;
+        padding: 3px 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
 
         .netto-main-text {
-          font-size: 1.25rem;
+          font-size: 1.15rem;
           font-weight: 900;
           font-style: italic;
           color: #E30613;
           line-height: 1;
           letter-spacing: -0.03em;
         }
+      }
 
-        .netto-sub-text {
-          font-size: 0.54rem;
-          font-weight: 800;
-          color: #E30613;
-          margin-top: 1px;
-          letter-spacing: -0.01em;
+      // Waage Icon Box
+      .scale-icon-box {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background-color: #EAF5EC;
+        color: #278F39;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        svg {
+          width: 18px;
+          height: 18px;
         }
       }
 
-      .netto-chevron {
-        font-size: 1.15rem;
-        font-weight: 700;
-        color: rgba(16, 37, 33, 0.45);
-      }
-    }
+      // Gewicht-Karte spezifisch
+      &.weight-card {
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: center;
 
-    .market-bottom-row {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
+        .weight-card-main-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
 
-      .change-link {
-        color: #278F39;
-        font-size: 0.8rem;
-        font-weight: 600;
-        background: none;
-        border: none;
-        padding: 0;
-        cursor: pointer;
-        text-decoration: underline;
+        .weight-card-sub-row {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          margin-top: 3px;
+          padding-left: 40px;
 
-        &:hover {
-          color: #1B6A2A;
+          .update-subtext {
+            font-size: 0.62rem;
+            color: #788581;
+            font-weight: 500;
+            white-space: nowrap;
+          }
+
+          .refresh-sub-icon {
+            width: 10px;
+            height: 10px;
+            color: #788581;
+            flex-shrink: 0;
+          }
         }
       }
     }
   }
 }
 
-// 5. Bereits gegessen und Noch verfügbar Karte
+// 5. Bereits gegessen und Noch verfügbar Karte (Exakt wie im Bild)
 .status-summary-card {
-  background-color: #F4FAF5;
-  border: 1px solid #D8EFE0;
+  background-color: #F0F8F2;
+  border: 1px solid #D6EFE0;
   border-radius: 18px;
   padding: 10px 14px;
   display: flex;
@@ -358,7 +401,7 @@
       transition: background-color 0.15s ease;
 
       &:hover {
-        background-color: rgba(39, 143, 57, 0.06);
+        background-color: rgba(39, 143, 57, 0.08);
       }
 
       &:focus-visible {
@@ -388,7 +431,7 @@
       flex-direction: column;
 
       .status-label {
-        font-size: 0.74rem;
+        font-size: 0.72rem;
         color: #66716D;
         font-weight: 500;
       }
@@ -398,7 +441,6 @@
         font-weight: 800;
         color: #102521;
         line-height: 1.15;
-        letter-spacing: -0.01em;
       }
     }
   }
@@ -406,238 +448,428 @@
   .status-divider {
     width: 1px;
     height: 32px;
-    background-color: #D3E7D8;
+    background-color: #D2E8D8;
     margin: 0 10px;
   }
 }
 
-// 6. "Bei Netto entdecken" Horizontale Produktkarten
-.discover-products-section {
+// 6. NEUER HAUPTBEREICH: TAGESAKTUELLES REZEPT
+.daily-meal-section {
   display: flex;
   flex-direction: column;
-  margin-top: 2px;
 
-  .section-title-row {
+  .meal-header-row {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
+    gap: 8px;
 
-    .section-heading {
-      font-size: 1.18rem;
+    .meal-section-title {
+      font-size: 1.15rem;
       font-weight: 800;
       color: #102521;
       margin: 0;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.01em;
     }
 
-    .see-all-link {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: #278F39;
-      cursor: pointer;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-  }
-
-  .section-desc {
-    margin: 1px 0 8px;
-    font-size: 0.8rem;
-    color: #66716D;
-  }
-
-  .horizontal-cards-track {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    padding-bottom: 4px;
-    -webkit-overflow-scrolling: touch;
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
-
-    .product-tile-card {
-      flex: 0 0 110px;
-      background-color: #FFFFFF;
-      border: 1px solid #EBF1EC;
-      border-radius: 16px;
-      padding: 8px 6px 8px;
+    .meal-time-badge {
       display: flex;
-      flex-direction: column;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-      cursor: pointer;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #66716D;
+      white-space: nowrap;
 
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
-        border-color: #D2EBD7;
+      .clock-icon {
+        width: 14px;
+        height: 14px;
+        stroke: #66716D;
       }
+    }
+  }
 
-      .product-thumb-box {
+  .meal-section-subtitle {
+    margin: 2px 0 10px;
+    font-size: 0.78rem;
+    color: #66716D;
+    font-weight: 400;
+  }
+
+  // Große Rezeptkarte
+  .featured-recipe-card {
+    background-color: #FFFFFF;
+    border: 1px solid #E2EBE4;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 3px 12px rgba(16, 37, 33, 0.04);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+    .recipe-image-wrap {
+      width: 100%;
+      height: 185px;
+      overflow: hidden;
+      cursor: pointer;
+      background-color: #F0F4F1;
+
+      .recipe-img {
         width: 100%;
-        height: 65px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 4px;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.3s ease;
 
-        img {
-          max-width: 100%;
-          max-height: 100%;
-          object-fit: contain;
+        &:hover {
+          transform: scale(1.02);
         }
       }
+    }
 
-      .tile-title {
-        font-size: 0.78rem;
-        font-weight: 700;
-        color: #102521;
-        margin: 0;
-        line-height: 1.2;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
+    .recipe-card-content {
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
 
-      .tile-portion {
-        font-size: 0.68rem;
-        color: #66716D;
-        margin-top: 1px;
-      }
-
-      .tile-bottom-line {
+      .recipe-info-left {
+        flex: 1;
+        min-width: 0;
         display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-top: 4px;
+        flex-direction: column;
 
-        .tile-cals {
-          font-size: 0.74rem;
+        .recipe-title {
+          font-size: 0.95rem;
+          font-weight: 800;
+          color: #102521;
+          margin: 0;
+          line-height: 1.2;
+          cursor: pointer;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          transition: color 0.15s ease;
+
+          &:hover {
+            color: #278F39;
+          }
+        }
+
+        .recipe-ingredients-preview {
+          font-size: 0.73rem;
+          color: #66716D;
+          margin: 3px 0 2px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .recipe-calories-text {
+          font-size: 0.76rem;
           font-weight: 700;
           color: #102521;
         }
+      }
 
-        .tile-add-btn {
-          width: 24px;
-          height: 24px;
-          border-radius: 50%;
-          background-color: #E5F5E8;
-          color: #278F39;
-          font-size: 1.05rem;
-          font-weight: 700;
-          border: none;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: background-color 0.15s ease, transform 0.15s ease;
+      .already-eaten-btn {
+        background-color: #EAF5EC;
+        border: 1.5px solid #278F39;
+        border-radius: 999px;
+        padding: 7px 13px;
+        color: #278F39;
+        font-size: 0.76rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        flex-shrink: 0;
+
+        .check-icon {
+          width: 14px;
+          height: 14px;
+        }
+
+        &:hover {
+          background-color: #DCF2E0;
+          border-color: #217A30;
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+    }
+  }
+
+  // Zustand: Alle Mahlzeiten für heute erledigt
+  .day-completed-card {
+    background-color: #F4FAF5;
+    border: 1px solid #D5EBD9;
+    border-radius: 20px;
+    padding: 22px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    .completed-icon-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: #E5F5E8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+
+      svg {
+        width: 26px;
+        height: 26px;
+      }
+    }
+
+    .completed-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #102521;
+      margin: 0 0 4px;
+    }
+
+    .completed-text {
+      font-size: 0.78rem;
+      color: #66716D;
+      margin: 0 0 16px;
+      max-width: 280px;
+    }
+
+    .completed-actions {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+
+      .completed-btn {
+        flex: 1;
+        padding: 10px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.15s ease;
+
+        &.outline {
+          background-color: #FFFFFF;
+          border: 1.5px solid #D0E7D4;
+          color: #102521;
 
           &:hover {
-            background-color: #278F39;
-            color: #FFFFFF;
-            transform: scale(1.08);
+            background-color: #F0F8F2;
+          }
+        }
+
+        &.solid {
+          background-color: #278F39;
+          border: none;
+          color: #FFFFFF;
+
+          &:hover {
+            background-color: #217A30;
           }
         }
       }
     }
   }
+
+  // Zustand: Noch kein Rezept geplant
+  .empty-meal-card {
+    background-color: #FFFFFF;
+    border: 1px dashed #D0DDD4;
+    border-radius: 20px;
+    padding: 22px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    .empty-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background-color: #F0F5F1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+
+      svg {
+        width: 22px;
+        height: 22px;
+      }
+    }
+
+    .empty-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #102521;
+      margin: 0 0 4px;
+    }
+
+    .empty-desc {
+      font-size: 0.75rem;
+      color: #66716D;
+      margin: 0 0 14px;
+      max-width: 260px;
+    }
+
+    .select-recipe-btn {
+      background-color: #278F39;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 18px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+
+      &:hover {
+        background-color: #217A30;
+      }
+
+      &:active {
+        transform: scale(0.96);
+      }
+    }
+  }
 }
 
-// 7. Große Aktionsbuttons
+// 7. Große Aktionsbuttons (Exakt wie im Referenzbild)
 .action-buttons-stack {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-top: 2px;
 
   .open-cart-button {
     width: 100%;
-    height: 48px;
-    border-radius: 9999px;
     background-color: #278F39;
     color: #FFFFFF;
-    font-size: 0.94rem;
-    font-weight: 700;
     border: none;
-    cursor: pointer;
+    border-radius: 16px;
+    padding: 13px 16px;
+    font-size: 0.95rem;
+    font-weight: 800;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 9px;
-    box-shadow: 0 4px 14px rgba(39, 143, 57, 0.28);
-    transition: all 0.2s ease;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(39, 143, 57, 0.22);
+    transition: all 0.15s ease;
+
+    .btn-icon-cart {
+      width: 20px;
+      height: 20px;
+    }
 
     &:hover {
       background-color: #217A30;
-      transform: translateY(-1px);
+      box-shadow: 0 5px 14px rgba(39, 143, 57, 0.28);
     }
 
     &:active {
-      transform: translateY(0);
-    }
-
-    .btn-icon-cart {
-      width: 19px;
-      height: 19px;
+      transform: scale(0.98);
     }
   }
 
-  .open-weight-button {
+  .open-recipes-button {
     width: 100%;
-    height: 48px;
-    border-radius: 9999px;
-    background-color: #E5F5E8;
-    color: #005333;
-    font-size: 0.94rem;
-    font-weight: 700;
-    border: none;
-    cursor: pointer;
+    background-color: #EAF5EC;
+    color: #103A2A;
+    border: 1.5px solid #D0E7D4;
+    border-radius: 16px;
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    font-weight: 800;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 9px;
-    transition: all 0.2s ease;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    .btn-icon-book {
+      width: 20px;
+      height: 20px;
+      color: #278F39;
+    }
 
     &:hover {
-      background-color: #D8EFE0;
-      transform: translateY(-1px);
+      background-color: #DCEFE0;
     }
 
     &:active {
-      transform: translateY(0);
-    }
-
-    .btn-icon-scale {
-      width: 19px;
-      height: 19px;
+      transform: scale(0.98);
     }
   }
 }
 
-// 8. Feste untere Navigation
+// 8. Toast-Popup mit Rückgängig-Button
+.dashboard-toast-popup {
+  position: absolute;
+  bottom: 68px;
+  left: 20px;
+  right: 20px;
+  background-color: #102521;
+  color: #FFFFFF;
+  padding: 11px 16px;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  z-index: 100;
+  animation: toastSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+  .toast-text {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .toast-undo-btn {
+    background-color: #278F39;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: #31BC45;
+    }
+  }
+}
+
+@keyframes toastSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// 9. Untere Navigation (Dauerhaft sichtbar)
 .dashboard-footer-nav {
   flex-shrink: 0;
   background-color: #FFFFFF;
-  border-top: 1px solid #EBF1EC;
-}
-
-// Toast Popup
-.dashboard-toast-popup {
-  position: fixed;
-  bottom: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #102521;
-  color: #FFFFFF;
-  padding: 10px 20px;
-  border-radius: 9999px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
-  z-index: 999;
-  white-space: nowrap;
+  border-top: 1px solid #F0F4F1;
+  z-index: 20;
 }

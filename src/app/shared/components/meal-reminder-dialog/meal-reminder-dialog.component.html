@@ -1,0 +1,74 @@
+@if (promptData(); as data) {
+  <div class="reminder-modal-backdrop" (click)="close()">
+    <div class="reminder-modal-card" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+      <!-- Schließen-Button -->
+      <button type="button" class="close-btn" (click)="close()" aria-label="Schließen">✕</button>
+
+      <!-- Glocken-Icon mit Pulse-Effekt -->
+      <div class="reminder-icon-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+      </div>
+
+      <!-- Mahlzeiten-Badge -->
+      <span class="meal-badge">{{ mealLabel() }}</span>
+
+      <!-- Titel -->
+      <h2 class="reminder-title">{{ titleText() }}</h2>
+
+      <!-- Geplante Speise Info -->
+      <p class="reminder-desc">
+        Du hattest <strong>{{ plannedTitle() }}</strong> geplant.<br>
+        Was hast du tatsächlich gegessen?
+      </p>
+
+      <!-- Drei Aktionen (Exakt wie in der Spezifikation) -->
+      <div class="reminder-actions-stack">
+        <!-- 1. Ja, wie geplant -->
+        <button
+          type="button"
+          (click)="onConfirmPlanned()"
+          class="action-btn as-planned"
+          id="btn-reminder-as-planned"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="action-icon">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Ja, wie geplant</span>
+        </button>
+
+        <!-- 2. Etwas anderes -->
+        <button
+          type="button"
+          (click)="onSelectAlternative()"
+          class="action-btn something-else"
+          id="btn-reminder-something-else"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="action-icon">
+            <path d="M18 2v6a3 3 0 0 1-3 3 3 3 0 0 1-3-3V2"></path>
+            <path d="M15 11v11"></path>
+            <path d="M6 2v7a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V2"></path>
+            <path d="M8 11v11"></path>
+          </svg>
+          <span>Ich habe etwas anderes gegessen</span>
+        </button>
+
+        <!-- 3. Noch nichts gegessen -->
+        <button
+          type="button"
+          (click)="onNothingYet()"
+          class="action-btn nothing-yet"
+          id="btn-reminder-nothing-yet"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="action-icon">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>Ich habe noch nichts gegessen</span>
+        </button>
+      </div>
+    </div>
+  </div>
+}

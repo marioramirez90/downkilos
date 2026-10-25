@@ -1,0 +1,211 @@
+<div class="alternative-screen">
+  <!-- Header -->
+  <header class="alt-header">
+    <div class="header-top">
+      <button type="button" (click)="goBack()" class="back-btn" id="btn-alt-back" aria-label="Zurück">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Zurück</span>
+      </button>
+    </div>
+
+    <h1 class="alt-title">Was hast du stattdessen gegessen?</h1>
+    <p class="alt-subtitle">Suche dein Lebensmittel und gib die gegessene Menge an.</p>
+
+    <!-- Info-Badge: Ersetzt die geplante Mahlzeit -->
+    <div class="replacement-info-badge">
+      <span class="badge-slot">Ersetzt {{ mealLabel() }}</span>
+      @if (plannedRecipe(); as recipe) {
+        <span class="badge-planned">Geplant: {{ recipe.title }}</span>
+      }
+    </div>
+  </header>
+
+  <!-- Scrollbarer Bereich -->
+  <main class="alt-content">
+    <!-- Ausgewählte Lebensmittel (Warenkorb/Liste) -->
+    @if (selectedItems().length > 0) {
+      <section class="selected-items-section">
+        <div class="section-title-row">
+          <h2 class="section-heading">Deine Auswahl ({{ selectedItems().length }})</h2>
+          <span class="total-cal-tag">{{ totalCalories() }} kcal gesamt</span>
+        </div>
+
+        <div class="selected-cards-list">
+          @for (item of selectedItems(); track item.id; let idx = $index) {
+            <div class="selected-card">
+              <img [src]="item.imageUrl" [alt]="item.name" class="item-thumb" />
+
+              <div class="item-details">
+                <strong class="item-name">{{ item.name }}</strong>
+                @if (item.brand) {
+                  <span class="item-brand">{{ item.brand }}</span>
+                }
+                <div class="item-quantity-row">
+                  <button type="button" (click)="updateItemCount(idx, -1)" class="qty-btn" aria-label="Weniger">−</button>
+                  <span class="qty-text">{{ item.quantityText }}</span>
+                  <button type="button" (click)="updateItemCount(idx, 1)" class="qty-btn" aria-label="Mehr">+</button>
+                </div>
+              </div>
+
+              <div class="item-cals-col">
+                <strong class="item-calories">{{ item.calories }} kcal</strong>
+                <button type="button" (click)="removeItemFromSelection(idx)" class="remove-btn" title="Entfernen">✕</button>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- Tab-Umschalter: Sortiment vs. Manuell -->
+    <div class="mode-tabs">
+      <button
+        type="button"
+        (click)="activeTab.set('search')"
+        class="tab-btn"
+        [class.active]="activeTab() === 'search'"
+      >
+        🔍 Im Sortiment suchen
+      </button>
+      <button
+        type="button"
+        (click)="activeTab.set('manual')"
+        class="tab-btn"
+        [class.active]="activeTab() === 'manual'"
+      >
+        ✍️ Manuell eintragen
+      </button>
+    </div>
+
+    <!-- Modus 1: Sortiment durchsuchen -->
+    @if (activeTab() === 'search') {
+      <div class="search-box-container">
+        <div class="search-input-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            type="text"
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)"
+            placeholder="z. B. Banane, Toast, Skyr, Apfel..."
+            class="search-input"
+            id="input-alt-search"
+            autocomplete="off"
+          />
+          @if (searchQuery()) {
+            <button type="button" (click)="searchQuery.set('')" class="clear-search-btn">✕</button>
+          }
+        </div>
+      </div>
+
+      <!-- Suchergebnisse -->
+      <div class="search-results-list">
+        @for (product of searchResults(); track product.id) {
+          <div class="product-result-row">
+            <img [src]="product.imageUrl" [alt]="product.name" class="prod-thumb" />
+
+            <div class="prod-info">
+              <strong class="prod-name">{{ product.name }}</strong>
+              <span class="prod-meta">
+                {{ product.brand || 'Netto' }} · {{ product.nutrition.caloriesPer100g }} kcal / 100g
+              </span>
+            </div>
+
+            <button
+              type="button"
+              (click)="addProductToSelection(product)"
+              class="add-prod-btn"
+              [id]="'btn-add-' + product.id"
+            >
+              + Hinzufügen
+            </button>
+          </div>
+        } @empty {
+          <div class="no-results-box">
+            <p>Kein passendes Produkt gefunden.</p>
+            <button type="button" (click)="activeTab.set('manual')" class="switch-to-manual-btn">
+              ✍️ Stattdessen manuell eingeben
+            </button>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Modus 2: Manuelle Erfassung -->
+    @if (activeTab() === 'manual') {
+      <div class="manual-entry-card">
+        <h3 class="manual-heading">Lebensmittel manuell erfassen</h3>
+        <p class="manual-sub">Falls dein gegessenes Essen nicht in der Datenbank existiert.</p>
+
+        <div class="form-group">
+          <label for="manual-food-name">Name des Lebensmittels *</label>
+          <input
+            id="manual-food-name"
+            type="text"
+            [ngModel]="manualName()"
+            (ngModelChange)="manualName.set($event)"
+            placeholder="z. B. Hausgemachtes Omelett"
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="manual-food-calories">Kalorien (kcal) *</label>
+            <input
+              id="manual-food-calories"
+              type="number"
+              [ngModel]="manualCalories()"
+              (ngModelChange)="manualCalories.set($event)"
+              placeholder="z. B. 240"
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="manual-food-portion">Menge / Portion</label>
+            <input
+              id="manual-food-portion"
+              type="text"
+              [ngModel]="manualPortion()"
+              (ngModelChange)="manualPortion.set($event)"
+              placeholder="1 Portion"
+              class="form-input"
+            />
+          </div>
+        </div>
+
+        <button
+          type="button"
+          (click)="addManualItemToSelection()"
+          [disabled]="!manualName() || !manualCalories() || manualCalories()! <= 0"
+          class="manual-add-btn"
+          id="btn-add-manual-food"
+        >
+          Zur Auswahl hinzufügen
+        </button>
+      </div>
+    }
+  </main>
+
+  <!-- Fester Bestätigungs-Footer -->
+  <footer class="alt-footer">
+    <button
+      type="button"
+      (click)="confirmAndLogAlternative()"
+      [disabled]="selectedItems().length === 0"
+      class="confirm-btn"
+      id="btn-confirm-alternative-meal"
+    >
+      <span>Als gegessen eintragen</span>
+      @if (selectedItems().length > 0) {
+        <span class="confirm-cal-badge">({{ totalCalories() }} kcal) →</span>
+      }
+    </button>
+  </footer>
+</div>

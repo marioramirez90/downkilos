@@ -78,7 +78,26 @@
         </svg>
       </div>
 
-      <!-- 2. App-Einstellungen -->
+      <!-- 2. Mahlzeiten-Erinnerungen -->
+      <div class="setting-row-card" (click)="openReminders()" role="button" tabindex="0" id="setting-reminders-row">
+        <div class="setting-left">
+          <div class="setting-icon-box standard-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#278F39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+          </div>
+          <div class="setting-text">
+            <strong class="setting-title">Mahlzeiten-Erinnerungen</strong>
+            <span class="setting-subtitle">Intelligente Benachrichtigungen & Zeiten</span>
+          </div>
+        </div>
+        <svg class="chevron-right-icon" viewBox="0 0 24 24" fill="none" stroke="#66716D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </div>
+
+      <!-- 3. App-Einstellungen -->
       <div class="setting-row-card" (click)="openAppSettings()" role="button" tabindex="0">
         <div class="setting-left">
           <div class="setting-icon-box standard-icon-box">

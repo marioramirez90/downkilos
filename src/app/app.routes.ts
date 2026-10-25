@@ -82,6 +82,12 @@ export const routes: Routes = [
     title: 'Down Kilos – Was hast du heute gegessen?',
   },
   {
+    path: 'was-hast-du-gegessen/alternative',
+    loadComponent: () =>
+      import('./features/food-diary/alternative-food/alternative-food.component').then((m) => m.AlternativeFoodComponent),
+    title: 'Down Kilos – Was hast du stattdessen gegessen?',
+  },
+  {
     path: 'food-log',
     redirectTo: 'was-hast-du-gegessen',
     pathMatch: 'full',
@@ -95,6 +101,17 @@ export const routes: Routes = [
   {
     path: 'einstellungen',
     redirectTo: 'settings',
+    pathMatch: 'full',
+  },
+  {
+    path: 'settings/reminders',
+    loadComponent: () =>
+      import('./features/settings/reminders/reminders-settings.component').then((m) => m.RemindersSettingsComponent),
+    title: 'Down Kilos – Mahlzeiten-Erinnerungen',
+  },
+  {
+    path: 'einstellungen/erinnerungen',
+    redirectTo: 'settings/reminders',
     pathMatch: 'full',
   },
   {

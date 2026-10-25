@@ -63,6 +63,10 @@ export class SettingsComponent implements OnInit {
     this.router.navigate(['/dietary-profile'], { queryParams: { returnUrl: '/settings' } });
   }
 
+  openReminders(): void {
+    this.router.navigate(['/settings/reminders']);
+  }
+
   openAppSettings(): void {
     this.showAppSettingsModal.set(true);
   }

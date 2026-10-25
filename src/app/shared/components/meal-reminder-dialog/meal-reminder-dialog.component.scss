@@ -1,0 +1,190 @@
+.reminder-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(16, 37, 33, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.reminder-modal-card {
+  background-color: #FFFFFF;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 380px;
+  padding: 24px 20px 20px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #F0F4F1;
+  border: none;
+  color: #66716D;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background-color: #E2EBE4;
+    color: #102521;
+  }
+}
+
+.reminder-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background-color: #E5F5E8;
+  color: #278F39;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+
+  svg {
+    width: 26px;
+    height: 26px;
+  }
+}
+
+.meal-badge {
+  background-color: #EAF5EC;
+  color: #278F39;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.reminder-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #102521;
+  margin: 0 0 8px;
+  line-height: 1.25;
+}
+
+.reminder-desc {
+  font-size: 0.84rem;
+  color: #66716D;
+  margin: 0 0 20px;
+  line-height: 1.45;
+
+  strong {
+    color: #102521;
+  }
+}
+
+.reminder-actions-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+
+  .action-btn {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 14px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: none;
+
+    .action-icon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    // 1. Ja, wie geplant
+    &.as-planned {
+      background-color: #278F39;
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(39, 143, 57, 0.22);
+
+      &:hover {
+        background-color: #217A30;
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
+    }
+
+    // 2. Etwas anderes
+    &.something-else {
+      background-color: #EAF5EC;
+      color: #103A2A;
+      border: 1.5px solid #CBE4D1;
+
+      &:hover {
+        background-color: #DDF0E1;
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
+    }
+
+    // 3. Noch nichts gegessen
+    &.nothing-yet {
+      background-color: #FFFFFF;
+      color: #66716D;
+      border: 1.5px solid #E5EBE6;
+
+      &:hover {
+        background-color: #F8FAF8;
+        color: #102521;
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

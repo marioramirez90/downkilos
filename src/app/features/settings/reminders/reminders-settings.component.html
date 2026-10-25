@@ -1,0 +1,222 @@
+<div class="reminders-screen">
+  <!-- Header -->
+  <header class="reminders-header">
+    <div class="header-top">
+      <button type="button" (click)="goBack()" class="back-btn" id="btn-reminders-back" aria-label="Zurück">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Einstellungen</span>
+      </button>
+    </div>
+
+    <h1 class="reminders-title">Mahlzeiten-Erinnerungen</h1>
+    <p class="reminders-subtitle">Erhalte freiwillige Erinnerungen, um deine Mahlzeiten entspannt im Blick zu behalten.</p>
+  </header>
+
+  <!-- Inhaltsbereich -->
+  <main class="reminders-content">
+    <!-- 1. Hauptschalter: Erinnerungen aktivieren/deaktivieren -->
+    <div class="master-toggle-card">
+      <div class="master-toggle-left">
+        <div class="bell-icon-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+        </div>
+        <div>
+          <strong class="master-title">Erinnerungen aktivieren</strong>
+          <span class="master-sub">Fragt dich zur passenden Zeit nach deinen Mahlzeiten</span>
+        </div>
+      </div>
+
+      <label class="switch-control" for="toggle-master-reminders">
+        <input
+          type="checkbox"
+          id="toggle-master-reminders"
+          [checked]="enabled()"
+          (change)="toggleMasterEnabled()"
+        />
+        <span class="slider round"></span>
+      </label>
+    </div>
+
+    <!-- Wenn Erinnerungen aktiviert sind: Einstellungen & Zeiten -->
+    @if (enabled()) {
+      <!-- 2. Sektion: Mahlzeiten & Uhrzeiten -->
+      <section class="settings-card">
+        <h2 class="card-section-title">Erinnerungszeiten</h2>
+        <p class="card-section-desc">Passe die Zeiten an deinen gewohnten Tagesrhythmus an.</p>
+
+        <!-- Frühstück -->
+        <div class="meal-time-row">
+          <div class="meal-time-left">
+            <label class="switch-small">
+              <input
+                type="checkbox"
+                [ngModel]="breakfastEnabled()"
+                (ngModelChange)="breakfastEnabled.set($event); onSettingChange()"
+              />
+              <span class="slider-small"></span>
+            </label>
+            <div class="meal-time-label-group">
+              <span class="meal-name">Frühstück</span>
+              <small class="meal-default-note">Standard: 12:00 Uhr</small>
+            </div>
+          </div>
+          <input
+            type="time"
+            [disabled]="!breakfastEnabled()"
+            [ngModel]="breakfastTime()"
+            (ngModelChange)="breakfastTime.set($event); onSettingChange()"
+            class="time-input"
+            id="time-breakfast"
+          />
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Mittagessen -->
+        <div class="meal-time-row">
+          <div class="meal-time-left">
+            <label class="switch-small">
+              <input
+                type="checkbox"
+                [ngModel]="lunchEnabled()"
+                (ngModelChange)="lunchEnabled.set($event); onSettingChange()"
+              />
+              <span class="slider-small"></span>
+            </label>
+            <div class="meal-time-label-group">
+              <span class="meal-name">Mittagessen</span>
+              <small class="meal-default-note">Standard: 17:00 Uhr</small>
+            </div>
+          </div>
+          <input
+            type="time"
+            [disabled]="!lunchEnabled()"
+            [ngModel]="lunchTime()"
+            (ngModelChange)="lunchTime.set($event); onSettingChange()"
+            class="time-input"
+            id="time-lunch"
+          />
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Abendessen -->
+        <div class="meal-time-row">
+          <div class="meal-time-left">
+            <label class="switch-small">
+              <input
+                type="checkbox"
+                [ngModel]="dinnerEnabled()"
+                (ngModelChange)="dinnerEnabled.set($event); onSettingChange()"
+              />
+              <span class="slider-small"></span>
+            </label>
+            <div class="meal-time-label-group">
+              <span class="meal-name">Abendessen</span>
+              <small class="meal-default-note">Standard: 21:00 Uhr</small>
+            </div>
+          </div>
+          <input
+            type="time"
+            [disabled]="!dinnerEnabled()"
+            [ngModel]="dinnerTime()"
+            (ngModelChange)="dinnerTime.set($event); onSettingChange()"
+            class="time-input"
+            id="time-dinner"
+          />
+        </div>
+      </section>
+
+      <!-- 3. Sektion: Intelligente Optionen -->
+      <section class="settings-card">
+        <h2 class="card-section-title">Intelligente Optionen</h2>
+
+        <!-- Nur bei offenen Mahlzeiten -->
+        <div class="option-row">
+          <div class="option-text">
+            <strong class="option-title">Nur bei offenen Mahlzeiten</strong>
+            <span class="option-desc">Keine Erinnerung senden, wenn du das Essen bereits im Tagebuch erfasst hast.</span>
+          </div>
+          <label class="switch-control">
+            <input
+              type="checkbox"
+              [ngModel]="onlyOpenMeals()"
+              (ngModelChange)="onlyOpenMeals.set($event); onSettingChange()"
+            />
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Erinnerungen pausieren -->
+        <div class="option-row">
+          <div class="option-text">
+            <strong class="option-title">Erinnerungen pausieren</strong>
+            <span class="option-desc">Erinnerungen vorübergehend aussetzen (z. B. am Wochenende oder im Urlaub).</span>
+          </div>
+          <label class="switch-control">
+            <input
+              type="checkbox"
+              [ngModel]="paused()"
+              (ngModelChange)="paused.set($event); onSettingChange()"
+            />
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Diskreter Sperrbildschirm -->
+        <div class="option-row">
+          <div class="option-text">
+            <strong class="option-title">Diskreter Sperrbildschirm</strong>
+            <span class="option-desc">Zeigt neutrale Benachrichtigungstexte ohne konkrete Rezeptnamen an.</span>
+          </div>
+          <label class="switch-control">
+            <input
+              type="checkbox"
+              [ngModel]="privacyMode()"
+              (ngModelChange)="privacyMode.set($event); onSettingChange()"
+            />
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </section>
+
+      <!-- 4. Test-Sektion -->
+      <section class="settings-card test-card">
+        <h2 class="card-section-title">Erinnerung testen</h2>
+        <p class="card-section-desc">Möchtest du sehen, wie die Erinnerung mit den drei Antwortmöglichkeiten funktioniert?</p>
+        
+        <div class="test-buttons-row">
+          <button type="button" (click)="testReminderNow('breakfast')" class="test-btn" id="btn-test-breakfast">
+            Frühstück testen
+          </button>
+          <button type="button" (click)="testReminderNow('lunch')" class="test-btn" id="btn-test-lunch">
+            Mittagessen testen
+          </button>
+          <button type="button" (click)="testReminderNow('dinner')" class="test-btn" id="btn-test-dinner">
+            Abendessen testen
+          </button>
+        </div>
+      </section>
+    }
+  </main>
+
+  <!-- Toast Popup -->
+  @if (toastMessage(); as msg) {
+    <div class="reminders-toast">{{ msg }}</div>
+  }
+
+  <!-- Footer Navigation -->
+  <footer class="reminders-footer">
+    <app-bottom-nav></app-bottom-nav>
+  </footer>
+</div>

@@ -4,11 +4,12 @@ import { Location } from '@angular/common';
 import { Capacitor } from '@capacitor/core';
 import { App as CapApp } from '@capacitor/app';
 import { StatusBar, Style } from '@capacitor/status-bar';
+import { MealReminderDialogComponent } from './shared/components/meal-reminder-dialog/meal-reminder-dialog.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, MealReminderDialogComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

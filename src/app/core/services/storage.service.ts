@@ -7,7 +7,7 @@ const DB_NAME = 'down_kilos_db';
 const DB_VERSION = 1;
 const STORE_PROFILE = 'user_profile';
 const PROFILE_KEY = 'guest_profile';
-import { DietaryProfile, DEFAULT_DIETARY_PROFILE } from '../models/dietary-profile.model';
+import { DietaryProfile } from '../models/dietary-profile.model';
 
 const LOCAL_FALLBACK_KEY = 'down_kilos_guest_profile';
 const LOCAL_RETAILER_KEY = 'down_kilos_guest_retailer';
@@ -499,4 +499,3 @@ export class StorageService {
     }
   }
 }
-

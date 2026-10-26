@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { StorageService } from '../../core/services/storage.service';
-import { WeightEntry } from '../../core/models/weight-log.model';
 import { UserProfile } from '../../core/models/user-profile.model';
 import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-nav.component';
 
@@ -60,7 +59,6 @@ export class WeightComponent implements OnInit {
 
   // Monat-Namen für saubere deutsche Formatierung (z.B. "12. Mai 2024")
   private monthNames = ['Jan.', 'Feb.', 'März', 'Apr.', 'Mai', 'Juni', 'Juli', 'Aug.', 'Sept.', 'Okt.', 'Nov.', 'Dez.'];
-  private fullMonthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 
   async ngOnInit(): Promise<void> {
     await this.storageService.loadProfile();

@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -6,7 +6,6 @@ import { TranslatePipe } from '../../core/i18n/translate.pipe';
 import { StorageService } from '../../core/services/storage.service';
 import { CalorieCalculatorService } from '../../core/services/calorie-calculator.service';
 import { FoodLogService } from '../../core/services/food-log.service';
-import { WeightEntry } from '../../core/models/weight-log.model';
 import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-nav.component';
 import { HamburgerButtonComponent } from '../../shared/components/hamburger-button/hamburger-button.component';
 

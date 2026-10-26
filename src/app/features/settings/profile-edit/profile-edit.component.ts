@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { StorageService } from '../../../core/services/storage.service';
-import { CalorieCalculatorService } from '../../../core/services/calorie-calculator.service';
 import { BiologicalGender, UserProfile } from '../../../core/models/user-profile.model';
 import { BottomNavComponent } from '../../../shared/components/bottom-nav/bottom-nav.component';
 
@@ -17,7 +16,6 @@ import { BottomNavComponent } from '../../../shared/components/bottom-nav/bottom
 export class ProfileEditComponent implements OnInit {
   private router = inject(Router);
   private storageService = inject(StorageService);
-  private calorieCalculator = inject(CalorieCalculatorService);
 
   readonly profile = signal<UserProfile | null>(null);
 

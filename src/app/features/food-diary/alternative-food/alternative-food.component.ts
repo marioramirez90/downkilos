@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../../core/services/product.service';
 import { MealReminderService } from '../../../core/services/meal-reminder.service';
-import { FoodLogService } from '../../../core/services/food-log.service';
 import { ProductItem } from '../../../core/models/product.model';
 import { FoodLogItem } from '../../../core/models/food-log.model';
 import { MealType, Recipe } from '../../../core/models/recipe.model';
@@ -39,7 +38,6 @@ export class AlternativeFoodComponent implements OnInit {
   private router = inject(Router);
   private productService = inject(ProductService);
   private reminderService = inject(MealReminderService);
-  private foodLogService = inject(FoodLogService);
 
   readonly mealSlot = signal<MealType>('breakfast');
   readonly mealDate = signal<string>(new Date().toISOString().split('T')[0]);

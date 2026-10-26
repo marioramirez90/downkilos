@@ -5,7 +5,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { StorageService } from '../../core/services/storage.service';
 import {
   COMMON_FRUIT_ALLERGENS,
-  DEFAULT_DIETARY_PROFILE,
   DietaryForm,
   DietaryProfile,
   EU_14_ALLERGENS,

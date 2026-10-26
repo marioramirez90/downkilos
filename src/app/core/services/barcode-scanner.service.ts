@@ -2,8 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import {
   BarcodeScanner,
-  BarcodeFormat,
-  LensFacing
+  BarcodeFormat
 } from '@capacitor-mlkit/barcode-scanning';
 
 export interface ScanResult {
@@ -301,4 +300,3 @@ export class BarcodeScannerService {
     return clean.length >= 8 && clean.length <= 14;
   }
 }
-

@@ -1,7 +1,6 @@
 import { Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MealReminderService } from '../../../core/services/meal-reminder.service';
-import { MealType } from '../../../core/models/recipe.model';
 
 @Component({
   selector: 'app-meal-reminder-dialog',

@@ -217,7 +217,7 @@ export class MealPlannerService {
     let hasMissingPrices = false;
     const surplusItems: SurplusItemInfo[] = [];
 
-    aggregatedMap.forEach((entry, key) => {
+    aggregatedMap.forEach((entry) => {
       const prod = entry.productId ? this.productService.getProductById(entry.productId) : undefined;
 
       const packageGrams = prod?.packageWeightGrams || (entry.unit === 'kg' ? 1000 : (entry.name === 'Milch' ? 1000 : 500));

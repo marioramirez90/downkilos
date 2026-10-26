@@ -1,11 +1,10 @@
-import { Injectable, inject, signal, computed, effect } from '@angular/core';
+import { Injectable, inject, signal, effect } from '@angular/core';
 import { Router } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
-import { LocalNotifications, ActionPerformed, ScheduleOptions } from '@capacitor/local-notifications';
+import { LocalNotifications, ActionPerformed } from '@capacitor/local-notifications';
 import { MealType, Recipe } from '../models/recipe.model';
 import { FoodLogItem } from '../models/food-log.model';
 import { ReminderSettings, DEFAULT_REMINDER_SETTINGS, MealReminderLogEntry } from '../models/reminder.model';
-import { StorageService } from './storage.service';
 import { FoodLogService } from './food-log.service';
 import { MealPlannerService } from './meal-planner.service';
 
@@ -18,7 +17,6 @@ const ACTION_TYPE_ID = 'MEAL_REMINDER_ACTIONS';
 })
 export class MealReminderService {
   private router = inject(Router);
-  private storageService = inject(StorageService);
   private foodLog = inject(FoodLogService);
   private mealPlanner = inject(MealPlannerService);
 
@@ -172,7 +170,7 @@ export class MealReminderService {
   /**
    * Prüft, ob für eine Mahlzeit heute bereits ein Eintrag im Tagebuch existiert
    */
-  isMealAlreadyLogged(slot: MealType, dateStr?: string): boolean {
+  isMealAlreadyLogged(slot: MealType, _dateStr?: string): boolean {
     const items = this.foodLog.getItemsForMeal(slot);
     return items.some(i => i.status === 'eaten');
   }
@@ -347,9 +345,6 @@ export class MealReminderService {
 
     // Jedes alternative Lebensmittel als gegessen im FoodLog eintragen
     for (const item of items) {
-      if (item.productId) {
-        const prod = this.storageService ? undefined : undefined;
-      }
       const existing = this.foodLog.loggedItems();
       const updated = [item, ...existing];
       this.foodLog.loggedItems.set(updated);

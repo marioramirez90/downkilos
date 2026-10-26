@@ -6,14 +6,12 @@ import { StorageService } from '../../core/services/storage.service';
 import { CalorieCalculatorService } from '../../core/services/calorie-calculator.service';
 import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-nav.component';
 import { FoodLogService } from '../../core/services/food-log.service';
-import { ProductService } from '../../core/services/product.service';
-import { ShoppingListService } from '../../core/services/shopping-list.service';
 import { RetailerService } from '../../core/services/retailer.service';
 import { MealScheduleService } from '../../core/services/meal-schedule.service';
 import { MealPlannerService } from '../../core/services/meal-planner.service';
 import { UserProfile } from '../../core/models/user-profile.model';
 import { CalorieCalculationResult } from '../../core/models/calorie-calculation.model';
-import { Recipe, MealType } from '../../core/models/recipe.model';
+import { Recipe } from '../../core/models/recipe.model';
 import { WeightEntry } from '../../core/models/weight-log.model';
 
 @Component({
@@ -31,8 +29,6 @@ export class DashboardComponent implements OnInit {
   private router = inject(Router);
   readonly storageService = inject(StorageService);
   private calorieService = inject(CalorieCalculatorService);
-  private productService = inject(ProductService);
-  private shoppingListService = inject(ShoppingListService);
   private retailerService = inject(RetailerService);
   readonly foodLogService = inject(FoodLogService);
   readonly mealScheduleService = inject(MealScheduleService);
